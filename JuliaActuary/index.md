@@ -42,7 +42,7 @@ More info on these packages can be found below.
 
 There are two ways to add packages: 
 - In the code itself: `using Pkg; Pkg.add("MortalityTables")`
-- In the (REPL)[https://docs.julialang.org/en/v1/stdlib/REPL/index.html], hit `]` to enter Pkg mode and type `add MortalityTables`
+- In the [REPL](https://docs.julialang.org/en/v1/stdlib/REPL/index.html), hit `]` to enter Pkg mode and type `add MortalityTables`
 More info can be found at the [Pkg manager documentation](https://julialang.github.io/Pkg.jl/v1/getting-started).
 
 To use packages in your code:
@@ -311,4 +311,10 @@ If you have other ideas or questions, feel free to also open an issue, or discus
 
 # Blog
 
-- Posts go here
+*Note:* The following series is draft and subject to change:
+Becoming a Rockstar Actuary and building the insurance company of the future
+
+1. [Coding the Future](/blog/coding-for-the-future/)
+2. [Julia as the Language of Choice for Actuaries](/blog/julia-actuaries/)
+3. A tour of Julia 
+4. A deeper dive into JuliaActuary packages
