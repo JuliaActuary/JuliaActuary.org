@@ -1,7 +1,9 @@
 @def author = "Alec Loudenback"
 @def date = "July 9, 2020"
+@def title = "Coding the Future"
 
-# Coding the Future
+# {{fill title}}
+
 *By:  {{fill author}}*
 
 *{{fill date}}*

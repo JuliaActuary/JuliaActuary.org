@@ -1,4 +1,4 @@
-@def title = "JuliaActuary"
+@def title = "Home"
 @def tags = ["syntax", "code"]
 
 <!-- =============================
@@ -62,7 +62,7 @@ using PackageName
 **Features**
 
 - Lots of bundled SOA mort.soa.org tables
-- `survivorship` and `cumualtive_decrement` functions to calculate decrements over period of time
+- `survivorship` and `decrement` functions to calculate decrements over period of time
 - Partial year mortality calculations (Uniform, Constant, Balducci)
 - Friendly syntax and flexible usage
 
@@ -125,7 +125,7 @@ Calculate the force of mortality or survivorship over a range of time:
 julia> survivorship(vbt2001.ultimate,30,40) # the survivorship between ages 30 and 40
 0.9894404665434904
 
-julia> cumulative_decrement(vbt2001.ultimate,30,40) # the decrement between ages 30 and 40
+julia> decrement(vbt2001.ultimate,30,40) # the decrement between ages 30 and 40
 0.010559533456509618
 ```
 \\
@@ -249,20 +249,24 @@ ä(lc, 5)     # 5 year annuity due
 
 ```julia-repl
 julia> ? survivorship
-  survivorship(mortality_vector,to_age)
-  survivorship(mortality_vector,from_age,to_age)
+    survivorship(mortality_vector,to_age)
+    survivorship(mortality_vector,from_age,to_age)
 
 
-  Returns the survivorship through attained age to_age. The start of the calculation is either the start of the vector, or attained age `fromage.fromageandtoage` need to be Integers. Add a DeathDistribution as the last argument
-  to handle floating point and non-whole ages:
+  Returns the survivorship through attained age to_age. The start of the 
+  calculation is either the start of the vector, or attained age `from_age` 
+  and `to_age` need to be Integers. 
 
-  survivorship(mortality_vector,to_age,::DeathDistribution)
-  survivorship(mortality_vector,from_age,to_age,::DeathDistribution)
+  Add a DeathDistribution as the last argument to handle floating point 
+  and non-whole ages:
+
+    survivorship(mortality_vector,to_age,::DeathDistribution)
+    survivorship(mortality_vector,from_age,to_age,::DeathDistribution)
 
 
-  If given a negative to_age, it will return 1.0. Aside from simplifying the code, this makes sense as for something
-  to exist in order to decrement in the first place, it must have existed and surived to the point of being able to be
-  decremented.
+  If given a negative to_age, it will return 1.0. Aside from simplifying the code, 
+  this makes sense as for something to exist in order to decrement in the first place, 
+  it must have existed and surived to the point of being able to be decremented.
 
   Examples
   ≡≡≡≡≡≡≡≡≡≡

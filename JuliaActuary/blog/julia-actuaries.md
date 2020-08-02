@@ -1,7 +1,8 @@
 @def author = "Alec Loudenback"
 @def date = "July 9, 2020"
+@def title = "Julia as the Language of Choice for Actuaries"
 
-# Julia as the Language of Choice for Actuaries
+# {{fill title}}
 
 *By:  {{fill author}}*
 
