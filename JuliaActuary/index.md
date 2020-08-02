@@ -9,7 +9,7 @@
 
 > JuliaActuary is focused on building packages that enable actuaries everywhere to build solutions using open-source tools.
 
-The packages utilize all of the benefits of the [Julia language](https://julialang.org) and is a set of extensible packages that:
+The packages utilize all of the benefits of the [Julia language](https://julialang.org) and:
 
 * provide easy access and clean interface to mortality tables (**MortalityTables.jl**)
 * bundle a set of commonly used financial and math functions (**ActuaryUtiltities.jl**)
@@ -38,7 +38,7 @@ These packages are available for use in your project.
 
 More info on these packages can be found below.
 
-## Adding and Using Packages
+### Adding and Using Packages
 
 There are two ways to add packages: 
 - In the code itself: `using Pkg; Pkg.add("MortalityTables")`
@@ -140,7 +140,7 @@ julia> decrement(vbt2001.ultimate,30,40) # the decrement between ages 30 and 40
 
 ## ActuaryUtilities.jl
 
-> A collection of common functions/manipulations used in Actuarial Calculations.}
+> A collection of common functions/manipulations used in Actuarial Calculations.
 
 
 Some of the functions included:
