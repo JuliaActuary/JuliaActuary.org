@@ -183,11 +183,15 @@ Typically the compilation is very fast (milliseconds), but in the most complicat
 
 For users working with a lot of data or complex calculations (like actuaries!), the runtime speedup is worth a few seconds at the start. 
 
-## Does Choice of Programming Language Matter?
+## Does Choice of Tools Matter?
 
-I argue that the choice of programming language *does* matter. Productivity is one aspect, expressiveness is another, speed one more. There are many reasons to advocate for it, though seeing for yourself is probably the best way to get started. 
+I argue that the choice of programming language *does* matter. Productivity is one aspect, expressiveness is another, speed one more. There are many reasons to advocate for it, though seeing for yourself is probably the best way to get started.
 
-That said, Julia shouldn't be the only tool in your tool-kit. SQL will remain an important way to interact with databases. R and Python aren't going anywhere in the short term either!
+That said, Julia shouldn't be the only tool in your tool-kit. SQL will remain an important way to interact with databases. R and Python aren't going anywhere in the short term and will always offer a different perspective on things!
+
+In the [first article in this series](http://localhost:8000/blog/coding-for-the-future/), I talked about becoming a **10x Actuary**. In a large way, the choice of tools and paradigms that you focus on facilitate that growth.
+
+It's said that you can't fully conceptualize something unless your language has a word for it. Similar to spoken language, you may find that breaking out of spreadsheet coordinates and dataframes lets you ask different questions and solve problems in innovative ways.
 
 ## What next?
 
@@ -198,7 +202,7 @@ This is intended to be the first of a series of articles introducing Julia to ac
 
 In the meantime, some recommended resources to get started:
 
-- [JuliaLang.org](https://julialang.org/), the home site with the downloads to get started, and links to learning resources.
+- [JuliaLang.org](https://julialang.org/), the home site with the downloads to get started and links to learning resources.
 - [JuliaHub](https://juliahub.com/ui/Home) indexes open-source Julia packages and makes the entire ecosystem and documentation searchable from one place.
 - [JuliaAcademy](https://juliaacademy.com/courses), which has free short courses in Data Science, Introduction to Julia, DataFrames.jl, Machine Learning, and more.
 - [Learn Julia in Y minutes](https://learnxinyminutes.com/docs/julia/), a great quick-start if you are already comfortable with coding.
