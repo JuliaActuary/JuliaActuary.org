@@ -14,7 +14,7 @@
 
 I have suggested that actuaries who are competent coders will differentiate both companies and individuals. Coding ability will be useful no matter what tools you utilize everyday (e.g. Python/R/C++/etc. and associated packages) and I appreciate the communities and tools provided in all of them for their contribution to moving actuarial processes out of the Spreadsheet Age. 
 
-However, I'd like to motivate why Julia is the best programming language for actuaries to learn out of cohort and use it as the *holotype* for the modern actuarial process.
+However, I'd like to motivate why Julia is the best programming language for actuaries to learn and use it as the *holotype* for the modern actuarial process.
 
 
 ## Julia Overview
