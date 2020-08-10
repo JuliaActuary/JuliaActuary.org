@@ -194,7 +194,7 @@ That said, Julia shouldn't be the only tool in your tool-kit. SQL will remain an
 This is intended to be the first of a series of articles introducing Julia to actuaries. Future articles planned include:
 
 - An overview of useful general-purpose, data science, and mathematical Julia packages for actuaries
-- A deeper dive into some of the packages available from the nascent [JuliaActuary](http://JuliaActuary.org) organization[^2].
+- A deeper dive into some of the packages available from the nascent [JuliaActuary](http://JuliaActuary.org) organization[^3].
 
 In the meantime, some recommended resources to get started:
 
