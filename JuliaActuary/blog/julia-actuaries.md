@@ -12,16 +12,18 @@
 <div class="alert alert-danger"> <strong> NOTE: </strong> This article is a draft and the website/URLs are a work in progress. </div>
 ~~~
 
-I have suggested that actuaries who are competent coders will differentiate both companies and individuals. Coding ability will be useful no matter what tools you utilize everyday (e.g. Python/R/C++/etc. and associated packages) and I appreciate the communities and tools provided in all of them for their contribution to moving actuarial process. However, I'd like to motivate why Julia is the best programming language for actuaries to learn out of cohort and use it as the *holotype* for the modern actuarial process.
+I have suggested that actuaries who are competent coders will differentiate both companies and individuals. Coding ability will be useful no matter what tools you utilize everyday (e.g. Python/R/C++/etc. and associated packages) and I appreciate the communities and tools provided in all of them for their contribution to moving actuarial processes out of the Spreadsheet Age. 
+
+However, I'd like to motivate why Julia is the best programming language for actuaries to learn out of cohort and use it as the *holotype* for the modern actuarial process.
 
 
 ## Julia Overview
 
-Julia is a relatively new programming language compared to those that probably come to mind, and *it shows*. It's evident in its pragmatic, productivity-focused design choices, pleasant syntax, rich ecosystem, thriving communities, and its ability to both be very general purpose and power cutting edge computing.
+Julia is a relatively new programming language[^1], and *it shows*. It is evident in its pragmatic, productivity-focused design choices, pleasant syntax, rich ecosystem, thriving communities, and its ability to both be very general purpose and power cutting edge computing.
 
 Math-heavy computations *look like math*, it's easy to pick up, quick-to-prototype, packages work well together, and has great visualization libraries. There's a growing body of online references and tutorials, videos, and print media to learn from and it's popularity continues to grow across many fields.
 
-Large financial services companies have already started to adopt the language: BlackRock's Aladdin portfolio modeling, the Federal Reserve's economic simulations, and Aviva's Solvency II-compliant modeling. The last of these has a [great talk on YouTube](https://www.youtube.com/watch?v=__gMirBBNXY) by Aviva's Tim Thornham showcasing an on-the-ground view of what difference the right choice of technology and programming language can make. Moving from their vendor-supplied modeling solution was **1000x faster, took 1/10 the amount of code, and was implemented 10x faster**[^5].
+Large financial services companies have already started realizing gains: BlackRock's Aladdin portfolio modeling, the Federal Reserve's economic simulations, and Aviva's Solvency II-compliant modeling. The last of these has a [great talk on YouTube](https://www.youtube.com/watch?v=__gMirBBNXY) by Aviva's Tim Thornham, which showcases an on-the-ground view of what difference the right choice of technology and programming language can make. Moving from their vendor-supplied modeling solution was **1000x faster, took 1/10 the amount of code, and was implemented 10x faster**[^5].
 
 It's a language that's not just great for data science - but also not modeling, ETL, visualizations, package control/version management, machine learning, string manipulation, and many other use cases. Julia gets touted for "scientific computing" but that's just one aspect where it has no other choice as obvious.
 
@@ -31,7 +33,11 @@ As the [journal Nature said](https://www.nature.com/articles/d41586-019-02310-3)
 
 ### Expressiveness and Syntax
 
-Go from idea in your head to end product faster. Encapsulate concepts naturally and dispatch functions on the data you are interested in. Compose functions and data naturally. It's hard to explain, but perhaps two short examples will illustrate.
+**Expressiveness** is the *manner in which* and *scope of* ideas and concepts that can be represented in a programming language. **Syntax** refers to how the code *looks* on the screen and its readability.
+
+In a language with high expressiveness and pleasant syntax, you: Go from idea in your head to end product faster. Encapsulate concepts naturally and dispatch functions on the data you are interested in. Compose functions and data naturally. Focus on the end-goal instead of fighting the tools.
+
+It's hard to explain, but perhaps two short examples will illustrate.
 
 #### Example: Retention Analysis
 
@@ -56,23 +62,27 @@ end
 
 ```
 
-Now, some functions to calculate retention for policies and lives:
+Now to calculate amounts retained. First, let's say what retention means for a `Policy`:
 
 ```julia:./post/julia-for-the-future/code/ex2
 # define retention
 function retained(pol::Policy)
   pol.face - sum(cession.ceded for cession in pol.cessions)
 end
+```
 
+And then what retention means for a `Life`:
+
+```julia:./post/julia-for-the-future/code/ex3
 function retained(l::Life)
   sum(retained(policy) for policy in life.policies)
 end
 
 ```
 
-*See how natural that is?* It's almost exactly how you'd specify it English. No joins, no boilerplate, no fiddling with complicated syntax. You can express ideas and concepts the way that you think of them, not, for example, as a series of dataframe joins. 
+*See how natural that is?* It's almost exactly how you'd specify it English. No joins, no boilerplate, no fiddling with complicated syntax. You can express ideas and concepts the way that you think of them, not, for example, as a series of dataframe joins or as row/column coordinates on a spreadsheet.
 
-> Part of the expressiveness is how we defined `retained` and adapted it to mean related, but different things depending on the specific context. That is, we didn't have to define `retained_life(...)` and `retained_pol(...)` because Julia can be *dispatch* based on what you give it. This is, as some would call it, [unreasonably effective](https://www.youtube.com/watch?v=kc9HwsxE1OY).
+> Expressiveness example: we defined `retained` and adapted it to mean related, but different things depending on the specific context. That is, we didn't have to define `retained_life(...)` and `retained_pol(...)` because Julia can be *dispatch* based on what you give it. This is, as some would call it, [unreasonably effective](https://www.youtube.com/watch?v=kc9HwsxE1OY).
 
 Let's use the above code in practice then. 
 
@@ -159,27 +169,23 @@ For those who are enterprise-minded: in addition to the liberal licensing mentio
 
 Julia is also *fast*. Being 1000x faster at something sounds impressive, but what does it mean? It's the difference between something taking *10 seconds* instead of *3 hours* — or *1 hour* instead of *42 days*. **What analysis would you like to do if it took less time? A stochastic analysis of life-level claims? Machine learning with your experience data? Monthly valuation instead of quarterly?**
 
-Now, most workflows don't see a 1000x speedup, but 10x to 1000x is a very common range of speed differences vs R or Python or MATLAB. Sometimes you'll see less of a speed difference because R and Python already have acknowledged the speed issue and written most of what's important in low-level languages. This is an example of what's called the "two-language" problem where the language productive to write in isn't very fast. For example, [more than half of R packages use C/C++/Fortran](https://developer.r-project.org/Blog/public/2019/03/28/use-of-c---in-packages/) and core packages in Python like Pandas, PyTorch, NumPy, SciPy, etc. do this too.
+Now, most workflows don't see a 1000x speedup, but 10x to 1000x is a very common range of speed differences vs R or Python or MATLAB. 
+
+Sometimes you'll see less of a speed difference because R and Python already have acknowledged the speed issue and written most of what's important in low-level languages. This is an example of what's called the "two-language" problem where the language productive to write in isn't very fast. For example, [more than half of R packages use C/C++/Fortran](https://developer.r-project.org/Blog/public/2019/03/28/use-of-c---in-packages/) and core packages in Python like Pandas, PyTorch, NumPy, SciPy, etc. do this too.
 
 Because Julia packages are written almost exclusively in Julia, the ecosystem of packages works well together without a big overhead organization (e.g. TidyVerse, Numpy, etc). And because the packages you are using are written in Julia, it's easy to see what's going on, learn from them, or even contribute a package of your own!
 
 ### The Tradeoff
 
-Julia is fast because it's compiled, unlike R and Python which the computer just (loosely speaking) reads one line at a time. Julia compiles things "just-in-time", which means that right before you use a function for the first time, it will take a moment to compile the code for the machine. Subsequent calls don't need to be re-compiled and are very fast.
+Julia is fast because it's compiled, unlike R and Python which (loosely speaking) the computer just reads one line at a time. Julia compiles things "just-in-time", which means that right before you use a function for the first time, it will take a moment to pre-process the code section for the machine. Subsequent calls don't need to be re-compiled and are very fast.
 
 Typically the compilation is very fast (milliseconds), but in the most complicated cases it can be several seconds. One of these is the "time-to-first-plot" issue because it's the most common one users encounter: super-flexible plotting libraries have a lot of things to pre-compile. So in the case of plotting, it can take several seconds to display the first plot after starting Julia, but then it's remarkably quick and easy to create an animation of your model results. The time-to-first plot is a solvable problem that's receiving a lot of attention from the core developers and will get better with future Julia releases.
 
-For users working with a lot of data or complex calculations (like actuaries!), the runtime speedup is worth a few seconds at the start.
+For users working with a lot of data or complex calculations (like actuaries!), the runtime speedup is worth a few seconds at the start. 
 
 ## Does Choice of Programming Language Matter?
 
 I argue that the choice of programming language *does* matter. Productivity is one aspect, expressiveness is another, speed one more. There are many reasons to advocate for it, though seeing for yourself is probably the best way to get started. That said, Julia shouldn't be the only tool in your tool-kit. SQL will remain an important way to interact with databases. R and Python aren't going anywhere in the short term either!
-
-**It will increasingly be essential for companies to modernize to remain competitive. That modernization isn't built with big black-box software packages; it will be with domain experts who can translate the expertise into new forms of analysis - doing it faster and more robustly than the competition.** 
-
-SpaceX doesn't just hire rocket scientists - they hire rocket scientists who code.
-
-**Be an actuary who codes.**
 
 ## What next?
 
@@ -196,3 +202,5 @@ In the meantime, some recommended resources to get started:
 - [Learn Julia in Y minutes](https://learnxinyminutes.com/docs/julia/), a great quick-start if you are already comfortable with coding.
 - [Think Julia](https://benlauwens.github.io/ThinkJulia.jl/latest/book.html), a free e-book (or paid print edition) book which introduces programming from the start and teaches you valuable ways of thinking.
 - [Design Patterns and Best Practices](https://www.packtpub.com/application-development/hands-design-patterns-julia-10), a book that will help you as you transition from smaller, one-off scripts to designing larger packages and projects.
+
+[^1] Python first appeared in 1990. R is an implementation of S, which was created in 1976, though depending on when you want to place the start of an independent R project varies (1993, 1995, and 2000 are alternate dates). The history of these languages is long and substantial changes have occurred since these dates.

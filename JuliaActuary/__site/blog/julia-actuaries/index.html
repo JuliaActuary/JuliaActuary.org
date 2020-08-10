@@ -67,16 +67,19 @@
 
 <div class="alert alert-danger"> <strong> NOTE: </strong> This article is a draft and the website/URLs are a work in progress. </div>
 
-<p>I have suggested that actuaries who are competent coders will differentiate both companies and individuals. Coding ability will be useful no matter what tools you utilize everyday &#40;e.g. Python/R/C&#43;&#43;/etc. and associated packages&#41; and I appreciate the communities and tools provided in all of them for their contribution to moving actuarial process. However, I&#39;d like to motivate why Julia is the best programming language for actuaries to learn out of cohort and use it as the <em>holotype</em> for the modern actuarial process.</p>
+<p>I have suggested that actuaries who are competent coders will differentiate both companies and individuals. Coding ability will be useful no matter what tools you utilize everyday &#40;e.g. Python/R/C&#43;&#43;/etc. and associated packages&#41; and I appreciate the communities and tools provided in all of them for their contribution to moving actuarial processes out of the Spreadsheet Age. </p>
+<p>However, I&#39;d like to motivate why Julia is the best programming language for actuaries to learn out of cohort and use it as the <em>holotype</em> for the modern actuarial process.</p>
 <h2 id="julia_overview"><a href="#julia_overview">Julia Overview</a></h2>
-<p>Julia is a relatively new programming language compared to those that probably come to mind, and <em>it shows</em>. It&#39;s evident in its pragmatic, productivity-focused design choices, pleasant syntax, rich ecosystem, thriving communities, and its ability to both be very general purpose and power cutting edge computing.</p>
+<p>Julia is a relatively new programming language<sup id="fnref:1"><a href="#fndef:1" class="fnref">[1]</a></sup>, and <em>it shows</em>. It is evident in its pragmatic, productivity-focused design choices, pleasant syntax, rich ecosystem, thriving communities, and its ability to both be very general purpose and power cutting edge computing.</p>
 <p>Math-heavy computations <em>look like math</em>, it&#39;s easy to pick up, quick-to-prototype, packages work well together, and has great visualization libraries. There&#39;s a growing body of online references and tutorials, videos, and print media to learn from and it&#39;s popularity continues to grow across many fields.</p>
-<p>Large financial services companies have already started to adopt the language: BlackRock&#39;s Aladdin portfolio modeling, the Federal Reserve&#39;s economic simulations, and Aviva&#39;s Solvency II-compliant modeling. The last of these has a <a href="https://www.youtube.com/watch?v&#61;__gMirBBNXY">great talk on YouTube</a> by Aviva&#39;s Tim Thornham showcasing an on-the-ground view of what difference the right choice of technology and programming language can make. Moving from their vendor-supplied modeling solution was <strong>1000x faster, took 1/10 the amount of code, and was implemented 10x faster</strong><sup id="fnref:5"><a href="#fndef:5" class="fnref">[1]</a></sup>.</p>
+<p>Large financial services companies have already started realizing gains: BlackRock&#39;s Aladdin portfolio modeling, the Federal Reserve&#39;s economic simulations, and Aviva&#39;s Solvency II-compliant modeling. The last of these has a <a href="https://www.youtube.com/watch?v&#61;__gMirBBNXY">great talk on YouTube</a> by Aviva&#39;s Tim Thornham, which showcases an on-the-ground view of what difference the right choice of technology and programming language can make. Moving from their vendor-supplied modeling solution was <strong>1000x faster, took 1/10 the amount of code, and was implemented 10x faster</strong><sup id="fnref:5"><a href="#fndef:5" class="fnref">[2]</a></sup>.</p>
 <p>It&#39;s a language that&#39;s not just great for data science - but also not modeling, ETL, visualizations, package control/version management, machine learning, string manipulation, and many other use cases. Julia gets touted for &quot;scientific computing&quot; but that&#39;s just one aspect where it has no other choice as obvious.</p>
 <h2 id="for_the_actuary"><a href="#for_the_actuary">For the Actuary</a></h2>
 <p>As the <a href="https://www.nature.com/articles/d41586-019-02310-3">journal Nature said</a>, &quot;Come for the Syntax, Stay for the Speed&quot;. Here, I&#39;ll first cover some of the nice things about the language, and then discuss the runtime &#40;speed&#41;.</p>
 <h3 id="expressiveness_and_syntax"><a href="#expressiveness_and_syntax">Expressiveness and Syntax</a></h3>
-<p>Go from idea in your head to end product faster. Encapsulate concepts naturally and dispatch functions on the data you are interested in. Compose functions and data naturally. It&#39;s hard to explain, but perhaps two short examples will illustrate.</p>
+<p><strong>Expressiveness</strong> is the <em>manner in which</em> and <em>scope of</em> ideas and concepts that can be represented in a programming language. <strong>Syntax</strong> refers to how the code <em>looks</em> on the screen and its readability.</p>
+<p>In a language with high expressiveness and pleasant syntax, you: Go from idea in your head to end product faster. Encapsulate concepts naturally and dispatch functions on the data you are interested in. Compose functions and data naturally. Focus on the end-goal instead of fighting the tools.</p>
+<p>It&#39;s hard to explain, but perhaps two short examples will illustrate.</p>
 <h4 id="example_retention_analysis"><a href="#example_retention_analysis">Example: Retention Analysis</a></h4>
 <p>This is a really simple example relating <code>Cession</code>s, <code>Policy</code>s, and <code>Live</code>s to do simple retention analysis.</p>
 <p>First, let&#39;s define our data:</p>
@@ -93,18 +96,18 @@ struct Policy
 struct Cession
   ceded
 end</code></pre>
-<p>Now, some functions to calculate retention for policies and lives:</p>
+<p>Now to calculate amounts retained. First, let&#39;s say what retention means for a <code>Policy</code>:</p>
 <pre><code class="language-julia"># define retention
 function retained(pol::Policy)
   pol.face - sum(cession.ceded for cession in pol.cessions)
-end
-
-function retained(l::Life)
+end</code></pre>
+<p>And then what retention means for a <code>Life</code>:</p>
+<pre><code class="language-julia">function retained(l::Life)
   sum(retained(policy) for policy in life.policies)
 end</code></pre>
-<p><em>See how natural that is?</em> It&#39;s almost exactly how you&#39;d specify it English. No joins, no boilerplate, no fiddling with complicated syntax. You can express ideas and concepts the way that you think of them, not, for example, as a series of dataframe joins. </p>
+<p><em>See how natural that is?</em> It&#39;s almost exactly how you&#39;d specify it English. No joins, no boilerplate, no fiddling with complicated syntax. You can express ideas and concepts the way that you think of them, not, for example, as a series of dataframe joins or as row/column coordinates on a spreadsheet.</p>
 <blockquote>
-<p>Part of the expressiveness is how we defined <code>retained</code> and adapted it to mean related, but different things depending on the specific context. That is, we didn&#39;t have to define <code>retained_life&#40;...&#41;</code> and <code>retained_pol&#40;...&#41;</code> because Julia can be <em>dispatch</em> based on what you give it. This is, as some would call it, <a href="https://www.youtube.com/watch?v&#61;kc9HwsxE1OY">unreasonably effective</a>.</p>
+<p>Expressiveness example: we defined <code>retained</code> and adapted it to mean related, but different things depending on the specific context. That is, we didn&#39;t have to define <code>retained_life&#40;...&#41;</code> and <code>retained_pol&#40;...&#41;</code> because Julia can be <em>dispatch</em> based on what you give it. This is, as some would call it, <a href="https://www.youtube.com/watch?v&#61;kc9HwsxE1OY">unreasonably effective</a>.</p>
 </blockquote>
 <p>Let&#39;s use the above code in practice then. </p>
 <p><em>The <code>julia&gt;</code> syntax indicates that we&#39;ve moved into Julia&#39;s interactive mode &#40;REPL mode&#41;:</em></p>
@@ -177,23 +180,21 @@ rbern(100,0.5)</code></pre>
 <p>For those who are enterprise-minded: in addition to the liberal licensing mentioned above, there are professional products from organizations like <a href="https://juliacomputing.com/">Julia Computing</a> that provide hands-on support, training, IT governance solutions, behind-the-firewall package management, and deployment/scaling assistance.</p>
 <h3 id="the_speed"><a href="#the_speed">The Speed</a></h3>
 <p>Julia is also <em>fast</em>. Being 1000x faster at something sounds impressive, but what does it mean? It&#39;s the difference between something taking <em>10 seconds</em> instead of <em>3 hours</em> — or <em>1 hour</em> instead of <em>42 days</em>. <strong>What analysis would you like to do if it took less time? A stochastic analysis of life-level claims? Machine learning with your experience data? Monthly valuation instead of quarterly?</strong></p>
-<p>Now, most workflows don&#39;t see a 1000x speedup, but 10x to 1000x is a very common range of speed differences vs R or Python or MATLAB. Sometimes you&#39;ll see less of a speed difference because R and Python already have acknowledged the speed issue and written most of what&#39;s important in low-level languages. This is an example of what&#39;s called the &quot;two-language&quot; problem where the language productive to write in isn&#39;t very fast. For example, <a href="https://developer.r-project.org/Blog/public/2019/03/28/use-of-c---in-packages/">more than half of R packages use C/C&#43;&#43;/Fortran</a> and core packages in Python like Pandas, PyTorch, NumPy, SciPy, etc. do this too.</p>
+<p>Now, most workflows don&#39;t see a 1000x speedup, but 10x to 1000x is a very common range of speed differences vs R or Python or MATLAB. </p>
+<p>Sometimes you&#39;ll see less of a speed difference because R and Python already have acknowledged the speed issue and written most of what&#39;s important in low-level languages. This is an example of what&#39;s called the &quot;two-language&quot; problem where the language productive to write in isn&#39;t very fast. For example, <a href="https://developer.r-project.org/Blog/public/2019/03/28/use-of-c---in-packages/">more than half of R packages use C/C&#43;&#43;/Fortran</a> and core packages in Python like Pandas, PyTorch, NumPy, SciPy, etc. do this too.</p>
 <p>Because Julia packages are written almost exclusively in Julia, the ecosystem of packages works well together without a big overhead organization &#40;e.g. TidyVerse, Numpy, etc&#41;. And because the packages you are using are written in Julia, it&#39;s easy to see what&#39;s going on, learn from them, or even contribute a package of your own&#33;</p>
 <h3 id="the_tradeoff"><a href="#the_tradeoff">The Tradeoff</a></h3>
-<p>Julia is fast because it&#39;s compiled, unlike R and Python which the computer just &#40;loosely speaking&#41; reads one line at a time. Julia compiles things &quot;just-in-time&quot;, which means that right before you use a function for the first time, it will take a moment to compile the code for the machine. Subsequent calls don&#39;t need to be re-compiled and are very fast.</p>
+<p>Julia is fast because it&#39;s compiled, unlike R and Python which &#40;loosely speaking&#41; the computer just reads one line at a time. Julia compiles things &quot;just-in-time&quot;, which means that right before you use a function for the first time, it will take a moment to pre-process the code section for the machine. Subsequent calls don&#39;t need to be re-compiled and are very fast.</p>
 <p>Typically the compilation is very fast &#40;milliseconds&#41;, but in the most complicated cases it can be several seconds. One of these is the &quot;time-to-first-plot&quot; issue because it&#39;s the most common one users encounter: super-flexible plotting libraries have a lot of things to pre-compile. So in the case of plotting, it can take several seconds to display the first plot after starting Julia, but then it&#39;s remarkably quick and easy to create an animation of your model results. The time-to-first plot is a solvable problem that&#39;s receiving a lot of attention from the core developers and will get better with future Julia releases.</p>
-<p>For users working with a lot of data or complex calculations &#40;like actuaries&#33;&#41;, the runtime speedup is worth a few seconds at the start.</p>
+<p>For users working with a lot of data or complex calculations &#40;like actuaries&#33;&#41;, the runtime speedup is worth a few seconds at the start. </p>
 <h2 id="does_choice_of_programming_language_matter"><a href="#does_choice_of_programming_language_matter">Does Choice of Programming Language Matter?</a></h2>
 <p>I argue that the choice of programming language <em>does</em> matter. Productivity is one aspect, expressiveness is another, speed one more. There are many reasons to advocate for it, though seeing for yourself is probably the best way to get started. That said, Julia shouldn&#39;t be the only tool in your tool-kit. SQL will remain an important way to interact with databases. R and Python aren&#39;t going anywhere in the short term either&#33;</p>
-<p><strong>It will increasingly be essential for companies to modernize to remain competitive. That modernization isn&#39;t built with big black-box software packages; it will be with domain experts who can translate the expertise into new forms of analysis - doing it faster and more robustly than the competition.</strong> </p>
-<p>SpaceX doesn&#39;t just hire rocket scientists - they hire rocket scientists who code.</p>
-<p><strong>Be an actuary who codes.</strong></p>
 <h2 id="what_next"><a href="#what_next">What next?</a></h2>
 <p>This is intended to be the first of a series of articles introducing Julia to actuaries. Future articles planned include:</p>
 <ul>
 <li><p>An overview of useful general-purpose, data science, and mathematical Julia packages for actuaries</p>
 </li>
-<li><p>A deeper dive into some of the packages available from the nascent <a href="http://JuliaActuary.org">JuliaActuary</a> organization<sup id="fnref:6"><a href="#fndef:6" class="fnref">[2]</a></sup>.</p>
+<li><p>A deeper dive into some of the packages available from the nascent <a href="http://JuliaActuary.org">JuliaActuary</a> organization<sup id="fnref:6"><a href="#fndef:6" class="fnref">[3]</a></sup>.</p>
 </li>
 </ul>
 <p>In the meantime, some recommended resources to get started:</p>
@@ -211,9 +212,10 @@ rbern(100,0.5)</code></pre>
 <li><p><a href="https://www.packtpub.com/application-development/hands-design-patterns-julia-10">Design Patterns and Best Practices</a>, a book that will help you as you transition from smaller, one-off scripts to designing larger packages and projects.</p>
 </li>
 </ul>
+<p><sup id="fnref:1"><a href="#fndef:1" class="fnref">[1]</a></sup> Python first appeared in 1990. R is an implementation of S, which was created in 1976, though depending on when you want to place the start of an independent R project varies &#40;1993, 1995, and 2000 are alternate dates&#41;. The history of these languages is long and substantial changes have occurred since these dates.</p>
 <div class="page-foot">
   <div class="copyright">
-    &copy; Alec Loudenback. Last modified: August 02, 2020. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and <a href="https://julialang.org" >Julia</a>.
+    &copy; Alec Loudenback. Last modified: August 10, 2020. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and <a href="https://julialang.org" >Julia</a>.
   </div>
 </div>
 </div><!-- CONTENT ENDS HERE -->

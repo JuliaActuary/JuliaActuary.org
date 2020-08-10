@@ -3,7 +3,3 @@
 function retained(pol::Policy)
   pol.face - sum(cession.ceded for cession in pol.cessions)
 end
-
-function retained(l::Life)
-  sum(retained(policy) for policy in life.policies)
-end

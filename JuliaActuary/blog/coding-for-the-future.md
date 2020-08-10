@@ -92,6 +92,15 @@ Conversely, the skill and practice of coding enhances managerial capabilities. W
 
 Nor is the skillset described here limiting in any other aspect of career development any more than mathematical ability, project collaboration, or financial acumen — just to name a few.
 
+## Outlook
+
+**It will increasingly be essential for companies to modernize to remain competitive. That modernization isn't built with big black-box software packages; it will be with domain experts who can translate the expertise into new forms of analysis - doing it faster and more robustly than the competition.** 
+
+SpaceX doesn't just hire rocket scientists - they hire rocket scientists who code.
+
+**Be an actuary who codes.**
+
+
 ## Future Articles
 
 The forthcoming series of articles will help illustrate what this can look like in practice: examining the business case, acquainting with ways of interacting with problems outside of spreadsheets and dataframes, and approaching work in a way that removes the boring parts and focuses on the concepts and insights.
