@@ -34,6 +34,11 @@ These packages are available for use in your project.
 </div>
 ~~~
 
+~~~
+<div class="alert alert-info"> <strong>Note:</strong> You can use any package in it's current state and not worry about changes to the packages breaking any code that you write by <a href="https://julialang.github.io/Pkg.jl/v1/toml-files/#The-version-field-1">specifying the desired package version</a> in your project. 
+</div>
+~~~
+
 More info on these packages can be found below.
 
 ### Adding and Using Packages
