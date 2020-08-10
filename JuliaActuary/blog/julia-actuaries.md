@@ -23,7 +23,7 @@ Julia is a relatively new programming language[^1], and *it shows*. It is eviden
 
 Math-heavy computations *look like math*, it's easy to pick up, quick-to-prototype, packages work well together, and has great visualization libraries. There's a growing body of online references and tutorials, videos, and print media to learn from and it's popularity continues to grow across many fields.
 
-Large financial services companies have already started realizing gains: BlackRock's Aladdin portfolio modeling, the Federal Reserve's economic simulations, and Aviva's Solvency II-compliant modeling. The last of these has a [great talk on YouTube](https://www.youtube.com/watch?v=__gMirBBNXY) by Aviva's Tim Thornham, which showcases an on-the-ground view of what difference the right choice of technology and programming language can make. Moving from their vendor-supplied modeling solution was **1000x faster, took 1/10 the amount of code, and was implemented 10x faster**[^5].
+Large financial services companies have already started realizing gains: BlackRock's Aladdin portfolio modeling, the Federal Reserve's economic simulations, and Aviva's Solvency II-compliant modeling. The last of these has a [great talk on YouTube](https://www.youtube.com/watch?v=__gMirBBNXY) by Aviva's Tim Thornham, which showcases an on-the-ground view of what difference the right choice of technology and programming language can make. Moving from their vendor-supplied modeling solution was **1000x faster, took 1/10 the amount of code, and was implemented 10x faster**[^2].
 
 It's a language that's not just great for data science - but also not modeling, ETL, visualizations, package control/version management, machine learning, string manipulation, and many other use cases. Julia gets touted for "scientific computing" but that's just one aspect where it has no other choice as obvious.
 
@@ -185,14 +185,16 @@ For users working with a lot of data or complex calculations (like actuaries!), 
 
 ## Does Choice of Programming Language Matter?
 
-I argue that the choice of programming language *does* matter. Productivity is one aspect, expressiveness is another, speed one more. There are many reasons to advocate for it, though seeing for yourself is probably the best way to get started. That said, Julia shouldn't be the only tool in your tool-kit. SQL will remain an important way to interact with databases. R and Python aren't going anywhere in the short term either!
+I argue that the choice of programming language *does* matter. Productivity is one aspect, expressiveness is another, speed one more. There are many reasons to advocate for it, though seeing for yourself is probably the best way to get started. 
+
+That said, Julia shouldn't be the only tool in your tool-kit. SQL will remain an important way to interact with databases. R and Python aren't going anywhere in the short term either!
 
 ## What next?
 
 This is intended to be the first of a series of articles introducing Julia to actuaries. Future articles planned include:
 
 - An overview of useful general-purpose, data science, and mathematical Julia packages for actuaries
-- A deeper dive into some of the packages available from the nascent [JuliaActuary](http://JuliaActuary.org) organization[^6].
+- A deeper dive into some of the packages available from the nascent [JuliaActuary](http://JuliaActuary.org) organization[^2].
 
 In the meantime, some recommended resources to get started:
 
@@ -203,4 +205,8 @@ In the meantime, some recommended resources to get started:
 - [Think Julia](https://benlauwens.github.io/ThinkJulia.jl/latest/book.html), a free e-book (or paid print edition) book which introduces programming from the start and teaches you valuable ways of thinking.
 - [Design Patterns and Best Practices](https://www.packtpub.com/application-development/hands-design-patterns-julia-10), a book that will help you as you transition from smaller, one-off scripts to designing larger packages and projects.
 
-[^1] Python first appeared in 1990. R is an implementation of S, which was created in 1976, though depending on when you want to place the start of an independent R project varies (1993, 1995, and 2000 are alternate dates). The history of these languages is long and substantial changes have occurred since these dates.
+# Footnotes
+
+[^1]: Python first appeared in 1990. R is an implementation of S, which was created in 1976, though depending on when you want to place the start of an independent R project varies (1993, 1995, and 2000 are alternate dates). The history of these languages is long and substantial changes have occurred since these dates.
+[^2]: [Aviva Case Study](https://juliacomputing.com/case-studies/aviva.html)
+[^3]: The author of this article contributes to JuliaActuary.

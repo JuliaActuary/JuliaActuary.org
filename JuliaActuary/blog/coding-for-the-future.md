@@ -107,11 +107,9 @@ The forthcoming series of articles will help illustrate what this can look like 
 
 The [next article in this series](/blog/julia-actuaries/) will discuss what tools enable an actuary to deliver on the vision outlined in this article. In particular, it will focus on the Julia programming language, a tool almost uniquely positioned to enable actuaries to develop the analysis, systems, and models of tomorrow.
 
-
 # Footnotes
+
 [^1]: [Co-evolution of Information Processing Technology and Use: Interaction Between the Life Insurance and Tabulating Industries](https://dspace.mit.edu/bitstream/handle/1721.1/2472/swp-3575-28521189.pdf?sequence=1)
 [^2]: [From Tabulators to Early Computers in the U.S. Life Insurance Industry](http://ccs.mit.edu/papers/CCSWP153.html)
 [^3]: [Have you had your Bezos moment? What you can learn from Amazon](https://www.cio.com/article/3218667/have-you-had-your-bezos-moment-what-you-can-learn-from-amazon.html)
 [^4]: [The 10x [Rockstar] developer is NOT a myth](https://www.ybrikman.com/writing/2013/09/29/the-10x-developer-is-not-myth/)
-[^5]: [Aviva Case Study](https://juliacomputing.com/case-studies/aviva.html)
-[^6]: The author of this article contributes to JuliaActuary
