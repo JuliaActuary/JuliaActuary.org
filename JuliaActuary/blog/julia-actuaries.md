@@ -139,7 +139,7 @@ rbern(100,0.5)
 
 Without Googling, do you know how you'd do the Poisson distribution in Julia? In R? 
 
-Just like with `rand()`, `pdf()`, `cdf()`, etc. will all work the same way and work on all distributions.
+Just like with `rand()`, `pdf()`, `cdf()`, etc. all work the same way and work on all distributions.
 
 ### More of Julia's benefits
 
@@ -162,7 +162,7 @@ Julia is easy to write, learn, and be productive in:
 - Directly call and use R and Python code/packages with the `PyCall` and `RCall` packages
 - Error messages are helpful and tell you *what line* the error came from, not just what the error is
 
- For the power-users, advanced features are easily accessible: parallel programming, broadcasting, types, interfaces, metaprogramming, and more.
+For  power-users, advanced features are easily accessible: parallel programming, broadcasting, types, interfaces, metaprogramming, and more.
 
 These are some of the things that make Julia one of the world's most loved languages on the [StackOverflow Developer Survey](https://insights.stackoverflow.com/survey/2020#technology-most-loved-dreaded-and-wanted-languages).
 
@@ -198,11 +198,11 @@ That said, Julia shouldn't be the only tool in your tool-kit. SQL will remain an
 
 In the [first article in this series](http://localhost:8000/blog/coding-for-the-future/), I talked about becoming a **10x Actuary**. In a large way, the choice of tools and paradigms shape your focus and facilitate your growth.
 
-It's said that you can't fully conceptualize something unless your language has a word for it. Similar to spoken language, you may find that breaking out of spreadsheet coordinates and dataframes lets you ask different questions and solve problems in innovative ways.
+It's said that you can't fully conceptualize something unless your language has a word for it. Similar to spoken language, you may find that breaking out of spreadsheet coordinates and dataframes lets you ask different questions and solve problems in innovative ways - which rewards your intellect as others appreciate the results.
 
 ## What next?
 
-This is intended to be the first of a series of articles introducing Julia to actuaries. Future articles planned include:
+This is the second in a series talking about the future of actuarial work. Future articles planned dive introduce Julia further:
 
 - An overview of useful general-purpose, data science, and mathematical Julia packages for actuaries
 - A deeper dive into some of the packages available from the nascent [JuliaActuary](http://JuliaActuary.org) organization[^3].
