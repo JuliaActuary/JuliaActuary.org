@@ -12,7 +12,7 @@
 <div class="alert alert-danger"> <strong> NOTE: </strong> This article is a draft and the website/URLs are a work in progress. </div>
 ~~~
 
-I have suggested that actuaries who are competent coders will differentiate both companies and individuals. Coding ability will be useful no matter what tools you utilize everyday (e.g. Python/R/C++/etc. and associated packages) and I appreciate the communities and tools provided in all of them for their contribution to moving actuarial processes out of the Spreadsheet Age. 
+I have suggested that actuaries who are competent coders will differentiate both companies and individuals. Coding ability will be useful no matter what tools you utilize everyday (e.g. Python/R/C++/etc. and associated packages) and I appreciate the communities and tools provided in all of them for their contribution to moving actuarial processes out of the Spreadsheet Age.
 
 However, I'd like to motivate why Julia is the best programming language for actuaries to learn and use it as the *holotype* for the modern actuarial process.
 
@@ -25,7 +25,7 @@ Math-heavy computations *look like math*, it's easy to pick up, quick-to-prototy
 
 Large financial services companies have already started realizing gains: BlackRock's Aladdin portfolio modeling, the Federal Reserve's economic simulations, and Aviva's Solvency II-compliant modeling. The last of these has a [great talk on YouTube](https://www.youtube.com/watch?v=__gMirBBNXY) by Aviva's Tim Thornham, which showcases an on-the-ground view of what difference the right choice of technology and programming language can make. Moving from their vendor-supplied modeling solution was **1000x faster, took 1/10 the amount of code, and was implemented 10x faster**[^2].
 
-It's a language that's not just great for data science - but also not modeling, ETL, visualizations, package control/version management, machine learning, string manipulation, and many other use cases. Julia gets touted for "scientific computing" but that's just one aspect where it has no other choice as obvious.
+It's a language that's not just great for data science — but also not modeling, ETL, visualizations, package control/version management, machine learning, string manipulation, and many other use cases. Julia gets touted for "scientific computing" but that's just one aspect where it has no other choice as obvious.
 
 ## For the Actuary
 
@@ -118,7 +118,7 @@ julia> retained.(life.policies) # retained amount for each policy
 
 #### Example: Random Sampling
 
-As another motivating example showcasing multiple dispatch, here's random number generation in Julia. We generate 100 random uniform, standard normal, and Bernoulli samples - all of which just use the `rand()` function:
+As another motivating example showcasing multiple dispatch, here's random number generation in Julia. We generate 100 random uniform, standard normal, and Bernoulli samples — all of which just use the `rand()` function:
 
 ```julia
 # Julia
@@ -137,7 +137,9 @@ rnorm(100)
 rbern(100,0.5)
 ```
 
-Without Googling, do you know how you'd do the Poisson distribution in Julia? In R?
+Without Googling, do you know how you'd do the Poisson distribution in Julia? In R? 
+
+Just like with `rand()`, `pdf()`, `cdf()`, etc. will all work the same way and work on all distributions.
 
 ### More of Julia's benefits
 
@@ -177,11 +179,13 @@ Because Julia packages are written almost exclusively in Julia, the ecosystem of
 
 ### The Tradeoff
 
-Julia is fast because it's compiled, unlike R and Python which (loosely speaking) the computer just reads one line at a time. Julia compiles things "just-in-time", which means that right before you use a function for the first time, it will take a moment to pre-process the code section for the machine. Subsequent calls don't need to be re-compiled and are very fast.
+Julia is fast because it's compiled, unlike R and Python where (loosely speaking) the computer just reads one line at a time. Julia compiles things "just-in-time": right before you use a function for the first time, it will take a moment to pre-process the code section for the machine. Subsequent calls don't need to be re-compiled and are very fast.
+
+An example: if you are doing 100,000 stochastic projections, the first projection might take 1 second to compile, but 1/100th of a second for the other 99,999 runs. In Python, that same calculation might take 1/10th of a second for each computation. The former would take about 15 minutes, the latter 2.75 hours — an example of just a 10x advantage.
 
 Typically the compilation is very fast (milliseconds), but in the most complicated cases it can be several seconds. One of these is the "time-to-first-plot" issue because it's the most common one users encounter: super-flexible plotting libraries have a lot of things to pre-compile. So in the case of plotting, it can take several seconds to display the first plot after starting Julia, but then it's remarkably quick and easy to create an animation of your model results. The time-to-first plot is a solvable problem that's receiving a lot of attention from the core developers and will get better with future Julia releases.
 
-For users working with a lot of data or complex calculations (like actuaries!), the runtime speedup is worth a few seconds at the start. 
+For users working with a lot of data or complex calculations (like actuaries!), the runtime speedup is worth a few seconds at the start.
 
 ## Does Choice of Tools Matter?
 
