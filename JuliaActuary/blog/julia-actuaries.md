@@ -145,24 +145,25 @@ Just like with `rand()`, `pdf()`, `cdf()`, etc. will all work the same way and w
 
 Julia is easy to write, learn, and be productive in:
 
- - it's free and open-source
-   - Very permissive licenses,  facilitating the use in commercial environments (same with most packages)
- - write how you like because it's multi-paradigm: vectorizable (R), object-oriented (Python), functional (Lisp), or detail-oriented (C)
- - Built-in package manager, documentation, and testing-library
- - Jupyter Notebook support (it's in the name! **Ju**lia-**Pyt**hon-**R**)
- - Many small, nice things that add up:
-   - Unicode characters like `α` or `β`
-   - nice display of arrays
-   - simple anonymous function syntax
-   - wide range of text editor support
-   - first-class support for `missing` values across the entire language
-   - Literate programming support (like R-Markdown)
- - Awesome, built-in `Dates` package that makes working with dates a breeze
- - Directly call and use R and Python code/packages with the `PyCall` and `RCall` packages
- - Error messages are helpful and tell you *what line* the error came from, not just what the error is
- 
+- It's free and open-source
+  - Very permissive licenses,  facilitating the use in commercial environments (same with most packages)
+- Very large and growing set of available packages
+- Write how you like because it's multi-paradigm: vectorizable (R), object-oriented (Python), functional (Lisp), or detail-oriented (C)
+- Built-in package manager, documentation, and testing-library
+- Jupyter Notebook support (it's in the name! **Ju**lia-**Pyt**hon-**R**)
+- Many small, nice things that add up:
+  - Unicode characters like `α` or `β`
+  - nice display of arrays
+  - simple anonymous function syntax
+  - wide range of text editor support
+  - first-class support for `missing` values across the entire language
+  - Literate programming support (like R-Markdown)
+- Awesome, built-in `Dates` package that makes working with dates a breeze
+- Directly call and use R and Python code/packages with the `PyCall` and `RCall` packages
+- Error messages are helpful and tell you *what line* the error came from, not just what the error is
+
  For the power-users, advanced features are easily accessible: parallel programming, broadcasting, types, interfaces, metaprogramming, and more.
- 
+
 These are some of the things that make Julia one of the world's most loved languages on the [StackOverflow Developer Survey](https://insights.stackoverflow.com/survey/2020#technology-most-loved-dreaded-and-wanted-languages).
 
 For those who are enterprise-minded: in addition to the liberal licensing mentioned above, there are professional products from organizations like [Julia Computing](https://juliacomputing.com/) that provide hands-on support, training, IT governance solutions, behind-the-firewall package management, and deployment/scaling assistance.
@@ -171,7 +172,9 @@ For those who are enterprise-minded: in addition to the liberal licensing mentio
 
 Julia is also *fast*. Being 1000x faster at something sounds impressive, but what does it mean? It's the difference between something taking *10 seconds* instead of *3 hours* — or *1 hour* instead of *42 days*. **What analysis would you like to do if it took less time? A stochastic analysis of life-level claims? Machine learning with your experience data? Monthly valuation instead of quarterly?**
 
-Now, most workflows don't see a 1000x speedup, but 10x to 1000x is a very common range of speed differences vs R or Python or MATLAB. 
+Speaking from experience, it's not just great for production time improvements. It's really nice to know that I messed something up in a couple of seconds instead of 20 minutes when building something so that I can fix it!
+
+Now, most workflows don't see a 1000x speedup, but 10x to 1000x is a very common range of speed differences vs R or Python or MATLAB.
 
 Sometimes you'll see less of a speed difference because R and Python already have acknowledged the speed issue and written most of what's important in low-level languages. This is an example of what's called the "two-language" problem where the language productive to write in isn't very fast. For example, [more than half of R packages use C/C++/Fortran](https://developer.r-project.org/Blog/public/2019/03/28/use-of-c---in-packages/) and core packages in Python like Pandas, PyTorch, NumPy, SciPy, etc. do this too.
 
