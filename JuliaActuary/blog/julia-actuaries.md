@@ -196,7 +196,7 @@ I argue that the choice of programming language *does* matter. Productivity is o
 
 That said, Julia shouldn't be the only tool in your tool-kit. SQL will remain an important way to interact with databases. R and Python aren't going anywhere in the short term and will always offer a different perspective on things!
 
-In the [first article in this series](http://localhost:8000/blog/coding-for-the-future/), I talked about becoming a **10x Actuary**. In a large way, the choice of tools and paradigms that you focus on facilitate that growth.
+In the [first article in this series](http://localhost:8000/blog/coding-for-the-future/), I talked about becoming a **10x Actuary**. In a large way, the choice of tools and paradigms shape your focus and facilitate your growth.
 
 It's said that you can't fully conceptualize something unless your language has a word for it. Similar to spoken language, you may find that breaking out of spreadsheet coordinates and dataframes lets you ask different questions and solve problems in innovative ways.
 
