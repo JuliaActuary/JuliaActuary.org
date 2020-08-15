@@ -1,1 +1,360 @@
-<!doctype html> <html lang=en > <meta charset=UTF-8 > <meta name=viewport  content="width=device-width, initial-scale=1"> <link rel=stylesheet  href="/css/franklin.css"> <link rel=stylesheet  href="/css/basic.css"> <link rel=icon  href="/assets/favicon.png"> <script async defer src="https://buttons.github.io/buttons.js"></script> <link href="https://fonts.cdnfonts.com/css/literata" rel=stylesheet > <link rel=stylesheet  href="https://cdn.jsdelivr.net/gh/tonsky/FiraCode@4/distr/fira_code.css"> <title>Introduction To Julia through Life Retention Analysis | JuliaActuary</title> <link rel=apple-touch-icon  sizes=180x180  href="/assets/apple-touch-icon.png"> <link rel=icon  type="image/png" sizes=32x32  href="/assets/favicon-32x32.png"> <link rel=icon  type="image/png" sizes=16x16  href="/assets/favicon-16x16.png"> <link rel=manifest  href="/assets/site.webmanifest"> <header> <div class=blog-name > <a href="/"> <div class=blog-name-logo-container > <div class=blog-name-logo > <img src="/assets/logo_square.svg" alt=logo  /> </div> <div>JuliaActuary</div> </div> </a> <div class=tagline >Practical, extensible, and open-source actuarial modeling and analysis. </div> </div> <nav> <ul> <li><a href="/">Home</a> <li><a href="/#Packages">Packages</a> <ul> <li><a href="/#mortalitytablesjl">MortalityTables.jl</a> <li><a href="/#actuaryutilitiesjl">ActuaryUtilities.jl</a> <li><a href="/#LifeContingenciesjl">LifeContingencies.jl</a> </ul> <li><a href="/#community">Community</a> <ul> <li><a href="/#learn">Learn</a> <li><a href="/#integration_with_r_and_python">Integration</a> <li><a href="/#contributing">Contributing</a> </ul> <li><a href="/#blog">Blog</a> </ul> <img src="/assets/hamburger.svg" id=menu-icon > </nav> </header> <div class=franklin-content ><h1 id=introduction_to_julia_through_life_retention_analysis ><a href="#introduction_to_julia_through_life_retention_analysis">Introduction To Julia through Life Retention Analysis</a></h1> <p>In this tutorial, we will introduce basic ways of working with Julia and develop a simple working example of how to perform retention analysis in a powerful and performant manner. This extends the example from <a href="/blog/julia-actuaries/">Julia as the Language of Choice for Actuaries</a>.</p> <h2 id=installation_and_set-up ><a href="#installation_and_set-up">Installation and Set-up</a></h2> <p>There are many ways to work with Julia and you are not limited to a certain workflow or editor environement. However, for simplicity we will focus on four things here:</p> <ol> <li><p>Installing Julia</p> <li><p>The Julia REPL</p> <li><p>Jupyter Notebooks</p> <li><p>The Visual Stuido Code Editor</p> </ol> <h3 id=installing_julia ><a href="#installing_julia">Installing Julia</a></h3> <p>Julia is a free and can be downloaded from <a href="https://julialang.org/downloads/">JuliaLang.org/downloads</a>. If you have Windows, you probably want the <code>64-bit &#40;installer&#41;</code> version. Download and install - that&#39;s it&#33;</p> <h3 id=the_julia_repl ><a href="#the_julia_repl">The Julia REPL</a></h3> <p>If your installation went well, you should be able to find Julia in your start menu. This starts the <strong>REPL</strong> or <strong>Read, Eval, Print, Loop</strong> which is a simple interface to perform calculations or run scripts. Generally, you won&#39;t <em>need</em> to use this but it ends up being really useful <a href="https://krasjet.com/rnd.wlk/julia/">as the most powerful and extensible calculator on your computer</a>. Learn more about the <a href="https://en.wikibooks.org/wiki/Introducing_Julia/The_REPL">basic usage of the REPL here</a>.</p> <h3 id=jupyter_notebooks ><a href="#jupyter_notebooks">Jupyter Notebooks</a></h3> <p>Jupyter &#40;<strong>Ju</strong>lia, <strong>Py</strong>thon, and <strong>R</strong>&#41; notebooks have become incredibly widespread as a way to interactively edit code and do data analysis. To get started, open the Julia REPL and follow the <a href="https://github.com/JuliaLang/IJulia.jl#installation">instructions to install IJulia</a>, which is what powers Julia for Jupypter.</p> <h3 id=visual_studio_code ><a href="#visual_studio_code">Visual Studio Code</a></h3> <p>Among many tools for writing code, Visual Studio Code &#40;free from Microsoft&#41; has <a href="https://www.julia-vscode.org/">a nice Julia editor</a> that has things like auto-completion, plot views, dataset viewer, inline results, help text, and more &#40;similar to RStudio if that&#39;s where you are coming from&#41;. <a href="https://github.com/julia-vscode/julia-vscode#installing-juliavs-codevs-code-julia-extension">Instructions for instllation are here</a> &#40;you have alraedy completed step 1 at this point&#41;.</p> <p>Once installed, you can create a new file and save it with a <code>.jl</code> extension and the environement will load the Julia integrations. From there, you can <a href="https://www.julia-vscode.org/docs/stable/userguide/runningcode/">interactively run code blocks</a> &#40;similar to the interactivity in Jupyter&#41; by hitting <code>Alt</code> &#43;<code>Enter</code>.</p> <h2 id=building_the_analysis ><a href="#building_the_analysis">Building the Analysis</a></h2> <p>At this point you are free to use either Jupyter or VS Code to continue the tutorial - either editor should work.</p> <div class=page-foot > <div class=copyright > &copy; JuliaActuary Contributors. Last modified: August 07, 2020. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and <a href="https://julialang.org" >Julia</a>. </div> </div> </div> <script data-goatcounter="https://juliaactuary.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+   <link rel="stylesheet" href="/libs/highlight/github.min.css">
+   
+  <link rel="stylesheet" href="/css/franklin.css">
+  <link rel="stylesheet" href="/css/basic.css">
+  <link rel="icon" href="/assets/favicon.png">
+  <script async defer src="https://buttons.github.io/buttons.js"></script>
+  <link href="https://fonts.cdnfonts.com/css/literata" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/tonsky/FiraCode@4/distr/fira_code.css">
+   <title>Introduction To Julia through Life Retention and Claims Analysis | JuliaActuary</title>  
+
+  
+<!-- favicon stuff -->
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png">
+<link rel="manifest" href="/assets/site.webmanifest">
+
+
+</head>
+<body>
+  <header>
+<div class="blog-name">
+  <a href="/">
+    <div class="blog-name-logo-container">
+      
+      <div class="blog-name-logo">
+        <img src="/assets/logo_square.svg" alt="logo"  />
+      </div>
+      <div>JuliaActuary</div>
+    </div>
+  </a>
+  <div class="tagline">Practical, extensible, and open-source actuarial modeling and analysis. </div>
+</div>
+<nav>
+  <ul>
+    <li><a href="/">Home</a></li>
+    <li><a href="/#Packages">Packages</a>
+      <ul>
+        <li><a href="/#mortalitytablesjl">MortalityTables.jl</a></li>
+        <li><a href="/#actuaryutilitiesjl">ActuaryUtilities.jl</a></li>
+        <li><a href="/#LifeContingenciesjl">LifeContingencies.jl</a></li>
+      </ul>
+    </li>
+    <li><a href="/#community">Community</a>
+          <ul>
+        <li><a href="/#learn">Learn</a></li>
+        <li><a href="/#integration_with_r_and_python">Integration</a></li>
+        <li><a href="/#contributing">Contributing</a></li>
+      </ul></li>
+    <li><a href="/#blog">Blog</a></li>
+  </ul>
+  <img src="/assets/hamburger.svg" id="menu-icon">
+</nav>
+</header>
+
+
+<!-- Content appended here -->
+<div class="franklin-content"><p><div class="franklin-toc"><ol><li><a href="#installation_and_set-up">Installation and Set-up</a><ol><li><a href="#installing_julia">Installing Julia</a></li><li><a href="#the_julia_repl">The Julia REPL</a></li><li><a href="#jupyter_notebooks">Jupyter Notebooks</a></li><li><a href="#visual_studio_code">Visual Studio Code</a></li></ol></li><li><a href="#retention_analysis">Retention Analysis</a><ol><li><a href="#loading_the_sample_data">Loading the sample data</a></li><li><a href="#data_structures">Data Structures</a></li><li><a href="#data_meet_model_model_meet_data">Data, meet Model. Model, meet Data.</a></li><li><a href="#building_the_retention_logic">Building the Retention Logic&#33;</a></li><li><a href="#analyzing_the_inforce_data">Analyzing the inforce data</a></li></ol></li><li><a href="#stochastic_mortality_analysis">Stochastic Mortality Analysis</a></li></ol></div> <h1 id="introduction_to_julia_through_life_retention_and_claims_analysis"><a href="#introduction_to_julia_through_life_retention_and_claims_analysis">Introduction To Julia through Life Retention and Claims Analysis</a></h1>
+<p>In this tutorial, we will introduce basic ways of working with Julia and develop a simple working example of how to perform retention analysis in a powerful and performant manner. This extends the example from <a href="/blog/julia-actuaries/">Julia as the Language of Choice for Actuaries</a>.</p>
+<h2 id="installation_and_set-up"><a href="#installation_and_set-up">Installation and Set-up</a></h2>
+<p>There are many ways to work with Julia and you are not limited to a certain workflow or editor environement. However, for simplicity we will focus on four things here:</p>
+<ol>
+<li><p>Installing Julia</p>
+</li>
+<li><p>The Julia REPL</p>
+</li>
+<li><p>Jupyter Notebooks</p>
+</li>
+<li><p>The Visual Stuido Code Editor</p>
+</li>
+</ol>
+<h3 id="installing_julia"><a href="#installing_julia">Installing Julia</a></h3>
+<p>Julia is a free and can be downloaded from <a href="https://julialang.org/downloads/">JuliaLang.org/downloads</a>. If you have Windows, you probably want the <code>64-bit &#40;installer&#41;</code> version. Download and install - that&#39;s it&#33;</p>
+<h3 id="the_julia_repl"><a href="#the_julia_repl">The Julia REPL</a></h3>
+<p>If your installation went well, you should be able to find Julia in your start menu. This starts the <strong>REPL</strong> or <strong>Read, Eval, Print, Loop</strong> which is a simple interface to perform calculations or run scripts. Generally, you won&#39;t <em>need</em> to use this but it ends up being really useful <a href="https://krasjet.com/rnd.wlk/julia/">as the most powerful and extensible calculator on your computer</a>. Learn more about the <a href="https://en.wikibooks.org/wiki/Introducing_Julia/The_REPL">basic usage of the REPL here</a>.</p>
+<h3 id="jupyter_notebooks"><a href="#jupyter_notebooks">Jupyter Notebooks</a></h3>
+<p>Jupyter &#40;<strong>Ju</strong>lia, <strong>Py</strong>thon, and <strong>R</strong>&#41; notebooks have become incredibly widespread as a way to interactively edit code and do data analysis. To get started, open the Julia REPL and follow the <a href="https://github.com/JuliaLang/IJulia.jl#installation">instructions to install IJulia</a>, which is what powers Julia for Jupypter.</p>
+<h3 id="visual_studio_code"><a href="#visual_studio_code">Visual Studio Code</a></h3>
+<p>Among many tools for writing code, Visual Studio Code &#40;free from Microsoft&#41; has <a href="https://www.julia-vscode.org/">a nice Julia editor</a> that has things like auto-completion, plot views, dataset viewer, inline results, help text, and more &#40;similar to RStudio if that&#39;s where you are coming from&#41;. <a href="https://github.com/julia-vscode/julia-vscode#installing-juliavs-codevs-code-julia-extension">Instructions for instllation are here</a> &#40;you have alraedy completed step 1 at this point&#41;.</p>
+<p>Once installed, you can create a new file and save it with a <code>.jl</code> extension and the environement will load the Julia integrations. From there, you can <a href="https://www.julia-vscode.org/docs/stable/userguide/runningcode/">interactively run code blocks</a> &#40;similar to the interactivity in Jupyter&#41; by hitting <code>Alt</code> &#43;<code>Enter</code>.</p>
+<p>At this point you are free to use either Jupyter or VS Code to continue the tutorial - either editor should work.</p>
+<h2 id="retention_analysis"><a href="#retention_analysis">Retention Analysis</a></h2>
+<h3 id="loading_the_sample_data"><a href="#loading_the_sample_data">Loading the sample data</a></h3>
+<p>We start by loading the CSV and DataFrames packages so that we can load the data.</p>
+<pre><code class="language-julia">using CSV, DataFrames</code></pre>
+<p>To read a CSV, we open the file and pass it &#40;with <code>x |&gt; f</code> is the same as <code>f&#40;x&#41;</code>&#41; to make it a <code>DataFrame</code><sup id="fnref:1"><a href="#fndef:1" class="fnref">[1]</a></sup>. <em>The font may render it like a triangle ligature, but <code>|&gt;</code> is just <code>|</code> and <code>&gt;</code> next to each other.</em></p>
+<pre><code class="language-julia">df_pol = CSV.File(raw"tutorials\_data\retention\policies.csv") |> DataFrame!
+first(df_pol,5)</code></pre><pre><code class="plaintext">5×16 DataFrame
+│ Row │ id    │ joint │ life1_id │ life1_name          │ life1_sex │ life1_risk │ life1_smoke │ life1_birthday │ life2_id │ life2_name    │ life2_sex │ life2_risk │ life2_smoke │ life2_birthday │ face    │ issue_date │
+│     │ Int64 │ Bool  │ Int64    │ String              │ String    │ String     │ Bool        │ Dates.Date     │ Int64?   │ String?       │ String?   │ String?    │ Bool?       │ Dates.Date?    │ Float64 │ Dates.Date │
+├─────┼───────┼───────┼──────────┼─────────────────────┼───────────┼────────────┼─────────────┼────────────────┼──────────┼───────────────┼───────────┼────────────┼─────────────┼────────────────┼─────────┼────────────┤
+│ 1   │ 1     │ 0     │ 2415     │ Stacie Labes        │ M         │ Standard   │ 0           │ 1948-09-16     │ missing  │ missing       │ missing   │ missing    │ missing     │ missing        │ 4.25e6  │ 1999-12-03 │
+│ 2   │ 2     │ 0     │ 602      │ Devi Breffitt       │ F         │ Preferred  │ 1           │ 1960-12-18     │ missing  │ missing       │ missing   │ missing    │ missing     │ missing        │ 3.8e6   │ 2005-11-15 │
+│ 3   │ 3     │ 0     │ 2197     │ Mollee Gundry       │ M         │ Standard   │ 1           │ 1969-12-04     │ missing  │ missing       │ missing   │ missing    │ missing     │ missing        │ 1.9e6   │ 2019-11-23 │
+│ 4   │ 4     │ 0     │ 3507     │ Ninette Ouchterlony │ M         │ Preferred  │ 1           │ 1957-09-20     │ missing  │ missing       │ missing   │ missing    │ missing     │ missing        │ 3.1e6   │ 2005-06-28 │
+│ 5   │ 5     │ 1     │ 1003     │ Henriette Oels      │ M         │ Preferred  │ 0           │ 1979-04-11     │ 1004     │ Kathrine Oels │ F         │ Standard   │ 0           │ 1971-09-07     │ 4.9e6   │ 2023-01-03 │</code></pre>
+<p>And the cessions:</p>
+<pre><code class="language-julia">df_cessions = CSV.File(raw"tutorials\_data\retention\cessions.csv") |> DataFrame!
+first(df_cessions,5)</code></pre><pre><code class="plaintext">5×3 DataFrame
+│ Row │ pol_id │ ceded    │ company │
+│     │ Int64  │ Float64  │ String  │
+├─────┼────────┼──────────┼─────────┤
+│ 1   │ 1      │ 1.625e6  │ BRe     │
+│ 2   │ 1      │ 1.625e6  │ CRe     │
+│ 3   │ 2      │ 1.4e6    │ ARe     │
+│ 4   │ 2      │ 1.4e6    │ ARe     │
+│ 5   │ 3      │ 450000.0 │ CRe     │</code></pre>
+<h3 id="data_structures"><a href="#data_structures">Data Structures</a></h3>
+<pre><code class="language-julia">struct Life
+    id
+    name
+    policies
+    sex
+    risk
+    smoke
+    birthdate
+end
+
+struct Policy
+    id
+    is_joint
+    face
+    issue_date
+    cessions
+end
+
+struct Cession
+    pol_id
+    face
+    company
+end</code></pre>
+<h3 id="data_meet_model_model_meet_data"><a href="#data_meet_model_model_meet_data">Data, meet Model. Model, meet Data.</a></h3>
+<pre><code class="language-julia">cessions = Dict() # will map pol_id => [cessions]
+
+for row in eachrow(df_cessions)
+    c = Cession(
+            row.pol_id,
+            row.ceded,
+            row.company
+        )
+    if ~haskey(cessions,row.pol_id)
+        cessions[row.pol_id]  = [c]
+    else
+        push!(cessions[row.pol_id],c)
+    end
+
+
+end</code></pre>
+<p>A dictionary, <code>Dict&#40;&#41;</code> is a <em>really</em> versatile data structure which contains <code>key &#61;&gt; value</code> pairs. In this case, we will use the id of each life from the data as the <em>key</em> and the <code>Life</code> data structure as the <em>value</em>.</p>
+<pre><code class="language-julia">lives = Dict() # will map life_id => Life</code></pre><pre><code class="plaintext">Dict{Any,Any}()</code></pre>
+<p>The hardest part is now looping through the policy data and building the <code>Life</code>s and <code>Policy</code>s.</p>
+<pre><code class="language-julia">for row in eachrow(df_pol) # loop through each row of the policies dataframe
+
+    pol = Policy(  # Create a Polcy object
+        row.id,                        # the policy id
+        row.joint,                     # a true/false if the policy is joint
+        row.face,                      # face amount
+        row.issue_date,                # issue date
+        haskey(cessions,row.id) ? cessions[row.id] : nothing # note the in-line "ternary" if statement
+    )
+
+    if ~haskey(lives,row.life1_id)      # create a new Life it it's not already in our `lives` dictionary
+        lives[row.life1_id] = Life(
+            row.life1_id,               # id
+            row.life1_name,             # name
+            [pol],                      # policies
+            row.life1_sex,              # sex
+            row.life1_risk,             # risk
+            row.life1_smoke,            # smoke
+            row.life1_birthday          # birthdate
+        )
+    else # append (push) to the existing life's policies
+        push!(lives[row.life1_id].policies,pol)
+    end
+
+    if pol.is_joint  # only do something with a second life it we have a joint policy
+        if ~haskey(lives,row.life2_id)      # create a new Life it it's not already in our `lives` dictionary
+            lives[row.life2_id] = Life(
+                row.life2_id,               # id
+                row.life2_name,             # name
+                [pol],                      # policies
+                row.life2_sex,              # sex
+                row.life2_risk,             # risk
+                row.life2_smoke,            # smoke
+                row.life2_birthday          # birthdate
+            )
+
+        else # append (push) to the existing life's policies
+            push!(lives[row.life2_id].policies,pol)
+        end
+    end
+
+
+end</code></pre>
+<h3 id="building_the_retention_logic"><a href="#building_the_retention_logic">Building the Retention Logic&#33;</a></h3>
+<p>Now, we define what <code>retained</code> means for both a <code>Policy</code> and a <code>Life</code>. We will define the same <strong>function</strong> &#40;<code>retention</code>&#41; to have two different <strong>methods</strong>, one that operates on a <code>Life</code> and one that operates on a <code>Policy</code>. This is called <strong>multiple dispatch</strong> and allows us to operate contextually and avoid a lot of <code>if/then</code> logic, or to have to define <code>retaiend_policy</code> and <code>retained_life</code> separately. For this case that&#39;s not a big deal, but sometimes it can get really unweildy writing out so many different function names.</p>
+<pre><code class="language-julia">function retained(pol::Policy)
+    if ~isnothing(pol.cessions)
+        pol.face - sum(cession.face for cession in pol.cessions)
+    else
+        pol.face
+    end
+end</code></pre><pre><code class="plaintext">retained (generic function with 2 methods)</code></pre>
+<p>Note that in the above, there is no <code>return</code> statement. Julia will return the result of the last expression if there&#39;s no explicit <code>return</code>. Alternatively, we can specifiy it with <code>return</code>. It&#39;s a matter of choice, but in the long run having the explicit version can be more consistent and readable, if a little bit more verbose.</p>
+<pre><code class="language-julia">function retained(life::Life)
+    return sum(retained.(life.policies))
+end</code></pre><pre><code class="plaintext">retained (generic function with 2 methods)</code></pre>
+<p>Let&#39;s also define a function that represents how much risk we would <em>like</em> to have at most for a given life. In words, let&#39;s say that our ruleset is the following:</p>
+<table><tr><th align="right">Issue Age</th><th align="right">Single</th><th align="right">Joint</th></tr><tr><td align="right">0 to 60</td><td align="right">750,000</td><td align="right">1,000,000</td></tr><tr><td align="right">61 and above</td><td align="right">400,000</td><td align="right">800,000</td></tr></table>
+<p>To figure out the issue age &#40;which we&#39;ll take as the first-issued policy in the case of multiple policies&#41;, we need to work with <code>Dates</code>.</p>
+<pre><code class="language-julia">using Dates</code></pre>
+<p>To get the information we need for our chart, we have to work with the policies and do some date manimulation:</p>
+<ol>
+<li><p>To get the earliest issue date, we find the minimum <code>issue_date</code> of all the policeis that this life has</p>
+</li>
+<li><p>To get the issue_age, we count how many years are between the <code>first_issue_date</code> and the <code>life.birthdate</code>.</p>
+</li>
+<li><p>With that information, it&#39;s a simple <code>if/then</code> to get the value we want</p>
+</li>
+</ol>
+<pre><code class="language-julia">function retention_limit(life::Life)
+    first_issue_date = minimum(pol.issue_date for pol in life.policies)
+    issue_age = length(life.birthdate:Year(1):first_issue_date) - 1 # Count of Years between the two dates minus 1
+
+    if any(pol.is_joint for pol in life.policies)  # if any of the policies are joint
+        if issue_age > 60
+            return 8.0e5  # scientific notation
+        else
+            return 1_000_000.0 # the underscores are just for readability
+        end
+    else # not joint
+        if issue_age > 60
+            return 4.0e5
+        else
+            return 7.5e5
+        end
+    end
+end</code></pre><pre><code class="plaintext">retention_limit (generic function with 1 method)</code></pre>
+<p>Now we can naturally work with the model data. For example, let&#39;s look at the retained face on life #74:</p>
+<pre><code class="language-julia">retained(lives[74])</code></pre><pre><code class="plaintext">5.4e6</code></pre>
+<p>And for the first policy that this life has:</p>
+<pre><code class="language-julia">retained(lives[74].policies[1])</code></pre><pre><code class="plaintext">350000.0</code></pre>
+<p>Hmm. Those aren&#39;t the same - seems like that life actually has more than one policy. We can confirm that:</p>
+<pre><code class="language-julia">length(lives[74].policies)</code></pre><pre><code class="plaintext">8</code></pre>
+<p>How would we see how much is retained on each policy? There&#39;s several ways:</p>
+<ul>
+<li><p><code>map&#40;lives&#91;74&#93;.policies,retained&#41;</code> - We already talked about <code>map</code>, but here&#39;s another example of it in action.</p>
+</li>
+<li><p><code>&#91;retained&#40;pol&#41; for pol in lives&#91;74&#93;.policies&#93;</code> - build an array by using <code>retained</code> on each policy referenced in the life</p>
+</li>
+<li><p><code>retained&#40;lives&#91;74&#93;.policies&#41;</code> - <strong>broadcast</strong> the function across the array. Let&#39;s talk more about this one:</p>
+</li>
+</ul>
+<pre><code class="language-julia">retained.(lives[74].policies)</code></pre><pre><code class="plaintext">8-element Array{Float64,1}:
+ 350000.0
+      1.0e6
+ 350000.0
+      1.0e6
+ 350000.0
+      1.0e6
+ 350000.0
+      1.0e6</code></pre>
+<p>Broadcasting — the <code>.</code> in-between the function and the parenthesis — is a very powerful aspect of Julia - it means that you can move from operating on individual units to collections of units without redefining methods or needing to always work in vectors or always work with one thing at a time.</p>
+<h3 id="analyzing_the_inforce_data"><a href="#analyzing_the_inforce_data">Analyzing the inforce data</a></h3>
+<p>That&#39;s it&#33; now we can look at our retention very easily at a policy or life level. In the next block of code, we will:</p>
+<ol>
+<li><p>Map over the <code>values</code> which are the <code>Life</code>s in our <code>lives</code> dictionary.</p>
+<ul>
+<li><p><code>Map</code> takes a collection and applies a function. In our case that function is what follows after the <code>do</code>.</p>
+</li>
+</ul>
+</li>
+<li><p>Create a <em>named tuple</em> of relevant data that we want</p>
+<ul>
+<li><p>A <em>named tuple</em> is kind of like a light-weight dataframe. You can inspect the values like <code>life_retention&#91;1&#93;.name</code> to get the name of the first processed <code>life</code>.</p>
+</li>
+</ul>
+</li>
+<li><p>Pipe &#40;<code>|&gt;</code> again&#41; into a DataFrame, mostly so that it will print nicely for this tutorial but there&#39;s no reason we couldn&#39;t work directly with the named tuple.</p>
+</li>
+<li><p><code>sort&#33;&#40;&#41;</code> the DataFrame so that it will show the biggest <code>:retained</code> ones first &#40;reverse order&#41;.</p>
+<ul>
+<li><p>Why is it <code>:retained</code> instead of <code>&quot;retained&quot;</code>? Actually it could be either&#33; The former is a <em>Symbol</em> in Julia, which is similar in many ways to a string, but when working with it, Julia won&#39;t have to compare each individual character to decided if it&#39;s equal to another Symbol.</p>
+</li>
+</ul>
+</li>
+<li><p>Show the top 10 most retained lives.</p>
+</li>
+</ol>
+<pre><code class="language-julia">life_retention = map(values(lives)) do life # Loop through the values of the lives pairs
+    (
+        id = life.id,
+        name = life.name,
+        sex = life.sex,
+        pol_count = length(life.policies),
+        total_face = sum(pol.face for pol in life.policies),
+        retained = retained(life),
+        desired_limit = retention_limit(life)
+    )
+end |> DataFrame
+
+sort!(life_retention,:retained,rev=true)
+sort!(life_retention,"retained",rev=true)
+
+first(life_retention,10)</code></pre><pre><code class="plaintext">10×7 DataFrame
+│ Row │ id    │ name               │ sex    │ pol_count │ total_face │ retained │ desired_limit │
+│     │ Int64 │ String             │ String │ Int64     │ Float64    │ Float64  │ Float64       │
+├─────┼───────┼────────────────────┼────────┼───────────┼────────────┼──────────┼───────────────┤
+│ 1   │ 1199  │ Del Massimi        │ M      │ 8         │ 2.76e7     │ 2.76e7   │ 1.0e6         │
+│ 2   │ 760   │ Ginnifer Ugolotti  │ F      │ 16        │ 5.98e7     │ 2.72e7   │ 1.0e6         │
+│ 3   │ 3927  │ Molly Farlham      │ M      │ 8         │ 2.64e7     │ 2.64e7   │ 750000.0      │
+│ 4   │ 2674  │ Fanny Stoller      │ F      │ 12        │ 4.2e7      │ 2.52e7   │ 750000.0      │
+│ 5   │ 3138  │ Ray Hearty         │ F      │ 12        │ 3.54e7     │ 2.5e7    │ 750000.0      │
+│ 6   │ 1423  │ Marci Fletcher     │ M      │ 12        │ 4.62e7     │ 2.46e7   │ 1.0e6         │
+│ 7   │ 2911  │ Joceline Facer     │ M      │ 12        │ 5.1e7      │ 2.42e7   │ 750000.0      │
+│ 8   │ 1136  │ Pearla Huntingford │ F      │ 8         │ 2.76e7     │ 2.32e7   │ 750000.0      │
+│ 9   │ 3915  │ Malena Walczynski  │ M      │ 8         │ 2.56e7     │ 2.32e7   │ 1.0e6         │
+│ 10  │ 2530  │ Oralie Birtwhistle │ F      │ 8         │ 3.72e7     │ 2.26e7   │ 1.0e6         │</code></pre>
+<p>Mr. Massimi has a lot coverage&#33; A next step might be to figure out what cessions would need to be made in order to cede risk to a reinsurer. We will instead take the analysis a different direction and look at a stochasic mortality projection.</p>
+<h2 id="stochastic_mortality_analysis"><a href="#stochastic_mortality_analysis">Stochastic Mortality Analysis</a></h2>
+<p>Something not commonly done with life insurance modeling is to take a life-oriented view of the block of business. You might consider it, however, because it can give you greater insight into your risk profile:</p>
+<ul>
+<li><p>The distribution of claims can be different as one life might generate multiple simultaneous claims</p>
+</li>
+<li><p>Even without first-to-die reporting, you can infer status from the block:</p>
+<ul>
+<li><p>If you have a joint policy, and one or more of the lives <em>also</em> has a single policy, then you can infer the living status of that life.</p>
+</li>
+</ul>
+</li>
+</ul>
+<table class="fndef" id="fndef:1">
+    <tr>
+        <td class="fndef-backref"><a href="#fnref:1">[1]</a></td>
+        <td class="fndef-content">The <code>&#33;</code> in <code>DataFrame&#33;</code> is used, by convention, to indicate that we are changing the object given, in this case the loaded CSV data.</td>
+    </tr>
+</table>
+
+</p>
+<div class="page-foot">
+  <div class="copyright">
+    &copy; JuliaActuary Contributors. Last modified: August 15, 2020. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and <a href="https://julialang.org" >Julia</a>.
+  </div>
+</div>
+</div><!-- CONTENT ENDS HERE -->
+    
+    
+        <script src="/libs/highlight/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();hljs.configure({tabReplace: '    '});</script>
+
+    
+    <script data-goatcounter="https://juliaactuary.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+  </body>
+</html>

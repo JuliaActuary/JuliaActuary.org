@@ -1,2 +1,2 @@
 # This file was generated, do not modify it. # hide
-using CSV, DataFrames
+lives = Dict() # will map life_id => Life

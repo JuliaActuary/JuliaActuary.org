@@ -1,0 +1,9 @@
+5×16 DataFrame
+│ Row │ id    │ joint │ life1_id │ life1_name          │ life1_sex │ life1_risk │ life1_smoke │ life1_birthday │ life2_id │ life2_name    │ life2_sex │ life2_risk │ life2_smoke │ life2_birthday │ face    │ issue_date │
+│     │ Int64 │ Bool  │ Int64    │ String              │ String    │ String     │ Bool        │ Dates.Date     │ Int64?   │ String?       │ String?   │ String?    │ Bool?       │ Dates.Date?    │ Float64 │ Dates.Date │
+├─────┼───────┼───────┼──────────┼─────────────────────┼───────────┼────────────┼─────────────┼────────────────┼──────────┼───────────────┼───────────┼────────────┼─────────────┼────────────────┼─────────┼────────────┤
+│ 1   │ 1     │ 0     │ 2415     │ Stacie Labes        │ M         │ Standard   │ 0           │ 1948-09-16     │ missing  │ missing       │ missing   │ missing    │ missing     │ missing        │ 4.25e6  │ 1999-12-03 │
+│ 2   │ 2     │ 0     │ 602      │ Devi Breffitt       │ F         │ Preferred  │ 1           │ 1960-12-18     │ missing  │ missing       │ missing   │ missing    │ missing     │ missing        │ 3.8e6   │ 2005-11-15 │
+│ 3   │ 3     │ 0     │ 2197     │ Mollee Gundry       │ M         │ Standard   │ 1           │ 1969-12-04     │ missing  │ missing       │ missing   │ missing    │ missing     │ missing        │ 1.9e6   │ 2019-11-23 │
+│ 4   │ 4     │ 0     │ 3507     │ Ninette Ouchterlony │ M         │ Preferred  │ 1           │ 1957-09-20     │ missing  │ missing       │ missing   │ missing    │ missing     │ missing        │ 3.1e6   │ 2005-06-28 │
+│ 5   │ 5     │ 1     │ 1003     │ Henriette Oels      │ M         │ Preferred  │ 0           │ 1979-04-11     │ 1004     │ Kathrine Oels │ F         │ Standard   │ 0           │ 1971-09-07     │ 4.9e6   │ 2023-01-03 │
