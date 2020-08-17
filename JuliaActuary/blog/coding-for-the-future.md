@@ -111,7 +111,7 @@ SpaceX doesn't just hire rocket scientists - they hire rocket scientists who cod
 
 The forthcoming series of articles will help illustrate what this can look like in practice: examining the business case, acquainting with ways of interacting with problems outside of spreadsheets and dataframes, and approaching work in a way that removes the boring parts and focuses on the concepts and insights.
 
-The [next article in this series](/blog/julia-actuaries/) will discuss what tools enable an actuary to deliver on the vision outlined in this article. In particular, it will highlight the Julia programming language, a tool almost well positioned to enable actuaries to develop the analysis, systems, and models of tomorrow.
+The [next article in this series](/blog/julia-actuaries/) will discuss what tools enable an actuary to deliver on the vision outlined in this article. In particular, it will highlight the Julia programming language, a tool well positioned to enable actuaries to develop the analysis, systems, and models of tomorrow.
 
 # Footnotes
 
