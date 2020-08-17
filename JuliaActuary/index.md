@@ -325,6 +325,6 @@ If you have other ideas or questions, feel free to also open an issue, or discus
 Becoming a Rockstar Actuary and building the insurance company of the future
 
 1. [Coding the Future](/blog/coding-for-the-future/)
-2. [Julia as the Language of Choice for Actuaries](/blog/julia-actuaries/)
+2. [Julia for Actuaries](/blog/julia-actuaries/)
 3. A tour of Julia 
 4. A deeper dive into JuliaActuary packages
