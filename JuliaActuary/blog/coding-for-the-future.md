@@ -32,19 +32,24 @@ Value-add came from the C-Suite, not from the underlying business processes, ope
 
 The pace of *strategic value-add* isn't slowing, though it must stretch further (in complexity and risk) to find comparable opportunities as the past. Having more agile, data-oriented operations enables companies to be able to react to and implement those opportunities. *Technological value-add* can improve a company's bottom line through lower expenses and higher top-line growth, but often with a more favorable risk profile than some of the "strategic" opportunities.
 
-The reversion to technological value-add has begun and is evident across many traditional sectors. Tesla claims it's a technology company; Amazon is the #1 product retailer because of its vehement focus on internal information sharing[^3]; Airlines are so dependent on their systems that the skies become quieter on the rare occasion that their computers give way.
+Today, there is a trend reverting back to technological value-creation and is evident across many traditional sectors. Tesla claims that it's a technology company; Amazon is the #1 product retailer because of its vehement focus on internal information sharing[^3]; Airlines are so dependent on their systems that the skies become quieter on the rare occasion that their computers give way.
 
-Why is it, that company's that are so involved in *things* (cars, shopping) and *physical services* (flights) are so much more focused on improving their technological operations than insurance companies *whose very focus is 'information-based'*? **The market has rewarded those who have prioritized their internal technological solutions.**
+Why is it, that companies that are so involved in *things* (cars, shopping) and *physical services* (flights) are so much more focused on improving their technological operations than insurance companies *whose very focus is 'information-based'*? **The market has rewarded those who have prioritized their internal technological solutions.**
 
 Commoditized investing services and low yield environments have reduced insurance companies' comparative advantage to "manage money". Yield compression and the explosion of consumer-oriented investment services means a more competitive focus on the ability to manage the entire policy lifecycle efficiently (digitally), perform more real-time analysis of experience and risk management, and handle the growing product and regulatory complexity.
 
 These are problems that have technological solutions and are waiting for insurance company adoption.
 
-Companies that treat data like coordinates on a grid (spreadsheets) *will get left behind*. Two main hurdles have prevented technology companies from breaking into insurance: high regulatory barriers to entry and figuring out how to sell complex, value-added insurance products without traditional distribution. Once those two walls are breached, traditional insurance companies without a strong technology core will struggle to keep up. It's not just adding "developers" to an organization; it's going to be **getting domain experts like actuaries to be an integral part of the technology transformation.**
+Companies that treat data like coordinates on a grid (spreadsheets) *will get left behind*. Two main hurdles have prevented technology companies from breaking into insurance:
+
+1. High regulatory barriers to entry, and
+2. Difficulty in selling complex insurance products without traditional distribution.
+
+Once those two walls are breached, traditional insurance companies without a strong technology core will struggle to keep up. The key to thriving is not just adding "developers" to an organization; it's going to be **getting domain experts like actuaries to be an integral part of the technology transformation.**
 
 ## What's coding got to do with this?
 
-Everything. Programming is the optimal way to interact between the computer and actuary — and importantly between computer and computer. Programming is the actionable expression of ideas, math, analysis, and information. Think of programming as the 21st-century leap in the Actuary's toolkit, just as spreadsheets were in the preceding 40 years. Versus a spreadsheet-oriented workflow:
+Everything. Programming is the optimal way to interact between the computer and actuary — and importantly between computer and computer. Programming is the actionable expression of ideas, math, analysis, and information. Think of programming as the 21st-century leap in the actuary's toolkit, just as spreadsheets were in the preceding 40 years. Versus a spreadsheet-oriented workflow:
 
 - Easier automation of, and between processes
 - Better reproducibility
@@ -62,7 +67,9 @@ It's commonly accepted now that in order to gather insights from your data, you 
 
 As we swing back to a technological focus, we do not leave the the finance-driven complexity behind. The increasingly complex business needs will highlight a large productivity difference between an actuary who can code and one who can't — simply because the former can react, create, synthesize, and model faster than the latter. From the efficiency of transforming administration extracts, summarizing and aggregating valuation output, to analyzing claims data in ways that spreadsheets simply can't handle, you can become a "**10x Actuary**"[^4].
 
-Flipping switches in a graphical user interface versus being able to *build models* is the difference between having a surface-level familiarity and having full command over the analysis and the concepts involved — with the flexibility to do what your software can't. Your current software might be able to perform the first layer of analysis, but be at a loss when you want to visualize, perform sensitivity analysis, statistics, stochastic analysis, or process automation. Things that, when done programmatically, are often just a few lines of additional code.
+Flipping switches in a graphical user interface versus being able to *build models* is the difference between having a surface-level familiarity and having full command over the analysis and the concepts involved — with the flexibility to do what your software can't. 
+
+Your current software might be able to perform the first layer of analysis, but be at a loss when you want to visualize, perform sensitivity analysis, statistics, stochastic analysis, or process automation. Things that, when done programmatically, are often just a few lines of additional code.
 
 Do I advocate dropping the license for your software vendor? No, not yet anyway. But the ability to supplement and break out of the modeling box has been an increasingly important part of most actuaries' work.
 
@@ -100,12 +107,11 @@ SpaceX doesn't just hire rocket scientists - they hire rocket scientists who cod
 
 **Be an actuary who codes.**
 
-
 ## Future Articles
 
 The forthcoming series of articles will help illustrate what this can look like in practice: examining the business case, acquainting with ways of interacting with problems outside of spreadsheets and dataframes, and approaching work in a way that removes the boring parts and focuses on the concepts and insights.
 
-The [next article in this series](/blog/julia-actuaries/) will discuss what tools enable an actuary to deliver on the vision outlined in this article. In particular, it will focus on the Julia programming language, a tool almost uniquely positioned to enable actuaries to develop the analysis, systems, and models of tomorrow.
+The [next article in this series](/blog/julia-actuaries/) will discuss what tools enable an actuary to deliver on the vision outlined in this article. In particular, it will highlight the Julia programming language, a tool almost well positioned to enable actuaries to develop the analysis, systems, and models of tomorrow.
 
 # Footnotes
 

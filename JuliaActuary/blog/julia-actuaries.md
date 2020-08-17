@@ -1,6 +1,6 @@
 @def author = "Alec Loudenback"
 @def date = "July 9, 2020"
-@def title = "Julia as the Language of Choice for Actuaries"
+@def title = "Julia for Actuaries"
 
 # {{fill title}}
 
@@ -12,16 +12,15 @@
 <div class="alert alert-danger"> <strong> NOTE: </strong> This article is a draft and the website/URLs are a work in progress. </div>
 ~~~
 
-I have suggested that actuaries who are competent coders will differentiate both companies and individuals. Coding ability will be useful no matter what tools you utilize everyday (e.g. Python/R/C++/etc. and associated packages) and I appreciate the communities and tools provided in all of them for their contribution to moving actuarial processes out of the Spreadsheet Age.
+I have suggested that actuaries who are competent coders will differentiate both companies and individuals. Coding ability will be useful no matter what tools you utilize everyday (e.g. Python/R/C++/etc. and associated packages) and all of those communities and tools contribute to moving actuarial processes out of the Spreadsheet Age.
 
-However, I'd like to motivate why Julia is the best programming language for actuaries to learn and use it as the *holotype* for the modern actuarial process.
-
+However, I'd like to motivate why Julia is an excellent programming language for actuaries to learn and use it as the *holotype* for the modern actuarial process.
 
 ## Julia Overview
 
 Julia is a relatively new programming language[^1], and *it shows*. It is evident in its pragmatic, productivity-focused design choices, pleasant syntax, rich ecosystem, thriving communities, and its ability to both be very general purpose and power cutting edge computing.
 
-Math-heavy computations *look like math*, it's easy to pick up, quick-to-prototype, packages work well together, and has great visualization libraries. There's a growing body of online references and tutorials, videos, and print media to learn from and it's popularity continues to grow across many fields.
+Math-heavy code *look like math*, it's easy to pick up, quick-to-prototype, packages work well together, and has great visualization libraries. There's a growing body of online references and tutorials, videos, and print media to learn from and it's popularity continues to grow across many fields.
 
 Large financial services companies have already started realizing gains: BlackRock's Aladdin portfolio modeling, the Federal Reserve's economic simulations, and Aviva's Solvency II-compliant modeling. The last of these has a [great talk on YouTube](https://www.youtube.com/watch?v=__gMirBBNXY) by Aviva's Tim Thornham, which showcases an on-the-ground view of what difference the right choice of technology and programming language can make. Moving from their vendor-supplied modeling solution was **1000x faster, took 1/10 the amount of code, and was implemented 10x faster**[^2].
 
@@ -84,7 +83,7 @@ end
 
 > Expressiveness example: we defined `retained` and adapted it to mean related, but different things depending on the specific context. That is, we didn't have to define `retained_life(...)` and `retained_pol(...)` because Julia can be *dispatch* based on what you give it. This is, as some would call it, [unreasonably effective](https://www.youtube.com/watch?v=kc9HwsxE1OY).
 
-Let's use the above code in practice then. 
+Let's use the above code in practice then.
 
 *The `julia>` syntax indicates that we've moved into Julia's interactive mode (REPL mode):*
 
@@ -153,14 +152,14 @@ Julia is easy to write, learn, and be productive in:
 - Jupyter Notebook support (it's in the name! **Ju**lia-**Pyt**hon-**R**)
 - Many small, nice things that add up:
   - Unicode characters like `α` or `β`
-  - nice display of arrays
-  - simple anonymous function syntax
-  - wide range of text editor support
-  - first-class support for `missing` values across the entire language
+  - Nice display of arrays
+  - Simple anonymous function syntax
+  - Wide range of text editor support
+  - First-class support for missing values across the entire language
   - Literate programming support (like R-Markdown)
-- Awesome, built-in `Dates` package that makes working with dates a breeze
-- Directly call and use R and Python code/packages with the `PyCall` and `RCall` packages
-- Error messages are helpful and tell you *what line* the error came from, not just what the error is
+- Built-in `Dates` package that makes working with dates a breeze
+- Ability to directly call and use R and Python code/packages with the `PyCall` and `RCall` packages
+- Error messages are helpful and tell you *what line* the error came from, not just the type of error
 
 For  power-users, advanced features are easily accessible: parallel programming, broadcasting, types, interfaces, metaprogramming, and more.
 
