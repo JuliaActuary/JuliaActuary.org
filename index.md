@@ -41,7 +41,7 @@ These packages are available for use in your project.
 
 More info on these packages can be found below.
 
-### Adding and Using Packages
+## Adding and Using Packages
 
 There are two ways to add packages: 
 - In the code itself: `using Pkg; Pkg.add("MortalityTables")`
