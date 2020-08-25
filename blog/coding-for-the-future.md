@@ -79,7 +79,7 @@ Additionally, code-based solutions can leverage the entire-technology sector's p
 
 ## Risk Governance
 
-Code based workflows are incredibly conducive to risk governance frameworks as well. A modern software project has all of the following... why not a modern insurance product and associated processes?
+Code based workflows are highly conducive to risk governance frameworks as well. A modern software project has all of the following... why not a modern insurance product and associated processes?
 
 - Access control and approval processes
 - Version control, version management, and reproducibility
