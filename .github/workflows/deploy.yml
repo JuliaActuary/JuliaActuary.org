@@ -34,7 +34,7 @@ jobs:
       uses: actions/setup-python@v1
       with:
         python-version: '3.x'
-    - run: pip install matplotlib # if you use PyPlot this is needed
+    # - run: pip install matplotlib # if you use PyPlot this is needed
     - name: Install Julia
       uses: julia-actions/setup-julia@v1
       with:
@@ -48,11 +48,12 @@ jobs:
     #   The last line should be `optimize()` though you may want to give it
     #   specific arguments, see the documentation or ?optimize in the REPL.
     - run: julia -e '
-            using Pkg; Pkg.add(["NodeJS", "Franklin"]);
+            using Pkg; Pkg.add("NodeJS");
+            Pkg.add(Pkg.PackageSpec(name="Franklin", rev="master"));
             using NodeJS; run(`$(npm_cmd()) install highlight.js`);
             using Franklin;
             Pkg.activate("."); Pkg.instantiate();
-            optimize()'
+            optimize(minify=false, prerender=false)'
     - name: Build and Deploy
       uses: JamesIves/github-pages-deploy-action@releases/v3
       with:
