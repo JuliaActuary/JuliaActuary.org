@@ -322,7 +322,7 @@ If you have other ideas or questions, feel free to also open an issue, or discus
 # Blog
 
 *Note:* The following series is draft and subject to change:
-Becoming a Rockstar Actuary and building the insurance company of the future
+Becoming a 10x Actuary and building the insurance company of the future
 
 1. [Coding the Future](/blog/coding-for-the-future/)
 2. [Julia for Actuaries](/blog/julia-actuaries/)
