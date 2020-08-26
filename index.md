@@ -326,5 +326,5 @@ Becoming a Rockstar Actuary and building the insurance company of the future
 
 1. [Coding the Future](/blog/coding-for-the-future/)
 2. [Julia for Actuaries](/blog/julia-actuaries/)
-3. A tour of Julia 
-4. A deeper dive into JuliaActuary packages
+3. A tour of Julia (Coming Soon...) 
+4. A deeper dive into JuliaActuary packages (Coming Soon...)
