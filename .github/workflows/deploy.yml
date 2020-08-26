@@ -56,6 +56,7 @@ jobs:
             optimize(minify=true, prerender=true)'
     - name: Show Git Diff
     - run: git diff 
+    - name: show ls
     - run: ls -a 
     - name: Build and Deploy
       uses: JamesIves/github-pages-deploy-action@releases/v3
