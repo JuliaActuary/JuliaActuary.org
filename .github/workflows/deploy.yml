@@ -54,6 +54,9 @@ jobs:
             using Franklin;
             Pkg.activate("."); Pkg.instantiate();
             optimize(minify=true, prerender=true)'
+    - name: Show Git Diff
+    - run: git diff 
+    - run: ls -a 
     - name: Build and Deploy
       uses: JamesIves/github-pages-deploy-action@releases/v3
       with:
