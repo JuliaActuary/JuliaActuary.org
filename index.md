@@ -35,7 +35,7 @@ These packages are available for use in your project.
 ~~~
 
 ~~~
-<div class="alert alert-info"> <strong>Note:</strong> You can use any package in it's current state and not worry about changes to the packages breaking any code that you write by <a href="https://julialang.github.io/Pkg.jl/v1/toml-files/#The-version-field-1">specifying the desired package version</a> in your project. 
+<div class="alert alert-info"> <strong>Note:</strong> You can use any package in it's current state and not worry about changes breaking any code that you write. Julia's package manager let's you <a href="https://julialang.github.io/Pkg.jl/v1/toml-files/#Manifest.toml-1" >exactly recreate a set of code and its dependencies.</a> (<a href="https://stackoverflow.com/questions/63485891/how-do-i-ensure-repeatability-of-julia-code-and-assoicated-dependencies">More</a>).
 </div>
 ~~~
 
