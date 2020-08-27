@@ -238,7 +238,7 @@ code {
     line-height: 1.35em;
     border-radius: 10px;
     padding: 0.6em 1.2em; 
-    background-color: rgb(244,244,255,0.7);}
+    background-color: rgb(244,244,255,0.5);}
 
 .hljs-meta, .hljs-metas, .hljs-metap { font-weight: bold; }
 
