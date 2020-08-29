@@ -290,7 +290,7 @@ julia> ? survivorship
 
 ## Integration with R and Python
 
-Julia has unrivaled ability to integrate with other languages, including existing R scripts via [RCall](https://github.com/JuliaInterop/RCall.jl) and with Python scripts via [PyCall](https://github.com/JuliaPy/PyCall.jl) so you can leverage any existing work.
+Julia integrates with other languages, allowing you to leverage existing scripts and packages in R via [RCall](https://github.com/JuliaInterop/RCall.jl) and in Python  via [PyCall](https://github.com/JuliaPy/PyCall.jl).
 
 <!-- =============================
      Contributing
