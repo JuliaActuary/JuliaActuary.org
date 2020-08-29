@@ -305,7 +305,7 @@ Julia integrates with other languages, allowing you to leverage existing scripts
 ~~~
 
 **License and Usage**:
-The packages in JuliaActuary are open-source and liberally licenses (MIT License) to allow wide private and commercial usage of the packages, like the base Julia language and many other packages in the ecosystem.
+The packages in JuliaActuary are open-source and liberally licensed (MIT License) to allow wide private and commercial usage of the packages, like the base Julia language and many other packages in the ecosystem.
 
 **Pull Requests**:
 JuliaActuary is open source; you are free to modify, use, or change your copy of the code - but if you make enhancements please consider opening a pull request ([basic walkthrough here](https://kshyatt.github.io/post/firstjuliapr/)).
