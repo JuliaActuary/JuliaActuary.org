@@ -255,6 +255,7 @@ Coming soon!
 #### Miscellaneous
 
 - [Interactive exploration](/tutorials/PlutoESG) of the AAA's Economic Scenario Generator
+- [Universal Life Policy Account Mechanics as a Differential Equation](/tutorials/PolicyDiffEq)
 
 #### Help mode
 
