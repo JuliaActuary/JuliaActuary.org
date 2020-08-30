@@ -238,6 +238,7 @@ ä(lc, 5)     # 5 year annuity due
 - [JuliaLang.org](https://julialang.org/), the home site with the downloads to get started, and links to learning resources.
 - [JuliaHub](https://juliahub.com/ui/Home) indexes open-source Julia packages and makes the entire ecosystem and documentation searchable from one place.
 - [JuliaAcademy](https://juliaacademy.com/courses), which has free short courses in Data Science, Introduction to Julia, DataFrames.jl, Machine Learning, and more.
+- [Data Science Tutorials](https://alan-turing-institute.github.io/DataScienceTutorials.jl/) from the Alan Turing Institute.
 - [Learn Julia in Y minutes](https://learnxinyminutes.com/docs/julia/), a great quick-start if you are already comfortable with coding.
 - [Think Julia](https://benlauwens.github.io/ThinkJulia.jl/latest/book.html), a free e-book (or paid print edition) book which introduces programming from the start and teaches you valuable ways of thinking.
 - [Design Patterns and Best Practices](https://www.packtpub.com/application-development/hands-design-patterns-julia-10), a book that will help you as you transition from smaller, one-off scripts to designing larger packages and projects.
@@ -254,6 +255,7 @@ Coming soon!
 #### Miscellaneous
 
 - [Interactive exploration](/tutorials/PlutoESG) of the AAA's Economic Scenario Generator
+- [Universal Life Policy Account Mechanics as a Differential Equation](/tutorials/PolicyDiffEq)
 
 #### Help mode
 
