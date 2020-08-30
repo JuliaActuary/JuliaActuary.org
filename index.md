@@ -114,7 +114,7 @@ julia> vbt2001.select[35] # vector of rates for issue age 35
  ⋮
  0.94729
  1.0
- 
+
 julia> vbt2001.select[35][35] #issue age 35, attained age 35
  0.00036
 
@@ -244,11 +244,20 @@ ä(lc, 5)     # 5 year annuity due
 
 ### Actuarial Usage and Examples
 
-**Documentation** - Each package includes examples on the Github site and in the documentation.
+#### Documentation
 
-**Walkthroughs and tutorials** - coming soon!
+Each package includes examples on the Github site and in the documentation.
 
-**Help mode** - You can also access help text when using the packages in the REPL by [activating help mode](https://docs.julialang.org/en/v1/stdlib/REPL/index.html#Help-mode-1), e.g.:
+#### Walkthroughs and tutorials 
+Coming soon!
+
+#### Miscellaneous
+
+- [Interactive exploration](/tutorials/PlutoESG) of the AAA's Economic Scenario Generator
+
+#### Help mode
+
+You can also access help text when using the packages in the REPL by [activating help mode](https://docs.julialang.org/en/v1/stdlib/REPL/index.html#Help-mode-1), e.g.:
 
 ```julia-repl
 julia> ? survivorship
