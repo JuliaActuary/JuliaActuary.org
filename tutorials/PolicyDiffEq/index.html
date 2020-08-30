@@ -1,0 +1,146 @@
+<!doctype html> <html lang=en > <meta charset=UTF-8 > <meta name=viewport  content="width=device-width, initial-scale=1"> <meta name=Description  content="JuliaActuary is an organization dedicated to promoting open-source software in actuarial science and industry applications."> <link rel=stylesheet  href="/libs/katex/katex.min.css"> <link rel=stylesheet  href="/libs/highlight/github.min.css"> <link rel=stylesheet  href="/css/franklin.css"> <link rel=stylesheet  href="/css/basic.css"> <link rel=icon  href="/assets/favicon.png"> <script async defer src="https://buttons.github.io/buttons.js"></script> <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600&family=Literata:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&display=swap" rel=stylesheet > <title>Universal Life Policy Account Mechanics as a Differential Equation | JuliaActuary</title> <link rel=apple-touch-icon  sizes=180x180  href="/assets/apple-touch-icon.png"> <link rel=icon  type="image/png" sizes=32x32  href="/assets/favicon-32x32.png"> <link rel=icon  type="image/png" sizes=16x16  href="/assets/favicon-16x16.png"> <link rel=manifest  href="/assets/site.webmanifest"> <header> <div class=blog-name > <a href="/"> <div class=blog-name-logo-container > <div class=blog-name-logo > <img src="/assets/logo_square.svg" alt=logo  /> </div> <div>JuliaActuary</div> </div> </a> <div class=tagline >Practical, extensible, and open-source actuarial modeling and analysis. </div> </div> <nav> <ul> <li><a href="/">Home</a> <li><a href="/#Packages">Packages</a> <ul> <li><a href="/#mortalitytablesjl">MortalityTables.jl</a> <li><a href="/#actuaryutilitiesjl">ActuaryUtilities.jl</a> <li><a href="/#LifeContingenciesjl">LifeContingencies.jl</a> </ul> <li><a href="/#community">Community</a> <ul> <li><a href="/#learn">Learn</a> <li><a href="/#integration_with_r_and_python">Integration</a> <li><a href="/#contributing">Contributing</a> </ul> <li><a href="/#blog">Blog</a> </ul> <img src="/assets/hamburger.svg" id=menu-icon > </nav> </header> <div class=franklin-content ><h1 id=fill_title ><a href="#fill_title">Universal Life Policy Account Mechanics as a Differential Equation</a></h1> <div class=franklin-toc ><ol><li><a href="#introduction">Introduction</a><li><a href="#running_the_system">Running the system</a><li><a href="#moving_up_the_ladder_of_abstraction">Moving up the ladder of abstraction</a><li><a href="#conclusion">Conclusion </a><li><a href="#endnotes">Endnotes</a></ol></div> <h2 id=introduction ><a href="#introduction">Introduction</a></h2> <p>This demonstrates an example of defining an universal life policy value roll like a discrete differential equation. </p> <p>It then uses the <a href="https://sciml.ai/">SciML DifferentialEquations</a> package to &quot;solve&quot; the policy projection given a single point, but also to see how the policy projection behaves under different premium and interest rate conditions.</p> <pre><code class="julia hljs"><span class=hljs-keyword >using</span> Dates, MortalityTables, DifferentialEquations,Plots, ActuaryUtilities
+<span class=hljs-built_in >Date</span>(<span class=hljs-number >2000</span>,<span class=hljs-number >1</span>,<span class=hljs-number >1</span>)</code></pre> <p>Let&#39;s use the 2001 CSO table as the basis for cost of insurance charges:</p> <pre><code class="julia hljs">tables = MortalityTables.tables()
+cso = tables[<span class=hljs-string >&quot;2001 CSO Super Preferred Select and Ultimate - Male Nonsmoker, ANB&quot;</span>]</code></pre> <pre><code class="plaintext hljs">MortalityTable (CSO/CET):
+   Name:
+       2001 CSO Super Preferred Select and Ultimate - Male Nonsmoker, ANB
+   Fields: 
+       (:select, :ultimate, :metadata)
+   Provider:
+       American Academy of Actuaries
+   mort.SOA.org ID:
+       1076
+   mort.SOA.org link:
+       https://mort.soa.org/ViewTable.aspx?&amp;TableIdentity=1076
+   Description:
+       2001 Commissioners Standard Ordinary (CSO) Super Preferred Select and Ultimate Table – Male Nonsmoker. Basis: Age Nearest Birthday. Minimum Select Age: 0. Maximum Select Age: 99. Minimum Ultimate Age: 16. Maximum Ultimate Age: 120
+</code></pre> <p>Next, policy mechanics are coded. It&#39;s essentially a discrete differential equation, so it leverages <a href="https://diffeq.sciml.ai/dev/"><code>DifferentialEquations.jl</code></a></p> <p>The projection is coded in the <a href="https://diffeq.sciml.ai/dev/types/discrete_types/">Discrete DifferentialEquation format</a>:</p> <span class=katex-display ><span class=katex ><span class=katex-mathml ><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>u</mi><mrow><mi>n</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>=</mo><mi>f</mi><mo stretchy=false >(</mo><mi>u</mi><mo separator=true >,</mo><mi>p</mi><mo separator=true >,</mo><msub><mi>t</mi><mrow><mi>n</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy=false >)</mo></mrow><annotation encoding="application/x-tex"> u_{n+1} = f(u,p,t_{n+1}) </annotation></semantics></math></span><span class=katex-html  aria-hidden=true ><span class=base ><span class=strut  style="height:0.638891em;vertical-align:-0.208331em;"></span><span class=mord ><span class="mord mathdefault">u</span><span class=msupsub ><span class="vlist-t vlist-t2"><span class=vlist-r ><span class=vlist  style="height:0.301108em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class=pstrut  style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">n</span><span class="mbin mtight">+</span><span class="mord mtight">1</span></span></span></span></span><span class=vlist-s >​</span></span><span class=vlist-r ><span class=vlist  style="height:0.208331em;"><span></span></span></span></span></span></span><span class=mspace  style="margin-right:0.2777777777777778em;"></span><span class=mrel >=</span><span class=mspace  style="margin-right:0.2777777777777778em;"></span></span><span class=base ><span class=strut  style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.10764em;">f</span><span class=mopen >(</span><span class="mord mathdefault">u</span><span class=mpunct >,</span><span class=mspace  style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault">p</span><span class=mpunct >,</span><span class=mspace  style="margin-right:0.16666666666666666em;"></span><span class=mord ><span class="mord mathdefault">t</span><span class=msupsub ><span class="vlist-t vlist-t2"><span class=vlist-r ><span class=vlist  style="height:0.301108em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class=pstrut  style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">n</span><span class="mbin mtight">+</span><span class="mord mtight">1</span></span></span></span></span><span class=vlist-s >​</span></span><span class=vlist-r ><span class=vlist  style="height:0.208331em;"><span></span></span></span></span></span></span><span class=mclose >)</span></span></span></span></span> <p>In the code below, this translates to:</p> <ul> <li><p><span class=katex ><span class=katex-mathml ><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>u</mi></mrow><annotation encoding="application/x-tex">u</annotation></semantics></math></span><span class=katex-html  aria-hidden=true ><span class=base ><span class=strut  style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">u</span></span></span></span> is the <em>state</em> of the system. We will track three variables to represent the <code>state</code>:</p> <ul> <li><p><code>state&#91;1&#93;</code> is the account value</p> <li><p><code>state&#91;2&#93;</code> is the premium paid</p> <li><p><code>state&#91;3&#93;</code> is the policy duration</p> </ul> <li><p><span class=katex ><span class=katex-mathml ><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi></mrow><annotation encoding="application/x-tex">p</annotation></semantics></math></span><span class=katex-html  aria-hidden=true ><span class=base ><span class=strut  style="height:0.625em;vertical-align:-0.19444em;"></span><span class="mord mathdefault">p</span></span></span></span> are the parameters of the system.</p> <li><p><span class=katex ><span class=katex-mathml ><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>t</mi></mrow><annotation encoding="application/x-tex">t</annotation></semantics></math></span><span class=katex-html  aria-hidden=true ><span class=base ><span class=strut  style="height:0.61508em;vertical-align:0em;"></span><span class="mord mathdefault">t</span></span></span></span> is the time, which will represent days since policy issuance</p> </ul> <pre><code class="julia hljs"><span class=hljs-keyword >function</span> policy_projection(state,p,t)
+    <span class=hljs-comment ># grab the state from the inputs</span>
+    av = state[<span class=hljs-number >1</span>] 
+    
+    <span class=hljs-comment ># calculated variables</span>
+    cur_date = p.issue_date + Day(t)
+    dur = duration(p.issue_date,cur_date)
+    att_age = p.issue_age + dur - <span class=hljs-number >1</span>
+	
+	<span class=hljs-comment ># lapse if AV &lt;= 0 </span>
+    lapsed = (av &lt;= <span class=hljs-number >0.0</span> ) &amp; (t &gt; <span class=hljs-number >1</span>) 
+    
+    <span class=hljs-keyword >if</span> !lapsed 
+
+        monthly_coi_rate = (<span class=hljs-number >1</span> - (<span class=hljs-number >1</span>-p.mort_assump[att_age]) ^ (<span class=hljs-number >1</span>/<span class=hljs-number >12</span>))
+
+		<span class=hljs-comment >## Periodic Policy elements</span>
+		
+        <span class=hljs-comment ># annual events</span>
+        <span class=hljs-keyword >if</span> Dates.monthday(cur_date) == Dates.monthday(p.issue_date) || 
+			cur_date ==p.issue_date + Day(<span class=hljs-number >1</span>) <span class=hljs-comment ># OR first issue date</span>
+			
+            premium = p.annual_prem
+        <span class=hljs-keyword >else</span>
+            premium = <span class=hljs-number >0.0</span>
+        <span class=hljs-keyword >end</span>
+
+        <span class=hljs-comment ># monthly_events</span>
+        <span class=hljs-keyword >if</span> Dates.day(cur_date) == Dates.day(p.issue_date)
+            coi = max((p.face - av) * monthly_coi_rate,<span class=hljs-number >0.0</span>)
+        <span class=hljs-keyword >else</span>
+            coi = <span class=hljs-number >0.0</span>
+        <span class=hljs-keyword >end</span>
+
+        <span class=hljs-comment ># daily events</span>
+        int(av) = av * ((<span class=hljs-number >1</span> + p.int_rate) ^ (<span class=hljs-number >1</span> / <span class=hljs-number >360</span>) - <span class=hljs-number >1.0</span>)
+
+
+        
+        <span class=hljs-comment ># av</span>
+        new_av = max(<span class=hljs-number >0.0</span>,av - coi + premium + int(av-coi)) 
+	
+				<span class=hljs-comment ># new state</span>
+		<span class=hljs-keyword >return</span> [new_av, premium, dur] <span class=hljs-comment ># AV, Prem, Dur</span>
+        
+    <span class=hljs-keyword >else</span>
+		<span class=hljs-comment ># new state</span>
+		<span class=hljs-keyword >return</span> [<span class=hljs-number >0.0</span>, <span class=hljs-number >0.0</span>, dur] <span class=hljs-comment ># AV, Prem, Dur</span>
+        
+    <span class=hljs-keyword >end</span>
+	
+    
+<span class=hljs-keyword >end</span></code></pre> <p>The following function will create a named tuple of parameters given a varying <code>prem</code> &#40;premium&#41; and <code>int</code> &#40;credit rate&#41;.</p> <pre><code class="julia hljs">params(prem,int) = (
+    int_rate = int,
+    issue_date = <span class=hljs-built_in >Date</span>(<span class=hljs-number >2010</span>,<span class=hljs-number >1</span>,<span class=hljs-number >1</span>),
+    face = <span class=hljs-number >1e6</span>,
+    issue_age = <span class=hljs-number >25</span>,
+    mort_assump = tables[<span class=hljs-string >&quot;2001 CSO Super Preferred Select and Ultimate - Male Nonsmoker, ANB&quot;</span>].ultimate,
+    projection_years = <span class=hljs-number >75</span>,
+    annual_prem = prem,
+)</code></pre> <h2 id=running_the_system ><a href="#running_the_system">Running the system</a></h2> <p>An example of a single projection:</p> <pre><code class="julia hljs">p = params(
+        <span class=hljs-number >8000.0</span>, <span class=hljs-comment ># 8,000 annual premium</span>
+        <span class=hljs-number >0.08</span>    <span class=hljs-comment ># 8% interest</span>
+        ) 
+
+<span class=hljs-comment ># calculate the number of days to project</span>
+projection_end_date = p.issue_date + Year(p.projection_years) 
+days_to_project = Dates.value(projection_end_date - p.issue_date)
+        
+<span class=hljs-comment ># the [0.0,..] are the initial conditions for the tracked variables</span>
+ prob = DiscreteProblem(policy_projection,[<span class=hljs-number >0.0</span>,<span class=hljs-number >0.0</span>,<span class=hljs-number >0</span>],(<span class=hljs-number >0</span>,days_to_project),p)
+ proj = solve(prob,FunctionMap())
+
+ plot(proj)</code></pre> <p>This results in the following plot. The tracked output variables <code>u1</code> and <code>u2</code> represent the two <code>vars</code> that we tracked above: account value and cumulative premium. <img src="/assets/tutorials/PolicyDiffEq/code/output/single_projection.svg" alt=""></p> <h2 id=moving_up_the_ladder_of_abstraction ><a href="#moving_up_the_ladder_of_abstraction">Moving up the ladder of abstraction</a></h2> <p>An excellent way to understand the behavior of a model is to <a href="http://worrydream.com/LadderOfAbstraction/">move up the ladder of abstraction</a>. Below, we will see what happens to the projection at varying levels of credit rates and annual premiums.</p> <pre><code class="julia hljs">prem_range = <span class=hljs-number >1000.0</span>:<span class=hljs-number >100.0</span>:<span class=hljs-number >9000.0</span>
+int_range = <span class=hljs-number >0.02</span>:<span class=hljs-number >0.0025</span>:<span class=hljs-number >0.08</span>
+
+<span class=hljs-keyword >function</span> ending_av(ann_prem,int,days_to_project)
+    p = params(ann_prem,int)
+    prob = DiscreteProblem(policy_projection,[<span class=hljs-number >0.0</span>,<span class=hljs-number >0.0</span>,<span class=hljs-number >0</span>],(<span class=hljs-number >0</span>,days_to_project),p)
+    proj = solve(prob,FunctionMap())
+    end_av = proj[<span class=hljs-keyword >end</span>][<span class=hljs-number >1</span>] 
+    <span class=hljs-keyword >if</span> end_av == <span class=hljs-number >0.0</span>
+        lapse_time = findfirst(isequal(<span class=hljs-number >0.0</span>),proj[<span class=hljs-number >1</span>,<span class=hljs-number >2</span>:<span class=hljs-keyword >end</span>])
+    <span class=hljs-keyword >else</span>
+        lapse_time = length(proj)
+    <span class=hljs-keyword >end</span>
+    duration = proj[<span class=hljs-number >3</span>,lapse_time]
+    end_age = p.issue_age + duration - <span class=hljs-number >1.0</span>
+    
+    <span class=hljs-keyword >return</span> end_av,end_age
+    
+<span class=hljs-keyword >end</span>
+
+end_age = zeros(length(prem_range),length(int_range))
+end_av = zeros(length(prem_range),length(int_range))
+
+<span class=hljs-comment ># loop through each projection we did and fill our ranges with the ending AV and ending age</span>
+<span class=hljs-keyword >for</span> (i,vp) <span class=hljs-keyword >in</span> enumerate(prem_range)
+    <span class=hljs-keyword >for</span> (j,vi) <span class=hljs-keyword >in</span> enumerate(int_range)
+        (end_av[i,j],end_age[i,j]) = ending_av(vp,vi,days_to_project)
+    <span class=hljs-keyword >end</span>
+<span class=hljs-keyword >end</span></code></pre> <p>Now let&#39;s plot the result:</p> <pre><code class="julia hljs"><span class=hljs-keyword >using</span> ColorSchemes <span class=hljs-comment ># for Turbo colors, which emphasize readability</span>
+
+viz = plot(layout=<span class=hljs-number >2</span>) <span class=hljs-comment ># side by side plot</span>
+
+<span class=hljs-comment ># </span>
+contour!(viz[<span class=hljs-number >1</span>],int_range,
+    prem_range,
+    end_av ./ <span class=hljs-number >1e6</span>, <span class=hljs-comment ># scale to millions for readability</span>
+
+    contour_labels=<span class=hljs-literal >true</span>,
+    c=cgrad(ColorSchemes.turbo.colors),
+    fill=<span class=hljs-literal >true</span>,
+    title=<span class=hljs-string >&quot;AV at age 100 (\$M)&quot;</span>,
+    ylabel=<span class=hljs-string >&quot;Annual Premium (\$)&quot;</span>,
+    
+
+)
+
+contour!(viz[<span class=hljs-number >2</span>],int_range,
+    prem_range,
+    end_age, 
+
+    contour_labels=<span class=hljs-literal >true</span>,
+    c=cgrad(ColorSchemes.turbo.colors),
+    fill=<span class=hljs-literal >true</span>,
+    yaxis=<span class=hljs-literal >false</span>,
+    title=<span class=hljs-string >&quot;Age at Lapse&quot;</span>,
+)
+
+annotate!(viz[<span class=hljs-number >2</span>],<span class=hljs-number >0.055</span>,<span class=hljs-number >7000</span>,Plots.text(<span class=hljs-string >&quot;Doesn&#x27;t lapse \nbefore age 100&quot;</span>, <span class=hljs-number >8</span>, :white, :center))</code></pre> <img src="/assets/tutorials/PolicyDiffEq/code/output/prem_int_sensitivity.svg" alt=""> <p>Not surprising, interest has a huge effect on the policy projection. Premium is also a major influence.</p> <p>One thing that&#39;s remarkable is how going from <code>2000</code> premium to just <code>~2200</code> of premium results in about a &#36;5m difference at <code>8&#37;</code> interest. </p> <h2 id=conclusion ><a href="#conclusion">Conclusion </a></h2> <p>This shows how universal life mechanics are a dynamic system. the growth/decay is governed by two competing feedback loops:</p> <ul> <li><p>Growth: the force of interest lets the balance grow exponentially over long periods of time</p> <li><p>Decay: low balances increase the net amount at risk and the resulting COI charges.</p> </ul> <h2 id=endnotes ><a href="#endnotes">Endnotes</a></h2> <p>This is not meant to represent any particular insurance product, nor fully replicate typical account mechanics.</p> <div class=page-foot > <div class=copyright > &copy; JuliaActuary Contributors. Last modified: August 30, 2020. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and <a href="https://julialang.org" >Julia</a>. </div> </div> </div> <script data-goatcounter="https://juliaactuary.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
