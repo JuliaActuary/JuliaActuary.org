@@ -30,7 +30,7 @@ The packages utilize all of the benefits of the [Julia language](https://juliala
 These packages are available for use in your project. Keep scrolling down for more info on each one.
 ~~~
 <div class="wide_table_reponsive" >
-<table><tbody><tr><th align="left">Name</th><th align="right">Description</th><th align="center">Development Status</th></tr><tr><td align="left"><a href="https://github.com/JuliaActuary/MortalityTables.jl"><code>MortalityTables.jl</code></a></td><td align="right">Easily work with standard <a href="mort.SOA.org">mort.SOA.org</a> tables with essential survivorship calculations.</td><td align="center"><img class="lifecycle" alt="Maturing" src="/assets/Maturing.svg"> <br> The package is nearing it's <code>v1.0.0</code> release</td></tr><tr><td align="left"><a href="https://github.com/JuliaActuary/ActuaryUtilities.jl"><code>ActuaryUtilities.jl</code></a></td><td align="right">Robust and fast calculations for <code>internal_rate_of_return</code>, <code>duration</code>, <code>convexity</code>, <code>present_value</code>, <code>breakeven</code>, and more.</td><td align="center"> <img class="lifecycle" alt="Maturing" src="/assets/Maturing.svg"> <br>  The package is nearing it's <code>v1.0.0</code> release</td></tr><tr><td align="left"><a href="https://github.com/JuliaActuary/LifeContingencies.jl"><code>LifeContingencies.jl</code></a></td><td align="right">Insurance, annuity, premium, and reserve maths.</td><td align="center"> <img class="lifecycle" alt="Developing" src="/assets/Developing.svg"> <br>  Functionality is mostly built-out, but the API may change substantially.</td></tr></tbody></table>
+<table><tbody><tr><th align="left">Name</th><th align="right">Description</th><th align="center">Development Status</th></tr><tr><td align="left"><a href="https://github.com/JuliaActuary/MortalityTables.jl"><code>MortalityTables.jl</code></a></td><td align="right">Easily work with standard <a href="mort.SOA.org">mort.SOA.org</a> tables and parametric models with common survivorship calculations.</td><td align="center"><img class="lifecycle" alt="Maturing" src="/assets/Maturing.svg"> <br> The package is nearing it's <code>v1.0.0</code> release</td></tr><tr><td align="left"><a href="https://github.com/JuliaActuary/ActuaryUtilities.jl"><code>ActuaryUtilities.jl</code></a></td><td align="right">Robust and fast calculations for <code>internal_rate_of_return</code>, <code>duration</code>, <code>convexity</code>, <code>present_value</code>, <code>breakeven</code>, and more.</td><td align="center"> <img class="lifecycle" alt="Maturing" src="/assets/Maturing.svg"> <br>  The package is nearing it's <code>v1.0.0</code> release</td></tr><tr><td align="left"><a href="https://github.com/JuliaActuary/LifeContingencies.jl"><code>LifeContingencies.jl</code></a></td><td align="right">Insurance, annuity, premium, and reserve maths.</td><td align="center"> <img class="lifecycle" alt="Developing" src="/assets/Developing.svg"> <br>  Functionality is mostly built-out, but the API may change substantially.</td></tr></tbody></table>
 </div>
 ~~~
 
@@ -66,6 +66,7 @@ using PackageName
 - `survivorship` and `decrement` functions to calculate decrements over period of time
 - Partial year mortality calculations (Uniform, Constant, Balducci)
 - Friendly syntax and flexible usage
+- Extensive set of parametric mortality models.
 
 **Quickstart**
 
@@ -131,6 +132,18 @@ julia> survivorship(vbt2001.ultimate,30,40) # the survivorship between ages 30 a
 julia> decrement(vbt2001.ultimate,30,40) # the decrement between ages 30 and 40
 0.010559533456509618
 ```
+
+**Parametric Models**
+
+Over 20 different models included. Example with the `Gompertz` model
+
+```julia
+m = MortalityTables.Gompertz(a=0.01,b=0.2)
+
+m[20]                 # the mortality rate at age 20
+decrement(m,20,25)    # the five year cumulative mortality rate
+survivorship(m,20,25) # the five year survivorship rate
+
 \\
 [MortalityTables package on Github 🡕](https://github.com/JuliaActuary/MortalityTables.jl)
 
