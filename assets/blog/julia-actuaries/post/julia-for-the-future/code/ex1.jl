@@ -8,7 +8,7 @@ struct Policy
   face
   cessions
  end
- 
+
 struct Cession
   ceded
 end
