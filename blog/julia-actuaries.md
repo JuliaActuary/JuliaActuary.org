@@ -264,48 +264,48 @@ In Julia, packages tend to be more plug-and-play. For example, every time you wa
 
 Some highlighted/recommended packages:
 
-- Actuarial Specific (part of the JuliaActuary.org umbrella[3])
-  -MortalityTables – Common tables and parametric models with survivorship calculations
-  -ActuaryUtilities – Robust and fast calculations for common functions
-  -LifeContingencies - Insurance, annuity, premium, and reserve maths.
+- Actuarial Specific (part of the [JuliaActuary.org](https://juliaactuary.org/) umbrella[^3])
+  - MortalityTables – Common tables and parametric models with survivorship calculations
+  - ActuaryUtilities – Robust and fast calculations for common functions
+  - LifeContingencies - Insurance, annuity, premium, and reserve maths.
 - Data Science and Statistics
-  -DataFrames – Work with datasets – similar to R’s data.table and able to handle much larger datasets than Python’s Pandas[4]
-  -Distributions – Common and exotic statistical distributions
-  -GLM – Generalized Linear Models
-  -Turing – Bayesian statistics like STAN
-  -Gen – Probabilistic programming
-  -OnlineStats – Single-pass algorithms for real-time/large data
-  -CSV – The fastest CSV reader
-  -ODBC – Database Connections
-  -Dates – Robust date types and functions
+  - DataFrames – Work with datasets – similar to R’s data.table and able to handle much larger datasets than Python’s Pandas[^4]
+  - Distributions – Common and exotic statistical distributions
+  - GLM – Generalized Linear Models
+  - Turing – Bayesian statistics like STAN
+  - Gen – Probabilistic programming
+  - OnlineStats – Single-pass algorithms for real-time/large data
+  - CSV – The fastest CSV reader
+  - ODBC – Database Connections
+  - Dates – Robust date types and functions
 - Machine Learning
-  -Flux – Elegant, GPU-powered ML
-  -Knet – Deep learning framework
-  -MLJ – ML models
+  - Flux – Elegant, GPU-powered ML
+  - Knet – Deep learning framework
+  - MLJ – ML models
 - Notebooks
-  -IJulia – the Julia kernel for Jupyter notebooks
-  -Pluto – reactive/interactive notebooks that address some of the biggest complaints with Jupyter
+  - IJulia – the Julia kernel for Jupyter notebooks
+  - Pluto – reactive/interactive notebooks that address some of the biggest complaints with Jupyter
 - Visualization
-  -Plots – Powerful but user-friendly plots and animations
-  -Queryverse – Tidyverse-like data manipulation and plotting
+  - Plots – Powerful but user-friendly plots and animations
+  - Queryverse – Tidyverse-like data manipulation and plotting
 - Dashboards
-  -Plot.ly Dash
+  - Plot.ly Dash
 - Miscellaneous
-  -Optim – Uni/Multivariate function optimization
-  -LinearAlgebra – Built-in library for working with arrays/matrices
-  -JuMP – Linear, Nonlinear, and other advanced optimization
-  -CUDA – GPU programming made easier
-  -Revise – Edit code while you work on it
+  - Optim – Uni/Multivariate function optimization
+  - LinearAlgebra – Built-in library for working with arrays/matrices
+  - JuMP – Linear, Nonlinear, and other advanced optimization
+  - CUDA – GPU programming made easier
+  - Revise – Edit code while you work on it
 - Interoperability
-  -PyCall – use existing Python code/libraries inside Julia
-  -RCall – use existing R code/libraries inside Julia
+  - PyCall – use existing Python code/libraries inside Julia
+  - RCall – use existing R code/libraries inside Julia
 - Web
-  -HTTP – Core web utilities
-  -Genie – Full application framework
-  -Franklin – Flexible Static Site Generator
+  - HTTP – Core web utilities
+  - Genie – Full application framework
+  - Franklin – Flexible Static Site Generator
 - Documentation
-  -Weave/Literate – Literate programming like RMarkdown
-  -Documenter – Write your documentation as comments to your code and produce full docpages
+  - Weave/Literate – Literate programming like RMarkdown
+  - Documenter – Write your documentation as comments to your code and produce full docpages
 
 And finally, some general resources to get started:
 
