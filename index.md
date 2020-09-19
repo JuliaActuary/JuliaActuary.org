@@ -30,7 +30,7 @@ The packages utilize all of the benefits of the [Julia language](https://juliala
 These packages are available for use in your project. Keep scrolling down for more info on each one.
 ~~~
 <div class="wide_table_reponsive" >
-<table><tbody><tr><th align="left">Name</th><th align="right">Description</th><th align="center">Development Status</th></tr><tr><td align="left"><a href="https://github.com/JuliaActuary/MortalityTables.jl"><code>MortalityTables.jl</code></a></td><td align="right">Easily work with standard <a href="mort.SOA.org">mort.SOA.org</a> tables and parametric models with common survivorship calculations.</td><td align="center"><img class="lifecycle" alt="Maturing" src="/assets/Maturing.svg"> <br> The package is nearing it's <code>v1.0.0</code> release</td></tr><tr><td align="left"><a href="https://github.com/JuliaActuary/ActuaryUtilities.jl"><code>ActuaryUtilities.jl</code></a></td><td align="right">Robust and fast calculations for <code>internal_rate_of_return</code>, <code>duration</code>, <code>convexity</code>, <code>present_value</code>, <code>breakeven</code>, and more.</td><td align="center"> <img class="lifecycle" alt="Maturing" src="/assets/Maturing.svg"> <br>  The package is nearing it's <code>v1.0.0</code> release</td></tr><tr><td align="left"><a href="https://github.com/JuliaActuary/LifeContingencies.jl"><code>LifeContingencies.jl</code></a></td><td align="right">Insurance, annuity, premium, and reserve maths.</td><td align="center"> <img class="lifecycle" alt="Developing" src="/assets/Developing.svg"> <br>  Functionality is mostly built-out, but the API may change substantially.</td></tr></tbody></table>
+<table><tbody><tr><th align="left">Name</th><th align="right">Description</th><th align="center">Development Status</th></tr><tr><td align="left"><a href="https://github.com/JuliaActuary/MortalityTables.jl"><code>MortalityTables.jl</code></a></td><td align="right">Easily work with standard <a href="mort.SOA.org">mort.SOA.org</a> tables and parametric models with common survival calculations.</td><td align="center"><img class="lifecycle" alt="Maturing" src="/assets/Maturing.svg"> <br> The package is nearing it's <code>v1.0.0</code> release</td></tr><tr><td align="left"><a href="https://github.com/JuliaActuary/ActuaryUtilities.jl"><code>ActuaryUtilities.jl</code></a></td><td align="right">Robust and fast calculations for <code>internal_rate_of_return</code>, <code>duration</code>, <code>convexity</code>, <code>present_value</code>, <code>breakeven</code>, and more.</td><td align="center"> <img class="lifecycle" alt="Maturing" src="/assets/Maturing.svg"> <br>  The package is nearing it's <code>v1.0.0</code> release</td></tr><tr><td align="left"><a href="https://github.com/JuliaActuary/LifeContingencies.jl"><code>LifeContingencies.jl</code></a></td><td align="right">Insurance, annuity, premium, and reserve maths.</td><td align="center"> <img class="lifecycle" alt="Developing" src="/assets/Developing.svg"> <br>  Functionality is mostly built-out, but the API may change substantially.</td></tr></tbody></table>
 </div>
 ~~~
 
@@ -63,7 +63,7 @@ using PackageName
 **Features**
 
 - Lots of bundled SOA mort.soa.org tables
-- `survivorship` and `decrement` functions to calculate decrements over period of time
+- `survival` and `decrement` functions to calculate decrements over period of time
 - Partial year mortality calculations (Uniform, Constant, Balducci)
 - Friendly syntax and flexible usage
 - Extensive set of parametric mortality models.
@@ -123,10 +123,10 @@ julia> vbt2001.ultimate[95]  # ultimate vectors only need to be called with the 
  0.24298
 ```
 
-Calculate the force of mortality or survivorship over a range of time:
+Calculate the force of mortality or survival over a range of time:
 
 ```julia
-julia> survivorship(vbt2001.ultimate,30,40) # the survivorship between ages 30 and 40
+julia> survival(vbt2001.ultimate,30,40) # the survival between ages 30 and 40
 0.9894404665434904
 
 julia> decrement(vbt2001.ultimate,30,40) # the decrement between ages 30 and 40
@@ -142,7 +142,7 @@ m = MortalityTables.Gompertz(a=0.01,b=0.2)
 
 m[20]                 # the mortality rate at age 20
 decrement(m,20,25)    # the five year cumulative mortality rate
-survivorship(m,20,25) # the five year survivorship rate
+survival(m,20,25) # the five year survival rate
 
 \\
 [MortalityTables package on Github 🡕](https://github.com/JuliaActuary/MortalityTables.jl)
@@ -169,7 +169,7 @@ Some of the functions included:
 - `discount_rate` for a given fixed rate or `InterestCurve`
 - `internal_rate_of_return` or `irr` to calculate the IRR given cashflows (including at timepoints like Excel's `XIRR`)
 - `breakeven` to calculate the breakeven time for a set of cashflows
-- `accum_offset` to calculate accumulations like survivorship from a mortality vector
+- `accum_offset` to calculate accumulations like survival from a mortality vector
 
 \\
 [ActuaryUtilities package on GitHub 🡕](https://github.com/JuliaActuary/ActuaryUtilities.jl)
@@ -275,20 +275,20 @@ Coming soon!
 You can also access help text when using the packages in the REPL by [activating help mode](https://docs.julialang.org/en/v1/stdlib/REPL/index.html#Help-mode-1), e.g.:
 
 ```julia-repl
-julia> ? survivorship
-    survivorship(mortality_vector,to_age)
-    survivorship(mortality_vector,from_age,to_age)
+julia> ? survival
+    survival(mortality_vector,to_age)
+    survival(mortality_vector,from_age,to_age)
 
 
-  Returns the survivorship through attained age to_age. The start of the 
+  Returns the survival through attained age to_age. The start of the 
   calculation is either the start of the vector, or attained age `from_age` 
   and `to_age` need to be Integers. 
 
   Add a DeathDistribution as the last argument to handle floating point 
   and non-whole ages:
 
-    survivorship(mortality_vector,to_age,::DeathDistribution)
-    survivorship(mortality_vector,from_age,to_age,::DeathDistribution)
+    survival(mortality_vector,to_age,::DeathDistribution)
+    survival(mortality_vector,from_age,to_age,::DeathDistribution)
 
 
   If given a negative to_age, it will return 1.0. Aside from simplifying the code, 
@@ -300,17 +300,17 @@ julia> ? survivorship
 
   julia> qs = UltimateMortality([0.1,0.3,0.6,1]);
 
-  julia> survivorship(qs,0)
+  julia> survival(qs,0)
   1.0
-  julia> survivorship(qs,1)
+  julia> survival(qs,1)
   0.9
 
-  julia> survivorship(qs,1,1)
+  julia> survival(qs,1,1)
   1.0
-  julia> survivorship(qs,1,2)
+  julia> survival(qs,1,2)
   0.7
 
-  julia> survivorship(qs,0.5,Uniform())
+  julia> survival(qs,0.5,Uniform())
   0.95
 ```
 
