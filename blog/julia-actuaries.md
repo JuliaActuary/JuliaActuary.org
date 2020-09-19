@@ -8,10 +8,6 @@
 
 *{{fill date}}*
 
-~~~
-<div class="alert alert-danger"> <strong> NOTE: </strong> This article is a draft and the website/URLs are a work in progress. </div>
-~~~
-
 I have suggested that actuaries who are competent coders will differentiate both themselves and the companies they work for. Coding ability will be useful no matter what tools you utilize every day (e.g., Python/R/C++/etc. and associated packages) and all of those tools and communities contribute to moving actuarial processes out of the Spreadsheet Age. 
 
 There’s a newer programming language called Julia, and in this article, I’d like to motivate why Julia is worth considering for actuarial work.

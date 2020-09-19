@@ -8,10 +8,6 @@
 
 *{{fill date}}*
 
-~~~
-<div class="alert alert-danger"> <strong> NOTE: </strong> This article is a draft and the website/URLs are a work in progress. </div>
-~~~
-
 > "...the insurance business is perhaps the purest example of an 'information-based' industry - that is, an industry whose sole activity consists of gathering, processing, and distributing information." - Martin Campbell-Kelly, writing about the Prudential in the Victorian Era.[^1]
 
 \toc
