@@ -143,7 +143,7 @@ m = MortalityTables.Gompertz(a=0.01,b=0.2)
 m[20]                 # the mortality rate at age 20
 decrement(m,20,25)    # the five year cumulative mortality rate
 survival(m,20,25) # the five year survival rate
-
+```
 \\
 [MortalityTables package on Github 🡕](https://github.com/JuliaActuary/MortalityTables.jl)
 
