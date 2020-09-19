@@ -20,7 +20,7 @@ With Julia: math-heavy code looks like math; it's easy to pick up, and quick-to-
 
 Julia’s popularity continues to grow across many fields and there's a growing body of online references and tutorials, videos, and print media to learn from.
 
-Large financial services companies have already started realizing gains: BlackRock's Aladdin portfolio modeling, the Federal Reserve's economic simulations, and Aviva's Solvency II-compliant modeling. The last of these has a [great talk on YouTube](https://www.youtube.com/watch?v=__gMirBBNXY) by Aviva's Tim Thornham, which showcases an on-the-ground view of what difference the right choice of technology and programming language can make. Moving from their vendor-supplied modeling solution was **1000x faster, took 1/10 the amount of code, and was implemented 10x faster**[^2].
+Large financial services organizations have already started realizing gains: BlackRock's Aladdin portfolio modeling, the Federal Reserve's economic simulations, and Aviva's Solvency II-compliant modeling. The last of these has a [great talk on YouTube](https://www.youtube.com/watch?v=__gMirBBNXY) by Aviva's Tim Thornham, which showcases an on-the-ground view of what difference the right choice of technology and programming language can make. Moving from their vendor-supplied modeling solution was **1000x faster, took 1/10 the amount of code, and was implemented 10x faster**[^2].
 
 The language is not just great for data science — but also modeling, ETL, visualizations, package control/version management, machine learning, string manipulation, web-backends, and many other use cases. 
 
