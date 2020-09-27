@@ -139,47 +139,37 @@ We generate 100:
     </tr>
     <tr>
         <td style="vertical-align:top;">
-          <code class="julia hljs">
-                <span class="hljs-keyword">using</span> Distributions
-                </br>
-                </br></br>
-                <span class="hljs-keyword">rand</span>(<span class="hljs-number">100</span>)
-                </br>
-                <span class="hljs-keyword">rand</span>(Normal(), <span class="hljs-number">100</span>)
-                </br>
-                <span class="hljs-keyword">rand</span>(Bernoulli(<span class="hljs-number">0</span>.<span class="hljs-number">5</span>), <span class="hljs-number">100</span>)
-                </br>
-                <span class="hljs-keyword">rand</span>([<span class="hljs-string">"Preferred"</span>,<span class="hljs-string">"Standard"</span>], <span class="hljs-number">100</span>)
-          </code>
-        </td>
-        <td style="vertical-align:top;">
-          <code class="r hljs">
-          </br></br></br>
-            runif(<span class="hljs-number">100</span>)
-            </br>
-            rnorm(<span class="hljs-number">100</span>)
-            </br>
-            rbern(<span class="hljs-number">100</span>, <span class="hljs-number">0.5</span>)
-            </br>
-            sample(c(<span class="hljs-string">"Preferred"</span>,<span class="hljs-string">"Standard"</span>), <span class="hljs-number">100</span>, replace=TRUE)
-          </code>
-        </td>
-        <td style="vertical-align:top;">
-          <code class="python hljs">
-            <span class="hljs-keyword">import</span> scipy.stats <span class="hljs-keyword">as</span> sps
-            </br>
-            <span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
-            </br>
-            </br>
-            sps.uniform.rvs(size=<span class="hljs-number">100</span>)
-            </br>
-            sps.norm.rvs(size=<span class="hljs-number">100</span>)
-            </br>
-            sps.bernoulli.rvs(p=<span class="hljs-number">0.5</span>,size=<span class="hljs-number">100</span>)
-            </br>
-            np.random.choice([<span class="hljs-string">"Preferred"</span>,<span class="hljs-string">"Standard"</span>], size=<span class="hljs-number">100</span>)
-          </code>
+        <pre>
+<code class="julia hljs"><span class="hljs-keyword">using</span> Distributions
 
+rand(<span class="hljs-number">100</span>)
+rand(Normal(), <span class="hljs-number">100</span>)
+rand(Bernoulli(<span class="hljs-number">0</span>.<span class="hljs-number">5</span>), <span class="hljs-number">100</span>)
+rand([<span class="hljs-string">"Preferred"</span>,<span class="hljs-string">"Standard"</span>], <span class="hljs-number">100</span>)
+</code>
+</pre>
+        </td>
+        <td style="vertical-align:top;">
+        <pre ><code class="r hljs">runif(<span class="hljs-number">100</span>)
+rnorm(<span class="hljs-number">100</span>)
+rbern(<span class="hljs-number">100</span>, <span class="hljs-number">0.5</span>)
+sample(c(<span class="hljs-string">"Preferred"</span>,<span class="hljs-string">"Standard"</span>), 
+<span class="hljs-number">100</span>, replace=TRUE)
+</code>
+          </pre>
+        </td>
+        <td style="vertical-align:top;">
+        <pre><code class="python hljs"><span class="hljs-keyword">import</span> scipy.stats <span class="hljs-keyword">as</span> sps
+<span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
+
+
+sps.uniform.rvs(size=<span class="hljs-number">100</span>)
+sps.norm.rvs(size=<span class="hljs-number">100</span>)
+sps.bernoulli.rvs(p=<span class="hljs-number">0.5</span>,size=<span class="hljs-number">100</span>)
+np.random.choice([<span class="hljs-string">"Preferred"</span>,<span class="hljs-string">"Standard"</span>], 
+size=<span class="hljs-number">100</span>)
+</code>
+</pre>
         </td>
 
     </tr>
