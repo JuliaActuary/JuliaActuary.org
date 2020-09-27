@@ -2,6 +2,9 @@
 @def date = "July 9, 2020"
 @def title = "Julia for Actuaries"
 
+@def rss_pubdate = Date(2020,9,27)
+@def rss = "Julia is a new programming language that's ideally suited for most actuarial workflows."
+
 # {{fill title}}
 
 *By:  {{fill author}}*

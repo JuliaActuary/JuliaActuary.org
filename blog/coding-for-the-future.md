@@ -2,6 +2,9 @@
 @def date = "July 9, 2020"
 @def title = "Coding the Future"
 
+@def rss_pubdate = Date(2020,9,27)
+@def rss = "Companies need to transform and actuaries who can code will play a pivotal role in that story."
+
 # {{fill title}}
 
 *By:  {{fill author}}*
