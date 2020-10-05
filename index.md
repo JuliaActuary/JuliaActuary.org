@@ -327,7 +327,7 @@ Julia integrates with other languages, allowing you to leverage existing scripts
 > Help by contributing code, asking questions, or reporting issues.
 
 ~~~
-<p>First off, <mark>thank you</mark> for your interest in modern actuarial solutions, no matter how you participate in the community.</p>
+<mark>Thank you</mark> for your interest in modern actuarial solutions, no matter how you participate in the community.</p>
 ~~~
 
 **License and Usage**:
