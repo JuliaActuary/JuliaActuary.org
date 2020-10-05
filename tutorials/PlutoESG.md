@@ -23,9 +23,7 @@ import Pkg; Pkg.add(["Pluto","Plots","UnPack"]) # install these dependencies
 using Pluto; Pluto.run()                        # use and start Pluto
 ```
 
-2. Navigate to [your local Pluto instance](localhost:1234) (if the link doesn't work, check the REPL for the URL you should go to). 
-
-3. In the Pluto window, enter this URL into the `Open from file:` box:
+2. In the Pluto window that opens, enter this URL into the `Open from file:` box:
 
 ```
 https://raw.githubusercontent.com/JuliaActuary/Learn/master/AAA_ESG.jl
