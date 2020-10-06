@@ -72,7 +72,7 @@ These packages are available for use in your project. Keep scrolling down for mo
         <td align="left">
           <a href="https://github.com/JuliaActuary/Yields.jl"><code>Yields.jl</code></a>
         </td>
-        <td align="right">Simple and composable yield curve.</td>
+        <td align="right">Simple and composable yield curves and calculations.</td>
         <td align="center">
           <img class="lifecycle" alt="Developing" src="/assets/Developing.svg" /> <br />
           Functionality is mostly built-out, but the API may change substantially.
