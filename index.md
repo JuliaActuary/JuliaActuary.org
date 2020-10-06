@@ -14,6 +14,7 @@ The packages utilize all of the benefits of the [Julia language](https://juliala
 * provide easy access and clean interface to mortality tables (**MortalityTables.jl**)
 * bundle a set of commonly used financial and math functions (**ActuaryUtiltities.jl**)
 * provide an easy interface to many common life contingent maths (**LifeContingencies.jl**)
+* Simple, yet powerful interest rate and yield curve functions (**Yields.jl**)
 
 ~~~
 </br>
@@ -29,9 +30,48 @@ The packages utilize all of the benefits of the [Julia language](https://juliala
 
 These packages are available for use in your project. Keep scrolling down for more info on each one.
 ~~~
-<div class="wide_table_reponsive" >
-<table><tbody><tr><th align="left">Name</th><th align="right">Description</th><th align="center">Development Status</th></tr><tr><td align="left"><a href="https://github.com/JuliaActuary/MortalityTables.jl"><code>MortalityTables.jl</code></a></td><td align="right">Easily work with standard <a href="mort.SOA.org">mort.SOA.org</a> tables and parametric models with common survival calculations.</td><td align="center"><img class="lifecycle" alt="Maturing" src="/assets/Maturing.svg"> <br> The package is nearing it's <code>v1.0.0</code> release</td></tr><tr><td align="left"><a href="https://github.com/JuliaActuary/ActuaryUtilities.jl"><code>ActuaryUtilities.jl</code></a></td><td align="right">Robust and fast calculations for <code>internal_rate_of_return</code>, <code>duration</code>, <code>convexity</code>, <code>present_value</code>, <code>breakeven</code>, and more.</td><td align="center"> <img class="lifecycle" alt="Maturing" src="/assets/Maturing.svg"> <br>  The package is nearing it's <code>v1.0.0</code> release</td></tr><tr><td align="left"><a href="https://github.com/JuliaActuary/LifeContingencies.jl"><code>LifeContingencies.jl</code></a></td><td align="right">Insurance, annuity, premium, and reserve maths.</td><td align="center"> <img class="lifecycle" alt="Developing" src="/assets/Developing.svg"> <br>  Functionality is mostly built-out, but the API may change substantially.</td></tr></tbody></table>
+<div class="wide_table_reponsive">
+  <table>
+    <tbody>
+      <tr>
+        <th align="left">Name</th>
+        <th align="right">Description</th>
+        <th align="center">Development Status</th>
+      </tr>
+      <tr>
+        <td align="left">
+          <a href="https://github.com/JuliaActuary/MortalityTables.jl"><code>MortalityTables.jl</code></a>
+        </td>
+        <td align="right">Easily work with standard <a href="mort.SOA.org">mort.SOA.org</a> tables and parametric models with common survival calculations.</td>
+        <td align="center">
+          <img class="lifecycle" alt="Maturing" src="/assets/Maturing.svg" /> <br />
+          The package is nearing it's <code>v1.0.0</code> release
+        </td>
+      </tr>
+      <tr>
+        <td align="left">
+          <a href="https://github.com/JuliaActuary/ActuaryUtilities.jl"><code>ActuaryUtilities.jl</code></a>
+        </td>
+        <td align="right">Robust and fast calculations for <code>internal_rate_of_return</code>, <code>duration</code>, <code>convexity</code>, <code>present_value</code>, <code>breakeven</code>, and more.</td>
+        <td align="center">
+          <img class="lifecycle" alt="Maturing" src="/assets/Maturing.svg" /> <br />
+          The package is nearing it's <code>v1.0.0</code> release
+        </td>
+      </tr>
+      <tr>
+        <td align="left">
+          <a href="https://github.com/JuliaActuary/LifeContingencies.jl"><code>LifeContingencies.jl</code></a>
+        </td>
+        <td align="right">Insurance, annuity, premium, and reserve maths.</td>
+        <td align="center">
+          <img class="lifecycle" alt="Developing" src="/assets/Developing.svg" /> <br />
+          Functionality is mostly built-out, but the API may change substantially.
+        </td>
+      </tr>
+    </tbody>
+  </table>
 </div>
+
 ~~~
 
 ~~~
