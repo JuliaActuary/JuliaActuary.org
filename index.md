@@ -361,6 +361,7 @@ Coming soon!
 
 - [Interactive exploration](/tutorials/PlutoESG) of the AAA's Economic Scenario Generator
 - [Interactive mortality table comparison tool](/tutorials/MortalityTableComparison) for any `mort.soa.org` table
+- [Interactive cashflow analysis](/tutorials/CashflowAnalysis)
 - [Universal Life Policy Account Mechanics as a Differential Equation](/tutorials/PolicyDiffEq)
 
 ### Help mode
