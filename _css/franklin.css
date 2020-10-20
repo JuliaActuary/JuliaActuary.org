@@ -230,7 +230,9 @@ code {
     padding: 0.2em 0.4em;
     border-radius: 2px;
     font-size: 90%;
-    font-family: 'Fira Code', monospace;
+    font-family: JuliaMono, monospace;
+    font-weight: 350;
+    font-variant-ligatures: contextual;
 }
 
 .hljs {

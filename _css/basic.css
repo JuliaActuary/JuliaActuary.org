@@ -209,3 +209,23 @@ td {
 table tbody tr td {
  border:1px solid lightgray
 }
+
+
+@font-face {
+    font-family: JuliaMono-Regular;
+    src: url("/_assets/_fonts/JuliaMono-Regular.woff2") format('woff2');
+}
+
+@font-face {
+    font-family: 'Literata';
+    font-style: normal;
+    font-display: swap;
+    src: url("/_assets/_fonts/Literata.woff2" format('woff2');
+  }
+
+@font-face {
+    font-family: 'Literata';
+    font-style: italic;
+    font-display: swap;
+    src: url("/_assets/_fonts/Literata-Italics.woff2" format('woff2');
+  }
