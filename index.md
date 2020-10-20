@@ -15,6 +15,7 @@ The packages utilize all of the benefits of the [Julia language](https://juliala
 * bundle a set of commonly used financial and math functions (**ActuaryUtiltities.jl**)
 * provide an easy interface to many common life contingent maths (**LifeContingencies.jl**)
 * Simple, yet powerful interest rate and yield curve functions (**Yields.jl**)
+* Exposure calculations with **ExperienceAnalysis.jl**
 
 ~~~
 </br>
@@ -73,6 +74,16 @@ These packages are available for use in your project. Keep scrolling down for mo
           <a href="https://github.com/JuliaActuary/Yields.jl"><code>Yields.jl</code></a>
         </td>
         <td align="right">Simple and composable yield curves and calculations.</td>
+        <td align="center">
+          <img class="lifecycle" alt="Developing" src="/assets/Developing.svg" /> <br />
+          Functionality is mostly built-out, but the API may change substantially.
+        </td>
+      </tr>
+            <tr>
+        <td align="left">
+          <a href="https://github.com/JuliaActuary/ExperienceAnalysis.jl"><code>ExperienceAnalysis.jl</code></a>
+        </td>
+        <td align="right">Meeting your exposure calculation needs.</td>
         <td align="center">
           <img class="lifecycle" alt="Developing" src="/assets/Developing.svg" /> <br />
           Functionality is mostly built-out, but the API may change substantially.
@@ -328,6 +339,52 @@ discount(yield,1.0) # 1 / (1 + 0.058 + 0.018)
 
 \\
 [Yields package on GitHub 🡕](https://github.com/JuliaActuary/Yields.jl)
+
+
+<!-- =============================
+     ExperienceAnalysis
+    ============================== -->
+
+## ExperienceAnalysis.jl
+
+> Meeting your exposure calculation needs.
+
+
+### QuickStart
+
+```julia
+using ExperienceAnalysis
+using Dates
+
+issue = Date(2016, 7, 4)
+termination = Date(2020, 1, 17)
+basis = ExperienceAnalysis.Policy(Year(1))
+exposure(basis, issue, termination)
+```
+This will return an array of tuples with a `from` and `to` date:
+
+```julia
+4-element Array{NamedTuple{(:from, :to),Tuple{Date,Date}},1}:
+ (from = Date("2016-07-04"), to = Date("2017-07-04"))
+ (from = Date("2017-07-04"), to = Date("2018-07-04"))
+ (from = Date("2018-07-04"), to = Date("2019-07-04"))
+ (from = Date("2019-07-04"), to = Date("2020-01-17"))
+```
+
+### Available Exposure Basis
+
+- `ExperienceAnalysis.Policy(period)` will give exposures periods based on the first date
+- `ExperienceAnalysis.Calendar(period)` will follow calendar periods (e.g. month or year)
+- `ExperienceAnalysis.PolicyCalendar(period,period)` will split into the smaller of the calendar or policy period.
+
+Where `period` is a [Period Type from the Dates standard library](https://docs.julialang.org/en/v1/stdlib/Dates/#Period-Types).
+
+Calculate exposures with `exposures(basis,from,to,continue_exposure)`. 
+
+- `continue_exposures` indicates whether the exposure should be extended through the full exposure period rather than terminate at the `to` date.
+
+\\
+[ExperienceAnalysis package on GitHub 🡕](https://github.com/JuliaActuary/ExperienceAnalysis.jl)
 
 # Community 
 <!-- =============================
