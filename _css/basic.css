@@ -213,19 +213,33 @@ table tbody tr td {
 
 @font-face {
     font-family: JuliaMono-Regular;
-    src: url("/_assets/_fonts/JuliaMono-Regular.woff2") format('woff2');
+    font-display: swap;
+    src: url("/assets/_fonts/JuliaMono-Regular.woff2") format('woff2');
 }
 
 @font-face {
     font-family: 'Literata';
     font-style: normal;
     font-display: swap;
-    src: url("/_assets/_fonts/Literata.woff2" format('woff2');
+    src: url("/assets/_fonts/Literata.woff2") format('woff2');
   }
 
 @font-face {
     font-family: 'Literata';
     font-style: italic;
     font-display: swap;
-    src: url("/_assets/_fonts/Literata-Italics.woff2" format('woff2');
+    src: url("/assets/_fonts/Literata-Italics.woff2") format('woff2');
   }
+
+@font-face {
+    font-family: 'Open Sans';
+    font-style: normal;
+    font-display: swap;
+    src: url("/assets/_fonts/Open-Sans.woff2") format('woff2');
+  }
+
+@font-face {
+    font-family: 'Open Sans';
+    font-style: italic;
+    font-display: swap;
+    src: url("/assets/_fonts/Open-Sans-Italics.woff2") format('woff2');
