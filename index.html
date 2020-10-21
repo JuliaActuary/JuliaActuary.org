@@ -202,7 +202,7 @@ discount(yield,<span class=hljs-number >1.0</span>) <span class=hljs-comment ># 
 
 issue = <span class=hljs-built_in >Date</span>(<span class=hljs-number >2016</span>, <span class=hljs-number >7</span>, <span class=hljs-number >4</span>)
 termination = <span class=hljs-built_in >Date</span>(<span class=hljs-number >2020</span>, <span class=hljs-number >1</span>, <span class=hljs-number >17</span>)
-basis = ExperienceAnalysis.Policy(Year(<span class=hljs-number >1</span>))
+basis = ExperienceAnalysis.Anniversary(Year(<span class=hljs-number >1</span>))
 exposure(basis, issue, termination)</code></pre>
 <p>This will return an array of tuples with a <code>from</code> and <code>to</code> date:</p>
 <pre><code class="julia hljs"><span class=hljs-number >4</span>-element <span class=hljs-built_in >Array</span>{NamedTuple{(:from, :to),<span class=hljs-built_in >Tuple</span>{<span class=hljs-built_in >Date</span>,<span class=hljs-built_in >Date</span>}},<span class=hljs-number >1</span>}:
@@ -212,11 +212,11 @@ exposure(basis, issue, termination)</code></pre>
  (from = <span class=hljs-built_in >Date</span>(<span class=hljs-string >&quot;2019-07-04&quot;</span>), to = <span class=hljs-built_in >Date</span>(<span class=hljs-string >&quot;2020-01-17&quot;</span>))</code></pre>
 <h3 id=available_exposure_basis ><a href="#available_exposure_basis">Available Exposure Basis</a></h3>
 <ul>
-<li><p><code>ExperienceAnalysis.Policy&#40;period&#41;</code> will give exposures periods based on the first date</p>
+<li><p><code>ExperienceAnalysis.Anniversary&#40;period&#41;</code> will give exposures periods based on the first date</p>
 
 <li><p><code>ExperienceAnalysis.Calendar&#40;period&#41;</code> will follow calendar periods &#40;e.g. month or year&#41;</p>
 
-<li><p><code>ExperienceAnalysis.PolicyCalendar&#40;period,period&#41;</code> will split into the smaller of the calendar or policy period.</p>
+<li><p><code>ExperienceAnalysis.AnniversaryCalendar&#40;period,period&#41;</code> will split into the smaller of the calendar or policy period.</p>
 
 </ul>
 <p>Where <code>period</code> is a <a href="https://docs.julialang.org/en/v1/stdlib/Dates/#Period-Types">Period Type from the Dates standard library</a>.</p>
