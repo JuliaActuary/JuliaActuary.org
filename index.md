@@ -248,15 +248,13 @@ Some of the functions included:
 
 - Integration with other JuliaActuary packages such as [MortalityTables.jl](https://github.com/JuliaActuary/MortalityTables.jl)
 - Fast calculations, with some parts utilizing parallel processing power automatically
-- Use functions that look more like the math you are used to (e.g. `A`, `ä`)
-with [Unicode support](https://docs.julialang.org/en/v1/manual/unicode-input/index.html)
+- Use functions that look more like the math you are used to (e.g. `A`, `ä`) with [Unicode support](https://docs.julialang.org/en/v1/manual/unicode-input/index.html)
 - All of the power, speed, convenience, tooling, and ecosystem of Julia
 - Flexible and modular modeling approach
 
 ### Package Overview
 
-- Leverages [MortalityTables.jl](https://github.com/JuliaActuary/MortalityTables.jl) for
-the mortality calculations
+- Leverages [MortalityTables.jl](https://github.com/JuliaActuary/MortalityTables.jl) for the mortality calculations
 - Contains common insurance calculations such as:
     - `insurance(life)`: Whole life
     - `insurance(life,n)`: Term life for `n` years
