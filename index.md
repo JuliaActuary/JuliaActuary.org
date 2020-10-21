@@ -206,7 +206,7 @@ decrement(m,20,25)    # the five year cumulative mortality rate
 survival(m,20,25) # the five year survival rate
 ```
 \\
-[MortalityTables package on Github 🡕](https://github.com/JuliaActuary/MortalityTables.jl)
+[MortalityTables package on Github 🡭](https://github.com/JuliaActuary/MortalityTables.jl)
 
 
 
@@ -232,7 +232,7 @@ Some of the functions included:
 - `accum_offset` to calculate accumulations like survivorship from a mortality vector
 
 \\
-[ActuaryUtilities package on GitHub 🡕](https://github.com/JuliaActuary/ActuaryUtilities.jl)
+[ActuaryUtilities package on GitHub 🡭](https://github.com/JuliaActuary/ActuaryUtilities.jl)
 
 
 <!-- =============================
@@ -301,7 +301,7 @@ ä(lc, 5)               # 5 year annuity due
 ...                    # and more!
 ```
 \\
-[LifeContingencies package on GitHub 🡕](https://github.com/JuliaActuary/LifeContingencies.jl)
+[LifeContingencies package on GitHub 🡭](https://github.com/JuliaActuary/LifeContingencies.jl)
 
 
 <!-- =============================
@@ -338,7 +338,7 @@ discount(yield,1.0) # 1 / (1 + 0.058 + 0.018)
 ```
 
 \\
-[Yields package on GitHub 🡕](https://github.com/JuliaActuary/Yields.jl)
+[Yields package on GitHub 🡭](https://github.com/JuliaActuary/Yields.jl)
 
 
 <!-- =============================
@@ -384,7 +384,7 @@ Calculate exposures with `exposures(basis,from,to,continue_exposure)`.
 - `continue_exposures` indicates whether the exposure should be extended through the full exposure period rather than terminate at the `to` date.
 
 \\
-[ExperienceAnalysis package on GitHub 🡕](https://github.com/JuliaActuary/ExperienceAnalysis.jl)
+[ExperienceAnalysis package on GitHub 🡭](https://github.com/JuliaActuary/ExperienceAnalysis.jl)
 
 # Community 
 <!-- =============================
