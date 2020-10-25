@@ -45,8 +45,7 @@ These packages are available for use in your project. Keep scrolling down for mo
         </td>
         <td align="right">Easily work with standard <a href="mort.SOA.org">mort.SOA.org</a> tables and parametric models with common survival calculations.</td>
         <td align="center">
-          <img class="lifecycle" alt="Maturing" src="/assets/Maturing.svg" /> <br />
-          The package is nearing it's <code>v1.0.0</code> release
+          <b>Stable</b></br>
         </td>
       </tr>
       <tr>
@@ -55,8 +54,8 @@ These packages are available for use in your project. Keep scrolling down for mo
         </td>
         <td align="right">Robust and fast calculations for <code>internal_rate_of_return</code>, <code>duration</code>, <code>convexity</code>, <code>present_value</code>, <code>breakeven</code>, and more.</td>
         <td align="center">
-          <img class="lifecycle" alt="Maturing" src="/assets/Maturing.svg" /> <br />
-          The package is nearing it's <code>v1.0.0</code> release
+          <b>Maturing</b></br>
+          API is mature, but finer details may change.
         </td>
       </tr>
       <tr>
@@ -65,8 +64,8 @@ These packages are available for use in your project. Keep scrolling down for mo
         </td>
         <td align="right">Insurance, annuity, premium, and reserve maths.</td>
         <td align="center">
-          <img class="lifecycle" alt="Developing" src="/assets/Developing.svg" /> <br />
-          Functionality is mostly built-out, but the API may change substantially.
+          <b>Developing</b></br>
+          Functionality is mostly built-out, but the API may change.
         </td>
       </tr>
       <tr>
@@ -75,8 +74,8 @@ These packages are available for use in your project. Keep scrolling down for mo
         </td>
         <td align="right">Simple and composable yield curves and calculations.</td>
         <td align="center">
-          <img class="lifecycle" alt="Developing" src="/assets/Developing.svg" /> <br />
-          Functionality is mostly built-out, but the API may change substantially.
+          <b>Developing</b></br>
+          Functionality is mostly built-out, but the API may change.
         </td>
       </tr>
             <tr>
@@ -85,8 +84,8 @@ These packages are available for use in your project. Keep scrolling down for mo
         </td>
         <td align="right">Meeting your exposure calculation needs.</td>
         <td align="center">
-          <img class="lifecycle" alt="Developing" src="/assets/Developing.svg" /> <br />
-          Functionality is mostly built-out, but the API may change substantially.
+          <b>Developing</b></br>
+          Functionality is mostly built-out, but the API may change.
         </td>
       </tr>
     </tbody>
