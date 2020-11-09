@@ -243,7 +243,7 @@ Some of the functions included:
 > Common life contingent calculations with a convenient interface.
 
 
-### Features:
+### Features
 
 - Integration with other JuliaActuary packages such as [MortalityTables.jl](https://github.com/JuliaActuary/MortalityTables.jl)
 - Fast calculations, with some parts utilizing parallel processing power automatically
@@ -253,12 +253,13 @@ Some of the functions included:
 
 ### Package Overview
 
-- Leverages [MortalityTables.jl](https://github.com/JuliaActuary/MortalityTables.jl) for the mortality calculations
+- Leverages [MortalityTables.jl](https://github.com/JuliaActuary/MortalityTables.jl) for
+the mortality calculations
 - Contains common insurance calculations such as:
-    - `insurance(life)`: Whole life
-    - `insurance(life,n)`: Term life for `n` years
-    - `ä(life)`: Life contingent annuity due
-    - `ä(life,n)`: Life contingent annuity due for `n` years
+  - `Insurance(life,yield)`: Whole life
+  - `Insurance(life,yield,n)`: Term life for `n` years
+  - `ä(life,yield)`: Life contingent annuity due
+  - `ä(life,yield)`: Life contingent annuity due for `n` years
 - Contains various commutation functions such as `D(x)`,`M(x)`,`C(x)`, etc.
 - `SingleLife` and `JointLife` capable
 - Interest rate mechanics via [`Yields.jl`](https://github.com/JuliaActuary/Yields.jl)
@@ -266,7 +267,8 @@ Some of the functions included:
 
 ### Examples
 
-####  Basic Functions
+#### Basic Functions
+
 Calculate various items for a 30-year-old male nonsmoker using 2015 VBT base table and a 5% interest rate
 
 ```julia
@@ -274,28 +276,54 @@ Calculate various items for a 30-year-old male nonsmoker using 2015 VBT base tab
 using LifeContingencies
 using MortalityTables
 using Yields
+import LifeConingencies: V, ä      # pull the shortform notation into scope
 
+# load mortality rates from MortalityTables.jl
 tbls = MortalityTables.tables()
 vbt2001 = tbls["2001 VBT Residual Standard Select and Ultimate - Male Nonsmoker, ANB"]
-age = 30
-life = SingleLife(
-    mort = vbt2001.select[age],
-    issue_age = age
+
+life = SingleLife(                 # The life underlying the risk
+    mort = vbt2001.select[age],    # -- Mortality rates
+    issue_age = 30                 # -- Issue Age
 )
 
-lc = LifeContingency(
-    life,
-    Yields.Constant(0.05)
-)
+yield = Yields.Constant(0.05)      # Using a flat 5% interest rate
+
+lc = LifeContingency(life, yield)  # LifeContingency joins the risk with interest
 
 
-insurance(lc)          # Whole Life insurance
-insurance(lc,10)       # 10 year term insurance
-premium_net(lc)        # Net whole life premium 
-V(lc,5)                # Net premium reserve for whole life insurance at time 5
-ä(lc)                  # Whole life annuity due
-ä(lc, 5)               # 5 year annuity due
-...                    # and more!
+ins = Insurance(lc)                      # Whole Life insurance
+ins = Insurance(life, yield)             # alternate way to construct
+```
+
+With the above life contingent data, we can calculate vectors of relevant information:
+
+```julia
+cashflows(ins)                     # A vector of the unit cashflows
+timepoints(ins)                    # The timepoints associated with the cashflows
+survival(ins)                      # The survival vector
+benefit(ins)                       # The unit benefit vector
+probability(ins)                   # The probability of beneift payment
+```
+
+Or calculate summary scalars:
+
+```julia
+present_value(ins)                 # The actuarial present value
+premium_net(lc)                    # Net whole life premium 
+V(lc,5)                            # Net premium reserve for whole life insurance at time 5
+```
+
+Other types of life contingent benefits:
+
+```julia
+Insurance(lc,n=10)                   # 10 year term insurance
+AnnuityImmediate(lc)               # Whole life annuity due
+AnnuityDue(lc)                     # Whole life annuity due
+ä(lc)                              # Shortform notation
+ä(lc, n=5)                           # 5 year annuity due
+ä(lc, n=5, certain=5,frequency=4)    # 5 year annuity due, with 5 year certain payable 4x per year
+...                                # and more!
 ```
 \\
 [LifeContingencies package on GitHub 🡭](https://github.com/JuliaActuary/LifeContingencies.jl)
