@@ -7,18 +7,18 @@
   <atom:link href="https://JuliaActuary.org/feed.xml" rel="self" type="application/rss+xml" />
   <item>
     <title>Coding the Future</title>
-    <link>https://JuliaActuary.org/blog/coding-for-the-future/index.html</link>
+    <link>https://JuliaActuary.org/blog/coding-for-the-future/</link>
     <description><![CDATA[Companies need to transform and actuaries who can code will play a pivotal role in that story.
-<br><a href="https://JuliaActuary.org/blog/coding-for-the-future/index.html">Read more</a>]]></description>
-    <guid>https://JuliaActuary.org/blog/coding-for-the-future/index.html</guid>
+<br><a href="https://JuliaActuary.org/blog/coding-for-the-future/">Read more</a>]]></description>
+    <guid>https://JuliaActuary.org/blog/coding-for-the-future/</guid>
     <pubDate>Sun, 27 Sep 2020 00:00:00 UT</pubDate>
   </item>
   <item>
     <title>Julia for Actuaries</title>
-    <link>https://JuliaActuary.org/blog/julia-actuaries/index.html</link>
+    <link>https://JuliaActuary.org/blog/julia-actuaries/</link>
     <description><![CDATA[Julia is a new programming language that&#39;s ideally suited for most actuarial workflows.
-<br><a href="https://JuliaActuary.org/blog/julia-actuaries/index.html">Read more</a>]]></description>
-    <guid>https://JuliaActuary.org/blog/julia-actuaries/index.html</guid>
+<br><a href="https://JuliaActuary.org/blog/julia-actuaries/">Read more</a>]]></description>
+    <guid>https://JuliaActuary.org/blog/julia-actuaries/</guid>
     <pubDate>Sun, 27 Sep 2020 00:00:00 UT</pubDate>
   </item>
 </channel>

@@ -117,17 +117,20 @@ survival(m,<span class=hljs-number >20</span>,<span class=hljs-number >25</span>
 </ul>
 <h3 id=package_overview ><a href="#package_overview">Package Overview</a></h3>
 <ul>
-<li><p>Leverages <a href="https://github.com/JuliaActuary/MortalityTables.jl">MortalityTables.jl</a> for the mortality calculations</p>
+<li><p>Leverages <a href="https://github.com/JuliaActuary/MortalityTables.jl">MortalityTables.jl</a> for</p>
 
+</ul>
+<p>the mortality calculations</p>
+<ul>
 <li><p>Contains common insurance calculations such as:</p>
 <ul>
-<li><p><code>insurance&#40;life&#41;</code>: Whole life</p>
+<li><p><code>Insurance&#40;life,yield&#41;</code>: Whole life</p>
 
-<li><p><code>insurance&#40;life,n&#41;</code>: Term life for <code>n</code> years</p>
+<li><p><code>Insurance&#40;life,yield,n&#41;</code>: Term life for <code>n</code> years</p>
 
-<li><p><code>ä&#40;life&#41;</code>: Life contingent annuity due</p>
+<li><p><code>ä&#40;life,yield&#41;</code>: Life contingent annuity due</p>
 
-<li><p><code>ä&#40;life,n&#41;</code>: Life contingent annuity due for <code>n</code> years</p>
+<li><p><code>ä&#40;life,yield&#41;</code>: Life contingent annuity due for <code>n</code> years</p>
 
 </ul>
 
@@ -146,28 +149,42 @@ survival(m,<span class=hljs-number >20</span>,<span class=hljs-number >25</span>
 <pre><code class="julia hljs"><span class=hljs-keyword >using</span> LifeContingencies
 <span class=hljs-keyword >using</span> MortalityTables
 <span class=hljs-keyword >using</span> Yields
+<span class=hljs-keyword >import</span> LifeConingencies: V, ä      <span class=hljs-comment ># pull the shortform notation into scope</span>
 
+<span class=hljs-comment ># load mortality rates from MortalityTables.jl</span>
 tbls = MortalityTables.tables()
 vbt2001 = tbls[<span class=hljs-string >&quot;2001 VBT Residual Standard Select and Ultimate - Male Nonsmoker, ANB&quot;</span>]
-age = <span class=hljs-number >30</span>
-life = SingleLife(
-    mort = vbt2001.select[age],
-    issue_age = age
+
+life = SingleLife(                 <span class=hljs-comment ># The life underlying the risk</span>
+    mort = vbt2001.select[age],    <span class=hljs-comment ># -- Mortality rates</span>
+    issue_age = <span class=hljs-number >30</span>                 <span class=hljs-comment ># -- Issue Age</span>
 )
 
-lc = LifeContingency(
-    life,
-    Yields.Constant(<span class=hljs-number >0.05</span>)
-)
+yield = Yields.Constant(<span class=hljs-number >0.05</span>)      <span class=hljs-comment ># Using a flat 5% interest rate</span>
+
+lc = LifeContingency(life, yield)  <span class=hljs-comment ># LifeContingency joins the risk with interest</span>
 
 
-insurance(lc)          <span class=hljs-comment ># Whole Life insurance</span>
-insurance(lc,<span class=hljs-number >10</span>)       <span class=hljs-comment ># 10 year term insurance</span>
-premium_net(lc)        <span class=hljs-comment ># Net whole life premium </span>
-V(lc,<span class=hljs-number >5</span>)                <span class=hljs-comment ># Net premium reserve for whole life insurance at time 5</span>
-ä(lc)                  <span class=hljs-comment ># Whole life annuity due</span>
-ä(lc, <span class=hljs-number >5</span>)               <span class=hljs-comment ># 5 year annuity due</span>
-...                    <span class=hljs-comment ># and more!</span></code></pre>
+ins = Insurance(lc)                      <span class=hljs-comment ># Whole Life insurance</span>
+ins = Insurance(life, yield)             <span class=hljs-comment ># alternate way to construct</span></code></pre>
+<p>With the above life contingent data, we can calculate vectors of relevant information:</p>
+<pre><code class="julia hljs">cashflows(ins)                     <span class=hljs-comment ># A vector of the unit cashflows</span>
+timepoints(ins)                    <span class=hljs-comment ># The timepoints associated with the cashflows</span>
+survival(ins)                      <span class=hljs-comment ># The survival vector</span>
+benefit(ins)                       <span class=hljs-comment ># The unit benefit vector</span>
+probability(ins)                   <span class=hljs-comment ># The probability of beneift payment</span></code></pre>
+<p>Or calculate summary scalars:</p>
+<pre><code class="julia hljs">present_value(ins)                 <span class=hljs-comment ># The actuarial present value</span>
+premium_net(lc)                    <span class=hljs-comment ># Net whole life premium </span>
+V(lc,<span class=hljs-number >5</span>)                            <span class=hljs-comment ># Net premium reserve for whole life insurance at time 5</span></code></pre>
+<p>Other types of life contingent benefits:</p>
+<pre><code class="julia hljs">Insurance(lc,n=<span class=hljs-number >10</span>)                   <span class=hljs-comment ># 10 year term insurance</span>
+AnnuityImmediate(lc)               <span class=hljs-comment ># Whole life annuity due</span>
+AnnuityDue(lc)                     <span class=hljs-comment ># Whole life annuity due</span>
+ä(lc)                              <span class=hljs-comment ># Shortform notation</span>
+ä(lc, n=<span class=hljs-number >5</span>)                           <span class=hljs-comment ># 5 year annuity due</span>
+ä(lc, n=<span class=hljs-number >5</span>, certain=<span class=hljs-number >5</span>,frequency=<span class=hljs-number >4</span>)    <span class=hljs-comment ># 5 year annuity due, with 5 year certain payable 4x per year</span>
+...                                <span class=hljs-comment ># and more!</span></code></pre>
 <p><br/> <a href="https://github.com/JuliaActuary/LifeContingencies.jl">LifeContingencies package on GitHub 🡭</a></p>
 <h2 id=yieldsjl ><a href="#yieldsjl">Yields.jl</a></h2>
 <blockquote>
@@ -342,7 +359,7 @@ exposure(basis, issue, termination)</code></pre>
 
 <div class=page-foot >
   <div class=copyright >
-    &copy; JuliaActuary Contributors. Last modified: October 27, 2020. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and <a href="https://julialang.org" >Julia</a>.
+    &copy; JuliaActuary Contributors. Last modified: November 09, 2020. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and <a href="https://julialang.org" >Julia</a>.
   </div>
 </div>
 </div>
