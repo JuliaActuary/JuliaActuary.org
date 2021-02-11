@@ -155,9 +155,9 @@ survival(m,<span class=hljs-number >20</span>,<span class=hljs-number >25</span>
 tbls = MortalityTables.tables()
 vbt2001 = tbls[<span class=hljs-string >&quot;2001 VBT Residual Standard Select and Ultimate - Male Nonsmoker, ANB&quot;</span>]
 
+issue_age = <span class=hljs-number >30</span>
 life = SingleLife(                 <span class=hljs-comment ># The life underlying the risk</span>
-    mort = vbt2001.select[age],    <span class=hljs-comment ># -- Mortality rates</span>
-    issue_age = <span class=hljs-number >30</span>                 <span class=hljs-comment ># -- Issue Age</span>
+    mort = vbt2001.select[issue_age],    <span class=hljs-comment ># -- Mortality rates</span>
 )
 
 yield = Yields.Constant(<span class=hljs-number >0.05</span>)      <span class=hljs-comment ># Using a flat 5% interest rate</span>
@@ -165,8 +165,8 @@ yield = Yields.Constant(<span class=hljs-number >0.05</span>)      <span class=h
 lc = LifeContingency(life, yield)  <span class=hljs-comment ># LifeContingency joins the risk with interest</span>
 
 
-ins = Insurance(lc)                      <span class=hljs-comment ># Whole Life insurance</span>
-ins = Insurance(life, yield)             <span class=hljs-comment ># alternate way to construct</span></code></pre>
+ins = Insurance(lc)                <span class=hljs-comment ># Whole Life insurance</span>
+ins = Insurance(life, yield)       <span class=hljs-comment ># alternate way to construct</span></code></pre>
 <p>With the above life contingent data, we can calculate vectors of relevant information:</p>
 <pre><code class="julia hljs">cashflows(ins)                     <span class=hljs-comment ># A vector of the unit cashflows</span>
 timepoints(ins)                    <span class=hljs-comment ># The timepoints associated with the cashflows</span>
@@ -182,9 +182,14 @@ V(lc,<span class=hljs-number >5</span>)                            <span class=h
 AnnuityImmediate(lc)               <span class=hljs-comment ># Whole life annuity due</span>
 AnnuityDue(lc)                     <span class=hljs-comment ># Whole life annuity due</span>
 ä(lc)                              <span class=hljs-comment ># Shortform notation</span>
-ä(lc, n=<span class=hljs-number >5</span>)                           <span class=hljs-comment ># 5 year annuity due</span>
-ä(lc, n=<span class=hljs-number >5</span>, certain=<span class=hljs-number >5</span>,frequency=<span class=hljs-number >4</span>)    <span class=hljs-comment ># 5 year annuity due, with 5 year certain payable 4x per year</span>
+ä(lc, n=<span class=hljs-number >5</span>)                         <span class=hljs-comment ># 5 year annuity due</span>
+ä(lc, n=<span class=hljs-number >5</span>, certain=<span class=hljs-number >5</span>,frequency=<span class=hljs-number >4</span>)  <span class=hljs-comment ># 5 year annuity due, with 5 year certain payable 4x per year</span>
 ...                                <span class=hljs-comment ># and more!</span></code></pre>
+<h4 id=constructing_lives ><a href="#constructing_lives">Constructing Lives</a></h4>
+<pre><code class="julia hljs">SingleLife(vbt2001.select[<span class=hljs-number >50</span>])                 <span class=hljs-comment ># no keywords, just a mortality vector</span>
+SingleLife(vbt2001.select[<span class=hljs-number >50</span>],issue_age = <span class=hljs-number >60</span>)  <span class=hljs-comment ># select at 50, but now 60</span>
+SingleLife(vbt2001.select,issue_age = <span class=hljs-number >50</span>)      <span class=hljs-comment ># use issue_age to pick the right select vector</span>
+SingleLife(mort=vbt2001.select,issue_age = <span class=hljs-number >50</span>) <span class=hljs-comment ># mort can also be a keyword</span></code></pre>
 <p><br/> <a href="https://github.com/JuliaActuary/LifeContingencies.jl">LifeContingencies package on GitHub 🡭</a></p>
 <h2 id=yieldsjl ><a href="#yieldsjl">Yields.jl</a></h2>
 <blockquote>
