@@ -48,6 +48,15 @@ These packages are available for use in your project. Keep scrolling down for mo
           <b>Stable</b></br>
         </td>
       </tr>
+       <tr>
+        <td align="left">
+          <a href="https://github.com/JuliaActuary/LifeContingencies.jl"><code>LifeContingencies.jl</code></a>
+        </td>
+        <td align="right">Insurance, annuity, premium, and reserve maths.</td>
+        <td align="center">
+          <b>Stable</b></br>
+        </td>
+      </tr>
       <tr>
         <td align="left">
           <a href="https://github.com/JuliaActuary/ActuaryUtilities.jl"><code>ActuaryUtilities.jl</code></a>
@@ -58,16 +67,7 @@ These packages are available for use in your project. Keep scrolling down for mo
           API is mature, but finer details may change.
         </td>
       </tr>
-      <tr>
-        <td align="left">
-          <a href="https://github.com/JuliaActuary/LifeContingencies.jl"><code>LifeContingencies.jl</code></a>
-        </td>
-        <td align="right">Insurance, annuity, premium, and reserve maths.</td>
-        <td align="center">
-          <b>Developing</b></br>
-          Functionality is mostly built-out, but the API may change.
-        </td>
-      </tr>
+
       <tr>
         <td align="left">
           <a href="https://github.com/JuliaActuary/Yields.jl"><code>Yields.jl</code></a>
