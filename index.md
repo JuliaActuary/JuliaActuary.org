@@ -63,8 +63,7 @@ These packages are available for use in your project. Keep scrolling down for mo
         </td>
         <td align="right">Robust and fast calculations for <code>internal_rate_of_return</code>, <code>duration</code>, <code>convexity</code>, <code>present_value</code>, <code>breakeven</code>, and more.</td>
         <td align="center">
-          <b>Maturing</b></br>
-          API is mature, but finer details may change.
+          <b>Stable</b></br>
         </td>
       </tr>
 
@@ -229,6 +228,15 @@ Some of the functions included:
 - `internal_rate_of_return` or `irr` to calculate the IRR given cashflows (including at timepoints like Excel's `XIRR`)
 - `breakeven` to calculate the breakeven time for a set of cashflows
 - `accum_offset` to calculate accumulations like survivorship from a mortality vector
+
+### Excel Utilities
+
+You can also copy/paste to/from Excel:
+
+![Copying to and from Excel](https://user-images.githubusercontent.com/711879/107859226-9e9a5500-6dfd-11eb-999f-5da5c7e5b8a6.gif)
+
+- `xlcopy()` copies and parses Excel content on the clipboard
+- `xlcopy(data)` will copy Julia data into your clipboard for pasting into Excel.
 
 \\
 [ActuaryUtilities package on GitHub 🡭](https://github.com/JuliaActuary/ActuaryUtilities.jl)
