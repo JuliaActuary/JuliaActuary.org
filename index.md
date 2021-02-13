@@ -61,7 +61,9 @@ These packages are available for use in your project. Keep scrolling down for mo
         <td align="left">
           <a href="https://github.com/JuliaActuary/ActuaryUtilities.jl"><code>ActuaryUtilities.jl</code></a>
         </td>
-        <td align="right">Robust and fast calculations for <code>internal_rate_of_return</code>, <code>duration</code>, <code>convexity</code>, <code>present_value</code>, <code>breakeven</code>, and more.</td>
+        <td align="right">Robust and fast calculations for <code>internal_rate_of_return</code>, <code>duration</code>, <code>convexity</code>, <code>present_value</code>, <code>breakeven</code>, and more. 
+        <br /><br />
+        <b>New!</b> Copy/paste to and from Excel.</td>
         <td align="center">
           <b>Stable</b></br>
         </td>
@@ -217,17 +219,20 @@ survival(m,20,25) # the five year survival rate
 
 > A collection of common functions/manipulations used in Actuarial Calculations.
 
-
-Some of the functions included:
-
+### Financial Maths
 - `duration`:
-  - Calculate the duration given an issue date and date (a.k.a. policy duration)
   - Calculate the `Macaulay`, `Modified`, or `DV01` durations for a set of cashflows
 - `convexity` for price sensitivity
 - Flexible interest rate options via the [`Yields.jl`](https://github.com/JuliaActuary/Yields.jl) package.
 - `internal_rate_of_return` or `irr` to calculate the IRR given cashflows (including at timepoints like Excel's `XIRR`)
 - `breakeven` to calculate the breakeven time for a set of cashflows
 - `accum_offset` to calculate accumulations like survivorship from a mortality vector
+
+### Insurance mechanics
+
+- `duration`:
+  - Calculate the duration given an issue date and date (a.k.a. policy duration)
+  
 
 ### Excel Utilities
 
