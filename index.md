@@ -123,30 +123,19 @@ using PackageName
 
 ### Features
 
-- Lots of bundled SOA mort.soa.org tables
+- Full set of SOA mort.soa.org tables included
 - `survival` and `decrement` functions to calculate decrements over period of time
 - Partial year mortality calculations (Uniform, Constant, Balducci)
 - Friendly syntax and flexible usage
 - Extensive set of parametric mortality models.
 
-### Quickstart 
+### Quickstart
 
-Loading the package and bundled tables:
+Load and see information about a particular table:
 
-```julia-repl
-julia> using MortalityTables
+```julia
+julia> vbt2001 = MortalityTables.table("2001 VBT Residual Standard Select and Ultimate - Male Nonsmoker, ANB")
 
-julia> tables = MortalityTables.tables()
-Dict{String,MortalityTable} with 266 entries:
-  "2015 VBT Female Non-Smoker RR90 ALB"                                       => SelectUltimateTable{OffsetArray{OffsetArray{Float64,1,Array{Float64,1}},1,Array{OffsetArray{F…  
-  "2017 Loaded CSO Preferred Structure Nonsmoker Preferred Female ANB"        => SelectUltimateTable{OffsetArray{OffsetArray{Float64,1,Array{Float64,1}},1,Array{OffsetArray{F…  
-  ⋮                                                                            => ⋮
-```
-
-Get information about a particular table:
-
-```julia-repl
-julia> vbt2001 = tables["2001 VBT Residual Standard Select and Ultimate - Male Nonsmoker, ANB"]
 MortalityTable (Insured Lives Mortality):
    Name:
        2001 VBT Residual Standard Select and Ultimate - Male Nonsmoker, ANB
@@ -169,18 +158,25 @@ MortalityTable (Insured Lives Mortality):
 
 The package revolves around easy-to-access vectors which are indexed by attained age:
 
-```julia-repl
-julia> vbt2001.select[35] # vector of rates for issue age 35
+```julia
+julia> vbt2001.select[35]          # vector of rates for issue age 35
  0.00036
  0.00048
  ⋮
  0.94729
  1.0
-
-julia> vbt2001.select[35][35] #issue age 35, attained age 35
+ 
+julia> vbt2001.select[35][35]      # issue age 35, attained age 35
  0.00036
+ 
+julia> vbt2001.select[35][50:end] # issue age 35, attained age 50 through end of table
+0.00316
+0.00345
+ ⋮
+0.94729
+1.0
 
-julia> vbt2001.ultimate[95]  # ultimate vectors only need to be called with the attained age
+julia> vbt2001.ultimate[95]        # ultimate vectors only need to be called with the attained age
  0.24298
 ```
 
@@ -192,6 +188,13 @@ julia> survival(vbt2001.ultimate,30,40) # the survival between ages 30 and 40
 
 julia> decrement(vbt2001.ultimate,30,40) # the decrement between ages 30 and 40
 0.010559533456509618
+```
+
+Non-whole periods of time are supported when you specify the assumption (`Constant()`, `Uniform()`, or `Balducci()`) for fractional periods:
+
+```julia
+julia> survival(vbt2001.ultimate,30,40.5,Uniform()) # the survival between ages 30 and 40.5
+0.9887676470262408
 ```
 
 ### Parametric Models
@@ -207,8 +210,6 @@ survival(m,20,25) # the five year survival rate
 ```
 \\
 [MortalityTables package on Github 🡭](https://github.com/JuliaActuary/MortalityTables.jl)
-
-
 
 
 <!-- =============================
