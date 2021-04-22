@@ -9,14 +9,6 @@
 
 > JuliaActuary is focused on building packages that enable actuaries everywhere to build solutions using open-source tools.
 
-The packages utilize all of the benefits of the [Julia language](https://julialang.org) and:
-
-* provide easy access and clean interface to mortality tables (**MortalityTables.jl**)
-* bundle a set of commonly used financial and math functions (**ActuaryUtiltities.jl**)
-* provide an easy interface to many common life contingent maths (**LifeContingencies.jl**)
-* Simple, yet powerful interest rate and yield curve functions (**Yields.jl**)
-* Exposure calculations with **ExperienceAnalysis.jl**
-
 ~~~
 </br>
 <a class="github-button" href="https://github.com/JuliaActuary/" data-size="large" aria-label="View {{title}} on GitHub">JuliaActuary on GitHub</a>
@@ -30,73 +22,32 @@ The packages utilize all of the benefits of the [Julia language](https://juliala
 # Packages
 
 These packages are available for use in your project. Keep scrolling down for more info on each one.
-~~~
-<div class="wide_table_reponsive">
-  <table>
-    <tbody>
-      <tr>
-        <th align="left">Name</th>
-        <th align="right">Description</th>
-        <th align="center">Development Status</th>
-      </tr>
-      <tr>
-        <td align="left">
-          <a href="https://github.com/JuliaActuary/MortalityTables.jl"><code>MortalityTables.jl</code></a>
-        </td>
-        <td align="right">Easily work with standard <a href="mort.SOA.org">mort.SOA.org</a> tables and parametric models with common survival calculations.</td>
-        <td align="center">
-          <b>Stable</b></br>
-        </td>
-      </tr>
-       <tr>
-        <td align="left">
-          <a href="https://github.com/JuliaActuary/LifeContingencies.jl"><code>LifeContingencies.jl</code></a>
-        </td>
-        <td align="right">Insurance, annuity, premium, and reserve maths.</td>
-        <td align="center">
-          <b>Stable</b></br>
-        </td>
-      </tr>
-      <tr>
-        <td align="left">
-          <a href="https://github.com/JuliaActuary/ActuaryUtilities.jl"><code>ActuaryUtilities.jl</code></a>
-        </td>
-        <td align="right">Robust and fast calculations for <code>internal_rate_of_return</code>, <code>duration</code>, <code>convexity</code>, <code>present_value</code>, <code>breakeven</code>, and more. 
-        <br /><br />
-        <b>New!</b> Copy/paste to and from Excel.</td>
-        <td align="center">
-          <b>Stable</b></br>
-        </td>
-      </tr>
 
-      <tr>
-        <td align="left">
-          <a href="https://github.com/JuliaActuary/Yields.jl"><code>Yields.jl</code></a>
-        </td>
-        <td align="right">Simple and composable yield curves and calculations.</td>
-        <td align="center">
-          <b>Developing</b></br>
-          Functionality is mostly built-out, but the API may change.
-        </td>
-      </tr>
-            <tr>
-        <td align="left">
-          <a href="https://github.com/JuliaActuary/ExperienceAnalysis.jl"><code>ExperienceAnalysis.jl</code></a>
-        </td>
-        <td align="right">Meeting your exposure calculation needs.</td>
-        <td align="center">
-          <b>Developing</b></br>
-          Functionality is mostly built-out, but the API may change.
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</div>
+[`MortalityTables.jl`](#MortalityTablesjl)
+  - Easily work with standard [mort.SOA.org](mort.SOA.org) tables and parametric models with common survival calculations.
+
+[`LifeContingencies.jl`](#LifeContingenciesjl)
+- Insurance, annuity, premium, and reserve maths.
+
+[`ActuaryUtilities.jl`](#ActuaryUtilitiesjl)
+- Robust and fast calculations for `internal_rate_of_return`, `duration`, `convexity`, `present_value`, `breakeven`, and more. 
+- Utility features like copy and paste to/from Excel and Julia!
+
+[`Yields.jl`](#Yieldsjl)※
+- Simple and composable yield curves and calculations.
+
+[`ExperienceAnalysis.jl`](#ExperienceAnalysisjl)※
+- Meeting your exposure calculation needs.
+
+
 
 ~~~
+<div class="alert alert-info">
+ 
 
-~~~
-<div class="alert alert-info"> <strong>Note:</strong> You can use any package in it's current state and not worry about changes breaking any code that you write. Julia's package manager let's you <a href="https://julialang.github.io/Pkg.jl/v1/toml-files/#Manifest.toml-1" >exactly recreate a set of code and its dependencies.</a> (<a href="https://stackoverflow.com/questions/63485891/how-do-i-ensure-repeatability-of-julia-code-and-assoicated-dependencies">More</a>).
+<p><strong>Note:</strong> packages marked with ※ are developing: the functionality is built-out and tested, but the API may change. </p>
+
+<p>For consistency, you can lock any package in its current state and not worry about breaking changes to any code that you write. Julia's package manager lets you <a href="https://julialang.github.io/Pkg.jl/v1/toml-files/#Manifest.toml-1" >exactly recreate a set of code and its dependencies.</a> (<a href="https://stackoverflow.com/questions/63485891/how-do-i-ensure-repeatability-of-julia-code-and-assoicated-dependencies">More</a>).</p>
 </div>
 ~~~
 
@@ -120,6 +71,7 @@ using PackageName
 ## MortalityTables.jl 
 
 > Hassle-free mortality and other rate tables.
+
 
 ### Features
 
