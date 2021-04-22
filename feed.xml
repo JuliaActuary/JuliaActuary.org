@@ -1,25 +1,61 @@
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-<channel>
-  <title><![CDATA[JuliaActuary]]></title>
-  <description><![CDATA[Practical, extensible, and open-source actuarial modeling and analysis. 
-]]></description>
-  <link>https://JuliaActuary.org/</link>
-  <atom:link href="https://JuliaActuary.org/feed.xml" rel="self" type="application/rss+xml" />
-  <item>
-    <title><![CDATA[Coding the Future]]></title>
-    <link>https://JuliaActuary.org/blog/coding-for-the-future/</link>
-    <description><![CDATA[Companies need to transform and actuaries who can code will play a pivotal role in that story.
-<br><a href="https://JuliaActuary.org/blog/coding-for-the-future/">Read more</a>]]></description>
-    <guid>https://JuliaActuary.org/blog/coding-for-the-future/</guid>
-    <pubDate>Sun, 27 Sep 2020 00:00:00 UT</pubDate>
-  </item>
-  <item>
-    <title><![CDATA[Julia for Actuaries]]></title>
-    <link>https://JuliaActuary.org/blog/julia-actuaries/</link>
-    <description><![CDATA[Julia is a new programming language that&#39;s ideally suited for most actuarial workflows.
-<br><a href="https://JuliaActuary.org/blog/julia-actuaries/">Read more</a>]]></description>
-    <guid>https://JuliaActuary.org/blog/julia-actuaries/</guid>
-    <pubDate>Sun, 27 Sep 2020 00:00:00 UT</pubDate>
-  </item>
-</channel>
-</rss>
+<?xml version="1.0" encoding="UTF-8"?>
+
+<rss version="2.0"
+  xmlns:content="http://purl.org/rss/1.0/modules/content/"
+  xmlns:dc="http://purl.org/dc/elements/1.1/"
+  xmlns:media="http://search.yahoo.com/mrss/"
+  xmlns:atom="http://www.w3.org/2005/Atom"
+  xmlns:georss="http://www.georss.org/georss">
+
+  <channel>
+    <title>
+      <![CDATA[  JuliaActuary  ]]>
+    </title>
+    <link> https://JuliaActuary.org </link>
+    <description>
+      <![CDATA[  Practical, extensible, and open-source actuarial modeling and analysis.   ]]>
+    </description>
+    <atom:link
+      href="https://JuliaActuary.org/feed.xml"
+      rel="self"
+      type="application/rss+xml" />
+
+
+<item>
+  <title>
+    <![CDATA[  Coding the Future  ]]>
+  </title>
+  <link> https://JuliaActuary.org/blog/coding-for-the-future/index.html </link>
+  <guid> https://JuliaActuary.org/blog/coding-for-the-future/index.html </guid>
+  <description>
+    <![CDATA[  Companies need to transform and actuaries who can code will play a pivotal role in that story.  ]]>
+  </description>  
+    
+  <pubDate>Sun, 27 Sep 2020 00:00:00 +0000</pubDate>  
+  
+  
+  <atom:author>
+    <atom:name>Alec Loudenback</atom:name>
+  </atom:author>
+        
+</item>
+
+<item>
+  <title>
+    <![CDATA[  Julia for Actuaries  ]]>
+  </title>
+  <link> https://JuliaActuary.org/blog/julia-actuaries/index.html </link>
+  <guid> https://JuliaActuary.org/blog/julia-actuaries/index.html </guid>
+  <description>
+    <![CDATA[  Julia is a new programming language that&#39;s ideally suited for most actuarial workflows.  ]]>
+  </description>  
+    
+  <pubDate>Sun, 27 Sep 2020 00:00:00 +0000</pubDate>  
+  
+  
+  <atom:author>
+    <atom:name>Alec Loudenback</atom:name>
+  </atom:author>
+        
+</item>
+</channel></rss>
