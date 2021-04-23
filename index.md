@@ -23,20 +23,20 @@
 
 These packages are available for use in your project. Keep scrolling down for more info on each one.
 
-[`MortalityTables.jl`](#MortalityTablesjl)
+[`MortalityTables.jl`](#mortalitytablesjl)
   - Easily work with standard [mort.SOA.org](mort.SOA.org) tables and parametric models with common survival calculations.
 
-[`LifeContingencies.jl`](#LifeContingenciesjl)
+[`LifeContingencies.jl`](#lifecontingenciesjl)
 - Insurance, annuity, premium, and reserve maths.
 
-[`ActuaryUtilities.jl`](#ActuaryUtilitiesjl)
+[`ActuaryUtilities.jl`](#actuaryutilitiesjl)
 - Robust and fast calculations for `internal_rate_of_return`, `duration`, `convexity`, `present_value`, `breakeven`, and more. 
 - Utility features like copy and paste to/from Excel and Julia!
 
-[`Yields.jl`](#Yieldsjl)※
+[`Yields.jl`](#yieldsjl)※
 - Simple and composable yield curves and calculations.
 
-[`ExperienceAnalysis.jl`](#ExperienceAnalysisjl)※
+[`ExperienceAnalysis.jl`](#experienceanalysisjl)※
 - Meeting your exposure calculation needs.
 
 
