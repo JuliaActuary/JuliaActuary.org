@@ -196,7 +196,194 @@ The differnece hints at some computational aspects related to arrays that I will
 
 > Performance, flexibility, readablily: pick one, two, or three depending on the language
 
+This section ranges from objective (performance metrics) to subjective (my take on flexibility and readabilty). My opinions are based on using R heavily for several years ~2011-2015, Python for ~2015-2018, and then primarily swtiched to Julia in ~2018. I have a lot of experience with VBA, and moderate experience with Javascript, with some educational/introductory background in C, List/Racket, Mathematica, Haskell, and Java.
+
+#### R
+
+
+##### Perfomrance
+
+R was the slowest all-around.
+
+##### Flexibility
+
+R scores well here - [non-standard evaluation](http://adv-r.had.co.nz/Computing-on-the-language.html#nse) lets you, essentially, inspect the written code without evaluating it. This is a nice feature that enables a lot of creativity and pleasantries (like ggplot knowing what to label the axes without you telling it!).
+
+R works in notebook environments and from a REPL.
+
+##### Readbility
+
+R is pretty good here too:
+
+```R
+
+# via Houstonwp
+q <- c(0.001,0.002,0.003,0.003,0.004,0.004,0.005,0.007,0.009,0.011)
+w <- c(0.05,0.07,0.08,0.10,0.14,0.20,0.20,0.20,0.10,0.04)
+P <- 100
+S <- 25000
+r <- 0.02
+
+base_r_npv <- function(q,w,P,S,r) {
+  inforce <- c(1,head(cumprod(1-q-w), -1))
+  ncf <- inforce * P - inforce * q * S
+  d <- (1/(1+r)) ^ seq_along(ncf)
+  sum(ncf * d)
+}
+
+base_r_npv(q,w,P,S,r)
+#> [1] 50.32483
+microbenchmark::microbenchmark(base_r_npv(q,w,P,S,r))
+```
+
 ...
+
+
+#### Rust 
+
+Rust is a newer, statically compiled language designed for performance and safety (in the don't let your program do memory managment mistakes that crash the computer).
+
+##### Performance
+
+Rust scores well here, coming second only to Julia.
+
+##### Flexibility
+
+Rust is statically compiled (you write script, have computer run script, see results). It doesn't have a REPL or ability to be used in an interactive way (e.g. notebook environments).
+
+##### Readabilty
+
+I really like the explcit function contract: you give it various floating point (`f64`) vectors and numbers, and it returns a float: `-> f64`. 
+
+Other than that it's pretty straightforward but definitely more verbose than any of the others.
+
+```
+#![feature(test)]
+extern crate test;
+use test::Bencher;
+
+// Via Paddy Horan
+pub fn npv(mortality_rates: &Vec<f64>, lapse_rates: &Vec<f64>, interest_rate: f64, sum_assured: f64, premium: f64, init_pols: f64, term: Option<usize>) -> f64 {
+
+    let term = term.unwrap_or_else(|| mortality_rates.len());
+    let mut result = 0.0;
+    let mut inforce = init_pols;
+    let v: f64 = 1.0 / (1.0 + interest_rate);
+
+    for (t, (q, w)) in mortality_rates.iter().zip(lapse_rates).enumerate() {
+        let no_deaths = if t < term {inforce * q} else {0.0};
+        let no_lapses = if t < term {inforce * w} else {0.0};
+        let premiums = inforce * premium;
+        let claims = no_deaths * sum_assured;
+        let net_cashflow = premiums - claims;
+        result += net_cashflow * v.powi(t as i32);
+        inforce = inforce - no_deaths - no_lapses;
+    }
+
+    result
+}
+#[bench]
+fn bench_xor_1000_ints(b: &mut Bencher) {
+
+let q: Vec<f64> = vec![0.001,0.002,0.003,0.003,0.004,0.004,0.005,0.007,0.009,0.011];
+let w: Vec<f64> = vec![0.05,0.07,0.08,0.10,0.14,0.20,0.20,0.20,0.10,0.04];
+let p: f64 = 100.0;
+let s: f64 = 25000.0;
+let r: f64 = 0.02;
+    b.iter(|| {
+        // use `test::black_box` to prevent compiler optimizations from disregarding
+        // unused values
+        test::black_box(npv(&q,&w,r,s,p,1.0,Some(10)));
+    });
+}
+```
+
+#### Python
+
+##### Performance
+
+With [NumPy](https://numpy.org/), Python was the second fastest `Vectorized` approach and 3rd place for the `Accumulator` loop, though in both cases more than an order of magnitude slower than the next place.
+
+##### Flexibility
+
+Python wins points for interactive usage in the REPL, notebooks, and wide variety of environments that support running Python code. However, within the language itself I have to dedcut points for the ease of inspectng/evaluating code.
+
+What I mean by that, is that if you look at the code example below, in order to test the code you have to turn it into string and then call the `timeit` function to read and parse the string. In none of the other tested languages was that required.
+
+I would also ding Python here, becuse once you get deep into an ecosystem (e.g. NumPy), you are sort of at the mercy of package developers to ensure that the packages are compatible.
+
+##### Readability
+
+One of Python's seminal features is the pleasant syntax, though opionions differ as to whehter the indentation should matter to how your program runs.
+
+
+```Python
+import timeit
+setup='''
+import numpy as np
+q = np.array([0.001,0.002,0.003,0.003,0.004,0.004,0.005,0.007,0.009,0.011])
+w = np.array([0.05,0.07,0.08,0.10,0.14,0.20,0.20,0.20,0.10,0.04])
+P = 100
+S = 25000
+r = 0.02
+def npv(q,w,P,S,r):
+    decrements = np.cumprod(1-q-w)
+    inforce = np.empty_like(decrements)
+    inforce[:1] = 1
+    inforce[1:] = decrements[:-1]
+    ncf = inforce * P - inforce * q * S
+    t = np.arange(np.size(q))
+    d = np.power(1/(1+r), t)
+    return np.sum(ncf * d)
+'''
+benchmark = '''npv(q,w,P,S,r)'''
+
+print(timeit.timeit(stmt=benchmark,setup=setup,number = 1000000))
+```
+
+
+#### Juila
+
+##### Perfomrance
+
+The fastest language with both algorithms.
+
+##### Flexiblity
+
+Available in a variety of environments, include the standard interactive ones like the REPL and notebooks. One key differentiator is the [reactive notebook](https://www.nature.com/articles/d41586-021-01174-w) environment, [Pluto.jl](https://github.com/fonsp/Pluto.jl) where notebook cells understand and interact with one-another.
+
+Julia packags are also [notoriously cross-functional](https://www.youtube.com/watch?v=kc9HwsxE1OY), so unlike Python (e.g. NumPy) or R (e.g. Tidyverse), tightly coupled specialty-ecosystems have not evolved in Julia.
+
+
+##### Readability
+
+Julia scores well here, but gets dinged in my mind for a couple of things:
+
+- all of those dots! 
+- the weird `@benchmark` and dollar signs (`$`s)
+
+The former is actually a very powerful concept/tool called [broadcasting](https://docs.julialang.org/en/v1/manual/arrays/#Broadcasting). Kind of like R (where everything is a vector and will combine in vector-like ways). Julia lets you both worlds: really effective scalars and highly efficient vector operations. Once you know what it does, it's hard to think of a shorter/more concise way to express it than the dot (`.`).
+
+The latter, `@benchmark` is a way to get Julia to work with the code itself, again kind of like R does. `@benchmark` is a [macro](https://docs.julialang.org/en/v1/manual/metaprogramming/#man-macros) that will run a really comprehensive and informative benchmarking set on the code given. 
+
+```Julia 
+using BenchmarkTools
+
+q = [0.001,0.002,0.003,0.003,0.004,0.004,0.005,0.007,0.009,0.011]
+w = [0.05,0.07,0.08,0.10,0.14,0.20,0.20,0.20,0.10,0.04]
+P = 100
+S = 25000
+r = 0.02
+
+function npv1(q,w,P,S,r) 
+	inforce = [1.; cumprod(1 .- q .- w)[1:end-1]] 
+  	ncf = inforce .* P .- inforce .* q .* S
+ 	d = (1 ./ (1 + r)) .^ (1:length(ncf))
+  	return sum(ncf .* d)
+end
+
+@benchmark npv(q,w,P,S,r)
+```
 
 ## Colophone
 
@@ -237,6 +424,8 @@ Platform Info:
 Python 3.9.4 (default, Apr  4 2021, 17:42:23) 
 [Clang 12.0.0 (clang-1200.0.32.29)] on darwin
 ```
+
+## Footnotes
 
 [^1] A take on [Andy and Bill's law](https://en.wikipedia.org/wiki/Andy_and_Bill%27s_law)
 
