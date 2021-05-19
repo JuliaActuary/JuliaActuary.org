@@ -385,6 +385,19 @@ end
 @benchmark npv(q,w,P,S,r)
 ```
 
+## More flexibiltiy, more performance from Julia
+
+I wanted to go a little bit deeper and show how 1) Julia just runs fast even if your not explicitly focused on performance. But for where it *really* matters, you can go even deeper. This is a lttle advanced, but I think it can be useful to introduce some basics as to why some languages and approaches are going to be fundamentally slower than others.
+
+Notes:
+The accumulator approach
+vectors and allocations
+talk about stack/heap?
+pick a faster approach and explain why it's even faster.
+
+
+
+
 ## Colophone
 
 ### Code
