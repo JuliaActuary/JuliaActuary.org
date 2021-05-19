@@ -9,6 +9,8 @@
 
 > JuliaActuary is focused on building packages that enable actuaries everywhere to build solutions using open-source tools.
 
+Please read the blog post, [Julia for Actuaries](/blog/julia-actuaries/) to see why Julia works so well for actuarial science.
+
 ~~~
 </br>
 <a class="github-button" href="https://github.com/JuliaActuary/" data-size="large" aria-label="View {{title}} on GitHub">JuliaActuary on GitHub</a>
