@@ -468,6 +468,11 @@ julia> ? survival
   0.95
 ```
 
+### Other Repositories of Interest for Actuaries
+
+- [RMInsurance](https://github.com/mkriele/RMInsurance.jl) is the code and examples for the second edition of the book "Value-Oriented Risk Management of Insurance Companies"
+- [LifeTable.jl](https://github.com/klpn/LifeTable.jl) will caculate life tables from the Human Mortality Database.
+
 ## Integration with R and Python
 
 Julia integrates with other languages, allowing you to leverage existing scripts and packages in R via [RCall](https://github.com/JuliaInterop/RCall.jl) and in Python  via [PyCall](https://github.com/JuliaPy/PyCall.jl).
