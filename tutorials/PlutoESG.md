@@ -19,8 +19,11 @@ Because JuliaActuary doesn't have a beefy server to run this on and let anybody 
 1. Open a Julia REPL and copy and paste the following:
 
 ```julia
-import Pkg; Pkg.add(["Pluto","Plots","UnPack"]) # install these dependencies
-using Pluto; Pluto.run()                        # use and start Pluto
+# install these dependencies
+import Pkg; Pkg.add(["Pluto","Plots","UnPack", "ThreadsX"]) 
+
+# use and start Pluto
+using Pluto; Pluto.run()                        
 ```
 
 2. In the Pluto window that opens, enter this URL into the `Open from file:` box:
