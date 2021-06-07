@@ -183,6 +183,12 @@ survival(m,20,25) # the five year survival rate
 - `breakeven` to calculate the breakeven time for a set of cashflows
 - `accum_offset` to calculate accumulations like survivorship from a mortality vector
 
+### Risk Measures
+
+- Calculate risk measures for a given vector of risks: 
+  - `CTE` for the Conditiona Tail Expectation, or 
+  - `VaR` for the percentile/Value at Risk.
+
 ### Insurance mechanics
 
 - `duration`:
