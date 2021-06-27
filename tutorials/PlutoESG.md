@@ -20,7 +20,7 @@ Because JuliaActuary doesn't have a beefy server to run this on and let anybody 
 
 ```julia
 # install these dependencies
-import Pkg; Pkg.add(["Pluto","Plots","UnPack", "ThreadsX"]) 
+import Pkg; Pkg.add(["Pluto","Plots","UnPack", "ActuaryUtilities", "ThreadsX"]) 
 
 # use and start Pluto
 using Pluto; Pluto.run()                        
