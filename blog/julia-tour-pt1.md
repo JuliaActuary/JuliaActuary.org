@@ -67,6 +67,7 @@ Julia is not perfect in this regard, but it's really neat to see how frequently 
 
 Julia also has language-level support for documentation, so packages are able to follow a consistent style of help text and have the docs be auto-generated into web pages available online.
 
+The following highlighted packages were chosen for their relevance to typical actuarial work, with a bias towards those I've personally used am familiar with. This is a small sampling of the over 6000 registered Julia Packages[^1]
 #### Data
 
 Starting with getting data in and out of your code, `CSV.jl` offers top-class read and write performance. `ODBC.jl` lets you connect to any database.
@@ -81,10 +82,17 @@ Starting with getting data in and out of your code, `CSV.jl` offers top-class re
 
 `Makie.jl` is an up-and-coming package that supports GPU-accelerated plotting and can create very rich, beautful visualizations, but it's a little less beginner friendly.
 
-
 #### Statistics
 
 Julia has first-class suport for `missing` values, which follows the rules of [three-valued logic](https://en.wikipedia.org/wiki/Three-valued_logic) so other pacakges don't need to do anything special to incorporate missing values.
+
+`StatsBase.jl` and `Distributions.jl` are essentials for a range of statistics functions and probability distributions respectively.
+
+`Turing.jl`, a Bayesian Stats library, is outstanding in it's combination of clear model syntax with performance. `GLM.jl` is useful for any type of linear modeling. 
+
+
+#### Machine Learning
+
 
 
 
@@ -92,3 +100,5 @@ Julia has first-class suport for `missing` values, which follows the rules of [t
 
 `Revise.jl`
 `BenchmarkTools.jl`
+
+[^1]: As of July 2021.

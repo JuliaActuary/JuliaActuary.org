@@ -185,8 +185,8 @@ survival(m,20,25) # the five year survival rate
 
 ### Risk Measures
 
-- Calculate risk measures for a given vector of risks: 
-  - `CTE` for the Conditiona Tail Expectation, or 
+- Calculate risk measures for a given vector of risks:
+  - `CTE` for the Conditiona Tail Expectation, or
   - `VaR` for the percentile/Value at Risk.
 
 ### Insurance mechanics
