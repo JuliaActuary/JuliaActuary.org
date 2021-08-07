@@ -26,7 +26,7 @@ Please read the blog post, [Julia for Actuaries](/blog/julia-actuaries/) to see 
 These packages are available for use in your project. Keep scrolling down for more info on each one.
 
 [`MortalityTables.jl`](#mortalitytablesjl)
-  - Easily work with standard [mort.SOA.org](mort.SOA.org) tables and parametric models with common survival calculations.
+  - Easily work with standard [mort.SOA.org](https://mort.soa.org/) tables and parametric models with common survival calculations.
 
 [`LifeContingencies.jl`](#lifecontingenciesjl)
 - Insurance, annuity, premium, and reserve maths.
@@ -423,12 +423,16 @@ Each package includes examples on the Github site and in the documentation.
 #### Walkthroughs and tutorials 
 Coming soon!
 
+#### Benchmarks
+
+Benchmarks of Actuarial workflows can be found on the [Benchmarks](/benchmarks/) page.
+
 #### Miscellaneous
 
-- [Interactive exploration](/tutorials/PlutoESG) of the AAA's Economic Scenario Generator
-- [Interactive mortality table comparison tool](/tutorials/MortalityTableComparison) for any `mort.soa.org` table
-- [Interactive cashflow analysis](/tutorials/CashflowAnalysis)
-- [Universal Life Policy Account Mechanics as a Differential Equation](/tutorials/PolicyDiffEq)
+- [Interactive exploration](/tutorials/PlutoESG/) of the AAA's Economic Scenario Generator
+- [Interactive mortality table comparison tool](/tutorials/MortalityTableComparison/) for any `mort.soa.org` table
+- [Interactive cashflow analysis](/tutorials/CashflowAnalysis/)
+- [Universal Life Policy Account Mechanics as a Differential Equation](/tutorials/PolicyDiffEq/)
 
 ### Help mode
 
@@ -513,14 +517,16 @@ If you have other ideas or questions, feel free to also open an issue, or discus
 
 ### Other Inquiries
 
-For more directed inquires, please send email to [inquiry@JuliaActuary.org](mailto: inquiry@juliaactuary.org).
+For more directed inquires, please send email to [inquiry@JuliaActuary.org](mailto:inquiry@juliaactuary.org).
 
 # Blog
 
 - [Coding the Future](/blog/coding-for-the-future/)
   - Building the insurance company of tomorrow by being a 10x actuary.
-- [Julia for Actuaries](/blog/julia-actuaries/) 
-  - Why Julia works so well for actuarial science. 
+- [Julia for Actuaries](/blog/julia-actuaries/)
+  - Why Julia works so well for actuarial science.
+- [The Life Modeling Problem: A Comparison of Julia, Rust, Python, and R](/blog/life-modeling-problem/) 
+  - Why Julia works so well for actuarial science.
 
 ~~~
 <em>Subscribe to new posts via the <a href="feed.xml">JuliaActuary RSS Feed <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16"><path fill="none" d="M0 0h24v24H0z"/><path d="M3 3c9.941 0 18 8.059 18 18h-3c0-8.284-6.716-15-15-15V3zm0 7c6.075 0 11 4.925 11 11h-3a8 8 0 0 0-8-8v-3zm0 7a4 4 0 0 1 4 4H3v-4z"/></svg></a></em>
