@@ -1,6 +1,6 @@
 @def author = "Alec Loudenback"
 @def date = "May 16, 2021"
-@def title = "The Life Modeling Problem"
+@def title = "The Life Modeling Problem: A Comparison of Julia, Rust, Python, and R"
 
 @def rss_pubdate = Date(2021,5,16)
 @def rss = "The \"hard parts\" of computational actuarial science and how well programming languages fare."
@@ -11,7 +11,9 @@
 
 *{{fill date}}*
 
-**!! Note that this article is a draft**
+> **!! Note that this article is a draft**
+
+*Note: This is an extended discussion of the results from one of the items on the [Benchmarks](/benchmarks/) page.*
 
 In the [ActuarialOpenSource](https://github.com/actuarialopensource) GitHub organization, a discussion began of the "Life Modeling Problem" (LMP) in actuarial science.
 
@@ -23,7 +25,7 @@ I think the "Life Modeling Problem" has the following attributes:
 
 The following discussion will get a little bit technical, but I think there are a few key takeaways:
 
-1. There are a lot of ways to accomplish the same task and it probably doesn't matter how
+1. There are a lot of ways to accomplish the same task and and that's good enough in most cases
 2. The approach to a problem makes a big difference: "if all you have is a dataframe, everything looks like a join"
 3. Performance, flexibility, readablily: pick one, two, or three depending on the language
 
@@ -140,7 +142,7 @@ benchmarks = DataFrame(CSV.File("blog/data/lmp_benchmarks.csv"))
 
 \output{./code/lmp/loaddata}
 
-It's hard to visualize/compare results with such vast different orders of magnitude. To aid in that, I've included a physical length comparsion representing the distance that light travels in the time for the computation to complete (comparing a nanosecond to one foot length [goes at least back to Admiral Grace Hopper](https://www.youtube.com/watch?v=9eyFDBPk4Yw)).
+To aid in visualizing results with such vast different orders of magnitude, this graph includes a physical length comparsion to serve as a reference. The computation time is represented by the distance that light travels in the time for the computation to complete (comparing a nanosecond to one foot length [goes at least back to Admiral Grace Hopper](https://www.youtube.com/watch?v=9eyFDBPk4Yw)).
 
 ```julia:./code/lmp/benchmkarkplot
 #hideall
@@ -168,9 +170,9 @@ savefig(p,joinpath(@OUTPUT, "benchmarks.svg")) # hide
 
 ### Takeaway #1
 
-> There are a lot of ways to accomplish the same task and it probably doesn't matter how
+> TThere are a lot of ways to accomplish the same task and and that's good enough in most cases
 
-All of the submissions and algorithms above worked, and fast enough that it gave an answer in very little time.
+All of the submissions and algorithms above worked, and fast enough that it gave an answer in very little time. And much of the time, the volume of data to process is small enough that it doesn't matter.
 
 But remember the CUNA Mutual example from above: Let's say that CUNA's runtime is already as fast as it can be, and index it to the fastest result in the benchmarks below. The difference between the fastest "couple of days" run and the slowest would be over __721 years__. So it's important to use tools and approaches that are performant for actuarial work.
 
@@ -207,7 +209,7 @@ R was the slowest all-around.
 
 ##### Flexibility
 
-R scores well here - [non-standard evaluation](http://adv-r.had.co.nz/Computing-on-the-language.html#nse) lets you, essentially, inspect the written code without evaluating it. This is a nice feature that enables a lot of creativity and pleasantries (like ggplot knowing what to label the axes without you telling it!).
+R scores well here - [non-standard evaluation](http://adv-r.had.co.nz/Computing-on-the-language.html#nse) lets you, essentially, inspect the written code without evaluating it. This is a nice feature that enables a lot of creativity and pleasantries (like ggplot knowing what to label the axes without you telling it).
 
 R works in notebook environments and from a REPL.
 
@@ -302,7 +304,7 @@ let r: f64 = 0.02;
 
 ##### Performance
 
-With [NumPy](https://numpy.org/), Python was the second fastest `Vectorized` approach and 3rd place for the `Accumulator` loop, though in both cases more than an order of magnitude slower than the next place.
+With [NumPy](https://numpy.org/), Python was the second fastest `Vectorized` approach and 3rd place for the `Accumulator` loop, both cases were still more than an order of magnitude slower than the next place.
 
 ##### Flexibility
 
@@ -341,6 +343,7 @@ benchmark = '''npv(q,w,P,S,r)'''
 print(timeit.timeit(stmt=benchmark,setup=setup,number = 1000000))
 ```
 
+I will say that the benchmarking setup with Python's `timeit` is definitely the most painful, needing to wrap the whole thing in a string. And then only get a single nubmer reult, without normalizing for the number of runs is very annoying.
 
 #### Juila
 
@@ -366,6 +369,8 @@ The former is actually a very powerful concept/tool called [broadcasting](https:
 
 The latter, `@benchmark` is a way to get Julia to work with the code itself, again kind of like R does. `@benchmark` is a [macro](https://docs.julialang.org/en/v1/manual/metaprogramming/#man-macros) that will run a really comprehensive and informative benchmarking set on the code given. 
 
+
+The `Vectorized` version:
 ```Julia 
 using BenchmarkTools
 
@@ -382,7 +387,25 @@ function npv1(q,w,P,S,r)
   	return sum(ncf .* d)
 end
 
-@benchmark npv(q,w,P,S,r)
+@benchmark npv($q,$w,$P,$S,$r)
+```
+
+And the `Accumulator` version:
+
+```julia
+function npv5(q,w,P,S,r,term=nothing)
+    term = term === nothing ? length(q) : term
+    inforce = 1.0
+    result = 0.0
+    v = (1 / ( 1 + r))
+    v_t = v
+    for (q,w,_) in zip(q,w,1:term)
+        result += inforce * (P - S * q) * v_t
+        inforce -= inforce * q + inforce * w
+        v_t *= v
+    end
+    return result
+end
 ```
 
 ## More flexibiltiy, more performance from Julia
