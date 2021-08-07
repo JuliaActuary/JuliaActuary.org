@@ -3,49 +3,61 @@
 
 <url>
     <loc>https://JuliaActuary.org/blog/coding-for-the-future/index.html</loc>
-    <lastmod>2021-06-27</lastmod>
+    <lastmod>2021-08-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
 <url>
     <loc>https://JuliaActuary.org/index.html</loc>
-    <lastmod>2021-06-27</lastmod>
+    <lastmod>2021-08-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
 <url>
-    <loc>https://JuliaActuary.org/tutorials/MortalityTableComparison/index.html</loc>
-    <lastmod>2021-06-27</lastmod>
+    <loc>https://JuliaActuary.org/benchmarks/index.html</loc>
+    <lastmod>2021-08-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
 <url>
     <loc>https://JuliaActuary.org/blog/julia-actuaries/index.html</loc>
-    <lastmod>2021-06-27</lastmod>
+    <lastmod>2021-08-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
 <url>
-    <loc>https://JuliaActuary.org/tutorials/retention/index.html</loc>
-    <lastmod>2021-06-27</lastmod>
+    <loc>https://JuliaActuary.org/tutorials/MortalityTableComparison/index.html</loc>
+    <lastmod>2021-08-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
 <url>
     <loc>https://JuliaActuary.org/tutorials/PlutoESG/index.html</loc>
-    <lastmod>2021-06-27</lastmod>
+    <lastmod>2021-08-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+</url>
+<url>
+    <loc>https://JuliaActuary.org/tutorials/retention/index.html</loc>
+    <lastmod>2021-08-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
 <url>
     <loc>https://JuliaActuary.org/tutorials/CashflowAnalysis/index.html</loc>
-    <lastmod>2021-06-27</lastmod>
+    <lastmod>2021-08-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+</url>
+<url>
+    <loc>https://JuliaActuary.org/blog/life-modeling-problem/index.html</loc>
+    <lastmod>2021-08-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
 <url>
     <loc>https://JuliaActuary.org/tutorials/PolicyDiffEq/index.html</loc>
-    <lastmod>2021-06-27</lastmod>
+    <lastmod>2021-08-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>

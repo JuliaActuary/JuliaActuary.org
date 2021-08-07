@@ -1,0 +1,267 @@
+<!doctype html> <html lang=en > <meta charset=UTF-8 > <meta name=viewport  content="width=device-width, initial-scale=1"> <meta name=Description  content="Practical, extensible, and open-source actuarial modeling and analysis."> <meta property="og:description" content="Practical, extensible, and open-source actuarial modeling and analysis."> <meta property="og:image" content="/assets/logo_square.svg"> <link rel=stylesheet  href="/libs/highlight/github.min.css"> <link rel=stylesheet  href="/css/franklin.css"> <link rel=stylesheet  href="/css/basic.css"> <link rel=icon  href="/assets/favicon.png"> <script async defer src="https://buttons.github.io/buttons.js"></script> <title>The Life Modeling Problem: A Comparison of Julia, Rust, Python, and R | JuliaActuary</title> <link rel=apple-touch-icon  sizes=180x180  href="/assets/apple-touch-icon.png"> <link rel=icon  type="image/png" sizes=32x32  href="/assets/favicon-32x32.png"> <link rel=icon  type="image/png" sizes=16x16  href="/assets/favicon-16x16.png"> <link rel=manifest  href="/assets/site.webmanifest"> <header> <div class=blog-name > <a href="/"> <div class=blog-name-logo-container > <div class=blog-name-logo > <img src="/assets/logo_square.svg" alt=logo  /> </div> <div>JuliaActuary</div> </div> </a> <div class=tagline >Practical, extensible, and open-source actuarial modeling and analysis. </div> </div> <nav> <ul> <li><a href="/">Home</a> <li><a href="/#packages">Packages</a> <ul> <li><a href="/#mortalitytablesjl">MortalityTables.jl</a> <li><a href="/#actuaryutilitiesjl">ActuaryUtilities.jl</a> <li><a href="/#lifecontingenciesjl">LifeContingencies.jl</a> <li><a href="/#yieldsjl">Yields.jl</a> <li><a href="/#experienceanalysisjl">ExperienceAnalysis.jl</a> </ul> <li><a href="/#community">Community</a> <ul> <li><a href="/#learn">Learn</a> <li><a href="/#integration_with_r_and_python">Integration</a> <li><a href="/#contributing">Contributing</a> </ul> <li><a href="/#blog">Blog</a> </ul> <img src="/assets/hamburger.svg" id=menu-icon > </nav> </header> <div class=franklin-content ><h1 id=fill_title ><a href="#fill_title" class=header-anchor >The Life Modeling Problem: A Comparison of Julia, Rust, Python, and R</a></h1> <p><em>By: Alec Loudenback</em></p> <p><em>May 16, 2021</em></p> <blockquote> <p><strong>&#33;&#33; Note that this article is a draft</strong></p> </blockquote> <p><em>Note: This is an extended discussion of the results from one of the items on the <a href="/benchmarks/">Benchmarks</a> page.</em></p> <p>In the <a href="https://github.com/actuarialopensource">ActuarialOpenSource</a> GitHub organization, a discussion began of the &quot;Life Modeling Problem&quot; &#40;LMP&#41; in actuarial science.</p> <p>I think the &quot;Life Modeling Problem&quot; has the following attributes:</p> <ul> <li><p>Recursive calcuations</p> <li><p>Computationally intensive</p> <li><p>Large volume of data to process</p> </ul> <p>The following discussion will get a little bit technical, but I think there are a few key takeaways:</p> <ol> <li><p>There are a lot of ways to accomplish the same task and and that&#39;s good enough in most cases</p> <li><p>The approach to a problem makes a big difference: &quot;if all you have is a dataframe, everything looks like a join&quot;</p> <li><p>Performance, flexibility, readablily: pick one, two, or three depending on the language</p> </ol> <p>To skip the background and the discussion, <a href="#benchmarks">click here to jump to the benchmarks</a>.</p> <h2 id=the_life_modeling_problem ><a href="#the_life_modeling_problem" class=header-anchor >The Life Modeling Problem</a></h2> <p>Inspired by the discussion in the <a href="https://github.com/actuarialopensource">ActuarialOpenSource</a> GitHub community discussion, folks started submitted solutions to what someone referred to as the &quot;Life Modeling Problem&quot;. This user <a href="https://github.com/orgs/actuarialopensource/teams/common-room/discussions/5">submitted a short snippet</a> for consideraton of a representative problem.</p> <p>My take on the characteristics are that modeling life actuarial science problems breaks down to the following items:</p> <ul> <li><p>Calculations are recursive in nature</p> <li><p>Computationally intensive cacluations</p> <li><p>Performance matters given large volumes of data to process</p> <li><p>Readability and usability aids in controls and risk</p> </ul> <h3 id=recursive_calculations ><a href="#recursive_calculations" class=header-anchor >Recursive calculations</a></h3> <p>Many actuarial formulas are recursive in nature. Reserves are defined &quot;prospecively&quot; or &quot;retrospectively&quot; </p> <h3 id=computationally_intensive ><a href="#computationally_intensive" class=header-anchor >Computationally intensive</a></h3> <p>Modeling is incredibly computationally complex due to the volume of data needed to process. For example, CUNA Mutual disclosed that they spin up 50 servers with 20 cores a <a href="https://www.cunamutual.com/landing-pages/that-conference/cuna-mutual-applications">couple of days per month</a> to do the calculations. </p> <h3 id=processing_volume ><a href="#processing_volume" class=header-anchor >Processing volume</a></h3> <p>There&#39;s a cottage industry devoted to inforce compression and model simplifications to get runtimes and budgets down to a reasonable level. However, as the capacity for computing has grown, the company and regulatory demnads have grown. E.g in the US reserving has transition from net-premium reserve to integrated ALM &#40;CFT&#41; to deterministic scenarios sets &#40;CFT w NY7 &#43; others&#41; to truly stochastic &#40;Stochasic PBR&#41;. &quot;What Intel giveth, the NAIC taketh away.&quot;<sup id="fnref:1"><a href="#fndef:1" class=fnref >[1]</a></sup>. </p> <p>So again, performance matters&#33;</p> <h3 id=readability_and_expressiveness ><a href="#readability_and_expressiveness" class=header-anchor >Readability and Expressiveness</a></h3> <p>Actuaries, even the <a href="/blog/coding-for-the-future/">10x Actuary</a>, aren&#39;t pure computer scientists and computuational efficiency has never been <em>so</em> critical that they sacrifce everthing else to get it. So the industry never turned to the 40-year king of performance computation, <a href="https://en.wikipedia.org/wiki/Fortran">Fortran</a>. The syntax is very &quot;close to the machine&quot;. I&#39;s a bit rough to read to anyone not well versed.</p> <p>Interestingly, <a href="https://en.wikipedia.org/wiki/APL_&#40;programming_language&#41;">APL</a> took off and was one of the dominant languages used by actuaries before the advent of <a href="/blog/coding-for-the-future/#the_10x_actuary">vendor-supplied modeling solutions</a>. </p> <p>Counting the occurances of a string looks like this in APL:</p> <pre><code class=language-APL >csubs←&#123;0&#61;x←⊃⍸⍺⍷⍵:0 ⋄ 1&#43;⍺∇&#40;¯1&#43;x&#43;⍴⍺&#41;↓⍵&#125;</code></pre>
+<p>whereas in Fortan it would be:</p>
+<pre><code class=language-julia >function countsubstring&#40;s1, s2&#41; result&#40;c&#41;
+  character&#40;*&#41;, intent&#40;in&#41; :: s1, s2
+  integer :: c, p, posn
+ 
+  c &#61; 0
+  if&#40;len&#40;s2&#41; &#61;&#61; 0&#41; return
+  p &#61; 1
+  do 
+    posn &#61; index&#40;s1&#40;p:&#41;, s2&#41;
+    if&#40;posn &#61;&#61; 0&#41; return
+    c &#61; c &#43; 1
+    p &#61; p &#43; posn &#43; len&#40;s2&#41; - 1
+  end do
+end function</code></pre>
+<p>Maybe more readable to the modern eye than APL, but many valuation and pricing acturies would still recognize what&#39;s going on with the first code example.</p>
+<p>Why did APL take off for Acturies and not APL? I think <a href="https://en.wikipedia.org/wiki/Expressive_power_&#37;28computer_science&#37;29">expressiveness</a> and the ability to have a language inspired by mathematical notation were attractive. More on this later in a comparison between the modern languages.</p>
+<p>The takeaway from this point, though, is that there is a natural draw towards more expressive, powerful languages than less expressive langauges, especially when dealing with math notations. So high expressiveness is something we want from a language that solves the LMP.</p>
+<h2 id=benchmarks ><a href="#benchmarks" class=header-anchor >Benchmarks</a></h2>
+<p>After the orignal user submitted a proposal, others chimed in and submitted versions in their favorite languages. I have collected those versions, and run them on a consistent set of hardware.</p>
+<p>Some &quot;submissions&quot; were excluded becuase they involved an entirely different approach, such as <a href="https://en.wikipedia.org/wiki/Memoization">memoizing</a> the function calls<sup id="fnref:2"><a href="#fndef:2" class=fnref >[2]</a></sup>.</p>
+<p>Times are nanoseconds</p>
+<pre><code class=language-julia >┌────────────────┬─────────────┬───────────────┬──────────┬──────────┐
+│           lang │   algorithm │ function_name │   median │     mean │
+│         String │      String │        String │ Float64? │ Float64? │
+├────────────────┼─────────────┼───────────────┼──────────┼──────────┤
+│ R &#40;data.table&#41; │  Vectorized │           npv │ 770554.0 │ 842767.3 │
+│              R │  Vectorized │      npv base │   4264.0 │  46617.0 │
+│              R │ Accumulator │      npv_loop │   4346.0 │  62275.7 │
+│           Rust │ Accumulator │           npv │     24.0 │  missing │
+│ Python &#40;NumPy&#41; │  Vectorized │           npv │  missing │   6823.3 │
+│         Python │ Accumulator │      npv_loop │  missing │   1486.0 │
+│          Julia │  Vectorized │          npv1 │    235.3 │    228.2 │
+│          Julia │  Vectorized │          npv2 │    235.8 │    218.4 │
+│          Julia │ Accumulator │          npv3 │     14.5 │     14.5 │
+│          Julia │ Accumulator │          npv4 │     10.8 │     10.8 │
+│          Julia │ Accumulator │          npv5 │     11.5 │     11.5 │
+│          Julia │ Accumulator │          npv6 │      9.0 │      9.0 │
+│          Julia │ Accumulator │          npv7 │      7.9 │      7.9 │
+│          Julia │ Accumulator │          npv8 │      7.4 │      7.4 │
+│          Julia │ Accumulator │          npv9 │      6.4 │      6.4 │
+└────────────────┴─────────────┴───────────────┴──────────┴──────────┘</code></pre>
+
+
+<pre><code class="plaintext code-output">UndefVarError: CSV not defined
+</code></pre>
+<p>To aid in visualizing results with such vast different orders of magnitude, this graph includes a physical length comparsion to serve as a reference. The computation time is represented by the distance that light travels in the time for the computation to complete &#40;comparing a nanosecond to one foot length <a href="https://www.youtube.com/watch?v&#61;9eyFDBPk4Yw">goes at least back to Admiral Grace Hopper</a>&#41;.</p>
+
+<p><span style="color:red;">// Image matching '/assets/blog/life-modeling-problem/code/lmp/benchmarks' not found. //</span></p>
+<h2 id=benchmark_discussion ><a href="#benchmark_discussion" class=header-anchor >Benchmark Discussion</a></h2>
+<h3 id=takeaway_1 ><a href="#takeaway_1" class=header-anchor >Takeaway #1</a></h3>
+<blockquote>
+<p>TThere are a lot of ways to accomplish the same task and and that&#39;s good enough in most cases</p>
+</blockquote>
+<p>All of the submissions and algorithms above worked, and fast enough that it gave an answer in very little time. And much of the time, the volume of data to process is small enough that it doesn&#39;t matter.</p>
+<p>But remember the CUNA Mutual example from above: Let&#39;s say that CUNA&#39;s runtime is already as fast as it can be, and index it to the fastest result in the benchmarks below. The difference between the fastest &quot;couple of days&quot; run and the slowest would be over <strong>721 years</strong>. So it&#39;s important to use tools and approaches that are performant for actuarial work.</p>
+<p>So for little one-off tasks it doesn&#39;t make a big difference what tool or algorthim is used. More often than not, your one-off calculatons or checks will be done fast enough that it&#39;s not important to be picky. But if wanting to scale your work to a broader application within your company or the industry, I think it&#39;s important to be perfromance-minded<sup id="fnref:4"><a href="#fndef:4" class=fnref >[3]</a></sup>. </p>
+<h3 id=takeaway_2 ><a href="#takeaway_2" class=header-anchor >Takeaway #2</a></h3>
+<blockquote>
+<p>&quot;If all you have is a dataframe, everything looks like a join&quot;</p>
+</blockquote>
+<p>I&#39;ve seen this several times in practice. Where a stacked dataframe of mortality rates is joined up with policy data in a complicated series of <code>&#37;&gt;&#37;</code>s &#40;pipes&#41;, <code>inner_joins</code> and <code>mutates</code>.</p>
+<p>Don&#39;t get me wrong, I think code is often still a better approach than spreadsheets<sup id="fnref:5"><a href="#fndef:5" class=fnref >[4]</a></sup>.</p>
+<p>However, like the old proverb that &quot;if all you have is a hammer, everything looks like a nail&quot; - sometimes the tool you have just isn&#39;t right for the job. That&#39;s the lesson of the R <a href="https://cran.r-project.org/web/packages/data.table/vignettes/datatable-intro.html">data.table</a> result above. Even with the fastest dataframe implementation in R, it vastly trails other submissions.</p>
+<h3 id=algortihm_choice ><a href="#algortihm_choice" class=header-anchor >Algortihm choice</a></h3>
+<p>Getting more refined about the approach, the other thing that is very obvious is that for this recursive type calculation, it&#39;s much more efficient to write a <code>for</code> loop &#40;the <code>Accumulator</code> approach&#41; in every language except for R &#40;where it wants everthing to be a vector or dataframe&#41;.</p>
+<p>The differnece hints at some computational aspects related to arrays that I will touch upon when discussing code examples below. The point for now is that you should consider using tools that give you the flexibility to approach problems in different ways.</p>
+<h3 id=takeaway_3 ><a href="#takeaway_3" class=header-anchor >Takeaway #3</a></h3>
+<blockquote>
+<p>Performance, flexibility, readablily: pick one, two, or three depending on the language</p>
+</blockquote>
+<p>This section ranges from objective &#40;performance metrics&#41; to subjective &#40;my take on flexibility and readabilty&#41;. My opinions are based on using R heavily for several years ~2011-2015, Python for ~2015-2018, and then primarily swtiched to Julia in ~2018. I have a lot of experience with VBA, and moderate experience with Javascript, with some educational/introductory background in C, List/Racket, Mathematica, Haskell, and Java.</p>
+<h4 id=r ><a href="#r" class=header-anchor >R</a></h4>
+<h5 id=perfomrance ><a href="#perfomrance" class=header-anchor >Perfomrance</a></h5>
+<p>R was the slowest all-around.</p>
+<h5 id=flexibility ><a href="#flexibility" class=header-anchor >Flexibility</a></h5>
+<p>R scores well here - <a href="http://adv-r.had.co.nz/Computing-on-the-language.html#nse">non-standard evaluation</a> lets you, essentially, inspect the written code without evaluating it. This is a nice feature that enables a lot of creativity and pleasantries &#40;like ggplot knowing what to label the axes without you telling it&#41;.</p>
+<p>R works in notebook environments and from a REPL.</p>
+<h5 id=readbility ><a href="#readbility" class=header-anchor >Readbility</a></h5>
+<p>R is pretty good here too:</p>
+<pre><code class=language-R ># via Houstonwp
+q &lt;- c&#40;0.001,0.002,0.003,0.003,0.004,0.004,0.005,0.007,0.009,0.011&#41;
+w &lt;- c&#40;0.05,0.07,0.08,0.10,0.14,0.20,0.20,0.20,0.10,0.04&#41;
+P &lt;- 100
+S &lt;- 25000
+r &lt;- 0.02
+
+base_r_npv &lt;- function&#40;q,w,P,S,r&#41; &#123;
+  inforce &lt;- c&#40;1,head&#40;cumprod&#40;1-q-w&#41;, -1&#41;&#41;
+  ncf &lt;- inforce * P - inforce * q * S
+  d &lt;- &#40;1/&#40;1&#43;r&#41;&#41; ^ seq_along&#40;ncf&#41;
+  sum&#40;ncf * d&#41;
+&#125;
+
+base_r_npv&#40;q,w,P,S,r&#41;
+#&gt; &#91;1&#93; 50.32483
+microbenchmark::microbenchmark&#40;base_r_npv&#40;q,w,P,S,r&#41;&#41;</code></pre>
+<p>...</p>
+<h4 id=rust ><a href="#rust" class=header-anchor >Rust </a></h4>
+<p>Rust is a newer, statically compiled language designed for performance and safety &#40;in the don&#39;t let your program do memory managment mistakes that crash the computer&#41;.</p>
+<h5 id=performance ><a href="#performance" class=header-anchor >Performance</a></h5>
+<p>Rust scores well here, coming second only to Julia.</p>
+<h5 id=flexibility__2 ><a href="#flexibility__2" class=header-anchor >Flexibility</a></h5>
+<p>Rust is statically compiled &#40;you write script, have computer run script, see results&#41;. It doesn&#39;t have a REPL or ability to be used in an interactive way &#40;e.g. notebook environments&#41;.</p>
+<h5 id=readabilty ><a href="#readabilty" class=header-anchor >Readabilty</a></h5>
+<p>I really like the explcit function contract: you give it various floating point &#40;<code>f64</code>&#41; vectors and numbers, and it returns a float: <code>-&gt; f64</code>. </p>
+<p>Other than that it&#39;s pretty straightforward but definitely more verbose than any of the others.</p>
+<pre><code class=language-julia >#&#33;&#91;feature&#40;test&#41;&#93;
+extern crate test;
+use test::Bencher;
+
+// Via Paddy Horan
+pub fn npv&#40;mortality_rates: &amp;Vec&lt;f64&gt;, lapse_rates: &amp;Vec&lt;f64&gt;, interest_rate: f64, sum_assured: f64, premium: f64, init_pols: f64, term: Option&lt;usize&gt;&#41; -&gt; f64 &#123;
+
+    let term &#61; term.unwrap_or_else&#40;|| mortality_rates.len&#40;&#41;&#41;;
+    let mut result &#61; 0.0;
+    let mut inforce &#61; init_pols;
+    let v: f64 &#61; 1.0 / &#40;1.0 &#43; interest_rate&#41;;
+
+    for &#40;t, &#40;q, w&#41;&#41; in mortality_rates.iter&#40;&#41;.zip&#40;lapse_rates&#41;.enumerate&#40;&#41; &#123;
+        let no_deaths &#61; if t &lt; term &#123;inforce * q&#125; else &#123;0.0&#125;;
+        let no_lapses &#61; if t &lt; term &#123;inforce * w&#125; else &#123;0.0&#125;;
+        let premiums &#61; inforce * premium;
+        let claims &#61; no_deaths * sum_assured;
+        let net_cashflow &#61; premiums - claims;
+        result &#43;&#61; net_cashflow * v.powi&#40;t as i32&#41;;
+        inforce &#61; inforce - no_deaths - no_lapses;
+    &#125;
+
+    result
+&#125;
+#&#91;bench&#93;
+fn bench_xor_1000_ints&#40;b: &amp;mut Bencher&#41; &#123;
+
+let q: Vec&lt;f64&gt; &#61; vec&#33;&#91;0.001,0.002,0.003,0.003,0.004,0.004,0.005,0.007,0.009,0.011&#93;;
+let w: Vec&lt;f64&gt; &#61; vec&#33;&#91;0.05,0.07,0.08,0.10,0.14,0.20,0.20,0.20,0.10,0.04&#93;;
+let p: f64 &#61; 100.0;
+let s: f64 &#61; 25000.0;
+let r: f64 &#61; 0.02;
+    b.iter&#40;|| &#123;
+        // use &#96;test::black_box&#96; to prevent compiler optimizations from disregarding
+        // unused values
+        test::black_box&#40;npv&#40;&amp;q,&amp;w,r,s,p,1.0,Some&#40;10&#41;&#41;&#41;;
+    &#125;&#41;;
+&#125;</code></pre>
+<h4 id=python ><a href="#python" class=header-anchor >Python</a></h4>
+<h5 id=performance__2 ><a href="#performance__2" class=header-anchor >Performance</a></h5>
+<p>With <a href="https://numpy.org/">NumPy</a>, Python was the second fastest <code>Vectorized</code> approach and 3rd place for the <code>Accumulator</code> loop, both cases were still more than an order of magnitude slower than the next place.</p>
+<h5 id=flexibility__3 ><a href="#flexibility__3" class=header-anchor >Flexibility</a></h5>
+<p>Python wins points for interactive usage in the REPL, notebooks, and wide variety of environments that support running Python code. However, within the language itself I have to dedcut points for the ease of inspectng/evaluating code.</p>
+<p>What I mean by that, is that if you look at the code example below, in order to test the code you have to turn it into string and then call the <code>timeit</code> function to read and parse the string. In none of the other tested languages was that required.</p>
+<p>I would also ding Python here, becuse once you get deep into an ecosystem &#40;e.g. NumPy&#41;, you are sort of at the mercy of package developers to ensure that the packages are compatible.</p>
+<h5 id=readability ><a href="#readability" class=header-anchor >Readability</a></h5>
+<p>One of Python&#39;s seminal features is the pleasant syntax, though opionions differ as to whehter the indentation should matter to how your program runs.</p>
+<pre><code class=language-Python >import timeit
+setup&#61;&#39;&#39;&#39;
+import numpy as np
+q &#61; np.array&#40;&#91;0.001,0.002,0.003,0.003,0.004,0.004,0.005,0.007,0.009,0.011&#93;&#41;
+w &#61; np.array&#40;&#91;0.05,0.07,0.08,0.10,0.14,0.20,0.20,0.20,0.10,0.04&#93;&#41;
+P &#61; 100
+S &#61; 25000
+r &#61; 0.02
+def npv&#40;q,w,P,S,r&#41;:
+    decrements &#61; np.cumprod&#40;1-q-w&#41;
+    inforce &#61; np.empty_like&#40;decrements&#41;
+    inforce&#91;:1&#93; &#61; 1
+    inforce&#91;1:&#93; &#61; decrements&#91;:-1&#93;
+    ncf &#61; inforce * P - inforce * q * S
+    t &#61; np.arange&#40;np.size&#40;q&#41;&#41;
+    d &#61; np.power&#40;1/&#40;1&#43;r&#41;, t&#41;
+    return np.sum&#40;ncf * d&#41;
+&#39;&#39;&#39;
+benchmark &#61; &#39;&#39;&#39;npv&#40;q,w,P,S,r&#41;&#39;&#39;&#39;
+
+print&#40;timeit.timeit&#40;stmt&#61;benchmark,setup&#61;setup,number &#61; 1000000&#41;&#41;</code></pre>
+<p>I will say that the benchmarking setup with Python&#39;s <code>timeit</code> is definitely the most painful, needing to wrap the whole thing in a string. And then only get a single nubmer reult, without normalizing for the number of runs is very annoying.</p>
+<h4 id=juila ><a href="#juila" class=header-anchor >Juila</a></h4>
+<h5 id=perfomrance__2 ><a href="#perfomrance__2" class=header-anchor >Perfomrance</a></h5>
+<p>The fastest language with both algorithms.</p>
+<h5 id=flexiblity ><a href="#flexiblity" class=header-anchor >Flexiblity</a></h5>
+<p>Available in a variety of environments, include the standard interactive ones like the REPL and notebooks. One key differentiator is the <a href="https://www.nature.com/articles/d41586-021-01174-w">reactive notebook</a> environment, <a href="https://github.com/fonsp/Pluto.jl">Pluto.jl</a> where notebook cells understand and interact with one-another.</p>
+<p>Julia packags are also <a href="https://www.youtube.com/watch?v&#61;kc9HwsxE1OY">notoriously cross-functional</a>, so unlike Python &#40;e.g. NumPy&#41; or R &#40;e.g. Tidyverse&#41;, tightly coupled specialty-ecosystems have not evolved in Julia.</p>
+<h5 id=readability__2 ><a href="#readability__2" class=header-anchor >Readability</a></h5>
+<p>Julia scores well here, but gets dinged in my mind for a couple of things:</p>
+<ul>
+<li><p>all of those dots&#33; </p>
+
+<li><p>the weird <code>@benchmark</code> and dollar signs &#40;<code>&#36;</code>s&#41;</p>
+
+</ul>
+<p>The former is actually a very powerful concept/tool called <a href="https://docs.julialang.org/en/v1/manual/arrays/#Broadcasting">broadcasting</a>. Kind of like R &#40;where everything is a vector and will combine in vector-like ways&#41;. Julia lets you both worlds: really effective scalars and highly efficient vector operations. Once you know what it does, it&#39;s hard to think of a shorter/more concise way to express it than the dot &#40;<code>.</code>&#41;.</p>
+<p>The latter, <code>@benchmark</code> is a way to get Julia to work with the code itself, again kind of like R does. <code>@benchmark</code> is a <a href="https://docs.julialang.org/en/v1/manual/metaprogramming/#man-macros">macro</a> that will run a really comprehensive and informative benchmarking set on the code given. </p>
+<p>The <code>Vectorized</code> version:</p>
+<pre><code class=language-Julia >using BenchmarkTools
+
+q &#61; &#91;0.001,0.002,0.003,0.003,0.004,0.004,0.005,0.007,0.009,0.011&#93;
+w &#61; &#91;0.05,0.07,0.08,0.10,0.14,0.20,0.20,0.20,0.10,0.04&#93;
+P &#61; 100
+S &#61; 25000
+r &#61; 0.02
+
+function npv1&#40;q,w,P,S,r&#41; 
+	inforce &#61; &#91;1.; cumprod&#40;1 .- q .- w&#41;&#91;1:end-1&#93;&#93; 
+  	ncf &#61; inforce .* P .- inforce .* q .* S
+ 	d &#61; &#40;1 ./ &#40;1 &#43; r&#41;&#41; .^ &#40;1:length&#40;ncf&#41;&#41;
+  	return sum&#40;ncf .* d&#41;
+end
+
+@benchmark npv&#40;&#36;q,&#36;w,&#36;P,&#36;S,&#36;r&#41;</code></pre>
+<p>And the <code>Accumulator</code> version:</p>
+<pre><code class=language-julia >function npv5&#40;q,w,P,S,r,term&#61;nothing&#41;
+    term &#61; term &#61;&#61;&#61; nothing ? length&#40;q&#41; : term
+    inforce &#61; 1.0
+    result &#61; 0.0
+    v &#61; &#40;1 / &#40; 1 &#43; r&#41;&#41;
+    v_t &#61; v
+    for &#40;q,w,_&#41; in zip&#40;q,w,1:term&#41;
+        result &#43;&#61; inforce * &#40;P - S * q&#41; * v_t
+        inforce -&#61; inforce * q &#43; inforce * w
+        v_t *&#61; v
+    end
+    return result
+end</code></pre>
+<h2 id=more_flexibiltiy_more_performance_from_julia ><a href="#more_flexibiltiy_more_performance_from_julia" class=header-anchor >More flexibiltiy, more performance from Julia</a></h2>
+<p>I wanted to go a little bit deeper and show how 1&#41; Julia just runs fast even if your not explicitly focused on performance. But for where it <em>really</em> matters, you can go even deeper. This is a lttle advanced, but I think it can be useful to introduce some basics as to why some languages and approaches are going to be fundamentally slower than others.</p>
+<p>Notes: The accumulator approach vectors and allocations talk about stack/heap? pick a faster approach and explain why it&#39;s even faster.</p>
+<h2 id=colophone ><a href="#colophone" class=header-anchor >Colophone</a></h2>
+<h3 id=code ><a href="#code" class=header-anchor >Code</a></h3>
+<p>All of the benchmarked code can be found in the <a href="https://github.com/JuliaActuary/Learn/tree/master/LifeModelingProblemBenchmarks">JuliaActuary Learn repository</a>. Please file an issue or submit a PR request there for issues/suggestions.</p>
+<h3 id=hardware ><a href="#hardware" class=header-anchor >Hardware</a></h3>
+<p>Macbook Air &#40;M1, 2020&#41;</p>
+<h3 id=software ><a href="#software" class=header-anchor >Software</a></h3>
+<p>All languages/libraries are Mac M1 native unless otherwise noted</p>
+<h4 id=julia ><a href="#julia" class=header-anchor >Julia</a></h4>
+<pre><code class=language-julia >Julia Version 1.7.0-DEV.938
+Commit 2b4c088ee7* &#40;2021-04-16 20:37 UTC&#41;
+Platform Info:
+  OS: macOS &#40;arm64-apple-darwin20.3.0&#41;
+  CPU: Apple M1
+  WORD_SIZE: 64
+  LIBM: libopenlibm
+  LLVM: libLLVM-11.0.1 &#40;ORCJIT, cyclone&#41;</code></pre>
+<h4 id=rust__2 ><a href="#rust__2" class=header-anchor >Rust </a></h4>
+<pre><code class=language-julia >1.53.0-nightly &#40;b0c818c5e 2021-04-16&#41;</code></pre>
+<h4 id=python__2 ><a href="#python__2" class=header-anchor >Python</a></h4>
+<pre><code class=language-julia >Python 3.9.4 &#40;default, Apr  4 2021, 17:42:23&#41; 
+&#91;Clang 12.0.0 &#40;clang-1200.0.32.29&#41;&#93; on darwin</code></pre>
+<h2 id=footnotes ><a href="#footnotes" class=header-anchor >Footnotes</a></h2>
+<p><sup id="fnref:1"><a href="#fndef:1" class=fnref >[1]</a></sup> A take on <a href="https://en.wikipedia.org/wiki/Andy_and_Bill&#37;27s_law">Andy and Bill&#39;s law</a></p>
+<p><sup id="fnref:2"><a href="#fndef:2" class=fnref >[2]</a></sup> If benchmarking memoiziation, it&#39;s essentially benchmarking how long it takes to perform hashing in a language. While interesting, especially in the context of <a href="https://scattered-thoughts.net/writing/an-opinionated-map-of-incremental-and-streaming-systems">incremental computing</a>, it&#39;s not the core issue at hand. Incremental computing libraries exist for all of the modern languages discussed here.</p>
+<p><sup id="fnref:3"><a href="#fndef:3" class=fnref >[5]</a></sup> Note that not all languages have both a mean and median result in their benchmarking libraries. Mean is a better representation for a garbage-collected modern language, because sometimes the computation just takes longer than the median result. Where the mean is not avaiable in the graph below, median is substituted.</p>
+<p><sup id="fnref:4"><a href="#fndef:4" class=fnref >[3]</a></sup> Don&#39;t <a href="https://en.wikipedia.org/wiki/Program_optimization#When_to_optimizer">prematurely optimize</a>. But in the long run avoid, <a href="https://www.nature.com/articles/d41586-019-02310-3">re-writing your code in a faster language too many times&#33;</a></p>
+<p><sup id="fnref:5"><a href="#fndef:5" class=fnref >[4]</a></sup>  I&#39;ve seen 50&#43; line, irregular Excel formulas. To Nick: it probably started out as a good idea but it was a beast to understand and modify&#33; At least with code you can look at the code with variable names and syntax highlighting&#33; Comments, if you are lucky&#33;</p>
+<div class=page-foot >
+  <div class=copyright >
+    &copy; Alec Loudenback. Last modified: August 07, 2021. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and <a href="https://julialang.org" >Julia</a>.
+  </div>
+</div>
+</div>
+    
+    
+        <script src="/libs/highlight/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();hljs.configure({tabReplace: '    '});</script>
+
+    
+    <script data-goatcounter="https://juliaactuary.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>

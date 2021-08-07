@@ -23,6 +23,44 @@
 
 <item>
   <title>
+    <![CDATA[  Benchmarks  ]]>
+  </title>
+  <link> https://JuliaActuary.org/benchmarks/index.html </link>
+  <guid> https://JuliaActuary.org/benchmarks/index.html </guid>
+  <description>
+    <![CDATA[  Acturial-related benchmarks.  ]]>
+  </description>  
+    
+  <pubDate>Sat, 07 Aug 2021 00:00:00 +0000</pubDate>  
+  
+  
+  <atom:author>
+    <atom:name>Misc</atom:name>
+  </atom:author>
+        
+</item>
+
+<item>
+  <title>
+    <![CDATA[  The Life Modeling Problem: A Comparison of Julia, Rust, Python, and R  ]]>
+  </title>
+  <link> https://JuliaActuary.org/blog/life-modeling-problem/index.html </link>
+  <guid> https://JuliaActuary.org/blog/life-modeling-problem/index.html </guid>
+  <description>
+    <![CDATA[  The &quot;hard parts&quot; of computational actuarial science and how well programming languages fare.  ]]>
+  </description>  
+    
+  <pubDate>Sun, 16 May 2021 00:00:00 +0000</pubDate>  
+  
+  
+  <atom:author>
+    <atom:name>Alec Loudenback</atom:name>
+  </atom:author>
+        
+</item>
+
+<item>
+  <title>
     <![CDATA[  Coding the Future  ]]>
   </title>
   <link> https://JuliaActuary.org/blog/coding-for-the-future/index.html </link>
