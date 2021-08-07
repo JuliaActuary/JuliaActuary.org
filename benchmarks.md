@@ -87,7 +87,7 @@ savefig(p,joinpath(@OUTPUT, "benchmarks.svg")) # hide
 
 For more a more in-depth discussion of these results, see [this post](/blog/life-modeling-problem/).
 
-All of the benchmarked code can be found in the [JuliaActuary Learn repository](https://github.com/JuliaActuary/Learn/tree/master/benchmarks/LifeModelingProblem). Please file an issue or submit a PR request there for issues/suggestions.
+All of the benchmarked code can be found in the [JuliaActuary Learn repository](https://github.com/JuliaActuary/Learn/tree/master/Benchmarks/LifeModelingProblem). Please file an issue or submit a PR request there for issues/suggestions.
 
 ## IRRs
 
@@ -111,7 +111,7 @@ Times are in nanoseconds:
 
 ### Discussion
 
-All of the benchmarked code can be found in the [JuliaActuary Learn repository](https://github.com/JuliaActuary/Learn/tree/master/Benchmarks/LifeModelingProblem). Please file an issue or submit a PR request there for issues/suggestions.
+All of the benchmarked code can be found in the [JuliaActuary Learn repository](https://github.com/JuliaActuary/Learn/tree/master/Benchmarks/irr). Please file an issue or submit a PR request there for issues/suggestions.
 
 ## Other benchmarks
 
@@ -125,7 +125,7 @@ These benchmarks have been performed by others, but provide relevant information
 
 ### Code
 
-All of the benchmarked code can be found in the [JuliaActuary Learn repository](https://github.com/JuliaActuary/Learn/tree/master/Benchmarks/irr). Please file an issue or submit a PR request there for issues/suggestions.
+All of the benchmarked code can be found in the [JuliaActuary Learn repository](https://github.com/JuliaActuary/Learn/tree/master/Benchmarks/). Please file an issue or submit a PR request there for issues/suggestions.
 
 ### Hardware
 

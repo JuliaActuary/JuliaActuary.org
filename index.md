@@ -24,7 +24,7 @@
 These packages are available for use in your project. Keep scrolling down for more info on each one.
 
 [`MortalityTables.jl`](#mortalitytablesjl)
-  - Easily work with standard [mort.SOA.org](mort.SOA.org) tables and parametric models with common survival calculations.
+  - Easily work with standard [mort.SOA.org](https://mort.soa.org/) tables and parametric models with common survival calculations.
 
 [`LifeContingencies.jl`](#lifecontingenciesjl)
 - Insurance, annuity, premium, and reserve maths.
@@ -421,10 +421,10 @@ Benchmarks of Actuarial workflows can be found on the [Benchmarks](/benchmarks/)
 
 #### Miscellaneous
 
-- [Interactive exploration](/tutorials/PlutoESG) of the AAA's Economic Scenario Generator
-- [Interactive mortality table comparison tool](/tutorials/MortalityTableComparison) for any `mort.soa.org` table
-- [Interactive cashflow analysis](/tutorials/CashflowAnalysis)
-- [Universal Life Policy Account Mechanics as a Differential Equation](/tutorials/PolicyDiffEq)
+- [Interactive exploration](/tutorials/PlutoESG/) of the AAA's Economic Scenario Generator
+- [Interactive mortality table comparison tool](/tutorials/MortalityTableComparison/) for any `mort.soa.org` table
+- [Interactive cashflow analysis](/tutorials/CashflowAnalysis/)
+- [Universal Life Policy Account Mechanics as a Differential Equation](/tutorials/PolicyDiffEq/)
 
 ### Help mode
 
@@ -504,7 +504,7 @@ If you have other ideas or questions, feel free to also open an issue, or discus
 
 ### Other Inquiries
 
-For more directed inquires, please send email to [inquiry@JuliaActuary.org](mailto: inquiry@juliaactuary.org).
+For more directed inquires, please send email to [inquiry@JuliaActuary.org](mailto:inquiry@juliaactuary.org).
 
 # Blog
 
