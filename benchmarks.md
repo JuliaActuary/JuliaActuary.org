@@ -111,6 +111,8 @@ Times are in nanoseconds:
 
 ### Discussion
 
+Note that ActuaryUtilities
+
 All of the benchmarked code can be found in the [JuliaActuary Learn repository](https://github.com/JuliaActuary/Learn/tree/master/Benchmarks/irr). Please file an issue or submit a PR request there for issues/suggestions.
 
 ## Other benchmarks
