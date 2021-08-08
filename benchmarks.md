@@ -57,8 +57,6 @@ All of the benchmarked code can be found in the [JuliaActuary Learn repository](
 
 Task: determine the IRR for a series of cashflows 701 elements long.
 
-Julia is 13,350 times faster than `numpy_financial`, and 54 times faster than the `better` Python package.
-
 ### Benchmarks
 
 ```
@@ -74,6 +72,8 @@ Times are in nanoseconds:
 ```
 
 ### Discussion
+
+Julia is 13,350 times faster than `numpy_financial`, and 54 times faster than the `better` Python package. The [ActuaryUtililites.jl](/#actuaryutilitiesjl) implementation is also more flexible, as it can be given an argument with timepoints, similar to Excel's `XIRR`.
 
 All of the benchmarked code can be found in the [JuliaActuary Learn repository](https://github.com/JuliaActuary/Learn/tree/master/Benchmarks/irr). Please file an issue or submit a PR request there for issues/suggestions.
 
