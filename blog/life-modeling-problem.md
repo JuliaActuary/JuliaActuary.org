@@ -94,14 +94,12 @@ The takeaway from this point, though, is that there is a natural draw towards mo
 
 ## Benchmarks
 
-After the orignal user submitted a proposal, others chimed in and submitted versions in their favorite languages. I have collected those versions, and run them on a consistent set of hardware.
+After the orignal user submitted a proposal, others chimed in and submitted versions in their favorite languages. I have collected those versions, and run them on a consistent set of hardware[^3].
 
 Some "submissions" were excluded becuase they involved an entirely different approach, such as [memoizing](https://en.wikipedia.org/wiki/Memoization) the function calls[^2].
 
-
-Times are nanoseconds[^3]:
-
-```
+```plaintext
+Times are nanoseconds:
 ┌────────────────┬─────────────┬───────────────┬──────────┬──────────┐
 │           lang │   algorithm │ function_name │   median │     mean │
 │         String │      String │        String │ Float64? │ Float64? │

@@ -59,7 +59,7 @@ Task: determine the IRR for a series of cashflows 701 elements long.
 
 ### Benchmarks
 
-```
+```plaintext
 Times are in nanoseconds:
 ┌──────────┬──────────────────┬───────────────────┬─────────┬─────────────┬───────────────┐
 │ Language │          Package │          Function │  Median │        Mean │ Relative Mean │
