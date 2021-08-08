@@ -61,7 +61,7 @@ benchmarks = DataFrame(CSV.File("blog/data/lmp_benchmarks.csv"))
 
 To aid in visualizing results with such vast different orders of magnitude, this graph includes a physical length comparsion to serve as a reference. The computation time is represented by the distance that light travels in the time for the computation to complete (comparing a nanosecond to one foot length [goes at least back to Admiral Grace Hopper](https://www.youtube.com/watch?v=9eyFDBPk4Yw)).
 
-```julia:./code/lmp/benchmkarkplot
+```julia:./code/lmp/benchmarkplot
 #hideall
 # Reference Grace Hopper explains the nanosecond
 p = plot(palette = :seaborn_colorblind,rotation=15)
