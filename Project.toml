@@ -9,5 +9,5 @@ Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 
 CSV = "0.8"
 DataFrames = "^1"
-Meaures = "0.3"
+Measures = "0.3"
 Plots = "1.20"
