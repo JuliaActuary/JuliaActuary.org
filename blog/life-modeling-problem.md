@@ -124,47 +124,11 @@ Times are nanoseconds[^3]:
 └────────────────┴─────────────┴───────────────┴──────────┴──────────┘
 ```
 
-
-
-```julia:./code/lmp/packages
-#hideall
-using Plots
-using Dates
-using DataFrames
-using CSV
-using Measures
-```
-
-```julia:./code/lmp/loaddata
-#hideall
-benchmarks = DataFrame(CSV.File("blog/data/lmp_benchmarks.csv"))
-```
-
 \output{./code/lmp/loaddata}
 
 To aid in visualizing results with such vast different orders of magnitude, this graph includes a physical length comparsion to serve as a reference. The computation time is represented by the distance that light travels in the time for the computation to complete (comparing a nanosecond to one foot length [goes at least back to Admiral Grace Hopper](https://www.youtube.com/watch?v=9eyFDBPk4Yw)).
 
-```julia:./code/lmp/benchmkarkplot
-#hideall
-# Reference Grace Hopper explains the nanosecond
-p = plot(palette = :seaborn_colorblind,rotation=15)
-# label equivalents to distance to make log scale more relatable
-scatter!(fill("\n equivalents (ns → ft)",7),[1,1e1,1e2,1e3,.8e4,0.72e5,3.3e6],series_annotations=Plots.text.(["1 foot","basketball hoop","blue whale","Eiffle Tower","avg ocean depth","marathon distance","Space Station altitude"], :left, 8,:grey),marker=0,label="",left_margin=20mm)
-
-# plot mean, or median if not available
-for g in groupby(benchmarks,:algorithm)
-    scatter!(g.lang,
-        ifelse.(ismissing.(g.mean),g.median,g.mean),
-        label="$(g.algorithm[1])",
-        yaxis=:log,
-        ylabel="Nanoseconds (log scale)",
-    marker = (:circle, 5, 0.5, stroke(0)))
-end
-savefig(p,joinpath(@OUTPUT, "benchmarks.svg")) # hide
-
-```
-
-\fig{./code/lmp/benchmarks}
+![Life Modeling Problem Benchmarks](/blog/data/benchmarks.svg)
 
 ## Benchmark Discussion
 
