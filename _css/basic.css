@@ -212,7 +212,7 @@ table tbody tr td {
 
 
 @font-face {
-    font-family: JuliaMono-Regular;
+    font-family: JuliaMono;
     font-display: swap;
     src: url("/assets/_fonts/JuliaMono-Regular.woff2") format('woff2');
 }
