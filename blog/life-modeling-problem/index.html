@@ -18,10 +18,10 @@ end function</code></pre>
 <p>Why did APL take off for Acturies and not APL? I think <a href="https://en.wikipedia.org/wiki/Expressive_power_&#37;28computer_science&#37;29">expressiveness</a> and the ability to have a language inspired by mathematical notation were attractive. More on this later in a comparison between the modern languages.</p>
 <p>The takeaway from this point, though, is that there is a natural draw towards more expressive, powerful languages than less expressive langauges, especially when dealing with math notations. So high expressiveness is something we want from a language that solves the LMP.</p>
 <h2 id=benchmarks ><a href="#benchmarks" class=header-anchor >Benchmarks</a></h2>
-<p>After the orignal user submitted a proposal, others chimed in and submitted versions in their favorite languages. I have collected those versions, and run them on a consistent set of hardware.</p>
-<p>Some &quot;submissions&quot; were excluded becuase they involved an entirely different approach, such as <a href="https://en.wikipedia.org/wiki/Memoization">memoizing</a> the function calls<sup id="fnref:2"><a href="#fndef:2" class=fnref >[2]</a></sup>.</p>
-<p>Times are nanoseconds</p>
-<pre><code class=language-julia >┌────────────────┬─────────────┬───────────────┬──────────┬──────────┐
+<p>After the orignal user submitted a proposal, others chimed in and submitted versions in their favorite languages. I have collected those versions, and run them on a consistent set of hardware<sup id="fnref:3"><a href="#fndef:3" class=fnref >[2]</a></sup>.</p>
+<p>Some &quot;submissions&quot; were excluded becuase they involved an entirely different approach, such as <a href="https://en.wikipedia.org/wiki/Memoization">memoizing</a> the function calls<sup id="fnref:2"><a href="#fndef:2" class=fnref >[3]</a></sup>.</p>
+<pre><code class=language-plaintext >Times are nanoseconds:
+┌────────────────┬─────────────┬───────────────┬──────────┬──────────┐
 │           lang │   algorithm │ function_name │   median │     mean │
 │         String │      String │        String │ Float64? │ Float64? │
 ├────────────────┼─────────────┼───────────────┼──────────┼──────────┤
@@ -51,13 +51,13 @@ end function</code></pre>
 </blockquote>
 <p>All of the submissions and algorithms above worked, and fast enough that it gave an answer in very little time. And much of the time, the volume of data to process is small enough that it doesn&#39;t matter.</p>
 <p>But remember the CUNA Mutual example from above: Let&#39;s say that CUNA&#39;s runtime is already as fast as it can be, and index it to the fastest result in the benchmarks below. The difference between the fastest &quot;couple of days&quot; run and the slowest would be over <strong>721 years</strong>. So it&#39;s important to use tools and approaches that are performant for actuarial work.</p>
-<p>So for little one-off tasks it doesn&#39;t make a big difference what tool or algorthim is used. More often than not, your one-off calculatons or checks will be done fast enough that it&#39;s not important to be picky. But if wanting to scale your work to a broader application within your company or the industry, I think it&#39;s important to be perfromance-minded<sup id="fnref:4"><a href="#fndef:4" class=fnref >[3]</a></sup>. </p>
+<p>So for little one-off tasks it doesn&#39;t make a big difference what tool or algorthim is used. More often than not, your one-off calculatons or checks will be done fast enough that it&#39;s not important to be picky. But if wanting to scale your work to a broader application within your company or the industry, I think it&#39;s important to be perfromance-minded<sup id="fnref:4"><a href="#fndef:4" class=fnref >[4]</a></sup>. </p>
 <h3 id=takeaway_2 ><a href="#takeaway_2" class=header-anchor >Takeaway #2</a></h3>
 <blockquote>
 <p>&quot;If all you have is a dataframe, everything looks like a join&quot;</p>
 </blockquote>
 <p>I&#39;ve seen this several times in practice. Where a stacked dataframe of mortality rates is joined up with policy data in a complicated series of <code>&#37;&gt;&#37;</code>s &#40;pipes&#41;, <code>inner_joins</code> and <code>mutates</code>.</p>
-<p>Don&#39;t get me wrong, I think code is often still a better approach than spreadsheets<sup id="fnref:5"><a href="#fndef:5" class=fnref >[4]</a></sup>.</p>
+<p>Don&#39;t get me wrong, I think code is often still a better approach than spreadsheets<sup id="fnref:5"><a href="#fndef:5" class=fnref >[5]</a></sup>.</p>
 <p>However, like the old proverb that &quot;if all you have is a hammer, everything looks like a nail&quot; - sometimes the tool you have just isn&#39;t right for the job. That&#39;s the lesson of the R <a href="https://cran.r-project.org/web/packages/data.table/vignettes/datatable-intro.html">data.table</a> result above. Even with the fastest dataframe implementation in R, it vastly trails other submissions.</p>
 <h3 id=algortihm_choice ><a href="#algortihm_choice" class=header-anchor >Algortihm choice</a></h3>
 <p>Getting more refined about the approach, the other thing that is very obvious is that for this recursive type calculation, it&#39;s much more efficient to write a <code>for</code> loop &#40;the <code>Accumulator</code> approach&#41; in every language except for R &#40;where it wants everthing to be a vector or dataframe&#41;.</p>
@@ -244,10 +244,10 @@ Platform Info:
 &#91;Clang 12.0.0 &#40;clang-1200.0.32.29&#41;&#93; on darwin</code></pre>
 <h2 id=footnotes ><a href="#footnotes" class=header-anchor >Footnotes</a></h2>
 <p><sup id="fnref:1"><a href="#fndef:1" class=fnref >[1]</a></sup> A take on <a href="https://en.wikipedia.org/wiki/Andy_and_Bill&#37;27s_law">Andy and Bill&#39;s law</a></p>
-<p><sup id="fnref:2"><a href="#fndef:2" class=fnref >[2]</a></sup> If benchmarking memoiziation, it&#39;s essentially benchmarking how long it takes to perform hashing in a language. While interesting, especially in the context of <a href="https://scattered-thoughts.net/writing/an-opinionated-map-of-incremental-and-streaming-systems">incremental computing</a>, it&#39;s not the core issue at hand. Incremental computing libraries exist for all of the modern languages discussed here.</p>
-<p><sup id="fnref:3"><a href="#fndef:3" class=fnref >[5]</a></sup> Note that not all languages have both a mean and median result in their benchmarking libraries. Mean is a better representation for a garbage-collected modern language, because sometimes the computation just takes longer than the median result. Where the mean is not avaiable in the graph below, median is substituted.</p>
-<p><sup id="fnref:4"><a href="#fndef:4" class=fnref >[3]</a></sup> Don&#39;t <a href="https://en.wikipedia.org/wiki/Program_optimization#When_to_optimizer">prematurely optimize</a>. But in the long run avoid, <a href="https://www.nature.com/articles/d41586-019-02310-3">re-writing your code in a faster language too many times&#33;</a></p>
-<p><sup id="fnref:5"><a href="#fndef:5" class=fnref >[4]</a></sup>  I&#39;ve seen 50&#43; line, irregular Excel formulas. To Nick: it probably started out as a good idea but it was a beast to understand and modify&#33; At least with code you can look at the code with variable names and syntax highlighting&#33; Comments, if you are lucky&#33;</p>
+<p><sup id="fnref:2"><a href="#fndef:2" class=fnref >[3]</a></sup> If benchmarking memoiziation, it&#39;s essentially benchmarking how long it takes to perform hashing in a language. While interesting, especially in the context of <a href="https://scattered-thoughts.net/writing/an-opinionated-map-of-incremental-and-streaming-systems">incremental computing</a>, it&#39;s not the core issue at hand. Incremental computing libraries exist for all of the modern languages discussed here.</p>
+<p><sup id="fnref:3"><a href="#fndef:3" class=fnref >[2]</a></sup> Note that not all languages have both a mean and median result in their benchmarking libraries. Mean is a better representation for a garbage-collected modern language, because sometimes the computation just takes longer than the median result. Where the mean is not avaiable in the graph below, median is substituted.</p>
+<p><sup id="fnref:4"><a href="#fndef:4" class=fnref >[4]</a></sup> Don&#39;t <a href="https://en.wikipedia.org/wiki/Program_optimization#When_to_optimizer">prematurely optimize</a>. But in the long run avoid, <a href="https://www.nature.com/articles/d41586-019-02310-3">re-writing your code in a faster language too many times&#33;</a></p>
+<p><sup id="fnref:5"><a href="#fndef:5" class=fnref >[5]</a></sup>  I&#39;ve seen 50&#43; line, irregular Excel formulas. To Nick: it probably started out as a good idea but it was a beast to understand and modify&#33; At least with code you can look at the code with variable names and syntax highlighting&#33; Comments, if you are lucky&#33;</p>
 <div class=page-foot >
   <div class=copyright >
     &copy; Alec Loudenback. Last modified: August 08, 2021. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and <a href="https://julialang.org" >Julia</a>.
