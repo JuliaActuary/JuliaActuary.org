@@ -5,7 +5,6 @@ The website_* must be defined for the RSS to work
 -->
 @def website_title = "JuliaActuary"
 @def website_descr = "Practical, extensible, and open-source actuarial modeling and analysis."
-@def prepath     = get(ENV, "PREVIEW_FRANKLIN_PREPATH", "") # In the third argument put the prepath you normally use
 @def website_url = get(ENV, "PREVIEW_FRANKLIN_WEBSITE_URL", "https://JuliaActuary.org") # Just put the website name
 
 @def author = "JuliaActuary Contributors"
