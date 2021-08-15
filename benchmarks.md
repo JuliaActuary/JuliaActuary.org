@@ -22,15 +22,15 @@ Some submissions were excluded becuase from the benchmarks they involved an enti
 ```
 Times are nanoseconds:
 ┌────────────────┬─────────────┬───────────────┬──────────┬──────────┐
-│           lang │   algorithm │ function_name │   median │     mean │
-│         String │      String │        String │ Float64? │ Float64? │
+│       Language │   Algorithm │ Function Name │   Median │     Mean │
 ├────────────────┼─────────────┼───────────────┼──────────┼──────────┤
 │ R (data.table) │  Vectorized │           npv │ 770554.0 │ 842767.3 │
 │              R │  Vectorized │      npv base │   4264.0 │  46617.0 │
 │              R │ Accumulator │      npv_loop │   4346.0 │  62275.7 │
 │           Rust │ Accumulator │           npv │     24.0 │  missing │
-│ Python (NumPy) │  Vectorized │           npv │  missing │   6823.3 │
-│         Python │ Accumulator │      npv_loop │  missing │   1486.0 │
+│ Python (NumPy) │  Vectorized │           npv │  missing │  14261.0 │
+│         Python │ Accumulator │      npv_loop │  missing │   2314.0 │
+│ Python (Numba) │ Accumulator │     npv_numba │  missing │    626.0 │
 │          Julia │  Vectorized │          npv1 │    235.3 │    228.2 │
 │          Julia │  Vectorized │          npv2 │    235.8 │    218.4 │
 │          Julia │ Accumulator │          npv3 │     14.5 │     14.5 │
@@ -123,8 +123,11 @@ Platform Info:
 #### Python
 
 ```
-Python 3.9.4 (default, Apr  4 2021, 17:42:23) 
-[Clang 12.0.0 (clang-1200.0.32.29)] on darwin
+Python 3.9.4 (default, Apr  9 2021, 09:32:38) 
+[Clang 10.0.0 ] :: Anaconda, Inc. on darwin
+
+numba                     0.53.1           py39hb2f4e1b_0
+numpy                     1.20.1           py39hd6e1bb9_0 
 ```
 
 #### R
