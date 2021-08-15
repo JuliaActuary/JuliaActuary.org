@@ -42,6 +42,25 @@
 
 <item>
   <title>
+    <![CDATA[  A tour of the Julia Ecosystem  ]]>
+  </title>
+  <link> https://JuliaActuary.org/blog/julia-tour-pt1/index.html </link>
+  <guid> https://JuliaActuary.org/blog/julia-tour-pt1/index.html </guid>
+  <description>
+    <![CDATA[  Julia is a new programming language that&#39;s ideally suited for most actuarial workflows.  ]]>
+  </description>  
+    
+  <pubDate>Sun, 18 Jul 2021 00:00:00 +0000</pubDate>  
+  
+  
+  <atom:author>
+    <atom:name>Alec Loudenback</atom:name>
+  </atom:author>
+        
+</item>
+
+<item>
+  <title>
     <![CDATA[  The Life Modeling Problem: A Comparison of Julia, Rust, Python, and R  ]]>
   </title>
   <link> https://JuliaActuary.org/blog/life-modeling-problem/index.html </link>
