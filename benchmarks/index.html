@@ -1,14 +1,14 @@
 <!doctype html> <html lang=en > <meta charset=UTF-8 > <meta name=viewport  content="width=device-width, initial-scale=1"> <meta name=Description  content="Practical, extensible, and open-source actuarial modeling and analysis."> <meta property="og:description" content="Practical, extensible, and open-source actuarial modeling and analysis."> <meta property="og:image" content="/assets/logo_square.svg"> <link rel=stylesheet  href="/libs/highlight/github.min.css"> <link rel=stylesheet  href="/css/franklin.css"> <link rel=stylesheet  href="/css/basic.css"> <link rel=icon  href="/assets/favicon.png"> <script async defer src="https://buttons.github.io/buttons.js"></script> <title>Benchmarks | JuliaActuary</title> <link rel=apple-touch-icon  sizes=180x180  href="/assets/apple-touch-icon.png"> <link rel=icon  type="image/png" sizes=32x32  href="/assets/favicon-32x32.png"> <link rel=icon  type="image/png" sizes=16x16  href="/assets/favicon-16x16.png"> <link rel=manifest  href="/assets/site.webmanifest"> <header> <div class=blog-name > <a href="/"> <div class=blog-name-logo-container > <div class=blog-name-logo > <img src="/assets/logo_square.svg" alt=logo  /> </div> <div>JuliaActuary</div> </div> </a> <div class=tagline >Practical, extensible, and open-source actuarial modeling and analysis. </div> </div> <nav> <ul> <li><a href="/">Home</a> <li><a href="/#packages">Packages</a> <ul> <li><a href="/#mortalitytablesjl">MortalityTables.jl</a> <li><a href="/#actuaryutilitiesjl">ActuaryUtilities.jl</a> <li><a href="/#lifecontingenciesjl">LifeContingencies.jl</a> <li><a href="/#yieldsjl">Yields.jl</a> <li><a href="/#experienceanalysisjl">ExperienceAnalysis.jl</a> </ul> <li><a href="/#community">Community</a> <ul> <li><a href="/#learn">Learn</a> <li><a href="/#integration_with_r_and_python">Integration</a> <li><a href="/#contributing">Contributing</a> </ul> <li><a href="/#blog">Blog</a> </ul> <img src="/assets/hamburger.svg" id=menu-icon > </nav> </header> <div class=franklin-content ><h1 id=fill_title ><a href="#fill_title" class=header-anchor >Benchmarks</a></h1> <div class=franklin-toc ><ol><li><a href="#the_life_modeling_problem">The Life Modeling Problem</a><ol><li><a href="#benchmarks">Benchmarks</a><li><a href="#discussion">Discussion</a></ol><li><a href="#irrs">IRRs</a><ol><li><a href="#benchmarks__2">Benchmarks</a><li><a href="#discussion__2">Discussion</a></ol><li><a href="#other_benchmarks">Other benchmarks</a><li><a href="#colophone">Colophone</a><ol><li><a href="#code">Code</a><li><a href="#hardware">Hardware</a><li><a href="#software">Software</a><ol><li><a href="#julia">Julia</a><li><a href="#rust">Rust</a><li><a href="#python">Python</a><li><a href="#r">R</a></ol></ol><li><a href="#footnotes">Footnotes</a></ol></div> <h2 id=the_life_modeling_problem ><a href="#the_life_modeling_problem" class=header-anchor >The Life Modeling Problem</a></h2> <p>Inspired by the discussion in the <a href="https://github.com/actuarialopensource">ActuarialOpenSource</a> GitHub community discussion, folks started submitted solutions to what someone referred to as the &quot;Life Modeling Problem&quot;. This user <a href="https://github.com/orgs/actuarialopensource/teams/common-room/discussions/5">submitted a short snippet</a> for consideraton of a representative problem.</p> <h3 id=benchmarks ><a href="#benchmarks" class=header-anchor >Benchmarks</a></h3> <p>After the orignal user submitted a proposal, others chimed in and submitted versions in their favorite languages. I have collected those versions, and run them on a consistent set of hardware.</p> <p>Some submissions were excluded becuase from the benchmarks they involved an entirely different approach, such as <a href="https://en.wikipedia.org/wiki/Memoization">memoizing</a> the function calls<sup id="fnref:1"><a href="#fndef:1" class=fnref >[1]</a></sup>.</p> <pre><code class=language-julia >Times are nanoseconds:
 ┌────────────────┬─────────────┬───────────────┬──────────┬──────────┐
-│           lang │   algorithm │ function_name │   median │     mean │
-│         String │      String │        String │ Float64? │ Float64? │
+│       Language │   Algorithm │ Function Name │   Median │     Mean │
 ├────────────────┼─────────────┼───────────────┼──────────┼──────────┤
 │ R &#40;data.table&#41; │  Vectorized │           npv │ 770554.0 │ 842767.3 │
 │              R │  Vectorized │      npv base │   4264.0 │  46617.0 │
 │              R │ Accumulator │      npv_loop │   4346.0 │  62275.7 │
 │           Rust │ Accumulator │           npv │     24.0 │  missing │
-│ Python &#40;NumPy&#41; │  Vectorized │           npv │  missing │   6823.3 │
-│         Python │ Accumulator │      npv_loop │  missing │   1486.0 │
+│ Python &#40;NumPy&#41; │  Vectorized │           npv │  missing │  14261.0 │
+│         Python │ Accumulator │      npv_loop │  missing │   2314.0 │
+│ Python &#40;Numba&#41; │ Accumulator │     npv_numba │  missing │    626.0 │
 │          Julia │  Vectorized │          npv1 │    235.3 │    228.2 │
 │          Julia │  Vectorized │          npv2 │    235.8 │    218.4 │
 │          Julia │ Accumulator │          npv3 │     14.5 │     14.5 │
@@ -35,8 +35,11 @@ Platform Info:
   LIBM: libopenlibm
   LLVM: libLLVM-11.0.1 &#40;ORCJIT, cyclone&#41;</code></pre> <h4 id=rust ><a href="#rust" class=header-anchor >Rust</a></h4> <pre><code class=language-julia >1.53.0-nightly &#40;b0c818c5e 2021-04-16&#41;</code></pre>
 <h4 id=python ><a href="#python" class=header-anchor >Python</a></h4>
-<pre><code class=language-julia >Python 3.9.4 &#40;default, Apr  4 2021, 17:42:23&#41; 
-&#91;Clang 12.0.0 &#40;clang-1200.0.32.29&#41;&#93; on darwin</code></pre>
+<pre><code class=language-julia >Python 3.9.4 &#40;default, Apr  9 2021, 09:32:38&#41; 
+&#91;Clang 10.0.0 &#93; :: Anaconda, Inc. on darwin
+
+numba                     0.53.1           py39hb2f4e1b_0
+numpy                     1.20.1           py39hd6e1bb9_0</code></pre>
 <h4 id=r ><a href="#r" class=header-anchor >R</a></h4>
 <pre><code class=language-julia >R Under development &#40;unstable&#41; &#40;2021-04-16 r80179&#41; -- &quot;Unsuffered Consequences&quot;
 Copyright &#40;C&#41; 2021 The R Foundation for Statistical Computing
