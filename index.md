@@ -185,8 +185,8 @@ survival(m,20,25) # the five year survival rate
 
 ### Risk Measures
 
-- Calculate risk measures for a given vector of risks: 
-  - `CTE` for the Conditiona Tail Expectation, or 
+- Calculate risk measures for a given vector of risks:
+  - `CTE` for the Conditiona Tail Expectation, or
   - `VaR` for the percentile/Value at Risk.
 
 ### Insurance mechanics
@@ -523,10 +523,13 @@ For more directed inquires, please send email to [inquiry@JuliaActuary.org](mail
 
 - [Coding the Future](/blog/coding-for-the-future/)
   - Building the insurance company of tomorrow by being a 10x actuary.
-- [Julia for Actuaries](/blog/julia-actuaries/)
-  - Why Julia works so well for actuarial science.
+- [Julia for Actuaries](/blog/julia-actuaries/) 
+  - Why Julia works so well for actuarial science. 
+- [A Tour of Julia: General Overview](/blog/julia-tour-pt1/)
+  - Getting started with Julia and a quick tour of the ecosystem.
 - [The Life Modeling Problem: A Comparison of Julia, Rust, Python, and R](/blog/life-modeling-problem/) 
   - Why Julia works so well for actuarial science.
+
 
 ~~~
 <em>Subscribe to new posts via the <a href="feed.xml">JuliaActuary RSS Feed <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16"><path fill="none" d="M0 0h24v24H0z"/><path d="M3 3c9.941 0 18 8.059 18 18h-3c0-8.284-6.716-15-15-15V3zm0 7c6.075 0 11 4.925 11 11h-3a8 8 0 0 0-8-8v-3zm0 7a4 4 0 0 1 4 4H3v-4z"/></svg></a></em>
