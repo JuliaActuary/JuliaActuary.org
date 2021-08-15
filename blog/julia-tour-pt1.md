@@ -125,7 +125,7 @@ Julia has first-class support for `missing` values, which follows the rules of [
 
 #### Differentiable Progamming
 
-Sensitivity testing is very common in actuarial workflows, but essentially it's often getting at understanding the change in one variable in relation to another. In other words, the derivative!
+Sensitivity testing is very common in actuarial workflows, but essentially it's understanding the change in one variable in relation to another. In other words, the derivative!
 
 Julia has unique capabilities where almost across the entire language and ecosystem, you can take the derivate of entire functions or scripts. For example, the following is real Julia code to automatically calculate the sensitivity of the ending account value with respect to the inputs:
 
@@ -136,9 +136,9 @@ julia> function policy_av(pol)
 	COIs = [0.00319,0.00345,0.0038,0.00419,0.0047,0.00532]
 	av = 0.0
 	for (i,coi) in enumerate(COIs)
-		av += av * (pol.credit_rate)
+		av += av * pol.credit_rate
 		av += pol.annual_premium
-		av -= (pol.face) * coi
+		av -= pol.face * coi
 	end
 	return av                # return the final account value
 end
