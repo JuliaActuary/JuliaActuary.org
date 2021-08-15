@@ -123,7 +123,7 @@ Julia has first-class support for `missing` values, which follows the rules of [
 
 `Turing.jl`, a Bayesian Stats library, is outstanding in it's combination of clear model syntax with performance. `GLM.jl` is useful for any type of linear modeling.
 
-#### Differentiable Progamming
+#### Differentiable Programming
 
 Sensitivity testing is very common in actuarial workflows, but essentially it's understanding the change in one variable in relation to another. In other words, the derivative!
 
