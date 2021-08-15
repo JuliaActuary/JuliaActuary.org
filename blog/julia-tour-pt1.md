@@ -30,7 +30,7 @@ There are three main reasons to consider using Julia:
 
 2) **High performance Julia code, instead of needing libraries written in C/Cython/etc..** For lots of problems, especially "toy" problems as you learn a language, the speed of Matlab/Python/R is fast enough. However, in real usage, particluarly actuarial problems, you might find that when you need the performance it's too late[^1]
 
-3) **The tooling and ecosystem is very modern, mature, and broad.** A built-in package manager, packages that work together without needing to know about each other, first-class GPU/parallel support, and wide range of packages relevant (and specialized for) actuarial workloads.
+3) **The tooling and ecosystem is very modern, mature, and broad.** A built-in package manager, packages that work together without needing to know about each other, differntiable programming, first-class GPU/parallel support, and wide range of packages relevant (and specialized for) actuarial workloads.
 
 Why Julia works so well in actuarial contexts was discussed in the prior article, [Julia for Actuaries](/blog/julia-actuaries). The rest of this article is going to focus on getting oriented to using Julia, and the next article in the series will introduce acturial packages available.
 
@@ -123,10 +123,40 @@ Julia has first-class suport for `missing` values, which follows the rules of [t
 
 `Turing.jl`, a Bayesian Stats library, is outstanding in it's combination of clear model syntax with performance. `GLM.jl` is useful for any type of linear modeling.
 
+#### Differentiable Progamming
+
+Sensitivity testing is very common in actuarial workflows, but essentially it's often gettnig at understanding the change in one variable in relation to another. In other words, the derivative!
+
+Julia has unique capabilities where almost across the entire language and ecosystem, you can take the derivate of entire functions or scripts. For example, the following is real Julia code to automatically calculate the sensitvity of the ending account value with respect to the inputs:
+
+```julia-repl
+julia> using Zygote
+
+julia> function policy_av(pol)
+	COIs = [0.00319,0.00345,0.0038,0.00419,0.0047,0.00532]
+	av = 0.0
+	for (i,coi) in enumerate(COIs)
+		av += av * (pol.credit_rate)
+		av += pol.annual_premium
+		av -= (pol.face) * coi
+	end
+	return av                # return the final account value
+end
+
+julia> pol= (annual_premium = 1000, face = 100_000, credit_rate = 0.05);
+
+julia> policy_av(pol)        # the ending account value
+4048.08
+
+julia> policy_av'(pol)       # the derivative of the account value with respect to the inputs
+(annual_premium = 6.802, face = -0.0275, credit_rate = 10972.52)
+```
+
+When executing the code above, Julia isn't just adding a small amount and calculating the finite difference. Differentiation can be applied to entire programs through extensive use of basic derivatives and the chain rule. This concept, **automatic differentiation**, has a lot potential uses in optimization, machine learning, sensitivty testing, and risk analysis.
 
 #### Machine Learning
 
-`Flux.jl`, `Gen.jl`, `Knet`, and `MLJ` are all very populare machine learning libraries. There are also packages for PyTorch, Tensorflow, and SciKitML available.
+`Flux.jl`, `Gen.jl`, `Knet`, and `MLJ` are all very populare machine learning libraries. Many of these libraries take advantage of the automatic differentiaion mentioned above. There are also packages for PyTorch, Tensorflow, and SciKitML available.
 
 #### Utilities
 
@@ -151,6 +181,8 @@ BenchmarkTools.Trial: 10000 samples with 994 evaluations.
 ```
 
 `Test` is a built-in package for performing testsets, while `Documenter` will build high-quality documentation based on your inline documentation.
+
+`ClipData.jl` lets you copy and paste from spreadhseets to Julia sessions.
 
 #### Other packages
 
