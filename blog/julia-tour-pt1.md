@@ -2,7 +2,7 @@
 @def date = "July 18, 2021"
 @def title = "A tour of the Julia Ecosystem"
 
-@def rss_pubdate = Date(2020,9,27)
+@def rss_pubdate = Date(2021,7,18)
 @def rss = "Julia is a new programming language that's ideally suited for most actuarial workflows."
 
 # {{fill title}}
