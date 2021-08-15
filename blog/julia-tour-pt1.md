@@ -11,6 +11,8 @@
 
 *{{fill date}}*7
 
+> **!! Note that this article is a draft**
+
 The article titled [Julia for Actuaries](/blog/julia-actuaries) gave a longer introduction to why Julia works so well in Actuarial Workflows. In summary: Julia's attribtutes are "evident in its pragmatic, productivity-focused design choices, pleasant syntax, rich ecosystem, thriving communities, and its ability to be both very general purpose and power cutting edge computing".
 
 In the [2021 Stack Overflow Survey](https://insights.stackoverflow.com/survey/2021?_ga=2.236209345.190202062.1628102352-126161871.1625855113#technology-most-loved-dreaded-and-wanted), Julia was the 5th most loved lanuage. This was ahead of other languages commonly used in actuarial contexts, such as Python (6th), R (28th), C++ (25th), Matlab (36th), or VBA (37th).
