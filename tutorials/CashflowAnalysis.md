@@ -10,13 +10,13 @@ The recording above shows a [Pluto.jl](https://github.com/fonsp/Pluto.jl) notebo
 
 ## Instructions to Run
 
-Because JuliaActuary doesn't have an active server to run this on, you have to run it locally.
+Because JuliaActuary doesn't have an active server to run this on, you have to run it locally. Assuming that you already have Julia installed but still need to install Pluto notebooks:
 
 1. Open a Julia REPL and copy and paste the following:
 
 ```julia
 # install these dependencies
-import Pkg; Pkg.add(["Pluto","Plots","PlutoUI","ActuaryUtilities","Yields"]) 
+import Pkg; Pkg.add(["Pluto"]) 
 
 # use and start Pluto
 using Pluto; Pluto.run()
