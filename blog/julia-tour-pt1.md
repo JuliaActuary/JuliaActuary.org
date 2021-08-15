@@ -1,6 +1,6 @@
 @def author = "Alec Loudenback"
 @def date = "July 18, 2021"
-@def title = "A tour of the Julia Ecosystem"
+@def title = "A Tour of the Julia Ecosystem for Actuaries"
 
 @def rss_pubdate = Date(2021,7,18)
 @def rss = "Julia is a new programming language that's ideally suited for most actuarial workflows."
@@ -9,7 +9,7 @@
 
 *By:  {{fill author}}*
 
-*{{fill date}}*7
+*{{fill date}}*
 
 > **!! Note that this article is a draft**
 
