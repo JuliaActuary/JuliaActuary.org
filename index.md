@@ -185,7 +185,7 @@ survival(m,20,25) # the five year survival rate
 ### Risk Measures
 
 - Calculate risk measures for a given vector of risks:
-  - `CTE` for the Conditiona Tail Expectation, or
+  - `CTE` for the Conditional Tail Expectation, or
   - `VaR` for the percentile/Value at Risk.
 
 ### Insurance mechanics
@@ -446,7 +446,7 @@ julia> ? survival
 
   If given a negative to_age, it will return 1.0. Aside from simplifying the code, 
   this makes sense as for something to exist in order to decrement in the first place, 
-  it must have existed and surived to the point of being able to be decremented.
+  it must have existed and survived to the point of being able to be decremented.
 
   Examples
   ≡≡≡≡≡≡≡≡≡≡
