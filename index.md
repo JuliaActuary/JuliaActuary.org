@@ -33,7 +33,6 @@ These packages are available for use in your project. Keep scrolling down for mo
 
 [`ActuaryUtilities.jl`](#actuaryutilitiesjl)
 - Robust and fast calculations for `internal_rate_of_return`, `duration`, `convexity`, `present_value`, `breakeven`, and more. 
-- Utility features like copy and paste to/from Excel and Julia!
 
 [`Yields.jl`](#yieldsjl)※
 - Simple and composable yield curves and calculations.
@@ -194,16 +193,6 @@ survival(m,20,25) # the five year survival rate
 - `duration`:
   - Calculate the duration given an issue date and date (a.k.a. policy duration)
   
-
-### Excel Utilities
-
-You can also copy/paste to/from Excel:
-
-![Copying to and from Excel](https://user-images.githubusercontent.com/711879/107859226-9e9a5500-6dfd-11eb-999f-5da5c7e5b8a6.gif)
-
-- `xlcopy()` copies and parses Excel content on the clipboard
-- `xlcopy(data)` will copy Julia data into your clipboard for pasting into Excel.
-
 \\
 [ActuaryUtilities package on GitHub 🡭](https://github.com/JuliaActuary/ActuaryUtilities.jl)
 
