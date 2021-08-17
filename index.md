@@ -514,8 +514,8 @@ For more directed inquires, please send email to [inquiry@JuliaActuary.org](mail
   - Building the insurance company of tomorrow by being a 10x actuary.
 - [Julia for Actuaries](/blog/julia-actuaries/) 
   - Why Julia works so well for actuarial science. 
-- [A Tour of Julia: General Overview](/blog/julia-tour-pt1/)
-  - Getting started with Julia and a quick tour of the ecosystem.
+- [Getting Started with Julia for Actuaries](/blog/julia-getting-started-actuaries/)
+  - Getting started with Julia with a bent towards things actuaries care about.
 - [The Life Modeling Problem: A Comparison of Julia, Rust, Python, and R](/blog/life-modeling-problem/) 
   - Why Julia works so well for actuarial science.
 

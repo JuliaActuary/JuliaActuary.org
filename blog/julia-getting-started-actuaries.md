@@ -1,9 +1,9 @@
 @def author = "Alec Loudenback"
 @def date = "July 18, 2021"
-@def title = "A Tour of the Julia Ecosystem for Actuaries"
+@def title = "Getting Started with Julia for Actuaries"
 
 @def rss_pubdate = Date(2021,7,18)
-@def rss = "Julia is a new programming language that's ideally suited for most actuarial workflows."
+@def rss = "A quickstart guide to using Julia in actuarial workflows."
 
 # {{fill title}}
 
@@ -104,6 +104,8 @@ Package installation is accomplished interactively in the REPL or executing comm
 - To execute certain commands, the above would be the same as `using Pkg; Pkg.add(["DataFrames", "CSV"])`
 
 Related to packages, is **environments** which are a self-contained workspace for your code. This lets you install only packages that are relevant to the current work. It also lets you 'remember' the exact set of packages and versions that you used. In fact, you can share the environment with others, and it will be able to recreate the same environment as when you ran the code. This is accomplished via a `Project.toml` file, which tracks the direct dependencies you've added, along with details about your project like its version number. The `Manifest.toml` tracks the entire dependency tree.
+
+Reproducibility via the environment tools above is a really key aspect that will ensure Julia code is consistent across time and users, which is important for financial controls.
 
 ### Editors
 
