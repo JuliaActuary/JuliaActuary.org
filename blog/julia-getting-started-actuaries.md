@@ -74,7 +74,7 @@ In a language without multiple dispatch, the alternative would be to:
 
 Macros are a feature where you can essentially program the language itself. In the Paul Graham essay mentioned above, macros are an example of the competitive advantage conferred by a more powerful language - and the choice of language was a fundamental competitive advantage.
 
-For example, when you see `@benchmark present_value(0.05,[10,10,10])` in Julia, the `@benchmark` effectively modifies the written code to wrap `my_function(10)` in setup, timing, and summary code before returning the result of `present_value`. There is an example of this later in the article.
+For example, when you see `@benchmark present_value(0.05,[10,10,10])` in Julia, the `@benchmark` effectively modifies the written code to wrap `present_value` in setup, timing, and summary code before returning the result of `present_value`. There is an example of this later in the article.
 
 Most other languages don't have macros, and it means that it's hard to 'hook into' code in a safe way. For example, benchmarking can involve a lot of boilerplate code just to setup, time, and summarize the results (such as the `timeit` library in Python).
 
