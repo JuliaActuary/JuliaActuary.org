@@ -3,7 +3,7 @@
 @def title = "Getting Started with Julia for Actuaries"
 
 @def rss_pubdate = Date(2021,7,18)
-@def rss = "A quickstart guide to using Julia in actuarial workflows."
+@def rss = "A quick-start guide to using Julia in actuarial workflows."
 
 # {{fill title}}
 
@@ -117,11 +117,11 @@ The most popular notebook tool is Jupyter ("Julia, Python, R"). It is widely use
 
 ## A Whirlwind Tour of General-Purpose Packages
 
-The Julia ecosystem favors composability and interoperability as an emergent aspect, enabled by multiple dispatch. In other words, because it's really easy to specialize functionality based on the type of data you are working with, there's much less need to bundle a lot of features within a single package. 
+The Julia ecosystem favors composability and interoperability as an emergent aspect, enabled by multiple dispatch. In other words, because it's easy to specialize functionality based on the type of data you are working with, there's much less need to bundle a lot of features within a single package.
 
-As you'll see, Julia packages tend to be less vertically integrated because its easier to pass data around. Counterexamples of this in Python and R:
+As you'll see, Julia packages tend to be less vertically integrated because it's easier to pass data around. Counterexamples of this in Python and R:
 
-- "numpy" compatible packages that are designed to work with the subset of numerically fast libraries in Python
+- Numpy-compatible packages that are designed to work with the subset of numerically fast libraries in Python
 - special functions in Pandas to read CSV, JSON, database connections, etc.
 - The "tidyverse" in R has a tightly coupled set of packages that works well together but has limitations with some other R packages
 
@@ -145,7 +145,7 @@ Starting with getting data in and out of your code, `CSV.jl` offers top-class re
 
 `StatsPlots.jl` extends `Plots.jl` with a focus on data visualization and compatibility with dataframes.
 
-`Makie.jl` is an up-and-coming package that supports GPU-accelerated plotting and can create very rich, beautiful visualizations, but it's main downside is that it has not yet been optimized to minimize the time-to-first-plot versus alternatives.
+`Makie.jl` supports GPU-accelerated plotting and can create very rich, beautiful visualizations, but its main downside is that it has not yet been optimized to minimize the time-to-first-plot versus alternatives.
 
 ### Statistics
 
@@ -153,7 +153,7 @@ Julia has first-class support for `missing` values, which follows the rules of [
 
 `StatsBase.jl` and `Distributions.jl` are essentials for a range of statistics functions and probability distributions respectively.
 
-`Turing.jl`, a Bayesian Stats library, is outstanding in it's combination of clear model syntax with performance. `GLM.jl` is useful for any type of linear modeling and `LsqFit.jl` is useful for fitting data to non-linear models.
+`Turing.jl`, a Bayesian Stats library, is outstanding in its combination of clear model syntax with performance. `GLM.jl` is useful for any type of linear modeling and `LsqFit.jl` is useful for fitting data to non-linear models.
 
 ### Machine Learning
 
@@ -163,7 +163,7 @@ Another advantage is that the Julia libraries can take advantage of automatic di
 
 ### Differentiable Programming
 
-Sensitivity testing is very common in actuarial workflows, but essentially it's understanding the change in one variable in relation to another. In other words, the derivative!
+Sensitivity testing is very common in actuarial workflows: essentially, it's understanding the change in one variable in relation to another. In other words, the derivative!
 
 Julia has unique capabilities where almost across the entire language and ecosystem, you can take the derivate of entire functions or scripts. For example, the following is real Julia code to automatically calculate the sensitivity of the ending account value with respect to the inputs:
 
@@ -190,7 +190,7 @@ julia> policy_av'(pol)       # the derivative of the account value with respect 
 (annual_premium = 6.802, face = -0.0275, credit_rate = 10972.52)
 ```
 
-When executing the code above, Julia isn't just adding a small amount and calculating the finite difference. Differentiation can be applied to entire programs through extensive use of basic derivatives and the chain rule. This concept, **automatic differentiation**, has a lot potential uses in optimization, machine learning, sensitivity testing, and risk analysis.
+When executing the code above, Julia isn't just adding a small amount and calculating the finite difference. Differentiation can be applied to entire programs through extensive use of basic derivatives and the chain rule. This concept, **automatic differentiation**, has potential uses in optimization, machine learning, sensitivity testing, and risk analysis.
 
 ### Utilities
 
@@ -228,7 +228,7 @@ Saving the best for last, the next article in the series will dive deeper into a
 
 ## Summary
 
-This article introduced Julia, getting setup with running and editing, and pointed toward a number of general purpose features and packages useful to actuaries. The next article in the series will focus on the range of actuarial-specific packages available.
+This article introduced Julia, getting setup with running and editing, and pointed toward a number of general-purpose features and packages useful to actuaries. The next article in the series will focus on the range of actuarial-specific packages available.
 
 [^1]: https://ocw.mit.edu/courses/mathematics/18-335j-introduction-to-numerical-methods-spring-2019/week-1/Julia-intro.pdf
 [^2]: As of July 2021.
