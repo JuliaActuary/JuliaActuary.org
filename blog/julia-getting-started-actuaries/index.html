@@ -9,7 +9,7 @@
 </ul>
 <h4 id=macros ><a href="#macros" class=header-anchor >Macros</a></h4>
 <p>Macros are a feature where you can essentially program the language itself. In the Paul Graham essay mentioned above, macros are an example of the competitive advantage conferred by a more powerful language - and the choice of language was a fundamental competitive advantage.</p>
-<p>For example, when you see <code>@benchmark present_value&#40;0.05,&#91;10,10,10&#93;&#41;</code> in Julia, the <code>@benchmark</code> effectively modifies the written code to wrap <code>my_function&#40;10&#41;</code> in setup, timing, and summary code before returning the result of <code>present_value</code>. There is an example of this later in the article.</p>
+<p>For example, when you see <code>@benchmark present_value&#40;0.05,&#91;10,10,10&#93;&#41;</code> in Julia, the <code>@benchmark</code> effectively modifies the written code to wrap <code>present_value</code> in setup, timing, and summary code before returning the result of <code>present_value</code>. There is an example of this later in the article.</p>
 <p>Most other languages don&#39;t have macros, and it means that it&#39;s hard to &#39;hook into&#39; code in a safe way. For example, benchmarking can involve a lot of boilerplate code just to setup, time, and summarize the results &#40;such as the <code>timeit</code> library in Python&#41;.</p>
 <h2 id=installation_and_tooling ><a href="#installation_and_tooling" class=header-anchor >Installation and Tooling</a></h2>
 <h3 id=installation ><a href="#installation" class=header-anchor >Installation</a></h3>
