@@ -39,17 +39,8 @@ There are three main reasons to consider using Julia:
 
 Why Julia works so well in actuarial contexts was discussed in the prior article, [Julia for Actuaries](/blog/julia-actuaries). The rest of this article is going to focus on getting oriented to using Julia, and the next article in the series will introduce actuarial packages available.
 
-## Julia's ecosystem
 
-### Basic Tooling
-
-#### Installation
-
-Julia is open source and can be downloaded from [JuliaLang.org](https://JuliaLang.org) and is available for all major operating systems. After you download and install, then you have Julia installed and can access the **REPL**, or Read-Eval-Print-Loop, which can run complete programs or [function as powerful day-to-day calculator](https://krasjet.com/rnd.wlk/julia/). However, many people find it more comfortable to work in a text editor or **IDE** (Integrated Development Environment).
-
-If you want a pre-packaged solution with a curated set of packages, consider the JuliaPro installation available from [Julia Computing](https://juliacomputing.com/), which has optional upgrades for more turn-key enterprise support.
-
-### The language itself
+## The language itself
 
 Julia is a high level language, with syntax that should feel familiar to someone coming from R, Python, or Matlab. There's a ton of great references online, such as:
 
@@ -65,11 +56,11 @@ If you want a ground-up introduction, the e-book [Think Julia](https://benlauwen
 
 Lastly, [JuliaAcademy.com](https://juliaacademy.com/) has a number of free courses that introduce the language via data science, machine learning, or "for nervous beginners".
 
-#### Spotlight on Features
+### Spotlight on Features
 
 A full introduction to the language is beyond the scope of this article. There are two features I'd like to highlight here, which exemplify powerful features not available in other languages. These might sound a little technical at first, but as Paul Graham describes in his essay, [Beating the Average](http://www.paulgraham.com/avg.html), it is hard to see what you might be missing until you get experience with it.
 
-##### Multiple Dispatch
+#### Multiple Dispatch
 
 Multiple dispatch is the term for deciding which function to call based on the combination of arguments. Taking an example pointed out by data scientist Brian Groenke[^3] of a simple ordinary least squares implementation:
 
@@ -84,13 +75,24 @@ In a language without multiple dispatch, the alternative would be to:
 - define `ols` for every combination of types you might encounter
 - attach a method to a class with every combination of second argument type
 
-##### Macros
+#### Macros
 
 Macros are a feature where you can essentially program the language itself. In the Paul Graham essay mentioned above, macros are an example of the competitive advantage conferred by a more powerful language - and the choice of language was a fundamental competitive advantage.
 
 For example, when you see `@benchmark present_value(0.05,[10,10,10])` in Julia, the `@benchmark` effectively modifies the written code to wrap `my_function(10)` in setup, timing, and summary code before returning the result of `present_value`. There is an example of this later in the article.
 
 Most other languages don't have macros, and it means that it's hard to 'hook into' code in a safe way. For example, benchmarking can involve a lot of boilerplate code just to setup, time, and summarize the results (such as the `timeit` library in Python). 
+
+## Julia's ecosystem
+
+### Installation
+
+Julia is open source and can be downloaded from [JuliaLang.org](https://JuliaLang.org) and is available for all major operating systems. After you download and install, then you have Julia installed and can access the **REPL**, or Read-Eval-Print-Loop, which can run complete programs or [function as powerful day-to-day calculator](https://krasjet.com/rnd.wlk/julia/). However, many people find it more comfortable to work in a text editor or **IDE** (Integrated Development Environment).
+
+If you want a pre-packaged solution with a curated set of packages, consider the JuliaPro installation available from [Julia Computing](https://juliacomputing.com/), which has optional upgrades for more turn-key enterprise support.
+
+
+
 
 ### Package Management
 
@@ -103,15 +105,15 @@ Package installation is accomplished interactively in the REPL or executing comm
 
 Related to packages, is **environments** which are a self-contained workspace for your code. This lets you install only packages that are relevant to the current work. It also lets you 'remember' the exact set of packages and versions that you used. In fact, you can share the environment with others, and it will be able to recreate the same environment as when you ran the code. This is accomplished via a `Project.toml` file, which tracks the direct dependencies you've added, along with details about your project like its version number. The `Manifest.toml` tracks the entire dependency tree.
 
-#### Editors
+### Editors
 
 Because Julia is very extensible and amenable to analysis of its own code, you can typically find plugins for whatever tool you prefer to write code in. I will mention a few here:
 
-##### Visual Studio Code
+#### Visual Studio Code
 
 Visual Studio Code is a free editor from Microsoft. There's a full-featured Julia plugin available, which will help with auto-completion, warnings, and other code hints that you might find in a dedicated editor (e.g. PyCharm or RStudio). Like those tools, you can view plots, show datasets, debug, and manage version control.
 
-##### Notebooks
+#### Notebooks
 
 Notebooks are typically more interactive environments than text editors - you can write code in cells and see the results side-by-side.
 
