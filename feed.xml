@@ -42,12 +42,12 @@
 
 <item>
   <title>
-    <![CDATA[  A Tour of the Julia Ecosystem for Actuaries  ]]>
+    <![CDATA[  Getting Started with Julia for Actuaries  ]]>
   </title>
-  <link> https://JuliaActuary.org/blog/julia-tour-pt1/index.html </link>
-  <guid> https://JuliaActuary.org/blog/julia-tour-pt1/index.html </guid>
+  <link> https://JuliaActuary.org/blog/julia-getting-started-actuaries/index.html </link>
+  <guid> https://JuliaActuary.org/blog/julia-getting-started-actuaries/index.html </guid>
   <description>
-    <![CDATA[  Julia is a new programming language that&#39;s ideally suited for most actuarial workflows.  ]]>
+    <![CDATA[  A quickstart guide to using Julia in actuarial workflows.  ]]>
   </description>  
     
   <pubDate>Sun, 18 Jul 2021 00:00:00 +0000</pubDate>  
