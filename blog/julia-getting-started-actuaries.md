@@ -27,11 +27,11 @@ In the [2021 Stack Overflow Survey](https://insights.stackoverflow.com/survey/20
 
 There are three main reasons to consider using Julia:
 
-1) **The language itself offers expressiveness, pleasant syntax, and less boilerplate than many alternatives.** Multiple dispatch is an evolution of object-oriented approaches that's more amenable to a wide range of programming styles, including functional and vectorized approaches.
+1) **The language itself offers expressiveness, pleasant syntax, and less boilerplate than many alternatives.** Multiple Dispatch is a programming paradigm that is an evolution of object-oriented approaches that's more amenable to a wide range of programming styles, including functional and vectorized approaches. It affords Julia codes a high level of composability and is what makes the Julia ecosystem so powerful.
 
 2) **High performance Julia code, instead of needing libraries written in C/Cython/etc..** For lots of problems, especially "toy" problems as you learn a language, the speed of Matlab/Python/R is fast enough. However, in real usage, particularly actuarial problems, you might find that when you need the performance it's too late[^1]
 
-3) **The language, tooling, and ecosystem is very modern, mature, and powerful.** A built-in package manager, packages that work together without needing to know about each other, differentiable programming, macros, first-class GPU/parallel support, and wide range of packages relevant (and specialized for) actuarial workloads.
+3) **The language, tooling, and ecosystem is very modern, mature, and powerful.** A built-in package manager, packages that work together without needing to know about each other, differentiable programming, meta-programming (macros), first-class GPU/parallel support, and wide range of packages relevant (and specialized for) actuarial workloads.
 
 More detail of why Julia works so well in actuarial contexts was discussed in the prior article, [Julia for Actuaries](/blog/julia-actuaries). The rest of this article is going to focus on getting oriented to using Julia, and the next article in the series will introduce actuarial packages available.
 
@@ -47,7 +47,7 @@ Julia code is compiled on-the-fly, generating efficient code for the specific da
 
 Born of a desire to have the niceties of high level languages with the performance of low level compiled code, there are many built-in data structures and functions related to numerical computing like that used in finance, insurance, and statistics.
 
-If you want a ground-up introduction, the e-book [Think Julia](https://benlauwens.github.io/ThinkJulia.jl/latest/book.html) starts simple and builds up. If you prefer a learn-by-example, the interactive, free, online course [Introduction to Computational Thinking](https://computationalthinking.mit.edu/Spring21/) by MIT will have you working on everything from data science to climate modeling.
+If you just want a quick introduction for beginners, https://www.juliafordatascience.com/ is a great resource with easy, digestible tutorials. If you want a ground-up introduction, the e-book [Think Julia](https://benlauwens.github.io/ThinkJulia.jl/latest/book.html) starts simple and builds up. If you prefer a learn-by-example, the interactive, free, online course [Introduction to Computational Thinking](https://computationalthinking.mit.edu/Spring21/) by MIT will have you working on everything from data science to climate modeling.
 
 Lastly, [JuliaAcademy.com](https://juliaacademy.com/) has a number of free courses that introduce the language via data science, machine learning, or "for nervous beginners".
 
@@ -57,26 +57,34 @@ A full introduction to the language is beyond the scope of this article. There a
 
 #### Multiple Dispatch
 
-Multiple dispatch is the term for deciding which function to call based on the combination of arguments. Taking an example pointed out by data scientist Brian Groenke[^3] of a simple ordinary least squares implementation:
+Multiple Dispatch is the term for deciding which function to call based on the combination of arguments. Taking an example pointed out by data scientist Brian Groenke[^3] of a simple ordinary least squares implementation:
 
 ```julia
 ols(x,y) = inv(x'x)x'y
+
+# alternatively, one can write ols(x,y) = x \ y
 ```
 
 "This very naive implementation already works for any appropriately sized `x` and `y`, including the multivariate case where `x` is a matrix or multiple-target case where `y` is a matrix. Furthermore, if `x` and `y` have special types [e.g diagonal or sparse matrices], we get the potentially optimized implementations [of the different combinations] for free."
 
-In a language without multiple dispatch, the alternative would be to:
+In a language without Multiple Dispatch, the alternative would be to:
 
 - define `ols` for every combination of types you might encounter
 - attach a method to a class with every combination of second argument type
 
-#### Macros
+[This article](https://www.moll.dev/projects/effective-multi-dispatch/) by developer Thomas Moll provides a wonderful and intuitive write-up of what Multiple Dispatch is and why it's powerful using the Pokemon game as an example (you don't need to know Pokemon to follow along).
 
-Macros are a feature where you can essentially program the language itself. In the Paul Graham essay mentioned above, macros are an example of the competitive advantage conferred by a more powerful language - and the choice of language was a fundamental competitive advantage.
+[This article](https://medium.com/@josh_40272/why-i-use-julia-8eb47216880e) by the statistician Josh Day gives an excellent overview of how Multiple Dispatch boosts one's productivity, allows for less code and more time spent on solving the actual problem at hand.
 
-For example, when you see `@benchmark present_value(0.05,[10,10,10])` in Julia, the `@benchmark` effectively modifies the written code to wrap `present_value` in setup, timing, and summary code before returning the result of `present_value`. There is an example of this later in the article.
+#### Meta-programming / Macros
+
+Meta-programming is the essentially the ability to program the language itself, and macros are one of the tools that provide this ability. In the Paul Graham essay mentioned above, macros are an example of the competitive advantage conferred by a more powerful language - and the choice of language was a fundamental competitive advantage.
+
+For example, when you see `@benchmark present_value(0.05, [10, 10, 10])` in Julia, the `@benchmark` effectively modifies the written code to wrap `present_value` in setup, timing, and summary code before returning the result of `present_value`. There is an example of this later in the article.
 
 Most other languages don't have macros, and it means that it's hard to 'hook into' code in a safe way. For example, benchmarking can involve a lot of boilerplate code just to setup, time, and summarize the results (such as the `timeit` library in Python).
+
+Note that *using* (i.e. *calling*) macros is quite prevalent when coding in Julia, however *writing* macros is usually reserved for special use cases and is not recommended for novice users or [indeed most use cases](https://www.youtube.com/watch?v=mSgXWpvQEHE).
 
 ## Installation and Tooling
 
@@ -105,7 +113,7 @@ Because Julia is very extensible and amenable to analysis of its own code, you c
 
 #### Visual Studio Code
 
-Visual Studio Code is a free editor from Microsoft. There's a full-featured Julia plugin available, which will help with auto-completion, warnings, and other code hints that you might find in a dedicated editor (e.g. PyCharm or RStudio). Like those tools, you can view plots, show datasets, debug, and manage version control.
+Visual Studio Code is a free editor from Microsoft. There's a full-featured [Julia plugin](https://www.julia-vscode.org/) available, which will help with auto-completion, warnings, and other code hints that you might find in a dedicated editor (e.g. PyCharm or RStudio). Like those tools, you can view plots, show datasets, debug, and manage version control.
 
 #### Notebooks
 
@@ -113,17 +121,17 @@ Notebooks are typically more interactive environments than text editors - you ca
 
 The most popular notebook tool is Jupyter ("Julia, Python, R"). It is widely used and fits in well with exploratory data analysis or other interactive workflows. It can be installed by adding the [`IJulia.jl`](https://github.com/JuliaLang/IJulia.jl) package.
 
-[`Pluto.jl`](https://plutojl.org/) is a newer tool, which adds reactivity and interactivity. It is also more amenable to version control than Jupyter notebooks are. Pluto is unique to Julia because of the language's ability to introspect and analyze dependencies in its own code.
+[`Pluto.jl`](https://plutojl.org/) is a newer tool, which adds reactivity and interactivity. It is also more amenable to version control than Jupyter notebooks are. Pluto is unique to Julia because of the language's ability to introspect and analyze dependencies in its own code. A wonderful feature of Pluto is also baked in package/environment management, meaning a Pluto notebook has the option to contain everything needed to reproduce results (as long as Julia and Pluto are installed).
 
 ## A Whirlwind Tour of General-Purpose Packages
 
-The Julia ecosystem favors composability and interoperability as an emergent aspect, enabled by multiple dispatch. In other words, because it's really easy to specialize functionality based on the type of data you are working with, there's much less need to bundle a lot of features within a single package. 
+The Julia ecosystem favors composability and interoperability as an emergent aspect, enabled by Multiple Dispatch. In other words, because it's really easy to specialize functionality based on the type of data you are working with, there's much less need to bundle a lot of features within a single package.
 
 As you'll see, Julia packages tend to be less vertically integrated because its easier to pass data around. Counterexamples of this in Python and R:
 
-- "numpy" compatible packages that are designed to work with the subset of numerically fast libraries in Python
+- NumPy compatible packages that are designed to work with the subset of numerically fast libraries in Python
 - special functions in Pandas to read CSV, JSON, database connections, etc.
-- The "tidyverse" in R has a tightly coupled set of packages that works well together but has limitations with some other R packages
+- The Tidyverse in R has a tightly coupled set of packages that works well together but has limitations with some other R packages
 
 Julia is not perfect in this regard, but it's neat to see how frequently things *just work*. It's not magic, but because of Julia features outside the scope of this article it's easy for package developers (and you!) to do this.
 
@@ -133,31 +141,39 @@ The following highlighted packages were chosen for their relevance to typical ac
 
 ### Data
 
-Starting with getting data in and out of your code, `CSV.jl` offers top-class read and write performance. `ODBC.jl` lets you connect to any database.
+Julia offers a rich data ecosystem with numerous packages at various stages of maturity. Perhaps at the center of the data ecosystem are [`CSV.jl`](https://github.com/JuliaData/CSV.jl) and [`DataFrames.jl`](https://dataframes.juliadata.org/stable/). `CSV.jl` is for reading and writing files text files (namely CSVs) and offers top-class read and write performance. `DataFrames.jl` is a mature package for working with dataframes, comparable to Pandas or dplyr.
 
-`DataFrames.jl` is a mature package for working with dataframes, comparable to Pandas or dplyr.
+Other notable packages include [`ODBC.jl`](https://github.com/JuliaDatabases/ODBC.jl), which lets you connect to any database (given you have the right drivers installed), and [`Arrow.jl`](https://github.com/JuliaData/Arrow.jl) which implements the [Apache Arrow](https://arrow.apache.org/) standard in Julia.
 
-`Dates` is a built-in package which builds on years of pain-points related to date manipulation into a straightforward and complete interface.
+Worth mentioning also is `Dates`, a built-in package which builds on years of pain-points related to date manipulation into a straightforward and complete interface.
+
+Check out JuliaData org for more packages and information: https://github.com/JuliaData
 
 ### Plotting
 
-`Plots.jl` isn't really a plotting tool - more specifically it's an interface to consistently work with several plotting backends, depending if you are trying to emphasize interactivity on the web or print-quality output. You can very easily add animations or change almost any feature of a plot.
+[`Plots.jl`](http://docs.juliaplots.org/latest/) is a meta-package providing an interface to consistently work with several plotting [backends](https://docs.juliaplots.org/latest/backends/), depending if you are trying to emphasize interactivity on the web or print-quality output. You can very easily add animations or change almost any feature of a plot.
 
-`StatsPlots.jl` extends `Plots.jl` with a focus on data visualization and compatibility with dataframes.
+[`StatsPlots.jl`](https://github.com/JuliaPlots/StatsPlots.jl) extends `Plots.jl` with a focus on data visualization and compatibility with dataframes.
 
-`Makie.jl` is an up-and-coming package that supports GPU-accelerated plotting and can create very rich, beautiful visualizations, but it's main downside is that it has not yet been optimized to minimize the time-to-first-plot versus alternatives.
+[`Makie.jl`](http://makie.juliaplots.org/dev/) is an up-and-coming package that supports GPU-accelerated plotting and can create very rich, [beautiful visualizations](https://lazarusa.github.io/BeautifulMakie/), but it's main downside is that it has not yet been optimized to minimize the time-to-first-plot versus alternatives.
 
 ### Statistics
 
 Julia has first-class support for `missing` values, which follows the rules of [three-valued logic](https://en.wikipedia.org/wiki/Three-valued_logic) so other packages don't need to do anything special to incorporate missing values.
 
-`StatsBase.jl` and `Distributions.jl` are essentials for a range of statistics functions and probability distributions respectively.
+[`StatsBase.jl`](https://github.com/JuliaStats/StatsBase.jl) and [`Distributions.jl`](https://github.com/JuliaStats/Distributions.jl) are essentials for a range of statistics functions and probability distributions respectively.
 
-`Turing.jl`, a Bayesian Stats library, is outstanding in it's combination of clear model syntax with performance. `GLM.jl` is useful for any type of linear modeling and `LsqFit.jl` is useful for fitting data to non-linear models.
+Others include:
+* [`Turing.jl`](https://turing.ml/stable/), a probablistic programming (Bayesian statistics) library, is outstanding in its combination of clear model syntax with performance.
+* [`GLM.jl`](https://github.com/JuliaStats/GLM.jl) for any type of linear modeling (mimicking R's `glm` functionality).
+* [`LsqFit.jl`](https://github.com/JuliaNLSolvers/LsqFit.jl) for fitting data to non-linear models.
+* [`MultvariateStats.jl`](https://github.com/JuliaStats/MultivariateStats.jl) for multivarate statistics, such as PCA.
+
+You can find more packages and learn about them at https://juliastats.org/.
 
 ### Machine Learning
 
-`Flux.jl`, `Gen.jl`, `Knet`, and `MLJ` are all very popular machine learning libraries. There are also packages for PyTorch, Tensorflow, and SciKitML available. One advantage for users is that the Julia packages are written in Julia, so it can be easier to adapt or see what's going on in the entire stack. In contrast to this design, PyTorch and Tensorflow are built primarily with C++.
+[`Flux`](https://fluxml.ai/), [`Gen`](https://www.gen.dev/), [`Knet`](https://github.com/denizyuret/Knet.jl), and [`MLJ`](https://alan-turing-institute.github.io/MLJ.jl/v0.12/) are all very popular machine learning libraries. There are also packages for PyTorch, Tensorflow, and SciKitML available. One advantage for users is that the Julia packages are written in Julia, so it can be easier to adapt or see what's going on in the entire stack. In contrast to this design, PyTorch and Tensorflow are built primarily with C++.
 
 Another advantage is that the Julia libraries can take advantage of automatic differentiation to optimize on a wider range of data and functions than those built into libraries in other languages.
 
@@ -171,7 +187,7 @@ Julia has unique capabilities where almost across the entire language and ecosys
 julia> using Zygote
 
 julia> function policy_av(pol)
-	COIs = [0.00319,0.00345,0.0038,0.00419,0.0047,0.00532]
+	COIs = [0.00319, 0.00345, 0.0038, 0.00419, 0.0047, 0.00532]
 	av = 0.0
 	for (i,coi) in enumerate(COIs)
 		av += av * pol.credit_rate
@@ -190,13 +206,13 @@ julia> policy_av'(pol)       # the derivative of the account value with respect 
 (annual_premium = 6.802, face = -0.0275, credit_rate = 10972.52)
 ```
 
-When executing the code above, Julia isn't just adding a small amount and calculating the finite difference. Differentiation can be applied to entire programs through extensive use of basic derivatives and the chain rule. This concept, **automatic differentiation**, has a lot potential uses in optimization, machine learning, sensitivity testing, and risk analysis.
+When executing the code above, Julia isn't just adding a small amount and calculating the finite difference. Differentiation can be applied to entire programs through extensive use of basic derivatives and the chain rule. This concept, **automatic differentiation**, has a lot potential uses in optimization, machine learning, sensitivity testing, and risk analysis. You can read more about Julia's autodiff ecosystem here: https://juliadiff.org/
 
 ### Utilities
 
-There are also a lot of nice quality-of-life packages, like `Revise.jl` which lets you edit code on the fly without needing to re-run entire scripts.
+There are also a lot of nice quality-of-life packages, like [`Revise.jl`](https://timholy.github.io/Revise.jl/stable/) which lets you edit code on the fly without needing to re-run entire scripts.
 
-`BenchmarkTools.jl` makes it incredibly easy to benchmark your code - simply add `@benchmark` in front of what you want to test, and you will be presented with detailed statistics. For example:
+[`BenchmarkTools.jl`](https://github.com/JuliaCI/BenchmarkTools.jl) makes it incredibly easy to benchmark your code - simply add `@benchmark` in front of what you want to test, and you will be presented with detailed statistics. For example:
 
 ```julia
 julia> @benchmark present_value(0.05,[10,10,10])
@@ -214,13 +230,13 @@ BenchmarkTools.Trial: 10000 samples with 994 evaluations.
 
 ```
 
-`Test` is a built-in package for performing testsets, while `Documenter` will build high-quality documentation based on your inline documentation.
+`Test` is a built-in package for performing testsets, while [`Documenter.jl`](https://github.com/JuliaDocs/Documenter.jl) will build high-quality documentation based on your inline documentation.
 
-`ClipData.jl` lets you copy and paste from spreadsheets to Julia sessions.
+[`ClipData.jl`](https://github.com/pdeffebach/ClipData.jl) lets you copy and paste from spreadsheets to Julia sessions.
 
 ### Other packages
 
-Julia is a general-purpose language, so you will find packages for web development, graphics, game development, audio production, and much more.
+Julia is a general-purpose language, so you will find packages for web development, graphics, game development, audio production, and much more. You can explore packages (and their dependencies) at https://juliahub.com/.
 
 ### Actuarial packages
 
