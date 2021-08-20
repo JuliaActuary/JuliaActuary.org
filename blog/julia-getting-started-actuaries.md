@@ -3,7 +3,7 @@
 @def title = "Getting Started with Julia for Actuaries"
 
 @def rss_pubdate = Date(2021,8,20)
-@def rss = "A quickstart guide to using Julia in actuarial workflows."
+@def rss = "A quick-start guide to using Julia in actuarial workflows."
 
 # {{fill title}}
 
@@ -123,11 +123,11 @@ The most popular notebook tool is Jupyter ("Julia, Python, R"). It is widely use
 
 ## A Whirlwind Tour of General-Purpose Packages
 
-The Julia ecosystem favors composability and interoperability as an emergent aspect, enabled by multiple dispatch. In other words, because it's really easy to specialize functionality based on the type of data you are working with, there's much less need to bundle a lot of features within a single package.
+The Julia ecosystem favors composability and interoperability as an emergent aspect, enabled by multiple dispatch. In other words, because it's easy to specialize functionality based on the type of data you are working with, there's much less need to bundle a lot of features within a single package.
 
-As you'll see, Julia packages tend to be less vertically integrated because its easier to pass data around. Counterexamples of this in Python and R:
+As you'll see, Julia packages tend to be less vertically integrated because it's easier to pass data around. Counterexamples of this in Python and R:
 
-- NumPy compatible packages that are designed to work with the subset of numerically fast libraries in Python
+- Numpy-compatible packages that are designed to work with the subset of numerically fast libraries in Python
 - special functions in Pandas to read CSV, JSON, database connections, etc.
 - The Tidyverse in R has a tightly coupled set of packages that works well together but has limitations with some other R packages
 
@@ -167,7 +167,8 @@ Others include:
 * [`LsqFit.jl`](https://github.com/JuliaNLSolvers/LsqFit.jl) for fitting data to non-linear models.
 * [`MultvariateStats.jl`](https://github.com/JuliaStats/MultivariateStats.jl) for multivarate statistics, such as PCA.
 
-You can find more packages and learn about them at https://juliastats.org/.
+You can find more packages and learn about them [here](https://juliastats.org/).
+
 
 ### Machine Learning
 
@@ -177,7 +178,7 @@ Another advantage is that the Julia libraries can take advantage of automatic di
 
 ### Differentiable Programming
 
-Sensitivity testing is very common in actuarial workflows, but essentially it's understanding the change in one variable in relation to another. In other words, the derivative!
+Sensitivity testing is very common in actuarial workflows: essentially, it's understanding the change in one variable in relation to another. In other words, the derivative!
 
 Julia has unique capabilities where almost across the entire language and ecosystem, you can take the derivate of entire functions or scripts. For example, the following is real Julia code to automatically calculate the sensitivity of the ending account value with respect to the inputs:
 
@@ -203,8 +204,7 @@ julia> policy_av(pol)        # the ending account value
 julia> policy_av'(pol)       # the derivative of the account value with respect to the inputs
 (annual_premium = 6.802, face = -0.0275, credit_rate = 10972.52)
 ```
-
-When executing the code above, Julia isn't just adding a small amount and calculating the finite difference. Differentiation can be applied to entire programs through extensive use of basic derivatives and the chain rule. This concept, **automatic differentiation**, has a lot potential uses in optimization, machine learning, sensitivity testing, and risk analysis. You can read more about Julia's autodiff ecosystem [here](https://juliadiff.org/).
+When executing the code above, Julia isn't just adding a small amount and calculating the finite difference. Differentiation can be applied to entire programs through extensive use of basic derivatives and the chain rule. This concept, **automatic differentiation**, has potential uses in optimization, machine learning, sensitivity testing, and risk analysis. You can read more about Julia's autodiff ecosystem [here](https://juliadiff.org/).
 
 ### Utilities
 
@@ -242,7 +242,7 @@ Saving the best for last, the next article in the series will dive deeper into a
 
 ## Summary
 
-This article introduced Julia, getting setup with running and editing, and pointed toward a number of general purpose features and packages useful to actuaries. The next article in the series will focus on the range of actuarial-specific packages available.
+This article introduced Julia, getting setup with running and editing, and pointed toward a number of general-purpose features and packages useful to actuaries. The next article in the series will focus on the range of actuarial-specific packages available.
 
 [^1]: https://ocw.mit.edu/courses/mathematics/18-335j-introduction-to-numerical-methods-spring-2019/week-1/Julia-intro.pdf
 [^2]: As of July 2021.
