@@ -35,10 +35,10 @@
 <p>The most popular notebook tool is Jupyter &#40;&quot;Julia, Python, R&quot;&#41;. It is widely used and fits in well with exploratory data analysis or other interactive workflows. It can be installed by adding the <a href="https://github.com/JuliaLang/IJulia.jl"><code>IJulia.jl</code></a> package.</p>
 <p><a href="https://plutojl.org/"><code>Pluto.jl</code></a> is a newer tool, which adds reactivity and interactivity. It is also more amenable to version control than Jupyter notebooks are. Pluto is unique to Julia because of the language&#39;s ability to introspect and analyze dependencies in its own code.</p>
 <h2 id=a_whirlwind_tour_of_general-purpose_packages ><a href="#a_whirlwind_tour_of_general-purpose_packages" class=header-anchor >A Whirlwind Tour of General-Purpose Packages</a></h2>
-<p>The Julia ecosystem favors composability and interoperability as an emergent aspect, enabled by multiple dispatch. In other words, because it&#39;s really easy to specialize functionality based on the type of data you are working with, there&#39;s much less need to bundle a lot of features within a single package. </p>
-<p>As you&#39;ll see, Julia packages tend to be less vertically integrated because its easier to pass data around. Counterexamples of this in Python and R:</p>
+<p>The Julia ecosystem favors composability and interoperability as an emergent aspect, enabled by multiple dispatch. In other words, because it&#39;s easy to specialize functionality based on the type of data you are working with, there&#39;s much less need to bundle a lot of features within a single package.</p>
+<p>As you&#39;ll see, Julia packages tend to be less vertically integrated because it&#39;s easier to pass data around. Counterexamples of this in Python and R:</p>
 <ul>
-<li><p>&quot;numpy&quot; compatible packages that are designed to work with the subset of numerically fast libraries in Python</p>
+<li><p>Numpy-compatible packages that are designed to work with the subset of numerically fast libraries in Python</p>
 
 <li><p>special functions in Pandas to read CSV, JSON, database connections, etc.</p>
 
@@ -55,16 +55,16 @@
 <h3 id=plotting ><a href="#plotting" class=header-anchor >Plotting</a></h3>
 <p><code>Plots.jl</code> isn&#39;t really a plotting tool - more specifically it&#39;s an interface to consistently work with several plotting backends, depending if you are trying to emphasize interactivity on the web or print-quality output. You can very easily add animations or change almost any feature of a plot.</p>
 <p><code>StatsPlots.jl</code> extends <code>Plots.jl</code> with a focus on data visualization and compatibility with dataframes.</p>
-<p><code>Makie.jl</code> is an up-and-coming package that supports GPU-accelerated plotting and can create very rich, beautiful visualizations, but it&#39;s main downside is that it has not yet been optimized to minimize the time-to-first-plot versus alternatives.</p>
+<p><code>Makie.jl</code> supports GPU-accelerated plotting and can create very rich, beautiful visualizations, but its main downside is that it has not yet been optimized to minimize the time-to-first-plot versus alternatives.</p>
 <h3 id=statistics ><a href="#statistics" class=header-anchor >Statistics</a></h3>
 <p>Julia has first-class support for <code>missing</code> values, which follows the rules of <a href="https://en.wikipedia.org/wiki/Three-valued_logic">three-valued logic</a> so other packages don&#39;t need to do anything special to incorporate missing values.</p>
 <p><code>StatsBase.jl</code> and <code>Distributions.jl</code> are essentials for a range of statistics functions and probability distributions respectively.</p>
-<p><code>Turing.jl</code>, a Bayesian Stats library, is outstanding in it&#39;s combination of clear model syntax with performance. <code>GLM.jl</code> is useful for any type of linear modeling and <code>LsqFit.jl</code> is useful for fitting data to non-linear models.</p>
+<p><code>Turing.jl</code>, a Bayesian Stats library, is outstanding in its combination of clear model syntax with performance. <code>GLM.jl</code> is useful for any type of linear modeling and <code>LsqFit.jl</code> is useful for fitting data to non-linear models.</p>
 <h3 id=machine_learning ><a href="#machine_learning" class=header-anchor >Machine Learning</a></h3>
 <p><code>Flux.jl</code>, <code>Gen.jl</code>, <code>Knet</code>, and <code>MLJ</code> are all very popular machine learning libraries. There are also packages for PyTorch, Tensorflow, and SciKitML available. One advantage for users is that the Julia packages are written in Julia, so it can be easier to adapt or see what&#39;s going on in the entire stack. In contrast to this design, PyTorch and Tensorflow are built primarily with C&#43;&#43;.</p>
 <p>Another advantage is that the Julia libraries can take advantage of automatic differentiation to optimize on a wider range of data and functions than those built into libraries in other languages.</p>
 <h3 id=differentiable_programming ><a href="#differentiable_programming" class=header-anchor >Differentiable Programming</a></h3>
-<p>Sensitivity testing is very common in actuarial workflows, but essentially it&#39;s understanding the change in one variable in relation to another. In other words, the derivative&#33;</p>
+<p>Sensitivity testing is very common in actuarial workflows: essentially, it&#39;s understanding the change in one variable in relation to another. In other words, the derivative&#33;</p>
 <p>Julia has unique capabilities where almost across the entire language and ecosystem, you can take the derivate of entire functions or scripts. For example, the following is real Julia code to automatically calculate the sensitivity of the ending account value with respect to the inputs:</p>
 <pre><code class=language-julia-repl >julia&gt; using Zygote
 
@@ -86,7 +86,7 @@ julia&gt; policy_av&#40;pol&#41;        # the ending account value
 
 julia&gt; policy_av&#39;&#40;pol&#41;       # the derivative of the account value with respect to the inputs
 &#40;annual_premium &#61; 6.802, face &#61; -0.0275, credit_rate &#61; 10972.52&#41;</code></pre>
-<p>When executing the code above, Julia isn&#39;t just adding a small amount and calculating the finite difference. Differentiation can be applied to entire programs through extensive use of basic derivatives and the chain rule. This concept, <strong>automatic differentiation</strong>, has a lot potential uses in optimization, machine learning, sensitivity testing, and risk analysis.</p>
+<p>When executing the code above, Julia isn&#39;t just adding a small amount and calculating the finite difference. Differentiation can be applied to entire programs through extensive use of basic derivatives and the chain rule. This concept, <strong>automatic differentiation</strong>, has potential uses in optimization, machine learning, sensitivity testing, and risk analysis.</p>
 <h3 id=utilities ><a href="#utilities" class=header-anchor >Utilities</a></h3>
 <p>There are also a lot of nice quality-of-life packages, like <code>Revise.jl</code> which lets you edit code on the fly without needing to re-run entire scripts.</p>
 <p><code>BenchmarkTools.jl</code> makes it incredibly easy to benchmark your code - simply add <code>@benchmark</code> in front of what you want to test, and you will be presented with detailed statistics. For example:</p>
@@ -109,7 +109,7 @@ BenchmarkTools.Trial: 10000 samples with 994 evaluations.
 <h3 id=actuarial_packages ><a href="#actuarial_packages" class=header-anchor >Actuarial packages</a></h3>
 <p>Saving the best for last, the next article in the series will dive deeper into actuarial packages, such as those published by <a href="https://JuliaActuary.org">JuliaActuary</a> for easy mortality table manipulation, common actuarial functions, financial math, and experience analysis.</p>
 <h2 id=summary ><a href="#summary" class=header-anchor >Summary</a></h2>
-<p>This article introduced Julia, getting setup with running and editing, and pointed toward a number of general purpose features and packages useful to actuaries. The next article in the series will focus on the range of actuarial-specific packages available.</p>
+<p>This article introduced Julia, getting setup with running and editing, and pointed toward a number of general-purpose features and packages useful to actuaries. The next article in the series will focus on the range of actuarial-specific packages available.</p>
 <p><table class=fndef  id="fndef:1">
     <tr>
         <td class=fndef-backref ><a href="#fnref:1">[1]</a>
@@ -131,7 +131,7 @@ BenchmarkTools.Trial: 10000 samples with 994 evaluations.
 </p>
 <div class=page-foot >
   <div class=copyright >
-    &copy; Alec Loudenback. Last modified: August 17, 2021. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and <a href="https://julialang.org" >Julia</a>.
+    &copy; Alec Loudenback. Last modified: August 20, 2021. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and <a href="https://julialang.org" >Julia</a>.
   </div>
 </div>
 </div>
