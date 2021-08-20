@@ -1,8 +1,8 @@
-@def author = "Alec Loudenback"
-@def date = "July 18, 2021"
+@def author = "Alec Loudenback and Dimitar Vanguelov"
+@def date = "August 20, 2021"
 @def title = "Getting Started with Julia for Actuaries"
 
-@def rss_pubdate = Date(2021,7,18)
+@def rss_pubdate = Date(2021,8,20)
 @def rss = "A quickstart guide to using Julia in actuarial workflows."
 
 # {{fill title}}
@@ -47,7 +47,7 @@ Julia code is compiled on-the-fly, generating efficient code for the specific da
 
 Born of a desire to have the niceties of high level languages with the performance of low level compiled code, there are many built-in data structures and functions related to numerical computing like that used in finance, insurance, and statistics.
 
-If you just want a quick introduction for beginners, https://www.juliafordatascience.com/ is a great resource with easy, digestible tutorials. If you want a ground-up introduction, the e-book [Think Julia](https://benlauwens.github.io/ThinkJulia.jl/latest/book.html) starts simple and builds up. If you prefer a learn-by-example, the interactive, free, online course [Introduction to Computational Thinking](https://computationalthinking.mit.edu/Spring21/) by MIT will have you working on everything from data science to climate modeling.
+If you just want a quick introduction for beginners, [Julia For Data Science](https://www.juliafordatascience.com/) is a great resource with easy, digestible tutorials. If you want a ground-up introduction, the e-book [Think Julia](https://benlauwens.github.io/ThinkJulia.jl/latest/book.html) starts simple and builds up. If you prefer a learn-by-example, the interactive, free, online course [Introduction to Computational Thinking](https://computationalthinking.mit.edu/Spring21/) by MIT will have you working on everything from data science to climate modeling.
 
 Lastly, [JuliaAcademy.com](https://juliaacademy.com/) has a number of free courses that introduce the language via data science, machine learning, or "for nervous beginners".
 
@@ -57,7 +57,7 @@ A full introduction to the language is beyond the scope of this article. There a
 
 #### Multiple Dispatch
 
-Multiple Dispatch is the term for deciding which function to call based on the combination of arguments. Taking an example pointed out by data scientist Brian Groenke[^3] of a simple ordinary least squares implementation:
+Multiple dispatch is the term for deciding which function to call based on the combination of arguments. Taking an example pointed out by data scientist Brian Groenke[^3] of a simple ordinary least squares implementation:
 
 ```julia
 ols(x,y) = inv(x'x)x'y
@@ -72,11 +72,9 @@ In a language without Multiple Dispatch, the alternative would be to:
 - define `ols` for every combination of types you might encounter
 - attach a method to a class with every combination of second argument type
 
-[This article](https://www.moll.dev/projects/effective-multi-dispatch/) by developer Thomas Moll provides a wonderful and intuitive write-up of what Multiple Dispatch is and why it's powerful using the Pokemon game as an example (you don't need to know Pokemon to follow along).
+The statistician Josh Day wrote [an entire blog post]((https://medium.com/@josh_40272/why-i-use-julia-8eb47216880e)) about how multiple dispatch boosts one's productivity, allows for less code, and more time spent on solving the actual problem at hand.
 
-[This article](https://medium.com/@josh_40272/why-i-use-julia-8eb47216880e) by the statistician Josh Day gives an excellent overview of how Multiple Dispatch boosts one's productivity, allows for less code and more time spent on solving the actual problem at hand.
-
-#### Meta-programming / Macros
+#### Meta-programming and Macros
 
 Meta-programming is the essentially the ability to program the language itself, and macros are one of the tools that provide this ability. In the Paul Graham essay mentioned above, macros are an example of the competitive advantage conferred by a more powerful language - and the choice of language was a fundamental competitive advantage.
 
@@ -84,7 +82,7 @@ For example, when you see `@benchmark present_value(0.05, [10, 10, 10])` in Juli
 
 Most other languages don't have macros, and it means that it's hard to 'hook into' code in a safe way. For example, benchmarking can involve a lot of boilerplate code just to setup, time, and summarize the results (such as the `timeit` library in Python).
 
-Note that *using* (i.e. *calling*) macros is quite prevalent when coding in Julia, however *writing* macros is usually reserved for special use cases and is not recommended for novice users or [indeed most use cases](https://www.youtube.com/watch?v=mSgXWpvQEHE).
+Note that *using* (i.e. *calling*) macros is quite prevalent when coding in Julia, however *writing* macros is [more advanced usage](https://www.youtube.com/watch?v=mSgXWpvQEHE) and beyond the scope of a "getting-started" guide.
 
 ## Installation and Tooling
 
@@ -121,11 +119,11 @@ Notebooks are typically more interactive environments than text editors - you ca
 
 The most popular notebook tool is Jupyter ("Julia, Python, R"). It is widely used and fits in well with exploratory data analysis or other interactive workflows. It can be installed by adding the [`IJulia.jl`](https://github.com/JuliaLang/IJulia.jl) package.
 
-[`Pluto.jl`](https://plutojl.org/) is a newer tool, which adds reactivity and interactivity. It is also more amenable to version control than Jupyter notebooks are. Pluto is unique to Julia because of the language's ability to introspect and analyze dependencies in its own code. A wonderful feature of Pluto is also baked in package/environment management, meaning a Pluto notebook has the option to contain everything needed to reproduce results (as long as Julia and Pluto are installed).
+[`Pluto.jl`](https://plutojl.org/) is a newer tool, which adds reactivity and interactivity. It is also more amenable to version control than Jupyter notebooks because notebooks are saved as plain Julia scripts. Pluto is unique to Julia because of the language's ability to introspect and analyze dependencies in its own code. A wonderful feature of Pluto is also baked in package/environment management, meaning a Pluto notebook has the option to contain everything needed to reproduce results (as long as Julia and Pluto are installed).
 
 ## A Whirlwind Tour of General-Purpose Packages
 
-The Julia ecosystem favors composability and interoperability as an emergent aspect, enabled by Multiple Dispatch. In other words, because it's really easy to specialize functionality based on the type of data you are working with, there's much less need to bundle a lot of features within a single package.
+The Julia ecosystem favors composability and interoperability as an emergent aspect, enabled by multiple dispatch. In other words, because it's really easy to specialize functionality based on the type of data you are working with, there's much less need to bundle a lot of features within a single package.
 
 As you'll see, Julia packages tend to be less vertically integrated because its easier to pass data around. Counterexamples of this in Python and R:
 
@@ -155,7 +153,7 @@ Check out JuliaData org for more packages and information: https://github.com/Ju
 
 [`StatsPlots.jl`](https://github.com/JuliaPlots/StatsPlots.jl) extends `Plots.jl` with a focus on data visualization and compatibility with dataframes.
 
-[`Makie.jl`](http://makie.juliaplots.org/dev/) is an up-and-coming package that supports GPU-accelerated plotting and can create very rich, [beautiful visualizations](https://lazarusa.github.io/BeautifulMakie/), but it's main downside is that it has not yet been optimized to minimize the time-to-first-plot versus alternatives.
+[`Makie.jl`](http://makie.juliaplots.org/dev/) supports GPU-accelerated plotting and can create very rich, [beautiful visualizations](https://lazarusa.github.io/BeautifulMakie/), but it's main downside is that it has not yet been optimized to minimize the time-to-first-plot versus alternatives.
 
 ### Statistics
 
@@ -206,7 +204,7 @@ julia> policy_av'(pol)       # the derivative of the account value with respect 
 (annual_premium = 6.802, face = -0.0275, credit_rate = 10972.52)
 ```
 
-When executing the code above, Julia isn't just adding a small amount and calculating the finite difference. Differentiation can be applied to entire programs through extensive use of basic derivatives and the chain rule. This concept, **automatic differentiation**, has a lot potential uses in optimization, machine learning, sensitivity testing, and risk analysis. You can read more about Julia's autodiff ecosystem here: https://juliadiff.org/
+When executing the code above, Julia isn't just adding a small amount and calculating the finite difference. Differentiation can be applied to entire programs through extensive use of basic derivatives and the chain rule. This concept, **automatic differentiation**, has a lot potential uses in optimization, machine learning, sensitivity testing, and risk analysis. You can read more about Julia's autodiff ecosystem [here](https://juliadiff.org/).
 
 ### Utilities
 
