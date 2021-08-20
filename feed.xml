@@ -23,6 +23,25 @@
 
 <item>
   <title>
+    <![CDATA[  Getting Started with Julia for Actuaries  ]]>
+  </title>
+  <link> https://JuliaActuary.org/blog/julia-getting-started-actuaries/index.html </link>
+  <guid> https://JuliaActuary.org/blog/julia-getting-started-actuaries/index.html </guid>
+  <description>
+    <![CDATA[  A quick-start guide to using Julia in actuarial workflows.  ]]>
+  </description>  
+    
+  <pubDate>Fri, 20 Aug 2021 00:00:00 +0000</pubDate>  
+  
+  
+  <atom:author>
+    <atom:name>Alec Loudenback and Dimitar Vanguelov</atom:name>
+  </atom:author>
+        
+</item>
+
+<item>
+  <title>
     <![CDATA[  Benchmarks  ]]>
   </title>
   <link> https://JuliaActuary.org/benchmarks/index.html </link>
@@ -36,25 +55,6 @@
   
   <atom:author>
     <atom:name>Misc</atom:name>
-  </atom:author>
-        
-</item>
-
-<item>
-  <title>
-    <![CDATA[  Getting Started with Julia for Actuaries  ]]>
-  </title>
-  <link> https://JuliaActuary.org/blog/julia-getting-started-actuaries/index.html </link>
-  <guid> https://JuliaActuary.org/blog/julia-getting-started-actuaries/index.html </guid>
-  <description>
-    <![CDATA[  A quick-start guide to using Julia in actuarial workflows.  ]]>
-  </description>  
-    
-  <pubDate>Sun, 18 Jul 2021 00:00:00 +0000</pubDate>  
-  
-  
-  <atom:author>
-    <atom:name>Alec Loudenback</atom:name>
   </atom:author>
         
 </item>
