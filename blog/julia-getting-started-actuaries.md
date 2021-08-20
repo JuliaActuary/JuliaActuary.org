@@ -15,7 +15,7 @@
 
 The previously published article titled [Julia for Actuaries](/blog/julia-actuaries) gave a longer introduction to why Julia works so well in actuarial workflows. In summary: Julia's attributes are "evident in its pragmatic, productivity-focused design choices, pleasant syntax, rich ecosystem, thriving communities, and its ability to be both very general purpose and power cutting edge computing".
 
-This is the second  in the follow trio of articles:
+This is the second in the following trilogy of articles:
 
 1. Why Julia works so well for actuaries
 2. Basic tooling and general packages of interest
@@ -73,7 +73,7 @@ In a language without multiple dispatch, the alternative would be to:
 - define `ols` for every combination of types you might encounter
 - attach a method to a class with every combination of second argument type
 
-The statistician Josh Day wrote [an entire blog post]((https://medium.com/@josh_40272/why-i-use-julia-8eb47216880e)) about how multiple dispatch boosts one's productivity, allows for less code, and more time spent on solving the actual problem at hand.
+The statistician Josh Day wrote [an entire blog post](https://medium.com/@josh_40272/why-i-use-julia-8eb47216880e) about how multiple dispatch boosts one's productivity, allows for less code, and more time spent on solving the actual problem at hand.
 
 #### Meta-programming and Macros
 
@@ -241,6 +241,10 @@ Julia is a general-purpose language, so you will find packages for web developme
 ### Actuarial packages
 
 Saving the best for last, the next article in the series will dive deeper into actuarial packages, such as those published by [JuliaActuary](https://JuliaActuary.org) for easy mortality table manipulation, common actuarial functions, financial math, and experience analysis.
+
+## Getting Help
+
+Aside from the usual StackOverflow, there is a [community page](https://julialang.org/community/) with links to the Discourse forum, Slack, and Zulip. The latter two have a dedicated `#actuary` channel.
 
 ## Summary
 
