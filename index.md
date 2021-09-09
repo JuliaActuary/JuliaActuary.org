@@ -410,7 +410,7 @@ Calculate exposures with `exposures(basis,from,to,continue_exposure)`.
 Each package includes examples on the Github site and in the documentation.
 
 #### Walkthroughs and tutorials 
-Coming soon!
+- [Getting MortalityTables.jl data into a dataframes](/tutorials/MortalityTablesDataFrame/) 
 
 #### Benchmarks
 
