@@ -16,8 +16,7 @@ Because JuliaActuary doesn't have a beefy server to run this on and let anybody 
 
 ```julia
 # install these dependencies
-import Pkg; Pkg.add(["Pluto","Plots","MortalityTables", 
-    "DifferentialEquations","ActuaryUtilities","ColorSchemes"]) 
+import Pkg; Pkg.add(["Pluto"]) 
 
 # use and start Pluto
 using Pluto; Pluto.run()
