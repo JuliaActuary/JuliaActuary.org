@@ -54,7 +54,7 @@ All of the benchmarked code can be found in the [JuliaActuary Learn repository](
 
 ## IRRs
 
-Task: determine the IRR for a series of cashflows 701 elements long.
+**Task:** determine the IRR for a series of cashflows 701 elements long.
 
 ### Benchmarks
 
@@ -77,6 +77,86 @@ Julia is 13,350 times faster than `numpy_financial`, and 54 times faster than th
 Excel was used to attempt a benchmark, but the `IRR` formula returned a `#DIV/0!` error.
 
 All of the benchmarked code can be found in the [JuliaActuary Learn repository](https://github.com/JuliaActuary/Learn/tree/master/Benchmarks/irr). Please file an issue or submit a PR request there for issues/suggestions.
+
+## Black-Scholes-Merton European Option Pricing
+
+**Task:** calculate the price of a vanilla european call option using the Black-Scholes-Merton formula.
+
+### Benchmarks
+
+```plaintext
+Times are in nanoseconds:
+┌──────────┬─────────┬─────────────┬───────────────┐
+│ Language │  Median │        Mean │ Relative Mean │
+├──────────┼─────────┼─────────────┼───────────────┤
+│   Python │ missing │    817000.0 │       19926.0 │
+│        R │  3649.0 │      3855.2 │          92.7 │
+│    Julia │    41.0 │        41.6 │           1.0 │
+└──────────┴─────────┴─────────────┴───────────────┘
+```
+
+### Discussion
+
+Julia is nearly 20,000 times faster than Python, and two orders of magnitude faster than R. For comparison, the functions are shown here for a comparison of syntax and semantics:
+
+#### Julia
+
+```julia
+using Distributions
+
+function d1(S,K,τ,r,σ)
+  return (log(S/K) + (r + σ^2/2) * τ) / (σ * √(τ))
+end
+
+function d2(S,K,τ,r,σ)
+  return d1(S,K,τ,r,σ) - σ * √(τ)
+end
+
+function Call(S,K,τ,r,σ)
+  N(x) = cdf(Normal(),x)
+  d₁ = d1(S,K,τ,r,σ)
+  d₂ = d2(S,K,τ,r,σ)
+  return N(d₁)*S - N(d₂) * K * exp(-r*τ)
+end
+```
+
+#### Python
+
+```python
+from scipy import stats
+import math
+
+def d1(S,K,τ,r,σ):
+  return (math.log(S/K) + (r + σ**2/2) * τ) / (σ * math.sqrt(τ))
+
+def d2(S,K,τ,r,σ):
+  return d1(S,K,τ,r,σ) - σ * math.sqrt(τ)
+
+def Call(S,K,τ,r,σ):
+  N = lambda x: stats.norm().cdf(x)
+  d_1 = d1(S,K,τ,r,σ)
+  d_2 = d2(S,K,τ,r,σ)
+  return N(d_1)*S - N(d_2) * K * math.exp(-r*τ)
+```
+
+#### R
+```R
+d1<- function(S,K,t,r,sig) {
+  ans <- (log(S/K) + (r + sig^2/2)*t) / (sig*sqrt(t))
+  return(ans)
+} 
+
+d2 <- function(S,K,t,r,sig) {
+  return(d1(S,K,t,r,sig) - sig*sqrt(t))
+}
+
+Call <- function(S,K,t,r,sig) {
+  d_1 <- d1(S,K,t,r,sig)
+  d_2 <- d2(S,K,t,r,sig)
+  return(S*pnorm(d_1) - K*exp(-r*t)*pnorm(d_2))
+}
+
+```
 
 ## Other benchmarks
 
