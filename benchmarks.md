@@ -82,6 +82,16 @@ All of the benchmarked code can be found in the [JuliaActuary Learn repository](
 
 **Task:** calculate the price of a vanilla european call option using the Black-Scholes-Merton formula.
 
+
+\begin{align}
+C(S_t, t) &= N(d_1)S_t - N(d_2)Ke^{-r(T - t)} \\
+
+d_1 &= \frac{1}{\sigma\sqrt{T - t}}\left[\ln\left(\frac{S_t}{K}\right) + \left(r + \frac{\sigma^2}{2}\right)(T - t)\right] \\
+
+d_2 &= d_1 - \sigma\sqrt{T - t}
+
+\end{align}
+
 ### Benchmarks
 
 ```plaintext
