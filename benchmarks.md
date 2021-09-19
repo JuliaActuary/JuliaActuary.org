@@ -19,7 +19,7 @@ After the original user submitted a proposal, others chimed in and submitted ver
 
 Some submissions were excluded because from the benchmarks they involved an entirely different approach, such as [memoizing](https://en.wikipedia.org/wiki/Memoization) the function calls[^1].
 
-```
+```plaintext
 Times are nanoseconds:
 ┌────────────────┬─────────────┬───────────────┬──────────┬──────────┐
 │       Language │   Algorithm │ Function Name │   Median │     Mean │
@@ -97,66 +97,7 @@ Times are in nanoseconds:
 
 ### Discussion
 
-Julia is nearly 20,000 times faster than Python, and two orders of magnitude faster than R. For comparison, the functions are shown here for a comparison of syntax and semantics:
-
-#### Julia
-
-```julia
-using Distributions
-
-function d1(S,K,τ,r,σ)
-  return (log(S/K) + (r + σ^2/2) * τ) / (σ * √(τ))
-end
-
-function d2(S,K,τ,r,σ)
-  return d1(S,K,τ,r,σ) - σ * √(τ)
-end
-
-function Call(S,K,τ,r,σ)
-  N(x) = cdf(Normal(),x)
-  d₁ = d1(S,K,τ,r,σ)
-  d₂ = d2(S,K,τ,r,σ)
-  return N(d₁)*S - N(d₂) * K * exp(-r*τ)
-end
-```
-
-#### Python
-
-```python
-from scipy import stats
-import math
-
-def d1(S,K,τ,r,σ):
-  return (math.log(S/K) + (r + σ**2/2) * τ) / (σ * math.sqrt(τ))
-
-def d2(S,K,τ,r,σ):
-  return d1(S,K,τ,r,σ) - σ * math.sqrt(τ)
-
-def Call(S,K,τ,r,σ):
-  N = lambda x: stats.norm().cdf(x)
-  d_1 = d1(S,K,τ,r,σ)
-  d_2 = d2(S,K,τ,r,σ)
-  return N(d_1)*S - N(d_2) * K * math.exp(-r*τ)
-```
-
-#### R
-```R
-d1<- function(S,K,t,r,sig) {
-  ans <- (log(S/K) + (r + sig^2/2)*t) / (sig*sqrt(t))
-  return(ans)
-} 
-
-d2 <- function(S,K,t,r,sig) {
-  return(d1(S,K,t,r,sig) - sig*sqrt(t))
-}
-
-Call <- function(S,K,t,r,sig) {
-  d_1 <- d1(S,K,t,r,sig)
-  d_2 <- d2(S,K,t,r,sig)
-  return(S*pnorm(d_1) - K*exp(-r*t)*pnorm(d_2))
-}
-
-```
+Julia is nearly 20,000 times faster than Python, and two orders of magnitude faster than R.
 
 ## Other benchmarks
 
