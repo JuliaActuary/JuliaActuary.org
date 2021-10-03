@@ -488,10 +488,6 @@ Julia integrates with other languages, allowing you to leverage existing scripts
 <mark>Thank you</mark> for your interest in modern actuarial solutions, no matter how you participate in the community.</p>
 ~~~
 
-### License and Usage
-
-The packages in JuliaActuary are open-source and liberally licensed (MIT License) to allow wide private and commercial usage of the packages, like the base Julia language and many other packages in the ecosystem.
-
 ### Pull Requests
 
 JuliaActuary is open source; you are free to modify, use, or change your copy of the code - but if you make enhancements please consider opening a pull request ([basic walkthrough here](https://kshyatt.github.io/post/firstjuliapr/)).
@@ -500,13 +496,21 @@ JuliaActuary is open source; you are free to modify, use, or change your copy of
 
 If you find issues, please open an issue on the relevant package's repository and we will try and address it as soon as possible.
 
+### Project Board
+
+See the [Good first Issues](https://github.com/orgs/JuliaActuary/projects/2) project board on Github for simple, self-contained ways to contribute such as adding small new features, improving the documentation, or writing up a tutorial on how to do something simple!
+
 ### Discussion and Questions
 
 If you have other ideas or questions, feel free to also open an issue, or discuss on the community [Zulip](https://julialang.zulipchat.com/#narrow/stream/249536-actuary) or [Slack #actuary channel](https://julialang.org/slack/). We welcome all actuarial and related disciplines!
 
-### Other Inquiries
+## Other Inquiries
 
 For more directed inquires, please send email to [inquiry@JuliaActuary.org](mailto:inquiry@juliaactuary.org).
+
+## License and Usage
+
+The packages in JuliaActuary are open-source and liberally licensed (MIT License) to allow wide private and commercial usage of the packages, like the base Julia language and many other packages in the ecosystem.
 
 # Blog
 
