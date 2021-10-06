@@ -215,6 +215,8 @@ There are also a lot of quality-of-life packages, like [`Revise.jl`](https://tim
 [`BenchmarkTools.jl`](https://github.com/JuliaCI/BenchmarkTools.jl) makes it incredibly easy to benchmark your code - simply add `@benchmark` in front of what you want to test, and you will be presented with detailed statistics. For example:
 
 ```julia
+julia> using ActuaryUtilities, BenchmarkTools
+
 julia> @benchmark present_value(0.05,[10,10,10])
 
 BenchmarkTools.Trial: 10000 samples with 994 evaluations.
