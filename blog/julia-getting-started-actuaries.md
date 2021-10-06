@@ -53,7 +53,7 @@ Lastly, [JuliaAcademy.com](https://juliaacademy.com/) has a number of free cours
 
 ### Spotlight on Features
 
-A full introduction to the language is beyond the scope of this article. There are two features I'd like to highlight here, which exemplify powerful features not available in other languages. These might sound a little technical at first, but as Paul Graham describes in his essay, [Beating the Average](http://www.paulgraham.com/avg.html), it is hard to see what you might be missing until you get experience with it.
+A full introduction to the language is beyond the scope of this article. There are two features we'd like to highlight here, which exemplify powerful features not available in other languages. These might sound a little technical at first, but as Paul Graham describes in his essay, [Beating the Average](http://www.paulgraham.com/avg.html), it is hard to see what you might be missing until you get experience with it.
 
 #### Multiple Dispatch
 
