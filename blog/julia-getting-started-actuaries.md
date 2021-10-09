@@ -91,7 +91,7 @@ Note that *using* macros is quite prevalent when coding in Julia, however *writi
 
 Julia is open source and can be downloaded from [JuliaLang.org](https://JuliaLang.org) and is available for all major operating systems. After you download and install, then you have Julia installed and can access the **REPL**, or Read-Eval-Print-Loop, which can run complete programs or [function as powerful day-to-day calculator](https://krasjet.com/rnd.wlk/julia/). However, many people find it more comfortable to work in a text editor or **IDE** (Integrated Development Environment).
 
-If you want a pre-packaged solution with a curated set of packages, consider the JuliaPro installation available from [Julia Computing](https://juliacomputing.com/), which has optional upgrades for more turn-key enterprise support.
+If you are looking for managed installations with a curated set of packages for use within an organization, there are ways to self-host package repositories and otherwise administratively manage packages. [Julia Computing](https://juliacomputing.com/) offers managed support with enterprise solutions, including push-button cloud compute capabilities.
 
 ### Package Management
 
