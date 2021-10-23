@@ -53,7 +53,7 @@ Lastly, [JuliaAcademy.com](https://juliaacademy.com/) has a number of free cours
 
 ### Spotlight on Features
 
-A full introduction to the language is beyond the scope of this article. There are two features I'd like to highlight here, which exemplify powerful features not available in other languages. These might sound a little technical at first, but as Paul Graham describes in his essay, [Beating the Average](http://www.paulgraham.com/avg.html), it is hard to see what you might be missing until you get experience with it.
+A full introduction to the language is beyond the scope of this article. There are two features we'd like to highlight here, which exemplify powerful features not available in other languages. These might sound a little technical at first, but as Paul Graham describes in his essay, [Beating the Average](http://www.paulgraham.com/avg.html), it is hard to see what you might be missing until you get experience with it.
 
 #### Multiple Dispatch
 
@@ -91,7 +91,7 @@ Note that *using* macros is quite prevalent when coding in Julia, however *writi
 
 Julia is open source and can be downloaded from [JuliaLang.org](https://JuliaLang.org) and is available for all major operating systems. After you download and install, then you have Julia installed and can access the **REPL**, or Read-Eval-Print-Loop, which can run complete programs or [function as powerful day-to-day calculator](https://krasjet.com/rnd.wlk/julia/). However, many people find it more comfortable to work in a text editor or **IDE** (Integrated Development Environment).
 
-If you want a pre-packaged solution with a curated set of packages, consider the JuliaPro installation available from [Julia Computing](https://juliacomputing.com/), which has optional upgrades for more turn-key enterprise support.
+If you are looking for managed installations with a curated set of packages for use within an organization, there are ways to self-host package repositories and otherwise administratively manage packages. [Julia Computing](https://juliacomputing.com/) offers managed support with enterprise solutions, including push-button cloud compute capabilities.
 
 ### Package Management
 
@@ -215,6 +215,8 @@ There are also a lot of quality-of-life packages, like [`Revise.jl`](https://tim
 [`BenchmarkTools.jl`](https://github.com/JuliaCI/BenchmarkTools.jl) makes it incredibly easy to benchmark your code - simply add `@benchmark` in front of what you want to test, and you will be presented with detailed statistics. For example:
 
 ```julia
+julia> using ActuaryUtilities, BenchmarkTools
+
 julia> @benchmark present_value(0.05,[10,10,10])
 
 BenchmarkTools.Trial: 10000 samples with 994 evaluations.
