@@ -310,8 +310,7 @@ SingleLife(mort=vbt2001.select,issue_age = 50) # mort can also be a keyword
 
 > Flexible and composable yield curves and interest functions.
 
-
-Provides a simple interface for constructing, manipulating, and using yield curves for modeling purposes.
+Provides a simple interface for constructing, manipulating, and using yield curves for modeling purposes. Includes bootstrapping methods and kernel methods like Smith-Wilson, which is used in Solvency II reporting.
 
 It's intended to provide common functionality around modeling interest rates, spreads, and miscellaneous yields across the JuliaActuary ecosystem (though not limited to use in JuliaActuary packages).
 
