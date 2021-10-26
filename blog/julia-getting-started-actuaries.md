@@ -1,8 +1,8 @@
 @def author = "Alec Loudenback and Dimitar Vanguelov"
-@def date = "August 20, 2021"
+@def date = "October 24, 2021"
 @def title = "Getting Started with Julia for Actuaries"
 
-@def rss_pubdate = Date(2021,8,20)
+@def rss_pubdate = Date(2021,10,24)
 @def rss = "A quick-start guide to using Julia in actuarial workflows."
 
 # {{fill title}}
@@ -11,7 +11,6 @@
 
 *{{fill date}}*
 
-> **!! Note that this article is a draft**
 
 The previously published article titled [Julia for Actuaries](/blog/julia-actuaries) gave a longer introduction to why Julia works so well in actuarial workflows. In summary: Julia's attributes are "evident in its pragmatic, productivity-focused design choices, pleasant syntax, rich ecosystem, thriving communities, and its ability to be both very general purpose and power cutting edge computing".
 
