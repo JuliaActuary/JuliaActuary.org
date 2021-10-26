@@ -16,7 +16,7 @@ Because JuliaActuary doesn't have an active server to run this on, you have to r
 
 ```julia
 # install these dependencies
-import Pkg; Pkg.add(["Pluto","Plots","PlutoUI","MortalityTables"]) 
+import Pkg; Pkg.add("Pluto") 
 
 # use and start Pluto
 using Pluto; Pluto.run()
