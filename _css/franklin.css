@@ -88,6 +88,10 @@ html {
         padding-left: 6%;
         padding-right: 6%;
     }
+
+    .code-carousel {
+        font-size: 0.4rem;
+    }
 }
 
 /* ==================================================================
