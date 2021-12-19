@@ -221,7 +221,14 @@ html {
 }
 
 .franklin-content a:hover {
-    text-decoration: underline;
+    /* text-decoration: underline; */
+    border-bottom: 1px solid #185aa0;
+}
+
+.franklin-content a:visited {
+    /* text-decoration: underline; */
+    color: #55097a;
+    border-bottom: 1px solid #8128ae;
 }
 
 /* ==================================================================
