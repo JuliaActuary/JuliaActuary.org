@@ -89,8 +89,8 @@ html {
         padding-right: 6%;
     }
 
-    .code-carousel {
-        font-size: 0.4rem;
+    .code-carousel pre .hljs {
+        font-size: 0.8rem;
     }
 }
 
