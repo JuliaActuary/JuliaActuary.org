@@ -1,424 +1,75 @@
-<!doctype html> <html lang=en > <meta charset=UTF-8 > <meta name=viewport  content="width=device-width, initial-scale=1"> <meta name=Description  content="Practical, extensible, and open-source actuarial modeling and analysis."> <meta property="og:description" content="Practical, extensible, and open-source actuarial modeling and analysis."> <meta property="og:image" content="/assets/logo_square.svg"> <link rel=stylesheet  href="/libs/highlight/github.min.css"> <link rel=stylesheet  href="/css/franklin.css"> <link rel=stylesheet  href="/css/basic.css"> <link rel=icon  href="/assets/favicon.png"> <script async defer src="https://buttons.github.io/buttons.js"></script> <title>Home | JuliaActuary</title> <link rel=apple-touch-icon  sizes=180x180  href="/assets/apple-touch-icon.png"> <link rel=icon  type="image/png" sizes=32x32  href="/assets/favicon-32x32.png"> <link rel=icon  type="image/png" sizes=16x16  href="/assets/favicon-16x16.png"> <link rel=manifest  href="/assets/site.webmanifest"> <header> <div class=blog-name > <a href="/"> <div class=blog-name-logo-container > <div class=blog-name-logo > <img src="/assets/logo_square.svg" alt=logo  /> </div> <div>JuliaActuary</div> </div> </a> <div class=tagline >Practical, extensible, and open-source actuarial modeling and analysis. </div> </div> <nav> <ul> <li><a href="/">Home</a> <li><a href="/#packages">Packages</a> <ul> <li><a href="/#mortalitytablesjl">MortalityTables.jl</a> <li><a href="/#actuaryutilitiesjl">ActuaryUtilities.jl</a> <li><a href="/#lifecontingenciesjl">LifeContingencies.jl</a> <li><a href="/#yieldsjl">Yields.jl</a> <li><a href="/#experienceanalysisjl">ExperienceAnalysis.jl</a> </ul> <li><a href="/#community">Community</a> <ul> <li><a href="/#learn">Learn</a> <li><a href="/#integration_with_r_and_python">Integration</a> <li><a href="/#contributing">Contributing</a> </ul> <li><a href="/#blog">Blog</a> </ul> <img src="/assets/hamburger.svg" id=menu-icon > </nav> </header> <div class=franklin-content ><h1 id=mission ><a href="#mission" class=header-anchor >Mission</a></h1> <blockquote> <p>JuliaActuary is focused on building packages that enable actuaries everywhere to build solutions using open-source tools.</p> </blockquote> <p>Please read the blog post, <a href="/blog/julia-actuaries/">Julia for Actuaries</a> to see why Julia works so well for actuarial science.</p> <a class=github-button  href="https://github.com/JuliaActuary/" data-size=large  aria-label="View Home on GitHub">JuliaActuary on GitHub</a> <h1 id=packages ><a href="#packages" class=header-anchor >Packages</a></h1> <p>These packages are available for use in your project. Keep scrolling down for more info on each one.</p> <p><a href="#mortalitytablesjl"><code>MortalityTables.jl</code></a></p> <ul> <li><p>Easily work with standard <a href="https://mort.soa.org/">mort.SOA.org</a> tables and parametric models with common survival calculations.</p> </ul> <p><a href="#lifecontingenciesjl"><code>LifeContingencies.jl</code></a></p> <ul> <li><p>Insurance, annuity, premium, and reserve maths.</p> </ul> <p><a href="#actuaryutilitiesjl"><code>ActuaryUtilities.jl</code></a></p> <ul> <li><p>Robust and fast calculations for <code>internal_rate_of_return</code>, <code>duration</code>, <code>convexity</code>, <code>present_value</code>, <code>breakeven</code>, and more. </p> </ul> <p><a href="#yieldsjl"><code>Yields.jl</code></a>※</p> <ul> <li><p>Simple and composable yield curves and calculations.</p> </ul> <p><a href="#experienceanalysisjl"><code>ExperienceAnalysis.jl</code></a>※</p> <ul> <li><p>Meeting your exposure calculation needs.</p> </ul> <div class="alert alert-info"> <p><strong>Note:</strong> packages marked with ※ are developing: the functionality is built-out and tested, but the API may change. </p> <p>For consistency, you can lock any package in its current state and not worry about breaking changes to any code that you write. Julia's package manager lets you <a href="https://julialang.github.io/Pkg.jl/v1/toml-files/#Manifest.toml-1" >exactly recreate a set of code and its dependencies.</a> (<a href="https://stackoverflow.com/questions/63485891/how-do-i-ensure-repeatability-of-julia-code-and-assoicated-dependencies">More</a>).</p> </div> <h2 id=adding_and_using_packages ><a href="#adding_and_using_packages" class=header-anchor >Adding and Using Packages</a></h2> <p>There are two ways to add packages:</p> <ul> <li><p>In the code itself: <code>using Pkg; Pkg.add&#40;&quot;MortalityTables&quot;&#41;</code></p> <li><p>In the <a href="https://docs.julialang.org/en/v1/stdlib/REPL/index.html">REPL</a>, hit <code>&#93;</code> to enter Pkg mode and type <code>add MortalityTables</code></p> </ul> <p>More info can be found at the <a href="https://julialang.github.io/Pkg.jl/v1/getting-started">Pkg manager documentation</a>.</p> <p>To use packages in your code:</p> <pre><code class=language-julia >using PackageName</code></pre>
-<h2 id=mortalitytablesjl ><a href="#mortalitytablesjl" class=header-anchor >MortalityTables.jl </a></h2>
-<blockquote>
-<p>Hassle-free mortality and other rate tables.</p>
-</blockquote>
-<h3 id=features ><a href="#features" class=header-anchor >Features</a></h3>
-<ul>
-<li><p>Full set of SOA mort.soa.org tables included</p>
-
-<li><p><code>survival</code> and <code>decrement</code> functions to calculate decrements over period of time</p>
-
-<li><p>Partial year mortality calculations &#40;Uniform, Constant, Balducci&#41;</p>
-
-<li><p>Friendly syntax and flexible usage</p>
-
-<li><p>Extensive set of parametric mortality models.</p>
-
-</ul>
-<h3 id=quickstart ><a href="#quickstart" class=header-anchor >Quickstart</a></h3>
-<p>Load and see information about a particular table:</p>
-<pre><code class=language-julia >julia&gt; vbt2001 &#61; MortalityTables.table&#40;&quot;2001 VBT Residual Standard Select and Ultimate - Male Nonsmoker, ANB&quot;&#41;
-
-MortalityTable &#40;Insured Lives Mortality&#41;:
+<!doctype html> <html lang=en > <meta charset=UTF-8 > <meta name=viewport  content="width=device-width, initial-scale=1"> <meta name=Description  content="Practical, extensible, and open-source actuarial modeling and analysis."> <meta property="og:description" content="Practical, extensible, and open-source actuarial modeling and analysis."> <meta property="og:image" content="/assets/logo_square.svg"> <link rel=stylesheet  href="/libs/highlight/github.min.css"> <link rel=stylesheet  href="/css/franklin.css"> <link rel=stylesheet  href="/css/basic.css"> <link rel=icon  href="/assets/favicon.png"> <title>Home | JuliaActuary</title> <link rel=apple-touch-icon  sizes=180x180  href="/assets/apple-touch-icon.png"> <link rel=icon  type="image/png" sizes=32x32  href="/assets/favicon-32x32.png"> <link rel=icon  type="image/png" sizes=16x16  href="/assets/favicon-16x16.png"> <link rel=manifest  href="/assets/site.webmanifest"> <script src="https://cdn.jsdelivr.net/npm/swiffy-slider@1.2.0/dist/js/swiffy-slider.min.js" crossorigin=anonymous  defer></script> <link href="https://cdn.jsdelivr.net/npm/swiffy-slider@1.2.0/dist/css/swiffy-slider.min.css" rel=stylesheet  crossorigin=anonymous > <header> <div class=blog-name > <a href="/"> <div class=blog-name-logo-container > <div class=blog-name-logo > <img src="/assets/logo_square.svg" alt=logo  /> </div> <div>JuliaActuary</div> </div> </a> <div class=tagline >Practical, extensible, and open-source actuarial modeling and analysis. </div> </div> <nav> <ul> <li><a href="/">Home</a> <li><a href="/packages">Packages</a> <ul> <li><a href="/packages/#mortalitytablesjl">MortalityTables.jl</a> <li><a href="/packages/#actuaryutilitiesjl">ActuaryUtilities.jl</a> <li><a href="/packages/#lifecontingenciesjl">LifeContingencies.jl</a> <li><a href="/packages/#yieldsjl">Yields.jl</a> <li><a href="/packages/#experienceanalysisjl">ExperienceAnalysis.jl</a> </ul> <li><a href="/community">Community</a> <ul> <li><a href="/community/#learn">Learn</a> <li><a href="/community/#integration_with_r_and_python">Integration</a> <li><a href="/community/#contributing">Contributing</a> </ul> <li><a href="/#blog">Blog</a> </ul> <img src="/assets/hamburger.svg" id=menu-icon > </nav> </header> <div class=franklin-content ><p><strong>JuliaActuary</strong> is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.</p> <p><strong>Julia</strong> is <a href="/blog/julia-actuaries/">an ideal language for Actuaries</a> and other financial professionals.</p> <p>It is free, open-source software and you can <a href="&quot;https://github.com/JuliaActuary/&quot;">join the development on Github</a>.</p> <div class="swiffy-slider slider-item-reveal slider-nav-autoplay slider-nav-autopause slider-nav-dark slider-indicators-dark " data-slider-nav-autoplay-interval=7500 > <ul class=slider-container > <li> <div class=code-carousel > <div class=top > <span class=dot  style="background:#ED594A;"></span> <span class=dot  style="background:#FDD800;"></span> <span class=dot  style="background:#5AC05A;"></span> <span class=code-example-head  >JuliaActuary Example</span> </div> <pre><code class="julia-repl hljs"><span class=hljs-meta >julia&gt;</span><span class=language-julia > <span class=hljs-keyword >using</span> MortalityTables
+</span>
+<span class=hljs-meta >julia&gt;</span><span class=language-julia > MortalityTables.table(<span class=hljs-string >&quot;2015 VBT Smoker Distinct Male Non-Smoker ALB&quot;</span>)
+</span>MortalityTable (Insured Lives Mortality):
    Name:
-       2001 VBT Residual Standard Select and Ultimate - Male Nonsmoker, ANB
+       2015 VBT Smoker Distinct Male Non-Smoker ALB
    Fields:
-       &#40;:select, :ultimate, :metadata&#41;
+       (:select, :ultimate, :metadata)
    Provider:
-       Society of Actuaries
+       American Academy of Actuaries along with the Society of Actuaries
    mort.SOA.org ID:
-       1118
+       3269
    mort.SOA.org link:
-       https://mort.soa.org/ViewTable.aspx?&amp;TableIdentity&#61;1118
+       https://mort.soa.org/ViewTable.aspx?&amp;TableIdentity=3269
    Description:
-       2001 Valuation Basic Table &#40;VBT&#41; Residual Standard Select and Ultimate Table -  Male Nonsmoker.
-       Basis: Age Nearest Birthday. 
-       Minimum Select Age: 0. 
-       Maximum Select Age: 99. 
-       Minimum Ultimate Age: 25. 
-       Maximum Ultimate Age: 120</code></pre>
-<p>The package revolves around easy-to-access vectors which are indexed by attained age:</p>
-<pre><code class=language-julia >julia&gt; vbt2001.select&#91;35&#93;          # vector of rates for issue age 35
- 0.00036
- 0.00048
- ⋮
- 0.94729
- 1.0
- 
-julia&gt; vbt2001.select&#91;35&#93;&#91;35&#93;      # issue age 35, attained age 35
- 0.00036
- 
-julia&gt; vbt2001.select&#91;35&#93;&#91;50:end&#93; # issue age 35, attained age 50 through end of table
-0.00316
-0.00345
- ⋮
-0.94729
-1.0
-
-julia&gt; vbt2001.ultimate&#91;95&#93;        # ultimate vectors only need to be called with the attained age
- 0.24298</code></pre>
-<p>Calculate the force of mortality or survival over a range of time:</p>
-<pre><code class=language-julia >julia&gt; survival&#40;vbt2001.ultimate,30,40&#41; # the survival between ages 30 and 40
-0.9894404665434904
-
-julia&gt; decrement&#40;vbt2001.ultimate,30,40&#41; # the decrement between ages 30 and 40
-0.010559533456509618</code></pre>
-<p>Non-whole periods of time are supported when you specify the assumption &#40;<code>Constant&#40;&#41;</code>, <code>Uniform&#40;&#41;</code>, or <code>Balducci&#40;&#41;</code>&#41; for fractional periods:</p>
-<pre><code class=language-julia >julia&gt; survival&#40;vbt2001.ultimate,30,40.5,Uniform&#40;&#41;&#41; # the survival between ages 30 and 40.5
-0.9887676470262408</code></pre>
-<h3 id=parametric_models ><a href="#parametric_models" class=header-anchor >Parametric Models</a></h3>
-<p>Over 20 different models included. Example with the <code>Gompertz</code> model</p>
-<pre><code class=language-julia >m &#61; MortalityTables.Gompertz&#40;a&#61;0.01,b&#61;0.2&#41;
-
-m&#91;20&#93;                 # the mortality rate at age 20
-decrement&#40;m,20,25&#41;    # the five year cumulative mortality rate
-survival&#40;m,20,25&#41; # the five year survival rate</code></pre>
-<p><br/> <a href="https://github.com/JuliaActuary/MortalityTables.jl">MortalityTables package on Github 🡭</a></p>
-<h2 id=actuaryutilitiesjl ><a href="#actuaryutilitiesjl" class=header-anchor >ActuaryUtilities.jl</a></h2>
-<blockquote>
-<p>A collection of common functions/manipulations used in Actuarial Calculations.</p>
-</blockquote>
-<h3 id=financial_maths ><a href="#financial_maths" class=header-anchor >Financial Maths</a></h3>
-<ul>
-<li><p><code>duration</code>:</p>
-<ul>
-<li><p>Calculate the <code>Macaulay</code>, <code>Modified</code>, or <code>DV01</code> durations for a set of cashflows</p>
-
-</ul>
-
-<li><p><code>convexity</code> for price sensitivity</p>
-
-<li><p>Flexible interest rate options via the <a href="https://github.com/JuliaActuary/Yields.jl"><code>Yields.jl</code></a> package.</p>
-
-<li><p><code>internal_rate_of_return</code> or <code>irr</code> to calculate the IRR given cashflows &#40;including at timepoints like Excel&#39;s <code>XIRR</code>&#41;</p>
-
-<li><p><code>breakeven</code> to calculate the breakeven time for a set of cashflows</p>
-
-<li><p><code>accum_offset</code> to calculate accumulations like survivorship from a mortality vector</p>
-
-</ul>
-<h3 id=risk_measures ><a href="#risk_measures" class=header-anchor >Risk Measures</a></h3>
-<ul>
-<li><p>Calculate risk measures for a given vector of risks:</p>
-<ul>
-<li><p><code>CTE</code> for the Conditional Tail Expectation, or</p>
-
-<li><p><code>VaR</code> for the percentile/Value at Risk.</p>
-
-</ul>
-
-</ul>
-<h3 id=insurance_mechanics ><a href="#insurance_mechanics" class=header-anchor >Insurance mechanics</a></h3>
-<ul>
-<li><p><code>duration</code>:</p>
-<ul>
-<li><p>Calculate the duration given an issue date and date &#40;a.k.a. policy duration&#41;</p>
-
-</ul>
-
-</ul>
-<p><br/> <a href="https://github.com/JuliaActuary/ActuaryUtilities.jl">ActuaryUtilities package on GitHub 🡭</a></p>
-<h2 id=lifecontingenciesjl ><a href="#lifecontingenciesjl" class=header-anchor >LifeContingencies.jl</a></h2>
-<blockquote>
-<p>Common life contingent calculations with a convenient interface.</p>
-</blockquote>
-<h3 id=features__2 ><a href="#features__2" class=header-anchor >Features</a></h3>
-<ul>
-<li><p>Integration with other JuliaActuary packages such as <a href="https://github.com/JuliaActuary/MortalityTables.jl">MortalityTables.jl</a></p>
-
-<li><p>Fast calculations, with some parts utilizing parallel processing power automatically</p>
-
-<li><p>Use functions that look more like the math you are used to &#40;e.g. <code>A</code>, <code>ä</code>&#41; with <a href="https://docs.julialang.org/en/v1/manual/unicode-input/index.html">Unicode support</a></p>
-
-<li><p>All of the power, speed, convenience, tooling, and ecosystem of Julia</p>
-
-<li><p>Flexible and modular modeling approach</p>
-
-</ul>
-<h3 id=package_overview ><a href="#package_overview" class=header-anchor >Package Overview</a></h3>
-<ul>
-<li><p>Leverages <a href="https://github.com/JuliaActuary/MortalityTables.jl">MortalityTables.jl</a> for</p>
-
-</ul>
-<p>the mortality calculations</p>
-<ul>
-<li><p>Contains common insurance calculations such as:</p>
-<ul>
-<li><p><code>Insurance&#40;life,yield&#41;</code>: Whole life</p>
-
-<li><p><code>Insurance&#40;life,yield,n&#41;</code>: Term life for <code>n</code> years</p>
-
-<li><p><code>ä&#40;life,yield&#41;</code>: Life contingent annuity due</p>
-
-<li><p><code>ä&#40;life,yield&#41;</code>: Life contingent annuity due for <code>n</code> years</p>
-
-</ul>
-
-<li><p>Contains various commutation functions such as <code>D&#40;x&#41;</code>,<code>M&#40;x&#41;</code>,<code>C&#40;x&#41;</code>, etc.</p>
-
-<li><p><code>SingleLife</code> and <code>JointLife</code> capable</p>
-
-<li><p>Interest rate mechanics via <a href="https://github.com/JuliaActuary/Yields.jl"><code>Yields.jl</code></a></p>
-
-<li><p>More documentation available by clicking the DOCS badges at the top of this README</p>
-
-</ul>
-<h3 id=examples ><a href="#examples" class=header-anchor >Examples</a></h3>
-<h4 id=basic_functions ><a href="#basic_functions" class=header-anchor >Basic Functions</a></h4>
-<p>Calculate various items for a 30-year-old male nonsmoker using 2015 VBT base table and a 5&#37; interest rate</p>
-<pre><code class=language-julia >using LifeContingencies
-using MortalityTables
-using Yields
-import LifeConingencies: V, ä      # pull the shortform notation into scope
-
-# load mortality rates from MortalityTables.jl
-tbls &#61; MortalityTables.tables&#40;&#41;
-vbt2001 &#61; tbls&#91;&quot;2001 VBT Residual Standard Select and Ultimate - Male Nonsmoker, ANB&quot;&#93;
-
-issue_age &#61; 30
-life &#61; SingleLife&#40;                 # The life underlying the risk
-    mort &#61; vbt2001.select&#91;issue_age&#93;,    # -- Mortality rates
-&#41;
-
-yield &#61; Yields.Constant&#40;0.05&#41;      # Using a flat 5&#37; interest rate
-
-lc &#61; LifeContingency&#40;life, yield&#41;  # LifeContingency joins the risk with interest
-
-
-ins &#61; Insurance&#40;lc&#41;                # Whole Life insurance
-ins &#61; Insurance&#40;life, yield&#41;       # alternate way to construct</code></pre>
-<p>With the above life contingent data, we can calculate vectors of relevant information:</p>
-<pre><code class=language-julia >cashflows&#40;ins&#41;                     # A vector of the unit cashflows
-timepoints&#40;ins&#41;                    # The timepoints associated with the cashflows
-survival&#40;ins&#41;                      # The survival vector
-benefit&#40;ins&#41;                       # The unit benefit vector
-probability&#40;ins&#41;                   # The probability of beneift payment</code></pre>
-<p>Or calculate summary scalars:</p>
-<pre><code class=language-julia >present_value&#40;ins&#41;                 # The actuarial present value
-premium_net&#40;lc&#41;                    # Net whole life premium 
-V&#40;lc,5&#41;                            # Net premium reserve for whole life insurance at time 5</code></pre>
-<p>Other types of life contingent benefits:</p>
-<pre><code class=language-julia >Insurance&#40;lc,n&#61;10&#41;                   # 10 year term insurance
-AnnuityImmediate&#40;lc&#41;               # Whole life annuity due
-AnnuityDue&#40;lc&#41;                     # Whole life annuity due
-ä&#40;lc&#41;                              # Shortform notation
-ä&#40;lc, n&#61;5&#41;                         # 5 year annuity due
-ä&#40;lc, n&#61;5, certain&#61;5,frequency&#61;4&#41;  # 5 year annuity due, with 5 year certain payable 4x per year
-...                                # and more&#33;</code></pre>
-<h4 id=constructing_lives ><a href="#constructing_lives" class=header-anchor >Constructing Lives</a></h4>
-<pre><code class=language-julia >SingleLife&#40;vbt2001.select&#91;50&#93;&#41;                 # no keywords, just a mortality vector
-SingleLife&#40;vbt2001.select&#91;50&#93;,issue_age &#61; 60&#41;  # select at 50, but now 60
-SingleLife&#40;vbt2001.select,issue_age &#61; 50&#41;      # use issue_age to pick the right select vector
-SingleLife&#40;mort&#61;vbt2001.select,issue_age &#61; 50&#41; # mort can also be a keyword</code></pre>
-<p><br/> <a href="https://github.com/JuliaActuary/LifeContingencies.jl">LifeContingencies package on GitHub 🡭</a></p>
-<h2 id=yieldsjl ><a href="#yieldsjl" class=header-anchor >Yields.jl</a></h2>
-<blockquote>
-<p>Flexible and composable yield curves and interest functions.</p>
-</blockquote>
-<p>Provides a simple interface for constructing, manipulating, and using yield curves for modeling purposes. Includes bootstrapping methods and kernel methods like Smith-Wilson, which is used in Solvency II reporting.</p>
-<p>It&#39;s intended to provide common functionality around modeling interest rates, spreads, and miscellaneous yields across the JuliaActuary ecosystem &#40;though not limited to use in JuliaActuary packages&#41;.</p>
-<h3 id=quickstart__2 ><a href="#quickstart__2" class=header-anchor >Quickstart</a></h3>
-<pre><code class=language-julia >using Yields
-
-riskfree_maturities &#61; &#91;0.5, 1.0, 1.5, 2.0&#93;
-riskfree    &#61; &#91;5.0, 5.8, 6.4, 6.8&#93; ./ 100     #spot rates
-
-spread_maturities &#61; &#91;0.5, 1.0, 1.5, 3.0&#93;      # different maturities
-spread    &#61; &#91;1.0, 1.8, 1.4, 1.8&#93; ./ 100       # spot spreads
-
-rf_curve &#61; Yields.Zero&#40;riskfree,riskfree_maturities&#41;
-spread_curve &#61; Yields.Zero&#40;spread,spread_maturities&#41;
-
-
-yield &#61; rf_curve &#43; spread_curve               # additive combination of the two curves
-
-discount&#40;yield,1.0&#41; # 1 / &#40;1 &#43; 0.058 &#43; 0.018&#41;</code></pre>
-<p><br/> <a href="https://github.com/JuliaActuary/Yields.jl">Yields package on GitHub 🡭</a></p>
-<h2 id=experienceanalysisjl ><a href="#experienceanalysisjl" class=header-anchor >ExperienceAnalysis.jl</a></h2>
-<blockquote>
-<p>Meeting your exposure calculation needs.</p>
-</blockquote>
-<h3 id=quickstart__3 ><a href="#quickstart__3" class=header-anchor >Quickstart</a></h3>
-<pre><code class=language-julia >using ExperienceAnalysis
-using Dates
-
-issue &#61; Date&#40;2016, 7, 4&#41;
-termination &#61; Date&#40;2020, 1, 17&#41;
-basis &#61; ExperienceAnalysis.Anniversary&#40;Year&#40;1&#41;&#41;
-exposure&#40;basis, issue, termination&#41;</code></pre>
-<p>This will return an array of tuples with a <code>from</code> and <code>to</code> date:</p>
-<pre><code class=language-julia >4-element Array&#123;NamedTuple&#123;&#40;:from, :to&#41;,Tuple&#123;Date,Date&#125;&#125;,1&#125;:
- &#40;from &#61; Date&#40;&quot;2016-07-04&quot;&#41;, to &#61; Date&#40;&quot;2017-07-04&quot;&#41;&#41;
- &#40;from &#61; Date&#40;&quot;2017-07-04&quot;&#41;, to &#61; Date&#40;&quot;2018-07-04&quot;&#41;&#41;
- &#40;from &#61; Date&#40;&quot;2018-07-04&quot;&#41;, to &#61; Date&#40;&quot;2019-07-04&quot;&#41;&#41;
- &#40;from &#61; Date&#40;&quot;2019-07-04&quot;&#41;, to &#61; Date&#40;&quot;2020-01-17&quot;&#41;&#41;</code></pre>
-<h3 id=available_exposure_basis ><a href="#available_exposure_basis" class=header-anchor >Available Exposure Basis</a></h3>
-<ul>
-<li><p><code>ExperienceAnalysis.Anniversary&#40;period&#41;</code> will give exposures periods based on the first date</p>
-
-<li><p><code>ExperienceAnalysis.Calendar&#40;period&#41;</code> will follow calendar periods &#40;e.g. month or year&#41;</p>
-
-<li><p><code>ExperienceAnalysis.AnniversaryCalendar&#40;period,period&#41;</code> will split into the smaller of the calendar or policy period.</p>
-
-</ul>
-<p>Where <code>period</code> is a <a href="https://docs.julialang.org/en/v1/stdlib/Dates/#Period-Types">Period Type from the Dates standard library</a>.</p>
-<p>Calculate exposures with <code>exposures&#40;basis,from,to,continue_exposure&#41;</code>. </p>
-<ul>
-<li><p><code>continue_exposures</code> indicates whether the exposure should be extended through the full exposure period rather than terminate at the <code>to</code> date.</p>
-
-</ul>
-<p><br/> <a href="https://github.com/JuliaActuary/ExperienceAnalysis.jl">ExperienceAnalysis package on GitHub 🡭</a></p>
-<h1 id=community ><a href="#community" class=header-anchor >Community </a></h1>
-<h2 id=learn ><a href="#learn" class=header-anchor >Learn</a></h2>
-<blockquote>
-<p>Resources to help get started.</p>
-</blockquote>
-<h3 id=programming_and_julia ><a href="#programming_and_julia" class=header-anchor >Programming and Julia</a></h3>
-<ul>
-<li><p><a href="https://julialang.org/">JuliaLang.org</a>, the home site with the downloads to get started, and links to learning resources.</p>
-
-<li><p><a href="https://juliahub.com/ui/Home">JuliaHub</a> indexes open-source Julia packages and makes the entire ecosystem and documentation searchable from one place.</p>
-
-<li><p><a href="https://juliaacademy.com/courses">JuliaAcademy</a>, which has free short courses in Data Science, Introduction to Julia, DataFrames.jl, Machine Learning, and more.</p>
-
-<li><p><a href="https://alan-turing-institute.github.io/DataScienceTutorials.jl/">Data Science Tutorials</a> from the Alan Turing Institute.</p>
-
-<li><p><a href="https://learnxinyminutes.com/docs/julia/">Learn Julia in Y minutes</a>, a great quick-start if you are already comfortable with coding.</p>
-
-<li><p><a href="https://benlauwens.github.io/ThinkJulia.jl/latest/book.html">Think Julia</a>, a free e-book &#40;or paid print edition&#41; book which introduces programming from the start and teaches you valuable ways of thinking.</p>
-
-<li><p><a href="https://www.packtpub.com/application-development/hands-design-patterns-julia-10">Design Patterns and Best Practices</a>, a book that will help you as you transition from smaller, one-off scripts to designing larger packages and projects.</p>
-
-</ul>
-<h3 id=actuarial_usage_and_examples ><a href="#actuarial_usage_and_examples" class=header-anchor >Actuarial Usage and Examples</a></h3>
-<h4 id=documentation ><a href="#documentation" class=header-anchor >Documentation</a></h4>
-<p>Each package includes examples on the Github site and in the documentation.</p>
-<h4 id=walkthroughs_and_tutorials ><a href="#walkthroughs_and_tutorials" class=header-anchor >Walkthroughs and tutorials </a></h4>
-<ul>
-<li><p><a href="/tutorials/MortalityTablesDataFrame/">Getting MortalityTables.jl data into a dataframes</a> </p>
-
-</ul>
-<h4 id=benchmarks ><a href="#benchmarks" class=header-anchor >Benchmarks</a></h4>
-<p>Benchmarks of Actuarial workflows can be found on the <a href="/benchmarks/">Benchmarks</a> page.</p>
-<h4 id=miscellaneous ><a href="#miscellaneous" class=header-anchor >Miscellaneous</a></h4>
-<ul>
-<li><p><a href="/tutorials/PlutoESG/">Interactive exploration</a> of the AAA&#39;s Economic Scenario Generator</p>
-
-<li><p><a href="/tutorials/MortalityTableComparison/">Interactive mortality table comparison tool</a> for any <code>mort.soa.org</code> table</p>
-
-<li><p><a href="/tutorials/CashflowAnalysis/">Interactive cashflow analysis</a></p>
-
-<li><p><a href="/tutorials/PolicyDiffEq/">Universal Life Policy Account Mechanics as a Differential Equation</a></p>
-
-</ul>
-<h3 id=help_mode ><a href="#help_mode" class=header-anchor >Help mode</a></h3>
-<p>You can also access help text when using the packages in the REPL by <a href="https://docs.julialang.org/en/v1/stdlib/REPL/index.html#Help-mode-1">activating help mode</a>, e.g.:</p>
-<pre><code class=language-julia-repl >julia&gt; ? survival
-    survival&#40;mortality_vector,to_age&#41;
-    survival&#40;mortality_vector,from_age,to_age&#41;
-
-
-  Returns the survival through attained age to_age. The start of the 
-  calculation is either the start of the vector, or attained age &#96;from_age&#96; 
-  and &#96;to_age&#96; need to be Integers. 
-
-  Add a DeathDistribution as the last argument to handle floating point 
-  and non-whole ages:
-
-    survival&#40;mortality_vector,to_age,::DeathDistribution&#41;
-    survival&#40;mortality_vector,from_age,to_age,::DeathDistribution&#41;
-
-
-  If given a negative to_age, it will return 1.0. Aside from simplifying the code, 
-  this makes sense as for something to exist in order to decrement in the first place, 
-  it must have existed and survived to the point of being able to be decremented.
-
-  Examples
-  ≡≡≡≡≡≡≡≡≡≡
-
-  julia&gt; qs &#61; UltimateMortality&#40;&#91;0.1,0.3,0.6,1&#93;&#41;;
-
-  julia&gt; survival&#40;qs,0&#41;
-  1.0
-  julia&gt; survival&#40;qs,1&#41;
-  0.9
-
-  julia&gt; survival&#40;qs,1,1&#41;
-  1.0
-  julia&gt; survival&#40;qs,1,2&#41;
-  0.7
-
-  julia&gt; survival&#40;qs,0.5,Uniform&#40;&#41;&#41;
-  0.95</code></pre>
-<h3 id=other_repositories_of_interest_for_actuaries ><a href="#other_repositories_of_interest_for_actuaries" class=header-anchor >Other Repositories of Interest for Actuaries</a></h3>
-<ul>
-<li><p><a href="https://github.com/mkriele/RMInsurance.jl">RMInsurance</a> is the code and examples for the second edition of the book &quot;Value-Oriented Risk Management of Insurance Companies&quot;</p>
-
-<li><p><a href="https://github.com/klpn/LifeTable.jl">LifeTable.jl</a> will caculate life tables from the Human Mortality Database.</p>
-
-</ul>
-<h2 id=integration_with_r_and_python ><a href="#integration_with_r_and_python" class=header-anchor >Integration with R and Python</a></h2>
-<p>Julia integrates with other languages, allowing you to leverage existing scripts and packages in R via <a href="https://github.com/JuliaInterop/RCall.jl">RCall</a> and in Python  via <a href="https://github.com/JuliaPy/PyCall.jl">PyCall</a>.</p>
-<h2 id=contributing ><a href="#contributing" class=header-anchor >Contributing</a></h2>
-<blockquote>
-<p>Help by contributing code, asking questions, or reporting issues.</p>
-</blockquote>
-
-<mark>Thank you</mark> for your interest in modern actuarial solutions, no matter how you participate in the community.</p>
-
-<h3 id=pull_requests ><a href="#pull_requests" class=header-anchor >Pull Requests</a></h3>
-<p>JuliaActuary is open source; you are free to modify, use, or change your copy of the code - but if you make enhancements please consider opening a pull request &#40;<a href="https://kshyatt.github.io/post/firstjuliapr/">basic walkthrough here</a>&#41;.</p>
-<h3 id=issues ><a href="#issues" class=header-anchor >Issues</a></h3>
-<p>If you find issues, please open an issue on the relevant package&#39;s repository and we will try and address it as soon as possible.</p>
-<h3 id=project_board ><a href="#project_board" class=header-anchor >Project Board</a></h3>
-<p>See the <a href="https://github.com/orgs/JuliaActuary/projects/2">Good first Issues</a> project board on Github for simple, self-contained ways to contribute such as adding small new features, improving the documentation, or writing up a tutorial on how to do something simple&#33;</p>
-<h3 id=discussion_and_questions ><a href="#discussion_and_questions" class=header-anchor >Discussion and Questions</a></h3>
-<p>If you have other ideas or questions, feel free to also open an issue, or discuss on the community <a href="https://julialang.zulipchat.com/#narrow/stream/249536-actuary">Zulip</a> or <a href="https://julialang.org/slack/">Slack #actuary channel</a>. We welcome all actuarial and related disciplines&#33;</p>
-<h2 id=other_inquiries ><a href="#other_inquiries" class=header-anchor >Other Inquiries</a></h2>
-<p>For more directed inquires, please send email to <a href="mailto:inquiry@juliaactuary.org">inquiry@JuliaActuary.org</a>.</p>
-<h2 id=license_and_usage ><a href="#license_and_usage" class=header-anchor >License and Usage</a></h2>
-<p>The packages in JuliaActuary are open-source and liberally licensed &#40;MIT License&#41; to allow wide private and commercial usage of the packages, like the base Julia language and many other packages in the ecosystem.</p>
-<h1 id=blog ><a href="#blog" class=header-anchor >Blog</a></h1>
-<ul>
-<li><p><a href="/blog/coding-for-the-future/">Coding the Future</a></p>
-<ul>
-<li><p>Building the insurance company of tomorrow by being a 10x actuary.</p>
-
-</ul>
-
-<li><p><a href="/blog/julia-actuaries/">Julia for Actuaries</a> </p>
-<ul>
-<li><p>Why Julia works so well for actuarial science. </p>
-
-</ul>
-
-<li><p><a href="/blog/julia-getting-started-actuaries/">Getting Started with Julia for Actuaries</a></p>
-<ul>
-<li><p>Getting started with Julia with a bent towards things actuaries care about.</p>
-
-</ul>
-
-<li><p><a href="/blog/life-modeling-problem/">The Life Modeling Problem: A Comparison of Julia, Rust, Python, and R</a> </p>
-<ul>
-<li><p>Why Julia works so well for actuarial science.</p>
-
-</ul>
-
-</ul>
-
-<em>Subscribe to new posts via the <a href=feed.xml >JuliaActuary RSS Feed <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width=16  height=16 ><path fill=none  d="M0 0h24v24H0z"/><path d="M3 3c9.941 0 18 8.059 18 18h-3c0-8.284-6.716-15-15-15V3zm0 7c6.075 0 11 4.925 11 11h-3a8 8 0 0 0-8-8v-3zm0 7a4 4 0 0 1 4 4H3v-4z"/></svg></a></em>
-
-<div class=page-foot >
-  <div class=copyright >
-    &copy; JuliaActuary Contributors. Last modified: October 26, 2021. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and <a href="https://julialang.org" >Julia</a>.
-  </div>
-</div>
-</div>
-    
-    
-        <script src="/libs/highlight/highlight.pack.js"></script>
-<script>hljs.initHighlightingOnLoad();hljs.configure({tabReplace: '    '});</script>
-
-    
-    <script data-goatcounter="https://juliaactuary.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+       2015 Valuation Basic Table (VBT) Smoker Distinct Table...</code></pre> </div> <li> <div class=code-carousel > <div class=top > <span class=dot  style="background:#ED594A;"></span> <span class=dot  style="background:#FDD800;"></span> <span class=dot  style="background:#5AC05A;"></span> <span class=code-example-head  >JuliaActuary Example</span> </div> <pre><code class="julia-repl hljs"><span class=hljs-meta >julia&gt;</span><span class=language-julia > <span class=hljs-keyword >using</span> Yields
+</span>
+<span class=hljs-meta >julia&gt;</span><span class=language-julia > maturities = [<span class=hljs-number >0.5</span>, <span class=hljs-number >1.0</span>, <span class=hljs-number >1.5</span>, <span class=hljs-number >2.0</span>]
+</span><span class=hljs-meta >julia&gt;</span><span class=language-julia > rates      = [<span class=hljs-number >5.0</span>, <span class=hljs-number >5.8</span>, <span class=hljs-number >6.4</span>, <span class=hljs-number >6.8</span>] ./ <span class=hljs-number >100</span>
+</span>
+<span class=hljs-meta >julia&gt;</span><span class=language-julia > rf_curve = Yields.Zero(rates,maturities)
+</span>
+               ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀Yield Curve (Yields.YieldCurve)⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+               ┌────────────────────────────────────────────────────────────┐
+           0.4 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ Zero rates
+               │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+               │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+               │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⡠⠤⠒⠋│
+               │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⠤⠖⠊⠉⠁⠀⠀⠀⠀│
+               │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⡤⠔⠒⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+               │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⡠⠤⠒⠊⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+   Periodic(1) │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⡠⠤⠖⠊⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+               │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⡠⠤⠖⠊⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+               │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⡠⠤⠒⠊⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+               │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⡤⠤⠒⠋⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+               │⠀⠀⠀⠀⠀⠀⠀⣀⡠⠤⠖⠒⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+               │⠀⢀⡠⠤⠒⠋⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+               │⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+             0 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+               └────────────────────────────────────────────────────────────┘
+               ⠀0⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀time⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀30⠀</code></pre> </div> <li> <div class=code-carousel > <div class=code-carousel > <div class=top > <span class=dot  style="background:#ED594A;"></span> <span class=dot  style="background:#FDD800;"></span> <span class=dot  style="background:#5AC05A;"></span> <span class=code-example-head  >JuliaActuary Example</span> </div> <pre><code class="julia-repl hljs"><span class=hljs-meta >julia&gt;</span><span class=language-julia > <span class=hljs-keyword >using</span> ActuaryUtilities
+</span>
+<span class=hljs-meta >julia&gt;</span><span class=language-julia > cashflows = [<span class=hljs-number >5</span>, <span class=hljs-number >5</span>, <span class=hljs-number >105</span>]
+</span><span class=hljs-meta >julia&gt;</span><span class=language-julia > discount_rate = <span class=hljs-number >0.03</span>
+</span>
+<span class=hljs-meta >julia&gt;</span><span class=language-julia > present_value(discount_rate, cashflows)           
+</span>105.65
+
+<span class=hljs-meta >julia&gt;</span><span class=language-julia > duration(Macaulay(), discount_rate, cashflows)    
+</span>2.86
+
+<span class=hljs-meta >julia&gt;</span><span class=language-julia > duration(discount_rate, cashflows)                
+</span>2.78
+
+<span class=hljs-meta >julia&gt;</span><span class=language-julia > convexity(discount_rate, cashflows)               
+</span>10.62</code></pre> </div> <li> <div class=code-carousel > <div class=code-carousel > <div class=top > <span class=dot  style="background:#ED594A;"></span> <span class=dot  style="background:#FDD800;"></span> <span class=dot  style="background:#5AC05A;"></span> <span class=code-example-head  >JuliaActuary Example</span> </div> <pre><code class="julia hljs"><span class=hljs-keyword >using</span> LifeContingencies
+<span class=hljs-keyword >using</span> MortalityTables
+<span class=hljs-keyword >using</span> Yields
+
+<span class=hljs-comment ># load mortality rates from MortalityTables.jl</span>
+vbt2015 = MortalityTables.table(<span class=hljs-string >&quot;2015 VBT Smoker Distinct Male Non-Smoker ALB&quot;</span>)
+
+issue_age = <span class=hljs-number >30</span>
+life = SingleLife(                       <span class=hljs-comment ># The life underlying the risk</span>
+    mort = vbt2015.select[issue_age],    <span class=hljs-comment ># -- Mortality rates</span>
+)
+
+yield = Yields.Constant(<span class=hljs-number >0.05</span>)            <span class=hljs-comment ># Using a flat 5% interest rate</span>
+
+ins = Insurance(life, yield)             <span class=hljs-comment ># alternate way to construct</span>
+
+<span class=hljs-comment ># Summary Scalars</span>
+present_value(ins)                       <span class=hljs-comment ># The actuarial present value</span>
+premium_net(lc)                          <span class=hljs-comment ># Net whole life premium </span>
+V(lc,<span class=hljs-number >5</span>)                                  <span class=hljs-comment ># Net premium reserve for whole life insurance at time 5</span></code></pre> </div> </ul> <button type=button  class=slider-nav ></button> <button type=button  class="slider-nav slider-nav-next"></button> <div class=slider-indicators > <button class=active ></button> <button></button> <button></button> <button></button> </div> </div> <h1 id=packages ><a href="#packages" class=header-anchor >Packages</a></h1> <p>These packages are available for use in your project.</p> <p><a href="/packages/#mortalitytablesjl"><code>MortalityTables.jl</code></a></p> <ul> <li><p>Easily work with standard <a href="https://mort.soa.org/">mort.SOA.org</a> tables and parametric models with common survival calculations.</p> </ul> <p><a href="/packages/#lifecontingenciesjl"><code>LifeContingencies.jl</code></a></p> <ul> <li><p>Insurance, annuity, premium, and reserve maths.</p> </ul> <p><a href="/packages/#actuaryutilitiesjl"><code>ActuaryUtilities.jl</code></a></p> <ul> <li><p>Robust and fast calculations for <code>internal_rate_of_return</code>, <code>duration</code>, <code>convexity</code>, <code>present_value</code>, <code>breakeven</code>, and more. </p> </ul> <p><a href="/packages/#yieldsjl"><code>Yields.jl</code></a></p> <ul> <li><p>Simple and composable yield curves and calculations.</p> </ul> <p><a href="/packages/#experienceanalysisjl"><code>ExperienceAnalysis.jl</code></a></p> <ul> <li><p>Meeting your exposure calculation needs.</p> </ul> <h1 id=juliaactuary_community ><a href="#juliaactuary_community" class=header-anchor >JuliaActuary Community</a></h1> <p>If you want to:</p> <ul> <li><p>Learn Julia or the basics of programming</p> <li><p>See actuarial usage and examples</p> <li><p>Integrate with R or Python code</p> <li><p>Contribute to JuliaActuary</p> <li><p>Get help and ask questions</p> </ul> <p>Then check out the <a href="/community">Community</a> page&#33;</p> <h1 id=blog ><a href="#blog" class=header-anchor >Blog</a></h1> <ul> <li><p><a href="/blog/coding-for-the-future/">Coding the Future</a></p> <ul> <li><p>Building the insurance company of tomorrow by being a 10x actuary.</p> </ul> <li><p><a href="/blog/julia-actuaries/">Julia for Actuaries</a> </p> <ul> <li><p>Why Julia works so well for actuarial science. </p> </ul> <li><p><a href="/blog/julia-getting-started-actuaries/">Getting Started with Julia for Actuaries</a></p> <ul> <li><p>Getting started with Julia with a bent towards things actuaries care about.</p> </ul> <li><p><a href="/blog/life-modeling-problem/">The Life Modeling Problem: A Comparison of Julia, Rust, Python, and R</a> </p> <ul> <li><p>Why Julia works so well for actuarial science.</p> </ul> </ul> <em>Subscribe to new posts via the <a href=feed.xml >JuliaActuary RSS Feed <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width=16  height=16 ><path fill=none  d="M0 0h24v24H0z"/><path d="M3 3c9.941 0 18 8.059 18 18h-3c0-8.284-6.716-15-15-15V3zm0 7c6.075 0 11 4.925 11 11h-3a8 8 0 0 0-8-8v-3zm0 7a4 4 0 0 1 4 4H3v-4z"/></svg></a></em> <div class=page-foot > The packages in JuliaActuary are open-source and liberally licensed (MIT License) to allow wide private and commercial usage of the packages, like the base Julia language and many other packages in the ecosystem. <div class=copyright > &copy; JuliaActuary Contributors. Last modified: December 19, 2021. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and <a href="https://julialang.org">Julia</a>. </div> </div></div> <script data-goatcounter="https://juliaactuary.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
