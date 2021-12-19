@@ -4,18 +4,23 @@
 <!-- =============================
      ABOUT
     ============================== -->
+**JuliaActuary** is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.
 
+**Julia** is [an ideal language for Actuaries](/blog/julia-actuaries/) and other financial professionals.
+
+
+It is free, open-source software and you can [join the development on Github]("https://github.com/JuliaActuary/").
 
 ~~~
 
-<div class="swiffy-slider slider-item-reveal slider-nav-autoplay" data-slider-nav-autoplay-interval="7500">
+<div class="swiffy-slider slider-item-reveal slider-nav-autoplay slider-nav-autopause slider-nav-dark slider-indicators-dark " data-slider-nav-autoplay-interval="7500">
     <ul class="slider-container">
         <li>
         <div class="code-carousel">
           <div class="top">
-    <span class="dot"></span>
-    <span class="dot"></span>
-    <span class="dot"></span>
+      <span class="dot" style="background:#ED594A;"></span>
+      <span class="dot" style="background:#FDD800;"></span>
+      <span class="dot" style="background:#5AC05A;"></span>
     <span class="code-example-head" >JuliaActuary Example</span>
   </div>
 ~~~
@@ -45,9 +50,9 @@ MortalityTable (Insured Lives Mortality):
         <li>
         <div class="code-carousel">
           <div class="top">
-    <span class="dot"></span>
-    <span class="dot"></span>
-    <span class="dot"></span>
+      <span class="dot" style="background:#ED594A;"></span>
+      <span class="dot" style="background:#FDD800;"></span>
+      <span class="dot" style="background:#5AC05A;"></span>
         <span class="code-example-head" >JuliaActuary Example</span>
   </div>
 
@@ -91,9 +96,9 @@ julia> rf_curve = Yields.Zero(rates,maturities)
         <div class="code-carousel">
                 <div class="code-carousel">
           <div class="top">
-    <span class="dot"></span>
-    <span class="dot"></span>
-    <span class="dot"></span>
+      <span class="dot" style="background:#ED594A;"></span>
+      <span class="dot" style="background:#FDD800;"></span>
+      <span class="dot" style="background:#5AC05A;"></span>
         <span class="code-example-head" >JuliaActuary Example</span>
   </div>
 ~~~
@@ -126,9 +131,9 @@ julia> convexity(discount_rate, cashflows)
         <div class="code-carousel">
                 <div class="code-carousel">
           <div class="top">
-    <span class="dot"></span>
-    <span class="dot"></span>
-    <span class="dot"></span>
+      <span class="dot" style="background:#ED594A;"></span>
+      <span class="dot" style="background:#FDD800;"></span>
+      <span class="dot" style="background:#5AC05A;"></span>
         <span class="code-example-head" >JuliaActuary Example</span>
   </div>
 ~~~
@@ -175,15 +180,6 @@ V(lc,5)                                  # Net premium reserve for whole life in
 </div>
     
 ~~~
-# About
-
-> JuliaActuary is focused on building packages that enable actuaries everywhere to build solutions using open-source tools.
-
-**Julia** as a language works as [an ideal language for Actuaries and other financial professionals](/blog/julia-actuaries/). 
-
-**JuliaActuary** is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.
-
-It is free, open-source software and you can [join the development on Github]("https://github.com/JuliaActuary/").
 
 <!-- =============================
      PACKAGES
@@ -201,10 +197,10 @@ These packages are available for use in your project.
 [`ActuaryUtilities.jl`](#actuaryutilitiesjl)
 - Robust and fast calculations for `internal_rate_of_return`, `duration`, `convexity`, `present_value`, `breakeven`, and more. 
 
-[`Yields.jl`](#yieldsjl)※
+[`Yields.jl`](#yieldsjl)
 - Simple and composable yield curves and calculations.
 
-[`ExperienceAnalysis.jl`](#experienceanalysisjl)※
+[`ExperienceAnalysis.jl`](#experienceanalysisjl)
 - Meeting your exposure calculation needs.
 
 
