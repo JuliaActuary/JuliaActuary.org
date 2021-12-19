@@ -188,19 +188,19 @@ V(lc,5)                                  # Net premium reserve for whole life in
 
 These packages are available for use in your project.
 
-[`MortalityTables.jl`](/packages#mortalitytablesjl)
+[`MortalityTables.jl`](/packages/#mortalitytablesjl)
   - Easily work with standard [mort.SOA.org](https://mort.soa.org/) tables and parametric models with common survival calculations.
 
-[`LifeContingencies.jl`](#lifecontingenciesjl)
+[`LifeContingencies.jl`](/packages/#lifecontingenciesjl)
 - Insurance, annuity, premium, and reserve maths.
 
-[`ActuaryUtilities.jl`](#actuaryutilitiesjl)
+[`ActuaryUtilities.jl`](/packages/#actuaryutilitiesjl)
 - Robust and fast calculations for `internal_rate_of_return`, `duration`, `convexity`, `present_value`, `breakeven`, and more. 
 
-[`Yields.jl`](#yieldsjl)
+[`Yields.jl`](/packages/#yieldsjl)
 - Simple and composable yield curves and calculations.
 
-[`ExperienceAnalysis.jl`](#experienceanalysisjl)
+[`ExperienceAnalysis.jl`](/packages/#experienceanalysisjl)
 - Meeting your exposure calculation needs.
 
 
