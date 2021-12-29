@@ -8,6 +8,12 @@
     <priority>0.5</priority>
 </url>
 <url>
+    <loc>https://JuliaActuary.org/tutorials/exposure_calculation/index.html</loc>
+    <lastmod>2021-12-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+</url>
+<url>
     <loc>https://JuliaActuary.org/tutorials/retention/index.html</loc>
     <lastmod>2021-12-29</lastmod>
     <changefreq>monthly</changefreq>
@@ -33,6 +39,12 @@
 </url>
 <url>
     <loc>https://JuliaActuary.org/index.html</loc>
+    <lastmod>2021-12-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+</url>
+<url>
+    <loc>https://JuliaActuary.org/blog/life-modeling-problem/index.html</loc>
     <lastmod>2021-12-29</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
