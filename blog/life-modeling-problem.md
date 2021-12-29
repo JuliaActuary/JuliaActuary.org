@@ -92,7 +92,7 @@ Why did APL take off for Actuaries and not APL? I think [expressiveness](https:/
 
 What is boiler-plate? It's writing a lot of code supporting the main idea, but straying from a simple mathematical formulation. For example, in high performance object-oriented languages (C#/C++/Java), the idiomatic code might involve a special class. See, for example this C# code to count substrings:
 
-```C#
+```csharp
 using System;
  
 class SubStringTestClass
@@ -153,7 +153,6 @@ Times are nanoseconds:
 └────────────────┴─────────────┴───────────────┴──────────┴──────────┘
 ```
 
-\output{./code/lmp/loaddata}
 
 To aid in visualizing results with such vast different orders of magnitude, this graph includes a physical length comparison to serve as a reference. The computation time is represented by the distance that light travels in the time for the computation to complete (comparing a nanosecond to one foot length [goes at least back to Admiral Grace Hopper](https://www.youtube.com/watch?v=9eyFDBPk4Yw)).
 
@@ -418,9 +417,6 @@ The accumulator approach
 vectors and allocations
 talk about stack/heap?
 pick a faster approach and explain why it's even faster.
-
-
-
 
 ## Colophon
 
