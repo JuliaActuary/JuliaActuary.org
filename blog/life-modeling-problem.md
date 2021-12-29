@@ -205,7 +205,7 @@ R scores well here - [non-standard evaluation](http://adv-r.had.co.nz/Computing-
 
 R works in notebook environments and from a REPL.
 
-One negative about R's flexibility is the fact that the language is [AGPL licensed](https://www.r-project.org/Licenses/AGPL-3), meaning that there are quite a few restrictions. For example, if you write code that relies on R and it's part of your underwriting pipeline, you would need to provide the source code for your application to the users of your website or application[^6]. The other languages discussed on this page have much more permissive licenses.
+One negative about R's flexibility is the fact that the language is [GPL licensed](https://www.r-project.org/Licenses/AGPL-3), meaning that there are quite a few restrictions. For example, if you distribute an application that relies on R (e.g. it becomes part of your sales platform distributed to agents) you would need to be able to provide the source code for your application to the said users[^6]. The other languages discussed on this page have much more permissive licenses.
 
 ##### Readability
 
