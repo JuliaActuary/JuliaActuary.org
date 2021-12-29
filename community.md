@@ -31,6 +31,7 @@ Each package includes examples on the Github site and in the documentation.
 ### Walkthroughs and tutorials 
 
 - [Getting MortalityTables.jl data into a dataframes](/tutorials/MortalityTablesDataFrame/) 
+- [Exposure Calculation with ExperienceAnalysis.jl](/tutorials/exposure_calculation/)
 
 ### Benchmarks
 
