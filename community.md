@@ -34,6 +34,7 @@ Each package includes examples on the Github site and in the documentation.
 - [Exposure Calculation with ExperienceAnalysis.jl](/tutorials/exposure_calculation/)
 - [Fitting Survival Data](/tutorials/SurvivalFitting/)
 - [Stochastic Mortality Projections](/tutorials/StochasticMortality/)
+- [Bayesian Markov-Chain-Monte-Carlo and Claims Data](/tutorials/Bayesian/)
 
 ### Benchmarks
 
