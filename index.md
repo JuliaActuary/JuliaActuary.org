@@ -9,7 +9,7 @@
 **Julia** is [an ideal language for Actuaries](/blog/julia-actuaries/) and other financial professionals.
 
 
-It is free, open-source software and you can [join the development on Github]("https://github.com/JuliaActuary/").
+It is free, open-source software and you can [join the development on Github](https://github.com/JuliaActuary/).
 
 ~~~
 
