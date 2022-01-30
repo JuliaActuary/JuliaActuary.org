@@ -3,91 +3,97 @@
 
 <url>
     <loc>https://JuliaActuary.org/blog/coding-for-the-future/index.html</loc>
-    <lastmod>2022-01-04</lastmod>
+    <lastmod>2022-01-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
 <url>
     <loc>https://JuliaActuary.org/tutorials/exposure_calculation/index.html</loc>
-    <lastmod>2022-01-04</lastmod>
+    <lastmod>2022-01-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
 <url>
     <loc>https://JuliaActuary.org/tutorials/retention/index.html</loc>
-    <lastmod>2022-01-04</lastmod>
+    <lastmod>2022-01-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
 <url>
     <loc>https://JuliaActuary.org/blog/julia-actuaries/index.html</loc>
-    <lastmod>2022-01-04</lastmod>
+    <lastmod>2022-01-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
 <url>
     <loc>https://JuliaActuary.org/community/index.html</loc>
-    <lastmod>2022-01-04</lastmod>
+    <lastmod>2022-01-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
 <url>
     <loc>https://JuliaActuary.org/tutorials/PolicyDiffEq/index.html</loc>
-    <lastmod>2022-01-04</lastmod>
+    <lastmod>2022-01-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
 <url>
     <loc>https://JuliaActuary.org/index.html</loc>
-    <lastmod>2022-01-04</lastmod>
+    <lastmod>2022-01-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
 <url>
     <loc>https://JuliaActuary.org/blog/life-modeling-problem/index.html</loc>
-    <lastmod>2022-01-04</lastmod>
+    <lastmod>2022-01-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
 <url>
     <loc>https://JuliaActuary.org/tutorials/MortalityTableComparison/index.html</loc>
-    <lastmod>2022-01-04</lastmod>
+    <lastmod>2022-01-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
 <url>
     <loc>https://JuliaActuary.org/benchmarks/index.html</loc>
-    <lastmod>2022-01-04</lastmod>
+    <lastmod>2022-01-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
 <url>
     <loc>https://JuliaActuary.org/tutorials/MortalityTablesDataFrame/index.html</loc>
-    <lastmod>2022-01-04</lastmod>
+    <lastmod>2022-01-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
 <url>
     <loc>https://JuliaActuary.org/tutorials/PlutoESG/index.html</loc>
-    <lastmod>2022-01-04</lastmod>
+    <lastmod>2022-01-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
 <url>
     <loc>https://JuliaActuary.org/blog/julia-getting-started-actuaries/index.html</loc>
-    <lastmod>2022-01-04</lastmod>
+    <lastmod>2022-01-30</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+</url>
+<url>
+    <loc>https://JuliaActuary.org/tutorials/USTreasury/index.html</loc>
+    <lastmod>2022-01-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
 <url>
     <loc>https://JuliaActuary.org/tutorials/CashflowAnalysis/index.html</loc>
-    <lastmod>2022-01-04</lastmod>
+    <lastmod>2022-01-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
 <url>
     <loc>https://JuliaActuary.org/packages/index.html</loc>
-    <lastmod>2022-01-04</lastmod>
+    <lastmod>2022-01-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
