@@ -17,19 +17,15 @@ These packages are available for use in your project. Scroll down for more infor
 [`ActuaryUtilities.jl`](/packages/#actuaryutilitiesjl)
 - Robust and fast calculations for `internal_rate_of_return`, `duration`, `convexity`, `present_value`, `breakeven`, and more. 
 
-[`Yields.jl`](/packages/#yieldsjl)※
+[`Yields.jl`](/packages/#yieldsjl)
 - Simple and composable yield curves and calculations.
 
-[`ExperienceAnalysis.jl`](/packages/#experienceanalysisjl)※
+[`ExperienceAnalysis.jl`](/packages/#experienceanalysisjl)
 - Meeting your exposure calculation needs.
 
 
 ~~~
 <div class="alert alert-info">
- 
-
-<p><strong>Note:</strong> packages marked with ※ are developing: the functionality is built-out and tested, but the API may change. </p>
-
 <p>For consistency, you can lock any package in its current state and not worry about breaking changes to any code that you write. Julia's package manager lets you <a href="https://julialang.github.io/Pkg.jl/v1/toml-files/#Manifest.toml-1" >exactly recreate a set of code and its dependencies.</a> (<a href="https://stackoverflow.com/questions/63485891/how-do-i-ensure-repeatability-of-julia-code-and-assoicated-dependencies">More</a>).</p>
 </div>
 ~~~
@@ -155,7 +151,26 @@ survival(m,20,25) # the five year survival rate
 
 > A collection of common functions/manipulations used in Actuarial Calculations.
 
-### Financial Maths
+A collection of common functions/manipulations used in Actuarial Calculations.
+
+## Quickstart
+
+```julia
+cfs = [5, 5, 105]
+times    = [1, 2, 3]
+
+discount_rate = 0.03
+
+present_value(discount_rate, cfs, times)           # 105.65
+duration(Macaulay(), discount_rate, cfs, times)    #   2.86
+duration(discount_rate, cfs, times)                #   2.78
+convexity(discount_rate, cfs, times)               #  10.62
+```
+
+### Features
+
+#### Financial Maths
+
 - `duration`:
   - Calculate the `Macaulay`, `Modified`, or `DV01` durations for a set of cashflows
 - `convexity` for price sensitivity
@@ -164,17 +179,20 @@ survival(m,20,25) # the five year survival rate
 - `breakeven` to calculate the breakeven time for a set of cashflows
 - `accum_offset` to calculate accumulations like survivorship from a mortality vector
 
-### Risk Measures
+#### Options Pricing
+
+- `eurocall` and `europut` for Black-Scholes option prices
+
+#### Risk Measures
 
 - Calculate risk measures for a given vector of risks:
   - `CTE` for the Conditional Tail Expectation, or
   - `VaR` for the percentile/Value at Risk.
 
-### Insurance mechanics
+#### Insurance mechanics
 
 - `duration`:
   - Calculate the duration given an issue date and date (a.k.a. policy duration)
-  
 \\
 [ActuaryUtilities package on GitHub 🡭](https://github.com/JuliaActuary/ActuaryUtilities.jl)
 
@@ -248,7 +266,7 @@ cashflows(ins)                     # A vector of the unit cashflows
 timepoints(ins)                    # The timepoints associated with the cashflows
 survival(ins)                      # The survival vector
 benefit(ins)                       # The unit benefit vector
-probability(ins)                   # The probability of beneift payment
+probability(ins)                   # The probability of benefit payment
 ```
 
 Or calculate summary scalars:
@@ -292,7 +310,7 @@ SingleLife(mort=vbt2001.select,issue_age = 50) # mort can also be a keyword
 
 > Flexible and composable yield curves and interest functions.
 
-Provides a simple interface for constructing, manipulating, and using yield curves for modeling purposes. Includes bootstrapping methods and kernel methods like Smith-Wilson, which is used in Solvency II reporting.
+**Yields** provides a simple interface for constructing, manipulating, and using yield curves for modeling purposes.
 
 It's intended to provide common functionality around modeling interest rates, spreads, and miscellaneous yields across the JuliaActuary ecosystem (though not limited to use in JuliaActuary packages).
 
@@ -302,7 +320,7 @@ It's intended to provide common functionality around modeling interest rates, sp
 using Yields
 
 riskfree_maturities = [0.5, 1.0, 1.5, 2.0]
-riskfree    = [5.0, 5.8, 6.4, 6.8] ./ 100     #spot rates
+riskfree    = [5.0, 5.8, 6.4, 6.8] ./ 100     #spot rates, annual effective if unspecified
 
 spread_maturities = [0.5, 1.0, 1.5, 3.0]      # different maturities
 spread    = [1.0, 1.8, 1.4, 1.8] ./ 100       # spot spreads
@@ -313,7 +331,97 @@ spread_curve = Yields.Zero(spread,spread_maturities)
 
 yield = rf_curve + spread_curve               # additive combination of the two curves
 
-discount(yield,1.0) # 1 / (1 + 0.058 + 0.018)
+discount(yield,1.5) # 1 / (1 + 0.064 + 0.014) ^ 1.5
+```
+
+### Usage
+
+#### Rates
+
+Rates are types that wrap scalar values to provide information about how to determine `discount` and `accumulation` factors.
+
+There are two `CompoundingFrequency` types:
+
+- `Yields.Periodic(m)` for rates that compound `m` times per period (e.g. `m` times per year if working with annual rates).
+- `Yields.Continuous()` for continuously compounding rates.
+
+##### Examples
+
+```julia
+Yields.Continuous(0.05)       # 5% continuously compounded
+Yields.Periodic(0.05,2)       # 5% compounded twice per period
+```
+
+These are both subtypes of the parent `Rate` type and are instantiated as:
+
+```julia
+Yields.Rate(0.05,Continuous())       # 5% continuously compounded
+Yields.Rate(0.05,Periodic(2))        # 5% compounded twice per period
+```
+
+Broadcast over a vector to create `Rates` with the given compounding:
+
+```
+Yields.Periodic.([0.02,0.03,0.04],2) 
+Yields.Continuous.([0.02,0.03,0.04]) 
+```
+
+#### Yields
+
+There are a several ways to construct a yield curve object.
+
+##### Bootstrapping Methods
+
+`rates` can be a vector of `Rate`s described above, or will assume `Yields.Periodic(1)` if the functions are given `Real` number values
+
+- `Yields.Zero(rates,maturities)`  using a vector of zero, or spot, rates
+- `Yields.Forward(rates,maturities)` using a vector of one-period (or `periods`-long) forward rates
+- `Yields.Constant(rate)` takes a single constant rate for all times
+- `Yields.Step(rates,maturities)` doesn't interpolate - the rate is flat up to the corresponding time in `times`
+- `Yields.Par(rates,maturities)` takes a series of yields for securities priced at par.Assumes that maturities <= 1 year do not pay coupons and that after one year, pays coupons with frequency equal to the CompoundingFrequency of the corresponding rate.
+- `Yields.CMT(rates,maturities)` takes the most commonly presented rate data (e.g. [Treasury.gov](https://www.treasury.gov/resource-center/data-chart-center/interest-rates/Pages/TextView.aspx?data=yield)) and bootstraps the curve given the combination of bills and bonds.
+- `Yields.OIS(rates,maturities)` takes the most commonly presented rate data for overnight swaps and bootstraps the curve.
+
+##### Kernel Methods
+
+- `Yields.SmithWilson` curve (used for [discounting in the EU Solvency II framework](https://www.eiopa.europa.eu/sites/default/files/risk_free_interest_rate/12092019-technical_documentation.pdf)) can be constructed either directly by specifying its inner representation or by calibrating to a set of cashflows with known prices.
+  - These cashflows can conveniently be constructed with a Vector of `Yields.ZeroCouponQuote`s, `Yields.SwapQuote`s, or `Yields.BulletBondQuote`s.
+
+#### Functions
+
+Most of the above yields have the following defined (goal is to have them all):
+
+- `discount(curve,from,to)` or `discount(curve,to)` gives the discount factor
+- `accumulation(curve,from,to)` or `accumulation(curve,to)` gives the accumulation factor
+- `forward(curve,from,to)` gives the average rate between the two given times
+- `zero(curve,time)` or `zero(curve,time,CompoundingFrequency)` gives the zero-coupon spot rate for the given time.
+
+#### Combinations
+
+Different yield objects can be combined with addition or subtraction. See the [Quickstart](#quickstart) for an example.
+
+When adding a `Yields.AbstractYield` with a scalar or vector, that scalar or vector will be promoted to a yield type via [`Yield()`](#yield). For example:
+
+```julia
+y1 = Yields.Constant(0.05)
+y2 = y1 + 0.01                # y2 is a yield of 0.06
+```
+
+#### Forward Starting Curves
+
+Constructed curves can be shifted so that a future timepoint becomes the effective time-zero for a said curve.
+
+```julia-repl
+julia> zero = [5.0, 5.8, 6.4, 6.8] ./ 100
+julia> maturity = [0.5, 1.0, 1.5, 2.0]
+julia> curve = Yields.Zero(zero, maturity)
+julia> fwd = Yields.ForwardStarting(curve, 1.0)
+
+julia> discount(curve,1,2)
+0.9275624570410582
+
+julia> discount(fwd,1) # `curve` has effectively been reindexed to `1.0`
+0.9275624570410582
 ```
 
 \\
