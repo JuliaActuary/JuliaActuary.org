@@ -1,4 +1,4 @@
-<!doctype html> <html lang=en > <meta charset=UTF-8 > <meta name=viewport  content="width=device-width, initial-scale=1"> <meta name=Description  content="Practical, extensible, and open-source actuarial modeling and analysis."> <meta property="og:description" content="Practical, extensible, and open-source actuarial modeling and analysis."> <meta property="og:image" content="/assets/logo_square.svg"> <link rel=stylesheet  href="/libs/highlight/github.min.css"> <link rel=stylesheet  href="/css/franklin.css"> <link rel=stylesheet  href="/css/basic.css"> <link rel=icon  href="/assets/favicon.png"> <title>Packages Overview | JuliaActuary</title> <link rel=apple-touch-icon  sizes=180x180  href="/assets/apple-touch-icon.png"> <link rel=icon  type="image/png" sizes=32x32  href="/assets/favicon-32x32.png"> <link rel=icon  type="image/png" sizes=16x16  href="/assets/favicon-16x16.png"> <link rel=manifest  href="/assets/site.webmanifest"> <script src="https://cdn.jsdelivr.net/npm/swiffy-slider@1.2.0/dist/js/swiffy-slider.min.js" crossorigin=anonymous  defer></script> <link href="/css/slider.css" rel=stylesheet > <header> <div class=blog-name > <a href="/"> <div class=blog-name-logo-container > <div class=blog-name-logo > <img src="/assets/logo_square.svg" alt=logo  height=100px  width=100px  /> </div> <div>JuliaActuary</div> </div> </a> <div class=tagline >Practical, extensible, and open-source actuarial modeling and analysis. </div> </div> <nav> <ul> <li><a href="/">Home</a> <li><a href="/packages">Packages</a> <ul> <li><a href="/packages/#mortalitytablesjl">MortalityTables.jl</a> <li><a href="/packages/#actuaryutilitiesjl">ActuaryUtilities.jl</a> <li><a href="/packages/#lifecontingenciesjl">LifeContingencies.jl</a> <li><a href="/packages/#yieldsjl">Yields.jl</a> <li><a href="/packages/#experienceanalysisjl">ExperienceAnalysis.jl</a> </ul> <li><a href="/community">Community</a> <ul> <li><a href="/community/#learn">Learn</a> <li><a href="/community/#integration_with_r_and_python">Integration</a> <li><a href="/community/#contributing">Contributing</a> </ul> <li><a href="/#blog">Blog</a> </ul> <img src="/assets/hamburger.svg" id=menu-icon > </nav> </header> <div class=franklin-content ><h1 id=packages ><a href="#packages" class=header-anchor >Packages</a></h1> <p>These packages are available for use in your project. Scroll down for more information on each one.</p> <p><a href="/packages/#mortalitytablesjl"><code>MortalityTables.jl</code></a></p> <ul> <li><p>Easily work with standard <a href="https://mort.soa.org/">mort.SOA.org</a> tables and parametric models with common survival calculations.</p> </ul> <p><a href="/packages/#lifecontingenciesjl"><code>LifeContingencies.jl</code></a></p> <ul> <li><p>Insurance, annuity, premium, and reserve maths.</p> </ul> <p><a href="/packages/#actuaryutilitiesjl"><code>ActuaryUtilities.jl</code></a></p> <ul> <li><p>Robust and fast calculations for <code>internal_rate_of_return</code>, <code>duration</code>, <code>convexity</code>, <code>present_value</code>, <code>breakeven</code>, and more. </p> </ul> <p><a href="/packages/#yieldsjl"><code>Yields.jl</code></a>※</p> <ul> <li><p>Simple and composable yield curves and calculations.</p> </ul> <p><a href="/packages/#experienceanalysisjl"><code>ExperienceAnalysis.jl</code></a>※</p> <ul> <li><p>Meeting your exposure calculation needs.</p> </ul> <div class="alert alert-info"> <p><strong>Note:</strong> packages marked with ※ are developing: the functionality is built-out and tested, but the API may change. </p> <p>For consistency, you can lock any package in its current state and not worry about breaking changes to any code that you write. Julia's package manager lets you <a href="https://julialang.github.io/Pkg.jl/v1/toml-files/#Manifest.toml-1" >exactly recreate a set of code and its dependencies.</a> (<a href="https://stackoverflow.com/questions/63485891/how-do-i-ensure-repeatability-of-julia-code-and-assoicated-dependencies">More</a>).</p> </div> <h2 id=adding_and_using_packages ><a href="#adding_and_using_packages" class=header-anchor >Adding and Using Packages</a></h2> <p>There are two ways to add packages:</p> <ul> <li><p>In the code itself: <code>using Pkg; Pkg.add&#40;&quot;MortalityTables&quot;&#41;</code></p> <li><p>In the <a href="https://docs.julialang.org/en/v1/stdlib/REPL/index.html">REPL</a>, hit <code>&#93;</code> to enter Pkg mode and type <code>add MortalityTables</code></p> </ul> <p>More info can be found at the <a href="https://julialang.github.io/Pkg.jl/v1/getting-started">Pkg manager documentation</a>.</p> <p>To use packages in your code:</p> <pre><code class="julia hljs"><span class=hljs-keyword >using</span> PackageName</code></pre>
+<!doctype html> <html lang=en > <meta charset=UTF-8 > <meta name=viewport  content="width=device-width, initial-scale=1"> <meta name=Description  content="Practical, extensible, and open-source actuarial modeling and analysis."> <meta property="og:description" content="Practical, extensible, and open-source actuarial modeling and analysis."> <meta property="og:image" content="/assets/logo_square.svg"> <link rel=stylesheet  href="/libs/highlight/github.min.css"> <link rel=stylesheet  href="/css/franklin.css"> <link rel=stylesheet  href="/css/basic.css"> <link rel=icon  href="/assets/favicon.png"> <title>Packages Overview | JuliaActuary</title> <link rel=apple-touch-icon  sizes=180x180  href="/assets/apple-touch-icon.png"> <link rel=icon  type="image/png" sizes=32x32  href="/assets/favicon-32x32.png"> <link rel=icon  type="image/png" sizes=16x16  href="/assets/favicon-16x16.png"> <link rel=manifest  href="/assets/site.webmanifest"> <script src="https://cdn.jsdelivr.net/npm/swiffy-slider@1.2.0/dist/js/swiffy-slider.min.js" crossorigin=anonymous  defer></script> <link href="/css/slider.css" rel=stylesheet > <header> <div class=blog-name > <a href="/"> <div class=blog-name-logo-container > <div class=blog-name-logo > <img src="/assets/logo_square.svg" alt=logo  height=100px  width=100px  /> </div> <div>JuliaActuary</div> </div> </a> <div class=tagline >Practical, extensible, and open-source actuarial modeling and analysis. </div> </div> <nav> <ul> <li><a href="/">Home</a> <li><a href="/packages">Packages</a> <ul> <li><a href="/packages/#mortalitytablesjl">MortalityTables.jl</a> <li><a href="/packages/#actuaryutilitiesjl">ActuaryUtilities.jl</a> <li><a href="/packages/#lifecontingenciesjl">LifeContingencies.jl</a> <li><a href="/packages/#yieldsjl">Yields.jl</a> <li><a href="/packages/#experienceanalysisjl">ExperienceAnalysis.jl</a> </ul> <li><a href="/community">Community</a> <ul> <li><a href="/community/#learn">Learn</a> <li><a href="/community/#integration_with_r_and_python">Integration</a> <li><a href="/community/#contributing">Contributing</a> </ul> <li><a href="/#blog">Blog</a> </ul> <img src="/assets/hamburger.svg" id=menu-icon > </nav> </header> <div class=franklin-content ><h1 id=packages ><a href="#packages" class=header-anchor >Packages</a></h1> <p>These packages are available for use in your project. Scroll down for more information on each one.</p> <p><a href="/packages/#mortalitytablesjl"><code>MortalityTables.jl</code></a></p> <ul> <li><p>Easily work with standard <a href="https://mort.soa.org/">mort.SOA.org</a> tables and parametric models with common survival calculations.</p> </ul> <p><a href="/packages/#lifecontingenciesjl"><code>LifeContingencies.jl</code></a></p> <ul> <li><p>Insurance, annuity, premium, and reserve maths.</p> </ul> <p><a href="/packages/#actuaryutilitiesjl"><code>ActuaryUtilities.jl</code></a></p> <ul> <li><p>Robust and fast calculations for <code>internal_rate_of_return</code>, <code>duration</code>, <code>convexity</code>, <code>present_value</code>, <code>breakeven</code>, and more. </p> </ul> <p><a href="/packages/#yieldsjl"><code>Yields.jl</code></a></p> <ul> <li><p>Simple and composable yield curves and calculations.</p> </ul> <p><a href="/packages/#experienceanalysisjl"><code>ExperienceAnalysis.jl</code></a></p> <ul> <li><p>Meeting your exposure calculation needs.</p> </ul> <div class="alert alert-info"> <p>For consistency, you can lock any package in its current state and not worry about breaking changes to any code that you write. Julia's package manager lets you <a href="https://julialang.github.io/Pkg.jl/v1/toml-files/#Manifest.toml-1" >exactly recreate a set of code and its dependencies.</a> (<a href="https://stackoverflow.com/questions/63485891/how-do-i-ensure-repeatability-of-julia-code-and-assoicated-dependencies">More</a>).</p> </div> <h2 id=adding_and_using_packages ><a href="#adding_and_using_packages" class=header-anchor >Adding and Using Packages</a></h2> <p>There are two ways to add packages:</p> <ul> <li><p>In the code itself: <code>using Pkg; Pkg.add&#40;&quot;MortalityTables&quot;&#41;</code></p> <li><p>In the <a href="https://docs.julialang.org/en/v1/stdlib/REPL/index.html">REPL</a>, hit <code>&#93;</code> to enter Pkg mode and type <code>add MortalityTables</code></p> </ul> <p>More info can be found at the <a href="https://julialang.github.io/Pkg.jl/v1/getting-started">Pkg manager documentation</a>.</p> <p>To use packages in your code:</p> <pre><code class="julia hljs"><span class=hljs-keyword >using</span> PackageName</code></pre>
 <h2 id=mortalitytablesjl ><a href="#mortalitytablesjl" class=header-anchor >MortalityTables.jl </a></h2>
 <blockquote>
 <p>Hassle-free mortality and other rate tables.</p>
@@ -79,7 +79,19 @@ survival(m,<span class=hljs-number >20</span>,<span class=hljs-number >25</span>
 <blockquote>
 <p>A collection of common functions/manipulations used in Actuarial Calculations.</p>
 </blockquote>
-<h3 id=financial_maths ><a href="#financial_maths" class=header-anchor >Financial Maths</a></h3>
+<p>A collection of common functions/manipulations used in Actuarial Calculations.</p>
+<h2 id=quickstart__2 ><a href="#quickstart__2" class=header-anchor >Quickstart</a></h2>
+<pre><code class="julia hljs">cfs = [<span class=hljs-number >5</span>, <span class=hljs-number >5</span>, <span class=hljs-number >105</span>]
+times    = [<span class=hljs-number >1</span>, <span class=hljs-number >2</span>, <span class=hljs-number >3</span>]
+
+discount_rate = <span class=hljs-number >0.03</span>
+
+present_value(discount_rate, cfs, times)           <span class=hljs-comment ># 105.65</span>
+duration(Macaulay(), discount_rate, cfs, times)    <span class=hljs-comment >#   2.86</span>
+duration(discount_rate, cfs, times)                <span class=hljs-comment >#   2.78</span>
+convexity(discount_rate, cfs, times)               <span class=hljs-comment >#  10.62</span></code></pre>
+<h3 id=features__2 ><a href="#features__2" class=header-anchor >Features</a></h3>
+<h4 id=financial_maths ><a href="#financial_maths" class=header-anchor >Financial Maths</a></h4>
 <ul>
 <li><p><code>duration</code>:</p>
 <ul>
@@ -98,7 +110,12 @@ survival(m,<span class=hljs-number >20</span>,<span class=hljs-number >25</span>
 <li><p><code>accum_offset</code> to calculate accumulations like survivorship from a mortality vector</p>
 
 </ul>
-<h3 id=risk_measures ><a href="#risk_measures" class=header-anchor >Risk Measures</a></h3>
+<h4 id=options_pricing ><a href="#options_pricing" class=header-anchor >Options Pricing</a></h4>
+<ul>
+<li><p><code>eurocall</code> and <code>europut</code> for Black-Scholes option prices</p>
+
+</ul>
+<h4 id=risk_measures ><a href="#risk_measures" class=header-anchor >Risk Measures</a></h4>
 <ul>
 <li><p>Calculate risk measures for a given vector of risks:</p>
 <ul>
@@ -109,7 +126,7 @@ survival(m,<span class=hljs-number >20</span>,<span class=hljs-number >25</span>
 </ul>
 
 </ul>
-<h3 id=insurance_mechanics ><a href="#insurance_mechanics" class=header-anchor >Insurance mechanics</a></h3>
+<h4 id=insurance_mechanics ><a href="#insurance_mechanics" class=header-anchor >Insurance mechanics</a></h4>
 <ul>
 <li><p><code>duration</code>:</p>
 <ul>
@@ -123,7 +140,7 @@ survival(m,<span class=hljs-number >20</span>,<span class=hljs-number >25</span>
 <blockquote>
 <p>Common life contingent calculations with a convenient interface.</p>
 </blockquote>
-<h3 id=features__2 ><a href="#features__2" class=header-anchor >Features</a></h3>
+<h3 id=features__3 ><a href="#features__3" class=header-anchor >Features</a></h3>
 <ul>
 <li><p>Integration with other JuliaActuary packages such as <a href="https://github.com/JuliaActuary/MortalityTables.jl">MortalityTables.jl</a></p>
 
@@ -193,7 +210,7 @@ ins = Insurance(life, yield)       <span class=hljs-comment ># alternate way to 
 timepoints(ins)                    <span class=hljs-comment ># The timepoints associated with the cashflows</span>
 survival(ins)                      <span class=hljs-comment ># The survival vector</span>
 benefit(ins)                       <span class=hljs-comment ># The unit benefit vector</span>
-probability(ins)                   <span class=hljs-comment ># The probability of beneift payment</span></code></pre>
+probability(ins)                   <span class=hljs-comment ># The probability of benefit payment</span></code></pre>
 <p>Or calculate summary scalars:</p>
 <pre><code class="julia hljs">present_value(ins)                 <span class=hljs-comment ># The actuarial present value</span>
 premium_net(lc)                    <span class=hljs-comment ># Net whole life premium </span>
@@ -216,13 +233,13 @@ SingleLife(mort=vbt2001.select,issue_age = <span class=hljs-number >50</span>) <
 <blockquote>
 <p>Flexible and composable yield curves and interest functions.</p>
 </blockquote>
-<p>Provides a simple interface for constructing, manipulating, and using yield curves for modeling purposes. Includes bootstrapping methods and kernel methods like Smith-Wilson, which is used in Solvency II reporting.</p>
+<p><strong>Yields</strong> provides a simple interface for constructing, manipulating, and using yield curves for modeling purposes.</p>
 <p>It&#39;s intended to provide common functionality around modeling interest rates, spreads, and miscellaneous yields across the JuliaActuary ecosystem &#40;though not limited to use in JuliaActuary packages&#41;.</p>
-<h3 id=quickstart__2 ><a href="#quickstart__2" class=header-anchor >Quickstart</a></h3>
+<h3 id=quickstart__3 ><a href="#quickstart__3" class=header-anchor >Quickstart</a></h3>
 <pre><code class="julia hljs"><span class=hljs-keyword >using</span> Yields
 
 riskfree_maturities = [<span class=hljs-number >0.5</span>, <span class=hljs-number >1.0</span>, <span class=hljs-number >1.5</span>, <span class=hljs-number >2.0</span>]
-riskfree    = [<span class=hljs-number >5.0</span>, <span class=hljs-number >5.8</span>, <span class=hljs-number >6.4</span>, <span class=hljs-number >6.8</span>] ./ <span class=hljs-number >100</span>     <span class=hljs-comment >#spot rates</span>
+riskfree    = [<span class=hljs-number >5.0</span>, <span class=hljs-number >5.8</span>, <span class=hljs-number >6.4</span>, <span class=hljs-number >6.8</span>] ./ <span class=hljs-number >100</span>     <span class=hljs-comment >#spot rates, annual effective if unspecified</span>
 
 spread_maturities = [<span class=hljs-number >0.5</span>, <span class=hljs-number >1.0</span>, <span class=hljs-number >1.5</span>, <span class=hljs-number >3.0</span>]      <span class=hljs-comment ># different maturities</span>
 spread    = [<span class=hljs-number >1.0</span>, <span class=hljs-number >1.8</span>, <span class=hljs-number >1.4</span>, <span class=hljs-number >1.8</span>] ./ <span class=hljs-number >100</span>       <span class=hljs-comment ># spot spreads</span>
@@ -233,13 +250,90 @@ spread_curve = Yields.Zero(spread,spread_maturities)
 
 yield = rf_curve + spread_curve               <span class=hljs-comment ># additive combination of the two curves</span>
 
-discount(yield,<span class=hljs-number >1.0</span>) <span class=hljs-comment ># 1 / (1 + 0.058 + 0.018)</span></code></pre>
+discount(yield,<span class=hljs-number >1.5</span>) <span class=hljs-comment ># 1 / (1 + 0.064 + 0.014) ^ 1.5</span></code></pre>
+<h3 id=usage ><a href="#usage" class=header-anchor >Usage</a></h3>
+<h4 id=rates ><a href="#rates" class=header-anchor >Rates</a></h4>
+<p>Rates are types that wrap scalar values to provide information about how to determine <code>discount</code> and <code>accumulation</code> factors.</p>
+<p>There are two <code>CompoundingFrequency</code> types:</p>
+<ul>
+<li><p><code>Yields.Periodic&#40;m&#41;</code> for rates that compound <code>m</code> times per period &#40;e.g. <code>m</code> times per year if working with annual rates&#41;.</p>
+
+<li><p><code>Yields.Continuous&#40;&#41;</code> for continuously compounding rates.</p>
+
+</ul>
+<h5 id=examples__2 ><a href="#examples__2" class=header-anchor >Examples</a></h5>
+<pre><code class="julia hljs">Yields.Continuous(<span class=hljs-number >0.05</span>)       <span class=hljs-comment ># 5% continuously compounded</span>
+Yields.Periodic(<span class=hljs-number >0.05</span>,<span class=hljs-number >2</span>)       <span class=hljs-comment ># 5% compounded twice per period</span></code></pre>
+<p>These are both subtypes of the parent <code>Rate</code> type and are instantiated as:</p>
+<pre><code class="julia hljs">Yields.Rate(<span class=hljs-number >0.05</span>,Continuous())       <span class=hljs-comment ># 5% continuously compounded</span>
+Yields.Rate(<span class=hljs-number >0.05</span>,Periodic(<span class=hljs-number >2</span>))        <span class=hljs-comment ># 5% compounded twice per period</span></code></pre>
+<p>Broadcast over a vector to create <code>Rates</code> with the given compounding:</p>
+<pre><code class="julia hljs">Yields.Periodic.([<span class=hljs-number >0.02</span>,<span class=hljs-number >0.03</span>,<span class=hljs-number >0.04</span>],<span class=hljs-number >2</span>) 
+Yields.Continuous.([<span class=hljs-number >0.02</span>,<span class=hljs-number >0.03</span>,<span class=hljs-number >0.04</span>])</code></pre>
+<h4 id=yields ><a href="#yields" class=header-anchor >Yields</a></h4>
+<p>There are a several ways to construct a yield curve object.</p>
+<h5 id=bootstrapping_methods ><a href="#bootstrapping_methods" class=header-anchor >Bootstrapping Methods</a></h5>
+<p><code>rates</code> can be a vector of <code>Rate</code>s described above, or will assume <code>Yields.Periodic&#40;1&#41;</code> if the functions are given <code>Real</code> number values</p>
+<ul>
+<li><p><code>Yields.Zero&#40;rates,maturities&#41;</code>  using a vector of zero, or spot, rates</p>
+
+<li><p><code>Yields.Forward&#40;rates,maturities&#41;</code> using a vector of one-period &#40;or <code>periods</code>-long&#41; forward rates</p>
+
+<li><p><code>Yields.Constant&#40;rate&#41;</code> takes a single constant rate for all times</p>
+
+<li><p><code>Yields.Step&#40;rates,maturities&#41;</code> doesn&#39;t interpolate - the rate is flat up to the corresponding time in <code>times</code></p>
+
+<li><p><code>Yields.Par&#40;rates,maturities&#41;</code> takes a series of yields for securities priced at par.Assumes that maturities &lt;&#61; 1 year do not pay coupons and that after one year, pays coupons with frequency equal to the CompoundingFrequency of the corresponding rate.</p>
+
+<li><p><code>Yields.CMT&#40;rates,maturities&#41;</code> takes the most commonly presented rate data &#40;e.g. <a href="https://www.treasury.gov/resource-center/data-chart-center/interest-rates/Pages/TextView.aspx?data&#61;yield">Treasury.gov</a>&#41; and bootstraps the curve given the combination of bills and bonds.</p>
+
+<li><p><code>Yields.OIS&#40;rates,maturities&#41;</code> takes the most commonly presented rate data for overnight swaps and bootstraps the curve.</p>
+
+</ul>
+<h5 id=kernel_methods ><a href="#kernel_methods" class=header-anchor >Kernel Methods</a></h5>
+<ul>
+<li><p><code>Yields.SmithWilson</code> curve &#40;used for <a href="https://www.eiopa.europa.eu/sites/default/files/risk_free_interest_rate/12092019-technical_documentation.pdf">discounting in the EU Solvency II framework</a>&#41; can be constructed either directly by specifying its inner representation or by calibrating to a set of cashflows with known prices.</p>
+<ul>
+<li><p>These cashflows can conveniently be constructed with a Vector of <code>Yields.ZeroCouponQuote</code>s, <code>Yields.SwapQuote</code>s, or <code>Yields.BulletBondQuote</code>s.</p>
+
+</ul>
+
+</ul>
+<h4 id=functions ><a href="#functions" class=header-anchor >Functions</a></h4>
+<p>Most of the above yields have the following defined &#40;goal is to have them all&#41;:</p>
+<ul>
+<li><p><code>discount&#40;curve,from,to&#41;</code> or <code>discount&#40;curve,to&#41;</code> gives the discount factor</p>
+
+<li><p><code>accumulation&#40;curve,from,to&#41;</code> or <code>accumulation&#40;curve,to&#41;</code> gives the accumulation factor</p>
+
+<li><p><code>forward&#40;curve,from,to&#41;</code> gives the average rate between the two given times</p>
+
+<li><p><code>zero&#40;curve,time&#41;</code> or <code>zero&#40;curve,time,CompoundingFrequency&#41;</code> gives the zero-coupon spot rate for the given time.</p>
+
+</ul>
+<h4 id=combinations ><a href="#combinations" class=header-anchor >Combinations</a></h4>
+<p>Different yield objects can be combined with addition or subtraction. See the <a href="#quickstart">Quickstart</a> for an example.</p>
+<p>When adding a <code>Yields.AbstractYield</code> with a scalar or vector, that scalar or vector will be promoted to a yield type via <a href="#yield"><code>Yield&#40;&#41;</code></a>. For example:</p>
+<pre><code class="julia hljs">y1 = Yields.Constant(<span class=hljs-number >0.05</span>)
+y2 = y1 + <span class=hljs-number >0.01</span>                <span class=hljs-comment ># y2 is a yield of 0.06</span></code></pre>
+<h4 id=forward_starting_curves ><a href="#forward_starting_curves" class=header-anchor >Forward Starting Curves</a></h4>
+<p>Constructed curves can be shifted so that a future timepoint becomes the effective time-zero for a said curve.</p>
+<pre><code class="julia-repl hljs"><span class=hljs-meta >julia&gt;</span><span class=language-julia > zero = [<span class=hljs-number >5.0</span>, <span class=hljs-number >5.8</span>, <span class=hljs-number >6.4</span>, <span class=hljs-number >6.8</span>] ./ <span class=hljs-number >100</span>
+</span><span class=hljs-meta >julia&gt;</span><span class=language-julia > maturity = [<span class=hljs-number >0.5</span>, <span class=hljs-number >1.0</span>, <span class=hljs-number >1.5</span>, <span class=hljs-number >2.0</span>]
+</span><span class=hljs-meta >julia&gt;</span><span class=language-julia > curve = Yields.Zero(zero, maturity)
+</span><span class=hljs-meta >julia&gt;</span><span class=language-julia > fwd = Yields.ForwardStarting(curve, <span class=hljs-number >1.0</span>)
+</span>
+<span class=hljs-meta >julia&gt;</span><span class=language-julia > discount(curve,<span class=hljs-number >1</span>,<span class=hljs-number >2</span>)
+</span>0.9275624570410582
+
+<span class=hljs-meta >julia&gt;</span><span class=language-julia > discount(fwd,<span class=hljs-number >1</span>) <span class=hljs-comment ># `curve` has effectively been reindexed to `1.0`</span>
+</span>0.9275624570410582</code></pre>
 <p><br/> <a href="https://github.com/JuliaActuary/Yields.jl">Yields package on GitHub 🡭</a></p>
 <h2 id=experienceanalysisjl ><a href="#experienceanalysisjl" class=header-anchor >ExperienceAnalysis.jl</a></h2>
 <blockquote>
 <p>Meeting your exposure calculation needs.</p>
 </blockquote>
-<h3 id=quickstart__3 ><a href="#quickstart__3" class=header-anchor >Quickstart</a></h3>
+<h3 id=quickstart__4 ><a href="#quickstart__4" class=header-anchor >Quickstart</a></h3>
 <pre><code class="julia hljs"><span class=hljs-keyword >using</span> ExperienceAnalysis
 <span class=hljs-keyword >using</span> Dates
 
@@ -364,7 +458,7 @@ exposure(basis, issue, termination)</code></pre>
   
   
   <div class=copyright >
-    &copy; JuliaActuary Contributors. Last modified: January 30, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and <a href="https://julialang.org">Julia</a>.
+    &copy; JuliaActuary Contributors. Last modified: February 20, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and <a href="https://julialang.org">Julia</a>.
   </div>
 </div></div>
     
