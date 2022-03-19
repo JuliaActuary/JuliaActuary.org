@@ -1,1 +1,23 @@
-Failed to precompile CSV [336ed68f-0bac-5ca0-87d4-7b16caf5d00b] to /home/runner/.julia/compiled/v1.7/CSV/jl_qIy5nJ.
+┌────────────────┬─────────────┬───────────────┬───────────────┬───────────────┐
+│       Language │   Algorithm │ Function name │        Median │          Mean │
+│                │             │               │ [nanoseconds] │ [nanoseconds] │
+├────────────────┼─────────────┼───────────────┼───────────────┼───────────────┤
+│ R (data.table) │  Vectorized │           npv │       770,554 │       842,767 │
+│              R │  Vectorized │      npv base │         4,264 │        46,617 │
+│              R │ Accumulator │      npv_loop │         4,346 │        62,276 │
+│           Rust │ Accumulator │          npv1 │            22 │            22 │
+│           Rust │ Accumulator │          npv2 │            14 │            14 │
+│           Rust │ Accumulator │          npv3 │             7 │             7 │
+│ Python (NumPy) │  Vectorized │           npv │       missing │        14,261 │
+│         Python │ Accumulator │      npv_loop │       missing │         2,314 │
+│ Python (Numba) │ Accumulator │     npv_numba │       missing │           626 │
+│          Julia │  Vectorized │          npv1 │           235 │           228 │
+│          Julia │  Vectorized │          npv2 │           236 │           218 │
+│          Julia │ Accumulator │          npv3 │            15 │            14 │
+│          Julia │ Accumulator │          npv4 │            11 │            11 │
+│          Julia │ Accumulator │          npv5 │            11 │            11 │
+│          Julia │ Accumulator │          npv6 │             9 │             9 │
+│          Julia │ Accumulator │          npv7 │             8 │             8 │
+│          Julia │ Accumulator │          npv8 │             7 │             7 │
+│          Julia │ Accumulator │          npv9 │             6 │             6 │
+└────────────────┴─────────────┴───────────────┴───────────────┴───────────────┘
