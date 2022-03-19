@@ -19,32 +19,45 @@ After the original user submitted a proposal, others chimed in and submitted ver
 
 Some submissions were excluded because from the benchmarks they involved an entirely different approach, such as [memoizing](https://en.wikipedia.org/wiki/Memoization) the function calls[^1].
 
-```plaintext
-Times are nanoseconds:
-┌────────────────┬─────────────┬───────────────┬──────────┬──────────┐
-│       Language │   Algorithm │ Function Name │   Median │     Mean │
-├────────────────┼─────────────┼───────────────┼──────────┼──────────┤
-│ R (data.table) │  Vectorized │           npv │ 770554.0 │ 842767.3 │
-│              R │  Vectorized │      npv base │   4264.0 │  46617.0 │
-│              R │ Accumulator │      npv_loop │   4346.0 │  62275.7 │
-│           Rust │ Accumulator │           npv │     24.0 │  missing │
-│ Python (NumPy) │  Vectorized │           npv │  missing │  14261.0 │
-│         Python │ Accumulator │      npv_loop │  missing │   2314.0 │
-│ Python (Numba) │ Accumulator │     npv_numba │  missing │    626.0 │
-│          Julia │  Vectorized │          npv1 │    235.3 │    228.2 │
-│          Julia │  Vectorized │          npv2 │    235.8 │    218.4 │
-│          Julia │ Accumulator │          npv3 │     14.5 │     14.5 │
-│          Julia │ Accumulator │          npv4 │     10.8 │     10.8 │
-│          Julia │ Accumulator │          npv5 │     11.5 │     11.5 │
-│          Julia │ Accumulator │          npv6 │      9.0 │      9.0 │
-│          Julia │ Accumulator │          npv7 │      7.9 │      7.9 │
-│          Julia │ Accumulator │          npv8 │      7.4 │      7.4 │
-│          Julia │ Accumulator │          npv9 │      6.4 │      6.4 │
-└────────────────┴─────────────┴───────────────┴──────────┴──────────┘
+
+```julia:./code/getdata
+#hideall
+using CSV, DataFrames
+using PrettyTables
+file = download("https://raw.githubusercontent.com/JuliaActuary/Learn/master/Benchmarks/LifeModelingProblem/benchmarks.csv")
+benchmarks = CSV.read(file,DataFrame)
+header = (["Language", "Algorithm", "Function name", "Median","Mean"],
+                 [ "",       "",    "",      "[nanoseconds]","[nanoseconds]"]);
+pretty_table(benchmarks;header,formatters = ft_printf("%'.1d"))
 ```
+\output{./code/getdata}
 
 To aid in visualizing results with such vast different orders of magnitude, this graph includes a physical length comparison to serve as a reference. The computation time is represented by the distance that light travels in the time for the computation to complete (comparing a nanosecond to one foot length [goes at least back to Admiral Grace Hopper](https://www.youtube.com/watch?v=9eyFDBPk4Yw)).
-![Life Modeling Problem Benchmarks](/blog/data/benchmarks.svg)
+
+```julia:.code/lmp_plot
+#hideall
+using Plots
+using DataFrames
+p = plot(palette = :seaborn_colorblind,rotation=25,yaxis=:log)
+# label equivalents to distance to make log scale more relatable
+scatter!(
+    fill("\n equivalents (ns → ft)",7),
+    [1,1e1,1e2,1e3,.8e4,0.72e5,3.3e6],
+    series_annotations=Plots.text.(["1 foot","basketball hoop","blue whale","Eiffel Tower","avg ocean depth","marathon distance","Space Station altitude"], :left, 8,:grey),marker=0,label="",left_margin=20Plots.mm,bottom_margin=8Plots.mm)
+
+# plot mean, or median if not available
+for g in groupby(benchmarks,:algorithm)
+    scatter!(p,g.lang,
+        ifelse.(ismissing.(g.mean),g.median,g.mean),
+        label="$(g.algorithm[1])",
+        ylabel="Nanoseconds (log scale)",
+    marker = (:circle, 5, 0.7, stroke(0)))
+end
+
+savefig(joinpath(@OUTPUT,"lmp_benchmarks.svg"))
+```
+
+\fig{.code/output/lmp_benchmarks.svg}
 
 ### Discussion
 
@@ -147,17 +160,16 @@ Platform Info:
 #### Rust
 
 ```
-1.53.0-nightly (b0c818c5e 2021-04-16)
+1.61.0-nightly (f103b2969 2022-03-12)
 ```
 
 #### Python
 
 ```
-Python 3.9.4 (default, Apr  9 2021, 09:32:38) 
-[Clang 10.0.0 ] :: Anaconda, Inc. on darwin
+Python 3.9.7
 
-numba                     0.53.1           py39hb2f4e1b_0
-numpy                     1.20.1           py39hd6e1bb9_0 
+numba                     0.54.1           py39hae1ba45_0
+numpy                     1.20.3           py39h4b4dc7a_0
 ```
 
 #### R
