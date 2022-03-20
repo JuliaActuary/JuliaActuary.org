@@ -4,6 +4,8 @@ using CSV, DataFrames
 using PrettyTables
 file = download("https://raw.githubusercontent.com/JuliaActuary/Learn/master/Benchmarks/LifeModelingProblem/benchmarks.csv")
 benchmarks = CSV.read(file,DataFrame)
-header = (["Language", "Algorithm", "Function name", "Median","Mean"],
-                 [ "",       "",    "",      "[nanoseconds]","[nanoseconds]"]);
+
+benchmarks.relative_mean = benchmarks.mean ./ minimum(benchmarks.mean)
+header = (["Language", "Algorithm", "Function name", "Median","Mean","Relative Mean"],
+                 [ "",       "",    "",      "[nanoseconds]","[nanoseconds]",""]);
 pretty_table(benchmarks;header,formatters = ft_printf("%'.1d"))
