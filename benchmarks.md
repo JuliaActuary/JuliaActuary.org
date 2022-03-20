@@ -34,7 +34,7 @@ pretty_table(benchmarks;header,formatters = ft_printf("%'.1d"))
 
 To aid in visualizing results with such vast different orders of magnitude, this graph includes a physical length comparison to serve as a reference. The computation time is represented by the distance that light travels in the time for the computation to complete (comparing a nanosecond to one foot length [goes at least back to Admiral Grace Hopper](https://www.youtube.com/watch?v=9eyFDBPk4Yw)).
 
-```julia:.code/lmp_plot
+```julia:lmp_plot
 #hideall
 using Plots
 using DataFrames
@@ -57,7 +57,7 @@ end
 savefig(joinpath(@OUTPUT,"lmp_benchmarks.svg"))
 ```
 
-\fig{.code/output/lmp_benchmarks.svg}
+\fig{lmp_benchmarks.svg}
 
 ### Discussion
 
