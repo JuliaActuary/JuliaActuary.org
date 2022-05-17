@@ -166,9 +166,9 @@ convexity(discount_rate, cfs, times)               <span class=hljs-comment >#  
 
 <li><p><code>Insurance&#40;life,yield,n&#41;</code>: Term life for <code>n</code> years</p>
 
-<li><p><code>ä&#40;life,yield&#41;</code>: Life contingent annuity due</p>
+<li><p><code>ä&#40;life,yield&#41;</code>: <code>present_value</code> of life-contingent annuity</p>
 
-<li><p><code>ä&#40;life,yield&#41;</code>: Life contingent annuity due for <code>n</code> years</p>
+<li><p><code>ä&#40;life,yield,n&#41;</code>: <code>present_value</code> of life-contingent annuity due for <code>n</code> years</p>
 
 </ul>
 
@@ -187,11 +187,10 @@ convexity(discount_rate, cfs, times)               <span class=hljs-comment >#  
 <pre><code class="julia hljs"><span class=hljs-keyword >using</span> LifeContingencies
 <span class=hljs-keyword >using</span> MortalityTables
 <span class=hljs-keyword >using</span> Yields
-<span class=hljs-keyword >import</span> LifeConingencies: V, ä      <span class=hljs-comment ># pull the shortform notation into scope</span>
+<span class=hljs-keyword >import</span> LifeContingencies: V, ä     <span class=hljs-comment ># pull the shortform notation into scope</span>
 
 <span class=hljs-comment ># load mortality rates from MortalityTables.jl</span>
-tbls = MortalityTables.tables()
-vbt2001 = tbls[<span class=hljs-string >&quot;2001 VBT Residual Standard Select and Ultimate - Male Nonsmoker, ANB&quot;</span>]
+vbt2001 = MortalityTables.table(<span class=hljs-string >&quot;2001 VBT Residual Standard Select and Ultimate - Male Nonsmoker, ANB&quot;</span>)
 
 issue_age = <span class=hljs-number >30</span>
 life = SingleLife(                 <span class=hljs-comment ># The life underlying the risk</span>
@@ -211,23 +210,24 @@ timepoints(ins)                    <span class=hljs-comment ># The timepoints as
 survival(ins)                      <span class=hljs-comment ># The survival vector</span>
 benefit(ins)                       <span class=hljs-comment ># The unit benefit vector</span>
 probability(ins)                   <span class=hljs-comment ># The probability of benefit payment</span></code></pre>
+<p>Some of the above will return lazy results. For example, <code>cashflows&#40;ins&#41;</code> will return a <code>Generator</code> which can be efficiently used in most places you&#39;d use a vector of cashflows &#40;e.g. <code>pv&#40;...&#41;</code> or <code>sum&#40;...&#41;</code>&#41; but has the advantage of being non-allocating &#40;less memory used, faster computations&#41;. To get a computed vector instead of the generator, simply call <code>collect&#40;...&#41;</code> on the result: <code>collect&#40;cashflows&#40;ins&#41;&#41;</code>.</p>
 <p>Or calculate summary scalars:</p>
 <pre><code class="julia hljs">present_value(ins)                 <span class=hljs-comment ># The actuarial present value</span>
 premium_net(lc)                    <span class=hljs-comment ># Net whole life premium </span>
 V(lc,<span class=hljs-number >5</span>)                            <span class=hljs-comment ># Net premium reserve for whole life insurance at time 5</span></code></pre>
 <p>Other types of life contingent benefits:</p>
-<pre><code class="julia hljs">Insurance(lc,n=<span class=hljs-number >10</span>)                   <span class=hljs-comment ># 10 year term insurance</span>
+<pre><code class="julia hljs">Insurance(lc,<span class=hljs-number >10</span>)                 <span class=hljs-comment ># 10 year term insurance</span>
 AnnuityImmediate(lc)               <span class=hljs-comment ># Whole life annuity due</span>
 AnnuityDue(lc)                     <span class=hljs-comment ># Whole life annuity due</span>
 ä(lc)                              <span class=hljs-comment ># Shortform notation</span>
-ä(lc, n=<span class=hljs-number >5</span>)                         <span class=hljs-comment ># 5 year annuity due</span>
-ä(lc, n=<span class=hljs-number >5</span>, certain=<span class=hljs-number >5</span>,frequency=<span class=hljs-number >4</span>)  <span class=hljs-comment ># 5 year annuity due, with 5 year certain payable 4x per year</span>
+ä(lc, <span class=hljs-number >5</span>)                           <span class=hljs-comment ># 5 year annuity due</span>
+ä(lc, <span class=hljs-number >5</span>, certain=<span class=hljs-number >5</span>,frequency=<span class=hljs-number >4</span>)    <span class=hljs-comment ># 5 year annuity due, with 5 year certain payable 4x per year</span>
 ...                                <span class=hljs-comment ># and more!</span></code></pre>
 <h4 id=constructing_lives ><a href="#constructing_lives" class=header-anchor >Constructing Lives</a></h4>
 <pre><code class="julia hljs">SingleLife(vbt2001.select[<span class=hljs-number >50</span>])                 <span class=hljs-comment ># no keywords, just a mortality vector</span>
 SingleLife(vbt2001.select[<span class=hljs-number >50</span>],issue_age = <span class=hljs-number >60</span>)  <span class=hljs-comment ># select at 50, but now 60</span>
 SingleLife(vbt2001.select,issue_age = <span class=hljs-number >50</span>)      <span class=hljs-comment ># use issue_age to pick the right select vector</span>
-SingleLife(mort=vbt2001.select,issue_age = <span class=hljs-number >50</span>) <span class=hljs-comment ># mort can also be a keyword</span></code></pre>
+SingleLife(mortality=vbt2001.select,issue_age = <span class=hljs-number >50</span>) <span class=hljs-comment ># mort can also be a keyword</span></code></pre>
 <p><br/> <a href="https://github.com/JuliaActuary/LifeContingencies.jl">LifeContingencies package on GitHub 🡭</a></p>
 <h2 id=yieldsjl ><a href="#yieldsjl" class=header-anchor >Yields.jl</a></h2>
 <blockquote>
@@ -458,7 +458,7 @@ exposure(basis, issue, termination)</code></pre>
   
   
   <div class=copyright >
-    &copy; JuliaActuary Contributors. Last modified: March 20, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and <a href="https://julialang.org">Julia</a>.
+    &copy; JuliaActuary Contributors. Last modified: May 17, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and <a href="https://julialang.org">Julia</a>.
   </div>
 </div></div>
     
