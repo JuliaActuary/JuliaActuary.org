@@ -205,7 +205,6 @@ convexity(discount_rate, cfs, times)               #  10.62
 
 > Common life contingent calculations with a convenient interface.
 
-
 ### Features
 
 - Integration with other JuliaActuary packages such as [MortalityTables.jl](https://github.com/JuliaActuary/MortalityTables.jl)
@@ -221,8 +220,8 @@ the mortality calculations
 - Contains common insurance calculations such as:
   - `Insurance(life,yield)`: Whole life
   - `Insurance(life,yield,n)`: Term life for `n` years
-  - `ä(life,yield)`: Life contingent annuity due
-  - `ä(life,yield)`: Life contingent annuity due for `n` years
+  - `ä(life,yield)`: `present_value` of life-contingent annuity
+  - `ä(life,yield,n)`: `present_value` of life-contingent annuity due for `n` years
 - Contains various commutation functions such as `D(x)`,`M(x)`,`C(x)`, etc.
 - `SingleLife` and `JointLife` capable
 - Interest rate mechanics via [`Yields.jl`](https://github.com/JuliaActuary/Yields.jl)
@@ -239,11 +238,10 @@ Calculate various items for a 30-year-old male nonsmoker using 2015 VBT base tab
 using LifeContingencies
 using MortalityTables
 using Yields
-import LifeConingencies: V, ä      # pull the shortform notation into scope
+import LifeContingencies: V, ä     # pull the shortform notation into scope
 
 # load mortality rates from MortalityTables.jl
-tbls = MortalityTables.tables()
-vbt2001 = tbls["2001 VBT Residual Standard Select and Ultimate - Male Nonsmoker, ANB"]
+vbt2001 = MortalityTables.table("2001 VBT Residual Standard Select and Ultimate - Male Nonsmoker, ANB")
 
 issue_age = 30
 life = SingleLife(                 # The life underlying the risk
@@ -269,6 +267,8 @@ benefit(ins)                       # The unit benefit vector
 probability(ins)                   # The probability of benefit payment
 ```
 
+Some of the above will return lazy results. For example, `cashflows(ins)` will return a `Generator` which can be efficiently used in most places you'd use a vector of cashflows (e.g. `pv(...)` or `sum(...)`) but has the advantage of being non-allocating (less memory used, faster computations). To get a computed vector instead of the generator, simply call `collect(...)` on the result: `collect(cashflows(ins))`.
+
 Or calculate summary scalars:
 
 ```julia
@@ -280,12 +280,12 @@ V(lc,5)                            # Net premium reserve for whole life insuranc
 Other types of life contingent benefits:
 
 ```julia
-Insurance(lc,n=10)                   # 10 year term insurance
+Insurance(lc,10)                 # 10 year term insurance
 AnnuityImmediate(lc)               # Whole life annuity due
 AnnuityDue(lc)                     # Whole life annuity due
 ä(lc)                              # Shortform notation
-ä(lc, n=5)                         # 5 year annuity due
-ä(lc, n=5, certain=5,frequency=4)  # 5 year annuity due, with 5 year certain payable 4x per year
+ä(lc, 5)                           # 5 year annuity due
+ä(lc, 5, certain=5,frequency=4)    # 5 year annuity due, with 5 year certain payable 4x per year
 ...                                # and more!
 ```
 
@@ -295,7 +295,7 @@ ä(lc, n=5, certain=5,frequency=4)  # 5 year annuity due, with 5 year certain p
 SingleLife(vbt2001.select[50])                 # no keywords, just a mortality vector
 SingleLife(vbt2001.select[50],issue_age = 60)  # select at 50, but now 60
 SingleLife(vbt2001.select,issue_age = 50)      # use issue_age to pick the right select vector
-SingleLife(mort=vbt2001.select,issue_age = 50) # mort can also be a keyword
+SingleLife(mortality=vbt2001.select,issue_age = 50) # mort can also be a keyword
 
 ```
 \\
