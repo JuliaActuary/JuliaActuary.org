@@ -215,15 +215,15 @@ version = "3.3.6+0"
 
 [[deps.GR]]
 deps = ["Base64", "DelimitedFiles", "GR_jll", "HTTP", "JSON", "Libdl", "LinearAlgebra", "Pkg", "Printf", "Random", "RelocatableFolders", "Serialization", "Sockets", "Test", "UUIDs"]
-git-tree-sha1 = "af237c08bda486b74318c8070adb96efa6952530"
+git-tree-sha1 = "b316fd18f5bc025fedcb708332aecb3e13b9b453"
 uuid = "28b8d3ca-fb5f-59d9-8090-bfdbd6d07a71"
-version = "0.64.2"
+version = "0.64.3"
 
 [[deps.GR_jll]]
 deps = ["Artifacts", "Bzip2_jll", "Cairo_jll", "FFMPEG_jll", "Fontconfig_jll", "GLFW_jll", "JLLWrappers", "JpegTurbo_jll", "Libdl", "Libtiff_jll", "Pixman_jll", "Pkg", "Qt5Base_jll", "Zlib_jll", "libpng_jll"]
-git-tree-sha1 = "cd6efcf9dc746b06709df14e462f0a3fe0786b1e"
+git-tree-sha1 = "1e5490a51b4e9d07e8b04836f6008f46b48aaa87"
 uuid = "d2c73de3-f751-5644-a686-071e5b155ba9"
-version = "0.64.2+0"
+version = "0.64.3+0"
 
 [[deps.GeometryBasics]]
 deps = ["EarCut_jll", "IterTools", "LinearAlgebra", "StaticArrays", "StructArrays", "Tables"]
@@ -663,9 +663,9 @@ uuid = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 
 [[deps.SpecialFunctions]]
 deps = ["ChainRulesCore", "IrrationalConstants", "LogExpFunctions", "OpenLibm_jll", "OpenSpecFun_jll"]
-git-tree-sha1 = "5ba658aeecaaf96923dce0da9e703bd1fe7666f9"
+git-tree-sha1 = "bc40f042cfcc56230f781d92db71f0e21496dffd"
 uuid = "276daf66-3868-5448-9aa4-cd146d93841b"
-version = "2.1.4"
+version = "2.1.5"
 
 [[deps.StaticArrays]]
 deps = ["LinearAlgebra", "Random", "Statistics"]
