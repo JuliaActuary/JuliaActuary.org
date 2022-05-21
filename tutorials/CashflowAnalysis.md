@@ -1,6 +1,6 @@
 # Interactive Cashflow Analysis with *ActuaryUtilities.jl*
 
-Scroll down below the sample video to see how to run it.
+Scroll down below the sample image to see how to run it.
 
 ~~~
  <img src="/tutorials/_assets/CashflowAnalysis/demo.gif" />
