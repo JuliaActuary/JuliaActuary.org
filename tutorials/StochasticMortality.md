@@ -10,7 +10,7 @@ The image above shows a [Pluto.jl](https://github.com/fonsp/Pluto.jl) notebook w
 
 ## Instructions to Run
 
-Because JuliaActuary doesn't have a beefy server to run this on and let anybody run/visualize thousands of stochastic scenarios, for this one you have to run it locally. Assuming that you already have Julia installed but still need to install Pluto notebooks:
+Assuming that you already have Julia installed but still need to install Pluto notebooks:
 
 1. Open a Julia REPL and copy and paste the following:
 
