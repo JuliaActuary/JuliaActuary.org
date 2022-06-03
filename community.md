@@ -59,7 +59,7 @@ Benchmarks of Actuarial workflows can be found on the [Benchmarks](/benchmarks/)
 
 ### Discussion and Questions
 
-If you have other ideas or questions, feel free to also open an issue, or discuss on the community [Zulip](https://julialang.zulipchat.com/#narrow/stream/249536-actuary) or [Slack #actuary channel](https://julialang.org/slack/). We welcome all actuarial and related disciplines!
+If you have other ideas or questions, join the [JuliaActuary Github Discussions](https://github.com/orgs/JuliaActuary/discussions). Or come say hello on the community [Zulip](https://julialang.zulipchat.com/#narrow/stream/249536-actuary) or [Slack #actuary channel](https://julialang.org/slack/). We welcome all actuarial and related disciplines!
 
 ### Help mode
 
