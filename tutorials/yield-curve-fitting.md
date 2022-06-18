@@ -18,11 +18,11 @@ Then fit the rates under four methods:
 - Boostrapping with splines (the default `Bootstrap` option)
 - Bootstrapping with linear splines
 
-```
-ns = Yields.Zero(NelsonSiegel(),rates,mats);
-nss = Yields.Zero(NelsonSiegelSvensson(),rates,mats);
-b = Yields.Zero(Bootstrap(),rates,mats);
-bl = Yields.Zero(Bootstrap(Yields.LinearSpline()),rates,mats);
+```julia
+ns =  Yields.Zero(NelsonSiegel(),                   rates,mats)
+nss = Yields.Zero(NelsonSiegelSvensson(),           rates,mats)
+b =   Yields.Zero(Bootstrap(),                      rates,mats)
+bl =  Yields.Zero(Bootstrap(Yields.LinearSpline()), rates,mats)
 ```
 
 That's it! We've fit the rates using four different techniques. These can now be used in a variety of ways, such as calculating the `present_value`, `duration`, or `convexity` of different cashflows if you imported [ActuaryUtilities.jl](https://github.com/JuliaActuary/ActuaryUtilities.jl)
