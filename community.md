@@ -28,13 +28,14 @@ After installing Julia from the official website, head to the [Packages](/packag
 
 Each package includes examples on the Github site and in the documentation.
 
-### Walkthroughs and tutorials 
+### Walkthroughs and tutorials
 
-- [Getting MortalityTables.jl data into a dataframes](/tutorials/MortalityTablesDataFrame/) 
+- [Getting MortalityTables.jl data into a dataframes](/tutorials/MortalityTablesDataFrame/)
 - [Exposure Calculation with ExperienceAnalysis.jl](/tutorials/exposure_calculation/)
 - [Fitting Survival Data](/tutorials/SurvivalFitting/)
 - [Stochastic Mortality Projections](/tutorials/StochasticMortality/)
 - [Bayesian Markov-Chain-Monte-Carlo and Claims Data](/tutorials/Bayesian/)
+- [Fitting Interest Rates to Yield Curves](/tutorials/yield-curve-fitting/)
 
 ### Benchmarks
 
