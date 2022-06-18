@@ -1,6 +1,6 @@
 # Fitting Yield Curves to rates
 
-Given rates and maturities, we can fit the yield curves with different techniques.
+Given rates and maturities, we can fit the yield curves with different techniques in [Yields.jl](https://juliaactuary.org/packages/#yieldsjl).
 
 Below, we specify that the rates should be interpreted as `Continuous`ly compounded zero rates:
 
