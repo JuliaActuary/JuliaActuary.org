@@ -52,5 +52,5 @@ using Pluto; Pluto.run()
 2. In the Pluto window that opens, enter this URL into the `Open from file:` box:
 
 ```
-https://raw.githubusercontent.com/JuliaActuary/Learn/master/MortalityTableComparison.jl
+https://raw.githubusercontent.com/JuliaActuary/Learn/master/Yield_Curve_fitting.jl
 ```
