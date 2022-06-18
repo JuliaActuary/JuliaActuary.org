@@ -233,7 +233,7 @@ SingleLife(mortality=vbt2001.select,issue_age = <span class=hljs-number >50</spa
 <blockquote>
 <p>Flexible and composable yield curves and interest functions.</p>
 </blockquote>
-<p><strong>Yields</strong> provides a simple interface for constructing, manipulating, and using yield curves for modeling purposes.</p>
+<p><strong>Yields.jl</strong> provides a simple interface for constructing, manipulating, and using yield curves for modeling purposes.</p>
 <p>It&#39;s intended to provide common functionality around modeling interest rates, spreads, and miscellaneous yields across the JuliaActuary ecosystem &#40;though not limited to use in JuliaActuary packages&#41;.</p>
 <h3 id=quickstart__3 ><a href="#quickstart__3" class=header-anchor >Quickstart</a></h3>
 <pre><code class="julia hljs"><span class=hljs-keyword >using</span> Yields
@@ -250,7 +250,7 @@ spread_curve = Yields.Zero(spread,spread_maturities)
 
 yield = rf_curve + spread_curve               <span class=hljs-comment ># additive combination of the two curves</span>
 
-discount(yield,<span class=hljs-number >1.5</span>) <span class=hljs-comment ># 1 / (1 + 0.064 + 0.014) ^ 1.5</span></code></pre>
+discount(yield,<span class=hljs-number >1.5</span>)                           <span class=hljs-comment ># 1 / (1 + 0.064 + 0.014) ^ 1.5</span></code></pre>
 <h3 id=usage ><a href="#usage" class=header-anchor >Usage</a></h3>
 <h4 id=rates ><a href="#rates" class=header-anchor >Rates</a></h4>
 <p>Rates are types that wrap scalar values to provide information about how to determine <code>discount</code> and <code>accumulation</code> factors.</p>
@@ -262,34 +262,60 @@ discount(yield,<span class=hljs-number >1.5</span>) <span class=hljs-comment ># 
 
 </ul>
 <h5 id=examples__2 ><a href="#examples__2" class=header-anchor >Examples</a></h5>
-<pre><code class="julia hljs">Yields.Continuous(<span class=hljs-number >0.05</span>)       <span class=hljs-comment ># 5% continuously compounded</span>
-Yields.Periodic(<span class=hljs-number >0.05</span>,<span class=hljs-number >2</span>)       <span class=hljs-comment ># 5% compounded twice per period</span></code></pre>
+<pre><code class="julia hljs">Continuous(<span class=hljs-number >0.05</span>)       <span class=hljs-comment ># 5% continuously compounded</span>
+Periodic(<span class=hljs-number >0.05</span>,<span class=hljs-number >2</span>)       <span class=hljs-comment ># 5% compounded twice per period</span></code></pre>
 <p>These are both subtypes of the parent <code>Rate</code> type and are instantiated as:</p>
-<pre><code class="julia hljs">Yields.Rate(<span class=hljs-number >0.05</span>,Continuous())       <span class=hljs-comment ># 5% continuously compounded</span>
-Yields.Rate(<span class=hljs-number >0.05</span>,Periodic(<span class=hljs-number >2</span>))        <span class=hljs-comment ># 5% compounded twice per period</span></code></pre>
+<pre><code class="julia hljs">Rate(<span class=hljs-number >0.05</span>,Continuous())       <span class=hljs-comment ># 5% continuously compounded</span>
+Rate(<span class=hljs-number >0.05</span>,Periodic(<span class=hljs-number >2</span>))        <span class=hljs-comment ># 5% compounded twice per period</span></code></pre>
 <p>Broadcast over a vector to create <code>Rates</code> with the given compounding:</p>
-<pre><code class="julia hljs">Yields.Periodic.([<span class=hljs-number >0.02</span>,<span class=hljs-number >0.03</span>,<span class=hljs-number >0.04</span>],<span class=hljs-number >2</span>) 
-Yields.Continuous.([<span class=hljs-number >0.02</span>,<span class=hljs-number >0.03</span>,<span class=hljs-number >0.04</span>])</code></pre>
-<h4 id=yields ><a href="#yields" class=header-anchor >Yields</a></h4>
-<p>There are a several ways to construct a yield curve object.</p>
-<h5 id=bootstrapping_methods ><a href="#bootstrapping_methods" class=header-anchor >Bootstrapping Methods</a></h5>
-<p><code>rates</code> can be a vector of <code>Rate</code>s described above, or will assume <code>Yields.Periodic&#40;1&#41;</code> if the functions are given <code>Real</code> number values</p>
+<pre><code class="julia hljs">Periodic.([<span class=hljs-number >0.02</span>,<span class=hljs-number >0.03</span>,<span class=hljs-number >0.04</span>],<span class=hljs-number >2</span>) 
+Continuous.([<span class=hljs-number >0.02</span>,<span class=hljs-number >0.03</span>,<span class=hljs-number >0.04</span>])</code></pre>
+<p>Rates can also be constructed by specifying the <code>CompoundingFrequency</code> and then passing a scalar rate:</p>
+<pre><code class="julia hljs">Periodic(<span class=hljs-number >1</span>)(<span class=hljs-number >0.05</span>)
+Continuous()(<span class=hljs-number >0.05</span>)</code></pre>
+<h5 id=conversion ><a href="#conversion" class=header-anchor >Conversion</a></h5>
+<p>Convert rates between different types with <code>convert</code>. E.g.:</p>
+<pre><code class="julia-repl hljs">r = Rate(Yields.Periodic(12),0.01)             # rate that compounds 12 times per rate period (ie monthly)
+
+convert(Yields.Periodic(1),r)                  # convert monthly rate to annual effective
+convert(Yields.Continuous(),r)          # convert monthly rate to continuous</code></pre>
+<h5 id=arithmetic ><a href="#arithmetic" class=header-anchor >Arithmetic</a></h5>
+<p>Adding, substracting, and comparing rates is supported.</p>
+<h4 id=curves ><a href="#curves" class=header-anchor >Curves</a></h4>
+<p>There are a several ways to construct a yield curve object. If <code>maturities</code> is omitted, the method will assume that the timepoints corresponding to each rate are the indices of the <code>rates</code> &#40;e.g. generally one to the length of the array for standard, non-offset arrays&#41;. </p>
+<h5 id=fitting_curves_to_rates ><a href="#fitting_curves_to_rates" class=header-anchor >Fitting Curves to Rates</a></h5>
+<p>There is a set of constructor methods which will return a yield curve calibrated to the given inputs. </p>
 <ul>
-<li><p><code>Yields.Zero&#40;rates,maturities&#41;</code>  using a vector of zero, or spot, rates</p>
+<li><p><code>Yields.Zero&#40;rates,maturities&#41;</code>  using a vector of zero rates &#40;sometimes referred to as &quot;spot&quot; rates&#41;</p>
 
-<li><p><code>Yields.Forward&#40;rates,maturities&#41;</code> using a vector of one-period &#40;or <code>periods</code>-long&#41; forward rates</p>
+<li><p><code>Yields.Forward&#40;rates,maturities&#41;</code> using a vector of forward rates</p>
 
-<li><p><code>Yields.Constant&#40;rate&#41;</code> takes a single constant rate for all times</p>
-
-<li><p><code>Yields.Step&#40;rates,maturities&#41;</code> doesn&#39;t interpolate - the rate is flat up to the corresponding time in <code>times</code></p>
-
-<li><p><code>Yields.Par&#40;rates,maturities&#41;</code> takes a series of yields for securities priced at par.Assumes that maturities &lt;&#61; 1 year do not pay coupons and that after one year, pays coupons with frequency equal to the CompoundingFrequency of the corresponding rate.</p>
+<li><p><code>Yields.Par&#40;rates,maturities&#41;</code> takes a series of yields for securities priced at par. Assumes that maturities &lt;&#61; 1 year do not pay coupons and that after one year, pays coupons with frequency equal to the CompoundingFrequency of the corresponding rate &#40;2 by default&#41;.</p>
 
 <li><p><code>Yields.CMT&#40;rates,maturities&#41;</code> takes the most commonly presented rate data &#40;e.g. <a href="https://www.treasury.gov/resource-center/data-chart-center/interest-rates/Pages/TextView.aspx?data&#61;yield">Treasury.gov</a>&#41; and bootstraps the curve given the combination of bills and bonds.</p>
 
-<li><p><code>Yields.OIS&#40;rates,maturities&#41;</code> takes the most commonly presented rate data for overnight swaps and bootstraps the curve.</p>
+<li><p><code>Yields.OIS&#40;rates,maturities&#41;</code> takes the most commonly presented rate data for overnight swaps and bootstraps the curve. Rates assume a single settlement for &lt;1 year and quarterly settlements for 1 year and above.</p>
 
 </ul>
+<h6 id=fitting_techniques ><a href="#fitting_techniques" class=header-anchor >Fitting techniques</a></h6>
+<p>There are multiple curve fitting methods available:</p>
+<ul>
+<li><p><code>Boostrap&#40;interpolation_method&#41;</code> &#40;the default method&#41;</p>
+<ul>
+<li><p>where <code>interpolation</code> can be one of the built-in <code>QuadraticSpline&#40;&#41;</code> &#40;the default&#41; or <code>LinearSpline&#40;&#41;</code>, or a user-supplied function.</p>
+
+</ul>
+
+<li><p>Two methods from the Nelson-Siegel-Svensson family, where τ_initial is the starting τ point for the fitting optimization routine: </p>
+<ul>
+<li><p><code>NelsonSiegel&#40;τ_initial&#61;1.0&#41;</code></p>
+
+<li><p><code>NelsonSiegelSvensson&#40;τ_initial&#61;&#91;1.0,1.0&#93;&#41;</code></p>
+
+</ul>
+
+</ul>
+<p>To specify which fitting method to use, pass the object to as the first parameter to the above set of constructors, for example: <code>Yields.Par&#40;NelsonSiegel&#40;&#41;,rates,maturities&#41;</code>.</p>
 <h5 id=kernel_methods ><a href="#kernel_methods" class=header-anchor >Kernel Methods</a></h5>
 <ul>
 <li><p><code>Yields.SmithWilson</code> curve &#40;used for <a href="https://www.eiopa.europa.eu/sites/default/files/risk_free_interest_rate/12092019-technical_documentation.pdf">discounting in the EU Solvency II framework</a>&#41; can be constructed either directly by specifying its inner representation or by calibrating to a set of cashflows with known prices.</p>
@@ -299,6 +325,13 @@ Yields.Continuous.([<span class=hljs-number >0.02</span>,<span class=hljs-number
 </ul>
 
 </ul>
+<h5 id=other_curves ><a href="#other_curves" class=header-anchor >Other Curves</a></h5>
+<ul>
+<li><p><code>Yields.Constant&#40;rate&#41;</code> takes a single constant rate for all times</p>
+
+<li><p><code>Yields.Step&#40;rates,maturities&#41;</code> doesn&#39;t interpolate - the rate is flat up to the corresponding time in <code>times</code></p>
+
+</ul>
 <h4 id=functions ><a href="#functions" class=header-anchor >Functions</a></h4>
 <p>Most of the above yields have the following defined &#40;goal is to have them all&#41;:</p>
 <ul>
@@ -306,9 +339,11 @@ Yields.Continuous.([<span class=hljs-number >0.02</span>,<span class=hljs-number
 
 <li><p><code>accumulation&#40;curve,from,to&#41;</code> or <code>accumulation&#40;curve,to&#41;</code> gives the accumulation factor</p>
 
-<li><p><code>forward&#40;curve,from,to&#41;</code> gives the average rate between the two given times</p>
-
 <li><p><code>zero&#40;curve,time&#41;</code> or <code>zero&#40;curve,time,CompoundingFrequency&#41;</code> gives the zero-coupon spot rate for the given time.</p>
+
+<li><p><code>forward&#40;curve,from,to&#41;</code> gives the zero rate between the two given times</p>
+
+<li><p><code>par&#40;curve,time&#41;</code> gives the coupon-paying par equivalent rate for the given time.</p>
 
 </ul>
 <h4 id=combinations ><a href="#combinations" class=header-anchor >Combinations</a></h4>
@@ -458,7 +493,7 @@ exposure(basis, issue, termination)</code></pre>
   
   
   <div class=copyright >
-    &copy; JuliaActuary Contributors. Last modified: June 03, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and <a href="https://julialang.org">Julia</a>.
+    &copy; JuliaActuary Contributors. Last modified: June 18, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and <a href="https://julialang.org">Julia</a>.
   </div>
 </div></div>
     
