@@ -257,6 +257,10 @@ table tbody tr td {
     border: 1px solid lightgray
 }
 
+body {
+    background-color: #f1f0f7;
+}
+
 
 @font-face {
     font-family: JuliaMono;

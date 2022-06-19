@@ -326,7 +326,7 @@ body {
 ================================================================== */
 
 code {
-    background-color: rgba(244, 244, 255, 0.5);
+    background-color: rgba(210, 210, 210, 0.5);
     padding: 0.2em 0.4em;
     border-radius: 2px;
     font-size: 90%;
@@ -380,7 +380,7 @@ code {
     line-height: 1.35em;
     border-radius: 10px;
     padding: 0.6em 1.2em;
-    background-color: rgb(244, 244, 255, 0.5);
+    background-color: rgba(220, 220, 220, 0.5);
 }
 
 .hljs-meta, .hljs-metas, .hljs-metap {
