@@ -36,6 +36,7 @@ Each package includes examples on the Github site and in the documentation.
 - [Stochastic Mortality Projections](/tutorials/StochasticMortality/)
 - [Bayesian Markov-Chain-Monte-Carlo and Claims Data](/tutorials/Bayesian/)
 - [Fitting Interest Rates to Yield Curves](/tutorials/yield-curve-fitting/)
+- [Nested Policy Projections](/tutorials/nested_stochastic/)
 
 ### Benchmarks
 
