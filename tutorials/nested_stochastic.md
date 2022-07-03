@@ -1,7 +1,7 @@
 # Nested Policy Projections
 
 In this notebook, we define a term life policy, implement the mechanics for "outer" projected values, as well as "inner" projections so that we can determine a projection-based reserve. This is done with both a deterministic and stochastic "inner" loop.
-tutorials/nested_stochastic/nested_stochastic.png
+
 ~~~
  <img src="/tutorials/_assets/nested_stochastic/nested_stochastic.png" />
 ~~~
