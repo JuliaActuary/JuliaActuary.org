@@ -9,38 +9,39 @@
 These packages are available for use in your project. Scroll down for more information on each one.
 
 ~~~
-<table>
+<table class="package-table">
+<tr></tr>
 <tr>
-<td>
+<td style="width:50%" style="vertical-align: top;">
    <p><strong><a href="/packages/#mortalitytablesjl">MortalityTables.jl</a></strong></p>
 
 <p>Easily work with standard tables and parametric models with common survival calculations.</p>
 </td>
-<td>
+<td style="vertical-align: top;">
    <p><strong><a href="/packages/#lifecontingenciesjl">LifeContingencies.jl</a></strong></p>
 <p>Insurance, annuity, premium, and reserve maths.</p>
 </td>
 
 </tr>
 <tr>
-<td>
+<td style="vertical-align: top;">
    <p><strong><a href="/packages/#actuaryutilitiesjl">ActuaryUtilities.jl</a></strong></p>
 
 <p>Robust and fast calculations for <code>internal_rate_of_return</code>, <code>duration</code>, <code>convexity</code>, <code>present_value</code>, <code>breakeven</code>, and more.</p>
 </td>
-<td>
+<td style="vertical-align: top;">
    <p><strong><a href="/packages/#experienceanalysisjl">ExperienceAnalysis.jl</a></strong></p>
 <p>Meeting your exposure calculation needs.</p>
 </td>
 
 </tr>
 <tr>
-<td>
+<td style="vertical-align: top;">
    <p><strong><a href="/packages/#actuaryutilitiesjl">Yields.jl</a></strong></p>
 
 <p>Simple and composable yield curves and calculations.</p>
 </td>
-<td>
+<td style="vertical-align: top;">
    <p><strong><a href="/packages/#economicscenariogeneratorsjl">EconomicScenarioGenerators.jl</a></strong></p>
 <p>Easy-to-use scenario generation that's Yields.jl compatible.</p>
 </td>
