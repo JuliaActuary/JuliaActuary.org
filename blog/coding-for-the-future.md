@@ -17,6 +17,12 @@
 
 ## The insurance industry: yesterday, today, and tomorrow
 
+![Victorian era "computers" as imagined by DALLE-2](/blog/assets/victorian%20computers.png)
+
+*Image: A Victorian-era room full of "computers" as imagined by DALL-E-2*
+
+---
+
 It might be odd to say that technology and its use in insurance is on a one-hundred-year cycle, but that seems to be the case.
 
 130 years ago, actuaries crowded into a room at a meeting of the Actuarial Society of America to watch a demonstration that would revolutionize the industry: Herman Hollerith's tabulating punch card machine[^1].
