@@ -31,6 +31,12 @@ jobs:
       uses: julia-actions/setup-julia@v1
       with:
         version: '1.8'
+    - name: Build notebooks
+      run: julia --project -e 'using Tutorials; build_tutorials()'
+      env:
+        JULIA_NUM_THREADS: '2'
+        DISABLE_CACHE: '${{ github.event.inputs.disableCache }}'
+        REPO: '${{ github.repository }}'
     # NOTE
     #   The steps below ensure that NodeJS and Franklin are loaded then it
     #   installs highlight.js which is needed for the prerendering step

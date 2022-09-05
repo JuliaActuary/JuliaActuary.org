@@ -1,3 +1,8 @@
+name = "Tutorials"
+uuid = "e088c1bc-e00f-47bb-8742-49f468c16799"
+authors = ["Alec Loudenback <alecloudenback@gmail.com>"]
+version = "1.0.0"
+
 [deps]
 CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
@@ -5,8 +10,11 @@ Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
 Parsers = "69de0a69-1ddd-5017-9359-2bf0b02dc9f0"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 PrettyTables = "08abe8d2-0d0c-5749-adfa-8a2ac140af0d"
+PlutoStaticHTML = "359b1769-a58e-495b-9770-312e911026ad"
 
 [compat]
 CSV = "^0.10"
 DataFrames = "^1"
 Plots = "^1"
+Franklin = "0.10"
+PlutoStaticHTML = "5"
