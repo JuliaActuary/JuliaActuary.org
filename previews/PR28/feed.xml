@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<rss version="2.0"
+  xmlns:content="http://purl.org/rss/1.0/modules/content/"
+  xmlns:dc="http://purl.org/dc/elements/1.1/"
+  xmlns:media="http://search.yahoo.com/mrss/"
+  xmlns:atom="http://www.w3.org/2005/Atom"
+  xmlns:georss="http://www.georss.org/georss">
+
+  <channel>
+    <title>
+      <![CDATA[  JuliaActuary  ]]>
+    </title>
+    <link> https://thirsty-davinci-e0b972.netlify.app/previews/PR28/ </link>
+    <description>
+      <![CDATA[  Practical, extensible, and open-source actuarial modeling and analysis.   ]]>
+    </description>
+    <atom:link
+      href="https://thirsty-davinci-e0b972.netlify.app/previews/PR28/feed.xml"
+      rel="self"
+      type="application/rss+xml" />
+
+
+<item>
+  <title>
+    <![CDATA[  Getting Started with Julia for Actuaries  ]]>
+  </title>
+  <link> https://thirsty-davinci-e0b972.netlify.app/previews/PR28/blog/julia-getting-started-actuaries/index.html </link>
+  <guid> https://thirsty-davinci-e0b972.netlify.app/previews/PR28/blog/julia-getting-started-actuaries/index.html </guid>
+  <description>
+    <![CDATA[  A quick-start guide to using Julia in actuarial workflows.  ]]>
+  </description>  
+    
+  <pubDate>Sun, 24 Oct 2021 00:00:00 +0000</pubDate>  
+  
+  
+  <atom:author>
+    <atom:name>Alec Loudenback and Dimitar Vanguelov</atom:name>
+  </atom:author>
+        
+</item>
+
+<item>
+  <title>
+    <![CDATA[  Benchmarks  ]]>
+  </title>
+  <link> https://thirsty-davinci-e0b972.netlify.app/previews/PR28/benchmarks/index.html </link>
+  <guid> https://thirsty-davinci-e0b972.netlify.app/previews/PR28/benchmarks/index.html </guid>
+  <description>
+    <![CDATA[  Acturial-related benchmarks.  ]]>
+  </description>  
+    
+  <pubDate>Sat, 07 Aug 2021 00:00:00 +0000</pubDate>  
+  
+  
+  <atom:author>
+    <atom:name>Misc</atom:name>
+  </atom:author>
+        
+</item>
+
+<item>
+  <title>
+    <![CDATA[  The Life Modeling Problem: A Comparison of Julia, Rust, Python, and R  ]]>
+  </title>
+  <link> https://thirsty-davinci-e0b972.netlify.app/previews/PR28/blog/life-modeling-problem/index.html </link>
+  <guid> https://thirsty-davinci-e0b972.netlify.app/previews/PR28/blog/life-modeling-problem/index.html </guid>
+  <description>
+    <![CDATA[  The &quot;hard parts&quot; of computational actuarial science and how well programming languages fare.  ]]>
+  </description>  
+    
+  <pubDate>Sun, 16 May 2021 00:00:00 +0000</pubDate>  
+  
+  
+  <atom:author>
+    <atom:name>Alec Loudenback</atom:name>
+  </atom:author>
+        
+</item>
+
+<item>
+  <title>
+    <![CDATA[  Coding the Future  ]]>
+  </title>
+  <link> https://thirsty-davinci-e0b972.netlify.app/previews/PR28/blog/coding-for-the-future/index.html </link>
+  <guid> https://thirsty-davinci-e0b972.netlify.app/previews/PR28/blog/coding-for-the-future/index.html </guid>
+  <description>
+    <![CDATA[  Companies need to transform and actuaries who can code will play a pivotal role in that story.  ]]>
+  </description>  
+    
+  <pubDate>Sun, 27 Sep 2020 00:00:00 +0000</pubDate>  
+  
+  
+  <atom:author>
+    <atom:name>Alec Loudenback</atom:name>
+  </atom:author>
+        
+</item>
+
+<item>
+  <title>
+    <![CDATA[  Julia for Actuaries  ]]>
+  </title>
+  <link> https://thirsty-davinci-e0b972.netlify.app/previews/PR28/blog/julia-actuaries/index.html </link>
+  <guid> https://thirsty-davinci-e0b972.netlify.app/previews/PR28/blog/julia-actuaries/index.html </guid>
+  <description>
+    <![CDATA[  Julia is a new programming language that&#39;s ideally suited for most actuarial workflows.  ]]>
+  </description>  
+    
+  <pubDate>Sun, 27 Sep 2020 00:00:00 +0000</pubDate>  
+  
+  
+  <atom:author>
+    <atom:name>Alec Loudenback</atom:name>
+  </atom:author>
+        
+</item>
+</channel></rss>
