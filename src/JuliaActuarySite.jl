@@ -56,7 +56,9 @@ function append_notebook_links()
             url = "/tutorials/$jl_file"
             open(md_path, "a") do io
                 text = """\n
-                    _To run this tutorial locally, download [this file]($url) and open it with
+                    ## Run this Pluto Notebook
+                    
+                    _To run this page locally, download [this file]($url) and open it with
                     [Pluto.jl](https://plutojl.org)._
 
                     ~~~
