@@ -1,8 +1,8 @@
-<!doctype html> <html lang=en > <meta charset=UTF-8 > <meta name=viewport  content="width=device-width, initial-scale=1"> <meta name=Description  content="Practical, extensible, and open-source actuarial modeling and analysis."> <meta property="og:description" content="Practical, extensible, and open-source actuarial modeling and analysis."> <meta property="og:image" content="/assets/logo_square.svg"> <link rel=stylesheet  href="/previews/PR28/css/franklin.css"> <link rel=stylesheet  href="/previews/PR28/css/basic.css"> <link rel=icon  href="/previews/PR28/assets/favicon.png"> <title> | JuliaActuary</title> <link rel=apple-touch-icon  sizes=180x180  href="/previews/PR28/assets/apple-touch-icon.png"> <link rel=icon  type="image/png" sizes=32x32  href="/previews/PR28/assets/favicon-32x32.png"> <link rel=icon  type="image/png" sizes=16x16  href="/previews/PR28/assets/favicon-16x16.png"> <link rel=manifest  href="/previews/PR28/assets/site.webmanifest"> <script src="https://cdn.jsdelivr.net/npm/swiffy-slider@1.2.0/dist/js/swiffy-slider.min.js" crossorigin=anonymous  defer></script> <link href="/previews/PR28/css/slider.css" rel=stylesheet > <header> <div class=blog-name > <a href="/previews/PR28/"> <div class=blog-name-logo-container > <div class=blog-name-logo > <img src="/previews/PR28/assets/logo_square.svg" alt=logo  height=100px  width=100px  /> </div> <div>JuliaActuary</div> </div> </a> <div class=tagline >Practical, extensible, and open-source actuarial modeling and analysis. </div> </div> <nav> <ul> <li><a href="/previews/PR28/">Home</a> <li><a href="/previews/PR28/packages">Packages</a> <li><a href="/previews/PR28/community">Community</a> <ul> <li><a href="/previews/PR28/community/#learn">Learn</a> <li><a href="/previews/PR28/community/#integration_with_r_and_python">Integration</a> <li><a href="/previews/PR28/community/#contributing">Contributing</a> </ul> <li><a href="/previews/PR28/#blog">Blog</a> </ul> <img src="/previews/PR28/assets/hamburger.svg" id=menu-icon > </nav> </header> <div class=franklin-content > <!-- # This information is used for caching. [PlutoStaticHTML.State] input_sha = "9919ce1b8f34efce340e5f8291c0715ed9c9ef897f4fb3be30834533ef64c286" julia_version = "1.8.0" --> <div class=markdown ><h1>Using MortaltiyTables.jl with DataFrames</h1> <h2>MortalityTables.jl standard representation</h2> <p>MortalityTables.jl stores the rates in a very efficient manner as a collection of vectors indexed by attained age.</p> </div> <div class=markdown ><p>First, we include the package, and then we&#39;ll pick a table, where all of the <code>mort.soa.org</code> tables are mirrored into your MortalityTables.jl installation.</p> </div> <pre class='language-julia'><code class='language-julia'>begin
+<!doctype html> <html lang=en > <meta charset=UTF-8 > <meta name=viewport  content="width=device-width, initial-scale=1"> <meta name=Description  content="Practical, extensible, and open-source actuarial modeling and analysis."> <meta property="og:description" content="Practical, extensible, and open-source actuarial modeling and analysis."> <meta property="og:image" content="/assets/logo_square.svg"> <link rel=stylesheet  href="/previews/PR28/css/franklin.css"> <link rel=stylesheet  href="/previews/PR28/css/basic.css"> <link rel=icon  href="/previews/PR28/assets/favicon.png"> <title> | JuliaActuary</title> <link rel=apple-touch-icon  sizes=180x180  href="/previews/PR28/assets/apple-touch-icon.png"> <link rel=icon  type="image/png" sizes=32x32  href="/previews/PR28/assets/favicon-32x32.png"> <link rel=icon  type="image/png" sizes=16x16  href="/previews/PR28/assets/favicon-16x16.png"> <link rel=manifest  href="/previews/PR28/assets/site.webmanifest"> <script src="https://cdn.jsdelivr.net/npm/swiffy-slider@1.2.0/dist/js/swiffy-slider.min.js" crossorigin=anonymous  defer></script> <link href="/previews/PR28/css/slider.css" rel=stylesheet > <header> <div class=blog-name > <a href="/previews/PR28/"> <div class=blog-name-logo-container > <div class=blog-name-logo > <img src="/previews/PR28/assets/logo_square.svg" alt=logo  height=100px  width=100px  /> </div> <div>JuliaActuary</div> </div> </a> <div class=tagline >Practical, extensible, and open-source actuarial modeling and analysis. </div> </div> <nav> <ul> <li><a href="/previews/PR28/">Home</a> <li><a href="/previews/PR28/packages">Packages</a> <li><a href="/previews/PR28/community">Community</a> <ul> <li><a href="/previews/PR28/community/#learn">Learn</a> <li><a href="/previews/PR28/community/#integration_with_r_and_python">Integration</a> <li><a href="/previews/PR28/community/#contributing">Contributing</a> </ul> <li><a href="/previews/PR28/#blog">Blog</a> </ul> <img src="/previews/PR28/assets/hamburger.svg" id=menu-icon > </nav> </header> <div class=franklin-content > <!-- # This information is used for caching. [PlutoStaticHTML.State] input_sha = "9919ce1b8f34efce340e5f8291c0715ed9c9ef897f4fb3be30834533ef64c286" julia_version = "1.8.0" --> <div class=markdown ><h1>Using MortaltiyTables.jl with DataFrames</h1> <h2>MortalityTables.jl standard representation</h2> <p>MortalityTables.jl stores the rates in a very efficient manner as a collection of vectors indexed by attained age.</p> </div> <div class=markdown ><p>First, we include the package, and then we&#39;ll pick a table, where all of the <code>mort.soa.org</code> tables are mirrored into your MortalityTables.jl installation.</p> </div> <pre class='language-julia'><code class='julia hljs'>begin
     using MortalityTables
 
     vbt = MortalityTables.table("2001 VBT Residual Standard Select and Ultimate - Male Nonsmoker, ANB") #or any other table
-end</code></pre> <pre id='var-vbt' class='code-output documenter-example-output'>MortalityTable (Insured Lives Mortality):
+end</code></pre> <pre id='var-vbt' class=''>MortalityTable (Insured Lives Mortality):
    Name:
        2001 VBT Residual Standard Select and Ultimate - Male Nonsmoker, ANB
    Fields: 
@@ -15,8 +15,8 @@ end</code></pre> <pre id='var-vbt' class='code-output documenter-example-output'
        https://mort.soa.org/ViewTable.aspx?&TableIdentity=1118
    Description:
        2001 Valuation Basic Table (VBT) Residual Standard Select and Ultimate Table -  Male Nonsmoker. Basis: Age Nearest Birthday. Minimum Select Age: 0. Maximum Select Age: 99. Minimum Ultimate Age: 25. Maximum Ultimate Age: 120
-</pre> <div class=markdown ><p>To see how the data is represented, we can look at the the select data for a 55 year old and see the attained age and mortality rates:</p> </div> <pre class='language-julia'><code class='language-julia'>vbt.select[55]</code></pre>
-<pre id='var-hash107198' class='code-output documenter-example-output'>66-element OffsetArray(::Vector{Float64}, 55:120) with eltype Float64 with indices 55:120:
+</pre> <div class=markdown ><p>To see how the data is represented, we can look at the the select data for a 55 year old and see the attained age and mortality rates:</p> </div> <pre class='language-julia'><code class='julia hljs'>vbt.select[55]</code></pre>
+<pre id='var-hash107198' class=''>66-element OffsetArray(::Vector{Float64}, 55:120) with eltype Float64 with indices 55:120:
  0.00139
  0.00218
  0.00288
@@ -44,13 +44,13 @@ end</code></pre> <pre id='var-vbt' class='code-output documenter-example-output'
 <div class=markdown ><h3>Generate sample data</h3>
 </div>
 
-<pre class='language-julia'><code class='language-julia'>using DataFrames</code></pre>
+<pre class='language-julia'><code class='julia hljs'>using DataFrames</code></pre>
 
 
-<pre class='language-julia'><code class='language-julia'>sample_size = 10_000</code></pre>
-<pre id='var-sample_size' class='code-output documenter-example-output'>10000</pre>
+<pre class='language-julia'><code class='julia hljs'>sample_size = 10_000</code></pre>
+<pre id='var-sample_size' class=''>10000</pre>
 
-<pre class='language-julia'><code class='language-julia'>sample_data = let
+<pre class='language-julia'><code class='julia hljs'>sample_data = let
     # generate fake data
     df = DataFrame(
         "sex" =&gt; rand(["Male","Female"],sample_size),
@@ -72,73 +72,73 @@ end</code></pre>
 
 <tr>
 <td>1
-<td>"Male"
+<td>"Female"
 <td>"Smoker"
-<td>29
-<td>35
+<td>40
+<td>41
 
 <tr>
 <td>2
 <td>"Female"
-<td>"Nonsmoker"
-<td>53
-<td>59
+<td>"Smoker"
+<td>48
+<td>51
 
 <tr>
 <td>3
 <td>"Female"
 <td>"Nonsmoker"
-<td>27
-<td>32
+<td>61
+<td>62
 
 <tr>
 <td>4
-<td>"Male"
+<td>"Female"
 <td>"Nonsmoker"
-<td>45
-<td>52
+<td>48
+<td>51
 
 <tr>
 <td>5
 <td>"Female"
-<td>"Nonsmoker"
-<td>32
-<td>34
+<td>"Smoker"
+<td>64
+<td>74
 
 <tr>
 <td>6
-<td>"Female"
+<td>"Male"
 <td>"Smoker"
-<td>27
-<td>37
+<td>65
+<td>66
 
 <tr>
 <td>7
 <td>"Female"
 <td>"Smoker"
-<td>26
-<td>30
+<td>50
+<td>51
 
 <tr>
 <td>8
-<td>"Male"
-<td>"Smoker"
-<td>33
-<td>35
+<td>"Female"
+<td>"Nonsmoker"
+<td>40
+<td>41
 
 <tr>
 <td>9
 <td>"Male"
 <td>"Smoker"
-<td>51
-<td>57
+<td>36
+<td>43
 
 <tr>
 <td>10
-<td>"Male"
-<td>"Nonsmoker"
-<td>61
-<td>69
+<td>"Female"
+<td>"Smoker"
+<td>26
+<td>31
 
 <tr>
 <td>...
@@ -147,8 +147,8 @@ end</code></pre>
 <td>10000
 <td>"Male"
 <td>"Smoker"
-<td>42
-<td>49
+<td>32
+<td>40
 
 </table>
 
@@ -162,7 +162,7 @@ end</code></pre>
 <p>It&#39;s easy to define the parameters applicable to your assumption set. Here, we&#39;ll use a dictionary to define the relationship:</p>
 </div>
 
-<pre class='language-julia'><code class='language-julia'>rate_map = Dict(
+<pre class='language-julia'><code class='julia hljs'>rate_map = Dict(
     "Male" =&gt; Dict(
         "Smoker" =&gt; MortalityTables.table("2001 VBT Residual Standard Select and Ultimate - Male Smoker, ANB"),
         "Nonsmoker" =&gt; MortalityTables.table("2001 VBT Residual Standard Select and Ultimate - Male Nonsmoker, ANB"),
@@ -180,7 +180,7 @@ end</code></pre>
 <div class=markdown ><p>and then we&#39;ll define a function to look up the relevant rate. Note how the function matches the levels we defined for the assumption set dictionary above.</p>
 </div>
 
-<pre class='language-julia'><code class='language-julia'>function rate_lookup(assumption_map,sex,smoke,issue_age,attained_age)
+<pre class='language-julia'><code class='julia hljs'>function rate_lookup(assumption_map,sex,smoke,issue_age,attained_age)
     # pick the relevant table
     table = assumption_map[sex][smoke]
     
@@ -193,40 +193,40 @@ end</code></pre>
 end
     
     </code></pre>
-<pre id='var-rate_lookup' class='code-output documenter-example-output'>rate_lookup (generic function with 1 method)</pre>
+<pre id='var-rate_lookup' class=''>rate_lookup (generic function with 1 method)</pre>
 
 
 <div class=markdown ><h3>Lining up with dataframe</h3>
 <p>By mapping each row&#39;s data to the lookup function, we get a vector of rates for our data:</p>
 </div>
 
-<pre class='language-julia'><code class='language-julia'>rates = map(eachrow(sample_data)) do row
+<pre class='language-julia'><code class='julia hljs'>rates = map(eachrow(sample_data)) do row
     rate_lookup(rate_map,row.sex,row.smoke,row.issue_age,row.attained_age)
 end</code></pre>
-<pre id='var-rates' class='code-output documenter-example-output'>10000-element Vector{Float64}:
- 0.00152
- 0.00385
- 0.00045
- 0.00296
- 0.00034
- 0.00139
- 0.00062
+<pre id='var-rates' class=''>10000-element Vector{Float64}:
+ 0.00081
+ 0.0037
+ 0.00275
+ 0.00166
+ 0.03329
+ 0.01045
+ 0.00282
  ⋮
- 0.00277
- 0.00245
- 0.00547
- 0.00237
- 0.00137
- 0.00503</pre>
+ 0.00081
+ 0.00062
+ 0.00479
+ 0.01335
+ 0.00166
+ 0.00222</pre>
 
 
 <div class=markdown ><p>And finally, we can just add this to the dataframe:</p>
 </div>
 
-<pre class='language-julia'><code class='language-julia'>sample_data.expectation = rates;</code></pre>
+<pre class='language-julia'><code class='julia hljs'>sample_data.expectation = rates;</code></pre>
 
 
-<pre class='language-julia'><code class='language-julia'>sample_data</code></pre>
+<pre class='language-julia'><code class='julia hljs'>sample_data</code></pre>
 <table>
 <tr>
 <th>
@@ -238,83 +238,83 @@ end</code></pre>
 
 <tr>
 <td>1
-<td>"Male"
+<td>"Female"
 <td>"Smoker"
-<td>29
-<td>35
-<td>0.00152
+<td>40
+<td>41
+<td>0.00081
 
 <tr>
 <td>2
 <td>"Female"
-<td>"Nonsmoker"
-<td>53
-<td>59
-<td>0.00385
+<td>"Smoker"
+<td>48
+<td>51
+<td>0.0037
 
 <tr>
 <td>3
 <td>"Female"
 <td>"Nonsmoker"
-<td>27
-<td>32
-<td>0.00045
+<td>61
+<td>62
+<td>0.00275
 
 <tr>
 <td>4
-<td>"Male"
+<td>"Female"
 <td>"Nonsmoker"
-<td>45
-<td>52
-<td>0.00296
+<td>48
+<td>51
+<td>0.00166
 
 <tr>
 <td>5
 <td>"Female"
-<td>"Nonsmoker"
-<td>32
-<td>34
-<td>0.00034
+<td>"Smoker"
+<td>64
+<td>74
+<td>0.03329
 
 <tr>
 <td>6
-<td>"Female"
+<td>"Male"
 <td>"Smoker"
-<td>27
-<td>37
-<td>0.00139
+<td>65
+<td>66
+<td>0.01045
 
 <tr>
 <td>7
 <td>"Female"
 <td>"Smoker"
-<td>26
-<td>30
-<td>0.00062
+<td>50
+<td>51
+<td>0.00282
 
 <tr>
 <td>8
-<td>"Male"
-<td>"Smoker"
-<td>33
-<td>35
-<td>0.00109
+<td>"Female"
+<td>"Nonsmoker"
+<td>40
+<td>41
+<td>0.00041
 
 <tr>
 <td>9
 <td>"Male"
 <td>"Smoker"
-<td>51
-<td>57
-<td>0.0087
+<td>36
+<td>43
+<td>0.00277
 
 <tr>
 <td>10
-<td>"Male"
-<td>"Nonsmoker"
-<td>61
-<td>69
-<td>0.01403
+<td>"Female"
+<td>"Smoker"
+<td>26
+<td>31
+<td>0.00073
 
 <tr>
 <td>...
@@ -323,14 +323,14 @@ end</code></pre>
 <td>10000
 <td>"Male"
 <td>"Smoker"
-<td>42
-<td>49
-<td>0.00503
+<td>32
+<td>40
+<td>0.00222
 
 </table>
 
 
-<pre class='language-julia'><code class='language-julia'>begin
+<pre class='language-julia'><code class='julia hljs'>begin
     # add a table of contents to the page
     using PlutoUI
     TableOfContents()

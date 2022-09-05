@@ -16,12 +16,12 @@
 <div class="markdown"><p>First, we include the package, and then we&#39;ll pick a table, where all of the <code>mort.soa.org</code> tables are mirrored into your MortalityTables.jl installation.</p>
 </div>
 
-<pre class='language-julia'><code class='language-julia'>begin
+<pre class='language-julia'><code class='julia hljs'>begin
     using MortalityTables
 
     vbt = MortalityTables.table("2001 VBT Residual Standard Select and Ultimate - Male Nonsmoker, ANB") #or any other table
 end</code></pre>
-<pre id='var-vbt' class='code-output documenter-example-output'>MortalityTable (Insured Lives Mortality):
+<pre id='var-vbt' class=''>MortalityTable (Insured Lives Mortality):
    Name:
        2001 VBT Residual Standard Select and Ultimate - Male Nonsmoker, ANB
    Fields: 
@@ -40,8 +40,8 @@ end</code></pre>
 <div class="markdown"><p>To see how the data is represented, we can look at the the select data for a 55 year old and see the attained age and mortality rates:</p>
 </div>
 
-<pre class='language-julia'><code class='language-julia'>vbt.select[55]</code></pre>
-<pre id='var-hash107198' class='code-output documenter-example-output'>66-element OffsetArray(::Vector{Float64}, 55:120) with eltype Float64 with indices 55:120:
+<pre class='language-julia'><code class='julia hljs'>vbt.select[55]</code></pre>
+<pre id='var-hash107198' class=''>66-element OffsetArray(::Vector{Float64}, 55:120) with eltype Float64 with indices 55:120:
  0.00139
  0.00218
  0.00288
@@ -69,13 +69,13 @@ end</code></pre>
 <div class="markdown"><h3>Generate sample data</h3>
 </div>
 
-<pre class='language-julia'><code class='language-julia'>using DataFrames</code></pre>
+<pre class='language-julia'><code class='julia hljs'>using DataFrames</code></pre>
 
 
-<pre class='language-julia'><code class='language-julia'>sample_size = 10_000</code></pre>
-<pre id='var-sample_size' class='code-output documenter-example-output'>10000</pre>
+<pre class='language-julia'><code class='julia hljs'>sample_size = 10_000</code></pre>
+<pre id='var-sample_size' class=''>10000</pre>
 
-<pre class='language-julia'><code class='language-julia'>sample_data = let
+<pre class='language-julia'><code class='julia hljs'>sample_data = let
     # generate fake data
     df = DataFrame(
         "sex" =&gt; rand(["Male","Female"],sample_size),
@@ -97,73 +97,73 @@ end</code></pre>
 </tr>
 <tr>
 <td>1</td>
-<td>"Male"</td>
+<td>"Female"</td>
 <td>"Smoker"</td>
-<td>29</td>
-<td>35</td>
+<td>40</td>
+<td>41</td>
 </tr>
 <tr>
 <td>2</td>
 <td>"Female"</td>
-<td>"Nonsmoker"</td>
-<td>53</td>
-<td>59</td>
+<td>"Smoker"</td>
+<td>48</td>
+<td>51</td>
 </tr>
 <tr>
 <td>3</td>
 <td>"Female"</td>
 <td>"Nonsmoker"</td>
-<td>27</td>
-<td>32</td>
+<td>61</td>
+<td>62</td>
 </tr>
 <tr>
 <td>4</td>
-<td>"Male"</td>
+<td>"Female"</td>
 <td>"Nonsmoker"</td>
-<td>45</td>
-<td>52</td>
+<td>48</td>
+<td>51</td>
 </tr>
 <tr>
 <td>5</td>
 <td>"Female"</td>
-<td>"Nonsmoker"</td>
-<td>32</td>
-<td>34</td>
+<td>"Smoker"</td>
+<td>64</td>
+<td>74</td>
 </tr>
 <tr>
 <td>6</td>
-<td>"Female"</td>
+<td>"Male"</td>
 <td>"Smoker"</td>
-<td>27</td>
-<td>37</td>
+<td>65</td>
+<td>66</td>
 </tr>
 <tr>
 <td>7</td>
 <td>"Female"</td>
 <td>"Smoker"</td>
-<td>26</td>
-<td>30</td>
+<td>50</td>
+<td>51</td>
 </tr>
 <tr>
 <td>8</td>
-<td>"Male"</td>
-<td>"Smoker"</td>
-<td>33</td>
-<td>35</td>
+<td>"Female"</td>
+<td>"Nonsmoker"</td>
+<td>40</td>
+<td>41</td>
 </tr>
 <tr>
 <td>9</td>
 <td>"Male"</td>
 <td>"Smoker"</td>
-<td>51</td>
-<td>57</td>
+<td>36</td>
+<td>43</td>
 </tr>
 <tr>
 <td>10</td>
-<td>"Male"</td>
-<td>"Nonsmoker"</td>
-<td>61</td>
-<td>69</td>
+<td>"Female"</td>
+<td>"Smoker"</td>
+<td>26</td>
+<td>31</td>
 </tr>
 <tr>
 <td>...</td>
@@ -172,8 +172,8 @@ end</code></pre>
 <td>10000</td>
 <td>"Male"</td>
 <td>"Smoker"</td>
-<td>42</td>
-<td>49</td>
+<td>32</td>
+<td>40</td>
 </tr>
 </table>
 
@@ -187,7 +187,7 @@ end</code></pre>
 <p>It&#39;s easy to define the parameters applicable to your assumption set. Here, we&#39;ll use a dictionary to define the relationship:</p>
 </div>
 
-<pre class='language-julia'><code class='language-julia'>rate_map = Dict(
+<pre class='language-julia'><code class='julia hljs'>rate_map = Dict(
     "Male" =&gt; Dict(
         "Smoker" =&gt; MortalityTables.table("2001 VBT Residual Standard Select and Ultimate - Male Smoker, ANB"),
         "Nonsmoker" =&gt; MortalityTables.table("2001 VBT Residual Standard Select and Ultimate - Male Nonsmoker, ANB"),
@@ -205,7 +205,7 @@ end</code></pre>
 <div class="markdown"><p>and then we&#39;ll define a function to look up the relevant rate. Note how the function matches the levels we defined for the assumption set dictionary above.</p>
 </div>
 
-<pre class='language-julia'><code class='language-julia'>function rate_lookup(assumption_map,sex,smoke,issue_age,attained_age)
+<pre class='language-julia'><code class='julia hljs'>function rate_lookup(assumption_map,sex,smoke,issue_age,attained_age)
     # pick the relevant table
     table = assumption_map[sex][smoke]
     
@@ -218,40 +218,40 @@ end</code></pre>
 end
     
     </code></pre>
-<pre id='var-rate_lookup' class='code-output documenter-example-output'>rate_lookup (generic function with 1 method)</pre>
+<pre id='var-rate_lookup' class=''>rate_lookup (generic function with 1 method)</pre>
 
 
 <div class="markdown"><h3>Lining up with dataframe</h3>
 <p>By mapping each row&#39;s data to the lookup function, we get a vector of rates for our data:</p>
 </div>
 
-<pre class='language-julia'><code class='language-julia'>rates = map(eachrow(sample_data)) do row
+<pre class='language-julia'><code class='julia hljs'>rates = map(eachrow(sample_data)) do row
     rate_lookup(rate_map,row.sex,row.smoke,row.issue_age,row.attained_age)
 end</code></pre>
-<pre id='var-rates' class='code-output documenter-example-output'>10000-element Vector{Float64}:
- 0.00152
- 0.00385
- 0.00045
- 0.00296
- 0.00034
- 0.00139
- 0.00062
+<pre id='var-rates' class=''>10000-element Vector{Float64}:
+ 0.00081
+ 0.0037
+ 0.00275
+ 0.00166
+ 0.03329
+ 0.01045
+ 0.00282
  ⋮
- 0.00277
- 0.00245
- 0.00547
- 0.00237
- 0.00137
- 0.00503</pre>
+ 0.00081
+ 0.00062
+ 0.00479
+ 0.01335
+ 0.00166
+ 0.00222</pre>
 
 
 <div class="markdown"><p>And finally, we can just add this to the dataframe:</p>
 </div>
 
-<pre class='language-julia'><code class='language-julia'>sample_data.expectation = rates;</code></pre>
+<pre class='language-julia'><code class='julia hljs'>sample_data.expectation = rates;</code></pre>
 
 
-<pre class='language-julia'><code class='language-julia'>sample_data</code></pre>
+<pre class='language-julia'><code class='julia hljs'>sample_data</code></pre>
 <table>
 <tr>
 <th></th>
@@ -263,83 +263,83 @@ end</code></pre>
 </tr>
 <tr>
 <td>1</td>
-<td>"Male"</td>
+<td>"Female"</td>
 <td>"Smoker"</td>
-<td>29</td>
-<td>35</td>
-<td>0.00152</td>
+<td>40</td>
+<td>41</td>
+<td>0.00081</td>
 </tr>
 <tr>
 <td>2</td>
 <td>"Female"</td>
-<td>"Nonsmoker"</td>
-<td>53</td>
-<td>59</td>
-<td>0.00385</td>
+<td>"Smoker"</td>
+<td>48</td>
+<td>51</td>
+<td>0.0037</td>
 </tr>
 <tr>
 <td>3</td>
 <td>"Female"</td>
 <td>"Nonsmoker"</td>
-<td>27</td>
-<td>32</td>
-<td>0.00045</td>
+<td>61</td>
+<td>62</td>
+<td>0.00275</td>
 </tr>
 <tr>
 <td>4</td>
-<td>"Male"</td>
+<td>"Female"</td>
 <td>"Nonsmoker"</td>
-<td>45</td>
-<td>52</td>
-<td>0.00296</td>
+<td>48</td>
+<td>51</td>
+<td>0.00166</td>
 </tr>
 <tr>
 <td>5</td>
 <td>"Female"</td>
-<td>"Nonsmoker"</td>
-<td>32</td>
-<td>34</td>
-<td>0.00034</td>
+<td>"Smoker"</td>
+<td>64</td>
+<td>74</td>
+<td>0.03329</td>
 </tr>
 <tr>
 <td>6</td>
-<td>"Female"</td>
+<td>"Male"</td>
 <td>"Smoker"</td>
-<td>27</td>
-<td>37</td>
-<td>0.00139</td>
+<td>65</td>
+<td>66</td>
+<td>0.01045</td>
 </tr>
 <tr>
 <td>7</td>
 <td>"Female"</td>
 <td>"Smoker"</td>
-<td>26</td>
-<td>30</td>
-<td>0.00062</td>
+<td>50</td>
+<td>51</td>
+<td>0.00282</td>
 </tr>
 <tr>
 <td>8</td>
-<td>"Male"</td>
-<td>"Smoker"</td>
-<td>33</td>
-<td>35</td>
-<td>0.00109</td>
+<td>"Female"</td>
+<td>"Nonsmoker"</td>
+<td>40</td>
+<td>41</td>
+<td>0.00041</td>
 </tr>
 <tr>
 <td>9</td>
 <td>"Male"</td>
 <td>"Smoker"</td>
-<td>51</td>
-<td>57</td>
-<td>0.0087</td>
+<td>36</td>
+<td>43</td>
+<td>0.00277</td>
 </tr>
 <tr>
 <td>10</td>
-<td>"Male"</td>
-<td>"Nonsmoker"</td>
-<td>61</td>
-<td>69</td>
-<td>0.01403</td>
+<td>"Female"</td>
+<td>"Smoker"</td>
+<td>26</td>
+<td>31</td>
+<td>0.00073</td>
 </tr>
 <tr>
 <td>...</td>
@@ -348,14 +348,14 @@ end</code></pre>
 <td>10000</td>
 <td>"Male"</td>
 <td>"Smoker"</td>
-<td>42</td>
-<td>49</td>
-<td>0.00503</td>
+<td>32</td>
+<td>40</td>
+<td>0.00222</td>
 </tr>
 </table>
 
 
-<pre class='language-julia'><code class='language-julia'>begin
+<pre class='language-julia'><code class='julia hljs'>begin
     # add a table of contents to the page
     using PlutoUI
     TableOfContents()
