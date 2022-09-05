@@ -16,7 +16,7 @@
 <div class="markdown"><p>First, we include the package, and then we&#39;ll pick a table, where all of the <code>mort.soa.org</code> tables are mirrored into your MortalityTables.jl installation.</p>
 </div>
 
-<pre class='language-julia'><code class='julia hljs pluto-input'>begin
+<pre class='language-julia'><code class='julia hljs'>begin
     using MortalityTables
 
     vbt = MortalityTables.table("2001 VBT Residual Standard Select and Ultimate - Male Nonsmoker, ANB") #or any other table
@@ -40,7 +40,7 @@ end</code></pre>
 <div class="markdown"><p>To see how the data is represented, we can look at the the select data for a 55 year old and see the attained age and mortality rates:</p>
 </div>
 
-<pre class='language-julia'><code class='julia hljs pluto-input'>vbt.select[55]</code></pre>
+<pre class='language-julia'><code class='julia hljs'>vbt.select[55]</code></pre>
 <pre id='var-hash107198' class='pluto-output'>66-element OffsetArray(::Vector{Float64}, 55:120) with eltype Float64 with indices 55:120:
  0.00139
  0.00218
@@ -69,13 +69,13 @@ end</code></pre>
 <div class="markdown"><h3>Generate sample data</h3>
 </div>
 
-<pre class='language-julia'><code class='julia hljs pluto-input'>using DataFrames</code></pre>
+<pre class='language-julia'><code class='julia hljs'>using DataFrames</code></pre>
 
 
-<pre class='language-julia'><code class='julia hljs pluto-input'>sample_size = 10_000</code></pre>
+<pre class='language-julia'><code class='julia hljs'>sample_size = 10_000</code></pre>
 <pre id='var-sample_size' class='pluto-output'>10000</pre>
 
-<pre class='language-julia'><code class='julia hljs pluto-input'>sample_data = let
+<pre class='language-julia'><code class='julia hljs'>sample_data = let
     # generate fake data
     df = DataFrame(
         "sex" =&gt; rand(["Male","Female"],sample_size),
@@ -97,71 +97,71 @@ end</code></pre>
 </tr>
 <tr>
 <td>1</td>
-<td>"Female"</td>
-<td>"Smoker"</td>
-<td>54</td>
-<td>56</td>
+<td>"Male"</td>
+<td>"Nonsmoker"</td>
+<td>40</td>
+<td>41</td>
 </tr>
 <tr>
 <td>2</td>
-<td>"Female"</td>
+<td>"Male"</td>
 <td>"Smoker"</td>
-<td>40</td>
-<td>50</td>
+<td>61</td>
+<td>71</td>
 </tr>
 <tr>
 <td>3</td>
 <td>"Male"</td>
-<td>"Nonsmoker"</td>
-<td>64</td>
-<td>65</td>
+<td>"Smoker"</td>
+<td>32</td>
+<td>34</td>
 </tr>
 <tr>
 <td>4</td>
-<td>"Female"</td>
-<td>"Smoker"</td>
-<td>56</td>
+<td>"Male"</td>
+<td>"Nonsmoker"</td>
 <td>59</td>
+<td>68</td>
 </tr>
 <tr>
 <td>5</td>
 <td>"Female"</td>
-<td>"Nonsmoker"</td>
-<td>63</td>
-<td>72</td>
+<td>"Smoker"</td>
+<td>59</td>
+<td>64</td>
 </tr>
 <tr>
 <td>6</td>
 <td>"Male"</td>
 <td>"Smoker"</td>
-<td>41</td>
-<td>49</td>
+<td>27</td>
+<td>34</td>
 </tr>
 <tr>
 <td>7</td>
 <td>"Female"</td>
 <td>"Smoker"</td>
-<td>30</td>
-<td>40</td>
+<td>54</td>
+<td>57</td>
 </tr>
 <tr>
 <td>8</td>
-<td>"Female"</td>
-<td>"Smoker"</td>
-<td>53</td>
-<td>56</td>
+<td>"Male"</td>
+<td>"Nonsmoker"</td>
+<td>43</td>
+<td>52</td>
 </tr>
 <tr>
 <td>9</td>
 <td>"Male"</td>
 <td>"Nonsmoker"</td>
-<td>50</td>
-<td>60</td>
+<td>35</td>
+<td>36</td>
 </tr>
 <tr>
 <td>10</td>
-<td>"Female"</td>
-<td>"Nonsmoker"</td>
+<td>"Male"</td>
+<td>"Smoker"</td>
 <td>27</td>
 <td>34</td>
 </tr>
@@ -172,8 +172,8 @@ end</code></pre>
 <td>10000</td>
 <td>"Male"</td>
 <td>"Smoker"</td>
-<td>36</td>
-<td>43</td>
+<td>40</td>
+<td>42</td>
 </tr>
 </table>
 
@@ -187,7 +187,7 @@ end</code></pre>
 <p>It&#39;s easy to define the parameters applicable to your assumption set. Here, we&#39;ll use a dictionary to define the relationship:</p>
 </div>
 
-<pre class='language-julia'><code class='julia hljs pluto-input'>rate_map = Dict(
+<pre class='language-julia'><code class='julia hljs'>rate_map = Dict(
     "Male" =&gt; Dict(
         "Smoker" =&gt; MortalityTables.table("2001 VBT Residual Standard Select and Ultimate - Male Smoker, ANB"),
         "Nonsmoker" =&gt; MortalityTables.table("2001 VBT Residual Standard Select and Ultimate - Male Nonsmoker, ANB"),
@@ -205,7 +205,7 @@ end</code></pre>
 <div class="markdown"><p>and then we&#39;ll define a function to look up the relevant rate. Note how the function matches the levels we defined for the assumption set dictionary above.</p>
 </div>
 
-<pre class='language-julia'><code class='julia hljs pluto-input'>function rate_lookup(assumption_map,sex,smoke,issue_age,attained_age)
+<pre class='language-julia'><code class='julia hljs'>function rate_lookup(assumption_map,sex,smoke,issue_age,attained_age)
     # pick the relevant table
     table = assumption_map[sex][smoke]
     
@@ -225,33 +225,33 @@ end
 <p>By mapping each row&#39;s data to the lookup function, we get a vector of rates for our data:</p>
 </div>
 
-<pre class='language-julia'><code class='julia hljs pluto-input'>rates = map(eachrow(sample_data)) do row
+<pre class='language-julia'><code class='julia hljs'>rates = map(eachrow(sample_data)) do row
     rate_lookup(rate_map,row.sex,row.smoke,row.issue_age,row.attained_age)
 end</code></pre>
 <pre id='var-rates' class='pluto-output'>10000-element Vector{Float64}:
- 0.00515
- 0.00458
- 0.0044
- 0.00675
- 0.01429
- 0.00518
- 0.00161
+ 0.00068
+ 0.03845
+ 0.00105
+ 0.01467
+ 0.01071
+ 0.00143
+ 0.0059
  ⋮
- 0.00179
- 0.00886
- 0.00124
- 0.03264
- 0.00059
- 0.00277</pre>
+ 0.01577
+ 0.00155
+ 0.0208
+ 0.00518
+ 0.02502
+ 0.00172</pre>
 
 
 <div class="markdown"><p>And finally, we can just add this to the dataframe:</p>
 </div>
 
-<pre class='language-julia'><code class='julia hljs pluto-input'>sample_data.expectation = rates;</code></pre>
+<pre class='language-julia'><code class='julia hljs'>sample_data.expectation = rates;</code></pre>
 
 
-<pre class='language-julia'><code class='julia hljs pluto-input'>sample_data</code></pre>
+<pre class='language-julia'><code class='julia hljs'>sample_data</code></pre>
 <table>
 <tr>
 <th></th>
@@ -263,83 +263,83 @@ end</code></pre>
 </tr>
 <tr>
 <td>1</td>
-<td>"Female"</td>
-<td>"Smoker"</td>
-<td>54</td>
-<td>56</td>
-<td>0.00515</td>
+<td>"Male"</td>
+<td>"Nonsmoker"</td>
+<td>40</td>
+<td>41</td>
+<td>0.00068</td>
 </tr>
 <tr>
 <td>2</td>
-<td>"Female"</td>
+<td>"Male"</td>
 <td>"Smoker"</td>
-<td>40</td>
-<td>50</td>
-<td>0.00458</td>
+<td>61</td>
+<td>71</td>
+<td>0.03845</td>
 </tr>
 <tr>
 <td>3</td>
 <td>"Male"</td>
-<td>"Nonsmoker"</td>
-<td>64</td>
-<td>65</td>
-<td>0.0044</td>
+<td>"Smoker"</td>
+<td>32</td>
+<td>34</td>
+<td>0.00105</td>
 </tr>
 <tr>
 <td>4</td>
-<td>"Female"</td>
-<td>"Smoker"</td>
-<td>56</td>
+<td>"Male"</td>
+<td>"Nonsmoker"</td>
 <td>59</td>
-<td>0.00675</td>
+<td>68</td>
+<td>0.01467</td>
 </tr>
 <tr>
 <td>5</td>
 <td>"Female"</td>
-<td>"Nonsmoker"</td>
-<td>63</td>
-<td>72</td>
-<td>0.01429</td>
+<td>"Smoker"</td>
+<td>59</td>
+<td>64</td>
+<td>0.01071</td>
 </tr>
 <tr>
 <td>6</td>
 <td>"Male"</td>
 <td>"Smoker"</td>
-<td>41</td>
-<td>49</td>
-<td>0.00518</td>
+<td>27</td>
+<td>34</td>
+<td>0.00143</td>
 </tr>
 <tr>
 <td>7</td>
 <td>"Female"</td>
 <td>"Smoker"</td>
-<td>30</td>
-<td>40</td>
-<td>0.00161</td>
+<td>54</td>
+<td>57</td>
+<td>0.0059</td>
 </tr>
 <tr>
 <td>8</td>
-<td>"Female"</td>
-<td>"Smoker"</td>
-<td>53</td>
-<td>56</td>
-<td>0.0055</td>
+<td>"Male"</td>
+<td>"Nonsmoker"</td>
+<td>43</td>
+<td>52</td>
+<td>0.00323</td>
 </tr>
 <tr>
 <td>9</td>
 <td>"Male"</td>
 <td>"Nonsmoker"</td>
-<td>50</td>
-<td>60</td>
-<td>0.00706</td>
+<td>35</td>
+<td>36</td>
+<td>0.00048</td>
 </tr>
 <tr>
 <td>10</td>
-<td>"Female"</td>
-<td>"Nonsmoker"</td>
+<td>"Male"</td>
+<td>"Smoker"</td>
 <td>27</td>
 <td>34</td>
-<td>0.00056</td>
+<td>0.00143</td>
 </tr>
 <tr>
 <td>...</td>
@@ -348,14 +348,14 @@ end</code></pre>
 <td>10000</td>
 <td>"Male"</td>
 <td>"Smoker"</td>
-<td>36</td>
-<td>43</td>
-<td>0.00277</td>
+<td>40</td>
+<td>42</td>
+<td>0.00172</td>
 </tr>
 </table>
 
 
-<pre class='language-julia'><code class='julia hljs pluto-input'>begin
+<pre class='language-julia'><code class='julia hljs'>begin
     # add a table of contents to the page
     using PlutoUI
     TableOfContents()
@@ -536,7 +536,7 @@ PlutoUI 0.7.9
 <!-- PlutoStaticHTML.End -->
 ~~~
 
-_To run this tutorial locally, download [this file](/tutorials/MortalityTablesDataFrame.jl) and open it with
+_To run this tutorial locally, download [this file](/notebooks/MortalityTablesDataFrame.jl) and open it with
 [Pluto.jl](https://plutojl.org)._
 
 ~~~

@@ -399,6 +399,13 @@ code {
     color: rgb(51, 131, 231);
 }
 
+.pluto-output {
+    background: rgba(210, 210, 210, 0.5);
+    
+    padding: 0.2em 0.4em;
+    border-radius: 2px;
+    font-variant-ligatures: contextual;
+}
 /* ==================================================================
     BOXES
 ================================================================== */
