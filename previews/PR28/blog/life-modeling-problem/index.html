@@ -1,63 +1,63 @@
-<!doctype html> <html lang=en > <meta charset=UTF-8 > <meta name=viewport  content="width=device-width, initial-scale=1"> <meta name=Description  content="Practical, extensible, and open-source actuarial modeling and analysis."> <meta property="og:description" content="Practical, extensible, and open-source actuarial modeling and analysis."> <meta property="og:image" content="/assets/logo_square.svg"> <link rel=stylesheet  href="/previews/PR28/libs/highlight/github.min.css"> <link rel=stylesheet  href="/previews/PR28/css/franklin.css"> <link rel=stylesheet  href="/previews/PR28/css/basic.css"> <link rel=icon  href="/previews/PR28/assets/favicon.png"> <title>The Life Modeling Problem: A Comparison of Julia, Rust, Python, and R | JuliaActuary</title> <link rel=apple-touch-icon  sizes=180x180  href="/previews/PR28/assets/apple-touch-icon.png"> <link rel=icon  type="image/png" sizes=32x32  href="/previews/PR28/assets/favicon-32x32.png"> <link rel=icon  type="image/png" sizes=16x16  href="/previews/PR28/assets/favicon-16x16.png"> <link rel=manifest  href="/previews/PR28/assets/site.webmanifest"> <script src="https://cdn.jsdelivr.net/npm/swiffy-slider@1.2.0/dist/js/swiffy-slider.min.js" crossorigin=anonymous  defer></script> <link href="/previews/PR28/css/slider.css" rel=stylesheet > <header> <div class=blog-name > <a href="/previews/PR28/"> <div class=blog-name-logo-container > <div class=blog-name-logo > <img src="/previews/PR28/assets/logo_square.svg" alt=logo  height=100px  width=100px  /> </div> <div>JuliaActuary</div> </div> </a> <div class=tagline >Practical, extensible, and open-source actuarial modeling and analysis. </div> </div> <nav> <ul> <li><a href="/previews/PR28/">Home</a> <li><a href="/previews/PR28/packages">Packages</a> <li><a href="/previews/PR28/community">Community</a> <ul> <li><a href="/previews/PR28/community/#learn">Learn</a> <li><a href="/previews/PR28/community/#integration_with_r_and_python">Integration</a> <li><a href="/previews/PR28/community/#contributing">Contributing</a> </ul> <li><a href="/previews/PR28/#blog">Blog</a> </ul> <img src="/previews/PR28/assets/hamburger.svg" id=menu-icon > </nav> </header> <div class=franklin-content ><h1 id=fill_title ><a href="#fill_title" class=header-anchor >The Life Modeling Problem: A Comparison of Julia, Rust, Python, and R</a></h1> <p><em>By: Alec Loudenback</em></p> <p><em>May 16, 2021</em></p> <blockquote> <p><strong>&#33;&#33; Note that this article is a draft</strong></p> </blockquote> <p><em>Note: This is an extended discussion of the results from one of the items on the <a href="/previews/PR28/benchmarks/">Benchmarks</a> page.</em></p> <p>In the <a href="https://github.com/actuarialopensource">ActuarialOpenSource</a> GitHub organization, a discussion began of the &quot;Life Modeling Problem&quot; &#40;LMP&#41; in actuarial science.</p> <p>I think the &quot;Life Modeling Problem&quot; has the following attributes:</p> <ul> <li><p>Recursive calculations</p> <li><p>Computationally intensive</p> <li><p>Large volume of data to process</p> </ul> <p>The following discussion will get a little bit technical, but I think there are a few key takeaways:</p> <ol> <li><p>There are a lot of ways to accomplish the same task and and that&#39;s good enough in most cases</p> <li><p>The approach to a problem makes a big difference: &quot;if all you have is a dataframe, everything looks like a join&quot;</p> <li><p>Performance, flexibility, readability: pick one, two, or three depending on the language</p> </ol> <p>To skip the background and the discussion, <a href="#benchmarks">click here to jump to the benchmarks</a>.</p> <h2 id=the_life_modeling_problem ><a href="#the_life_modeling_problem" class=header-anchor >The Life Modeling Problem</a></h2> <p>Inspired by the discussion in the <a href="https://github.com/actuarialopensource">ActuarialOpenSource</a> GitHub community discussion, folks started submitted solutions to what someone referred to as the &quot;Life Modeling Problem&quot;. This user <a href="https://github.com/orgs/actuarialopensource/teams/common-room/discussions/5">submitted a short snippet</a> for consideration of a representative problem.</p> <p>My take on the characteristics are that modeling life actuarial science problems breaks down to the following items:</p> <ul> <li><p>Calculations are recursive in nature</p> <li><p>Computationally intensive calculations</p> <li><p>Performance matters given large volumes of data to process</p> <li><p>Readability and usability aids in controls and risk</p> </ul> <h3 id=recursive_calculations ><a href="#recursive_calculations" class=header-anchor >Recursive calculations</a></h3> <p>Many actuarial formulas are recursive in nature. Reserves are defined &quot;prospectively&quot; or &quot;retrospectively&quot;. Algorithmically, this means that intra-seriatim calculations &#40;ie account value growth, survivorship&#41; are not amenable to parallelism but iter-seriatim calculations would be &#40;ie calculating multiple policy trajectories simultaneously&#41;.</p> <h3 id=computationally_intensive ><a href="#computationally_intensive" class=header-anchor >Computationally intensive</a></h3> <p>Modeling is incredibly computationally complex due to the volume of data needed to process. For example, CUNA Mutual disclosed that they spin up 50 servers with 20 cores a <a href="https://www.cunamutual.com/landing-pages/that-conference/cuna-mutual-applications">couple of days per month</a> to do the calculations.</p> <h3 id=processing_volume ><a href="#processing_volume" class=header-anchor >Processing volume</a></h3> <p>There&#39;s a cottage industry devoted to inforce compression and model simplifications to get runtime and budgets down to a reasonable level. However, as the capacity for computing has grown, the company and regulatory demands have grown. E.g in the US reserving has transition from net-premium reserve to integrated ALM &#40;CFT&#41; to deterministic scenarios sets &#40;CFT w NY7 &#43; others&#41; to truly stochastic &#40;Stochastic PBR&#41;. &quot;What Intel giveth, the NAIC taketh away.&quot;<sup id="fnref:1"><a href="#fndef:1" class=fnref >[1]</a></sup>.</p> <p>So again, performance matters&#33;</p> <h3 id=readability_and_expressiveness ><a href="#readability_and_expressiveness" class=header-anchor >Readability and Expressiveness</a></h3> <p>Actuaries, even the <a href="/previews/PR28/blog/coding-for-the-future/">10x Actuary</a>, aren&#39;t pure computer scientists and computational efficiency has never been <em>so</em> critical that they sacrifice everything else to get it. So the industry never turned to the 40-year king of performance computation, <a href="https://en.wikipedia.org/wiki/Fortran">Fortran</a>. The syntax is very &quot;close to the machine&quot;. I&#39;s a bit rough to read to anyone not well versed.</p> <p>Interestingly, <a href="https://en.wikipedia.org/wiki/APL_&#40;programming_language&#41;">APL</a> took off and was one of the dominant languages used by actuaries before the advent of <a href="/previews/PR28/blog/coding-for-the-future/#the_10x_actuary">vendor-supplied modeling solutions</a>.</p> <p>Counting the occurrences of a string looks like this in APL:</p> <pre><code class=language-APL >csubs←&#123;0&#61;x←⊃⍸⍺⍷⍵:0 ⋄ 1&#43;⍺∇&#40;¯1&#43;x&#43;⍴⍺&#41;↓⍵&#125;</code></pre>
+<!doctype html> <html lang=en > <meta charset=UTF-8 > <meta name=viewport  content="width=device-width, initial-scale=1"> <meta name=Description  content="Practical, extensible, and open-source actuarial modeling and analysis."> <meta property="og:description" content="Practical, extensible, and open-source actuarial modeling and analysis."> <meta property="og:image" content="/assets/logo_square.svg"> <link rel=stylesheet  href="/previews/PR28/libs/highlight/github.min.css"> <link rel=stylesheet  href="/previews/PR28/css/franklin.css"> <link rel=stylesheet  href="/previews/PR28/css/basic.css"> <link rel=icon  href="/previews/PR28/assets/favicon.png"> <title>The Life Modeling Problem: A Comparison of Julia, Rust, Python, and R | JuliaActuary</title> <link rel=apple-touch-icon  sizes=180x180  href="/previews/PR28/assets/apple-touch-icon.png"> <link rel=icon  type="image/png" sizes=32x32  href="/previews/PR28/assets/favicon-32x32.png"> <link rel=icon  type="image/png" sizes=16x16  href="/previews/PR28/assets/favicon-16x16.png"> <link rel=manifest  href="/previews/PR28/assets/site.webmanifest"> <script src="https://cdn.jsdelivr.net/npm/swiffy-slider@1.2.0/dist/js/swiffy-slider.min.js" crossorigin=anonymous  defer></script> <link href="/previews/PR28/css/slider.css" rel=stylesheet > <header> <div class=blog-name > <a href="/previews/PR28/"> <div class=blog-name-logo-container > <div class=blog-name-logo > <img src="/previews/PR28/assets/logo_square.svg" alt=logo  height=100px  width=100px  /> </div> <div>JuliaActuary</div> </div> </a> <div class=tagline >Practical, extensible, and open-source actuarial modeling and analysis. </div> </div> <nav> <ul> <li><a href="/previews/PR28/">Home</a> <li><a href="/previews/PR28/packages">Packages</a> <li><a href="/previews/PR28/community">Community</a> <ul> <li><a href="/previews/PR28/community/#learn">Learn</a> <li><a href="/previews/PR28/community/#integration_with_r_and_python">Integration</a> <li><a href="/previews/PR28/community/#contributing">Contributing</a> </ul> <li><a href="/previews/PR28/#blog">Blog</a> </ul> <img src="/previews/PR28/assets/hamburger.svg" id=menu-icon > </nav> </header> <div class=franklin-content ><h1 id=fill_title ><a href="#fill_title" class=header-anchor >The Life Modeling Problem: A Comparison of Julia, Rust, Python, and R</a></h1> <p><em>By: Alec Loudenback</em></p> <p><em>May 16, 2021</em></p> <blockquote> <p><strong>&#33;&#33; Note that this article is a draft</strong></p> </blockquote> <p><em>Note: This is an extended discussion of the results from one of the items on the <a href="/previews/PR28/benchmarks/">Benchmarks</a> page.</em></p> <p>In the <a href="https://github.com/actuarialopensource">ActuarialOpenSource</a> GitHub organization, a discussion began of the &quot;Life Modeling Problem&quot; &#40;LMP&#41; in actuarial science.</p> <p>I think the &quot;Life Modeling Problem&quot; has the following attributes:</p> <ul> <li><p>Recursive calculations</p> <li><p>Computationally intensive</p> <li><p>Large volume of data to process</p> </ul> <p>The following discussion will get a little bit technical, but I think there are a few key takeaways:</p> <ol> <li><p>There are a lot of ways to accomplish the same task and and that&#39;s good enough in most cases</p> <li><p>The approach to a problem makes a big difference: &quot;if all you have is a dataframe, everything looks like a join&quot;</p> <li><p>Performance, flexibility, readability: pick one, two, or three depending on the language</p> </ol> <p>To skip the background and the discussion, <a href="#benchmarks">click here to jump to the benchmarks</a>.</p> <h2 id=the_life_modeling_problem ><a href="#the_life_modeling_problem" class=header-anchor >The Life Modeling Problem</a></h2> <p>Inspired by the discussion in the <a href="https://github.com/actuarialopensource">ActuarialOpenSource</a> GitHub community discussion, folks started submitted solutions to what someone referred to as the &quot;Life Modeling Problem&quot;. This user <a href="https://github.com/orgs/actuarialopensource/teams/common-room/discussions/5">submitted a short snippet</a> for consideration of a representative problem.</p> <p>My take on the characteristics are that modeling life actuarial science problems breaks down to the following items:</p> <ul> <li><p>Calculations are recursive in nature</p> <li><p>Computationally intensive calculations</p> <li><p>Performance matters given large volumes of data to process</p> <li><p>Readability and usability aids in controls and risk</p> </ul> <h3 id=recursive_calculations ><a href="#recursive_calculations" class=header-anchor >Recursive calculations</a></h3> <p>Many actuarial formulas are recursive in nature. Reserves are defined &quot;prospectively&quot; or &quot;retrospectively&quot;. Algorithmically, this means that intra-seriatim calculations &#40;ie account value growth, survivorship&#41; are not amenable to parallelism but iter-seriatim calculations would be &#40;ie calculating multiple policy trajectories simultaneously&#41;.</p> <h3 id=computationally_intensive ><a href="#computationally_intensive" class=header-anchor >Computationally intensive</a></h3> <p>Modeling is incredibly computationally complex due to the volume of data needed to process. For example, CUNA Mutual disclosed that they spin up 50 servers with 20 cores a <a href="https://www.cunamutual.com/landing-pages/that-conference/cuna-mutual-applications">couple of days per month</a> to do the calculations.</p> <h3 id=processing_volume ><a href="#processing_volume" class=header-anchor >Processing volume</a></h3> <p>There&#39;s a cottage industry devoted to inforce compression and model simplifications to get runtime and budgets down to a reasonable level. However, as the capacity for computing has grown, the company and regulatory demands have grown. E.g in the US reserving has transition from net-premium reserve to integrated ALM &#40;CFT&#41; to deterministic scenarios sets &#40;CFT w NY7 &#43; others&#41; to truly stochastic &#40;Stochastic PBR&#41;. &quot;What Intel giveth, the NAIC taketh away.&quot;<sup id="fnref:1"><a href="#fndef:1" class=fnref >[1]</a></sup>.</p> <p>So again, performance matters&#33;</p> <h3 id=readability_and_expressiveness ><a href="#readability_and_expressiveness" class=header-anchor >Readability and Expressiveness</a></h3> <p>Actuaries, even the <a href="/previews/PR28/blog/coding-for-the-future/">10x Actuary</a>, aren&#39;t pure computer scientists and computational efficiency has never been <em>so</em> critical that they sacrifice everything else to get it. So the industry never turned to the 40-year king of performance computation, <a href="https://en.wikipedia.org/wiki/Fortran">Fortran</a>. The syntax is very &quot;close to the machine&quot;. I&#39;s a bit rough to read to anyone not well versed.</p> <p>Interestingly, <a href="https://en.wikipedia.org/wiki/APL_&#40;programming_language&#41;">APL</a> took off and was one of the dominant languages used by actuaries before the advent of <a href="/previews/PR28/blog/coding-for-the-future/#the_10x_actuary">vendor-supplied modeling solutions</a>.</p> <p>Counting the occurrences of a string looks like this in APL:</p> <pre><code class="julia hljs">csubs←{<span class=hljs-number >0</span>=x←⊃⍸⍺⍷⍵:<span class=hljs-number >0</span> ⋄ <span class=hljs-number >1</span>+⍺∇(¯<span class=hljs-number >1</span>+x+⍴⍺)↓⍵}</code></pre>
 <p>whereas in Fortran it would be:</p>
-<pre><code class=language-Fortran >function countsubstring&#40;s1, s2&#41; result&#40;c&#41;
-  character&#40;*&#41;, intent&#40;in&#41; :: s1, s2
-  integer :: c, p, posn
+<pre><code class="Fortran hljs"><span class=hljs-function ><span class=hljs-keyword >function</span></span> countsubstring(s1, s2) result(c)
+  <span class=hljs-keyword >character</span>(*), <span class=hljs-keyword >intent</span>(<span class=hljs-keyword >in</span>) :: s1, s2
+  <span class=hljs-keyword >integer</span> :: c, p, posn
  
-  c &#61; 0
-  if&#40;len&#40;s2&#41; &#61;&#61; 0&#41; return
-  p &#61; 1
-  do 
-    posn &#61; index&#40;s1&#40;p:&#41;, s2&#41;
-    if&#40;posn &#61;&#61; 0&#41; return
-    c &#61; c &#43; 1
-    p &#61; p &#43; posn &#43; len&#40;s2&#41; - 1
-  end do
-end function</code></pre>
+  c = <span class=hljs-number >0</span>
+  <span class=hljs-keyword >if</span>(len(s2) == <span class=hljs-number >0</span>) <span class=hljs-keyword >return</span>
+  p = <span class=hljs-number >1</span>
+  <span class=hljs-keyword >do</span> 
+    posn = <span class=hljs-built_in >index</span>(s1(p:), s2)
+    <span class=hljs-keyword >if</span>(posn == <span class=hljs-number >0</span>) <span class=hljs-keyword >return</span>
+    c = c + <span class=hljs-number >1</span>
+    p = p + posn + len(s2) - <span class=hljs-number >1</span>
+  <span class=hljs-keyword >end</span> <span class=hljs-keyword >do</span>
+<span class=hljs-keyword >end</span> <span class=hljs-function ><span class=hljs-keyword >function</span></span></code></pre>
 <p>Maybe more readable to the modern eye than APL, but many actuaries would still recognize what&#39;s going on with the first code example.</p>
 <p>Why did APL take off for Actuaries and not APL? I think <a href="https://en.wikipedia.org/wiki/Expressive_power_&#37;28computer_science&#37;29">expressiveness</a> and the ability to have a language inspired by mathematical notation were attractive. It&#39;s not pleasant to write a lot of boiler-plate simply to achieve a simple objective. </p>
 <p>What is boiler-plate? It&#39;s writing a lot of code supporting the main idea, but straying from a simple mathematical formulation. For example, in high performance object-oriented languages &#40;C#/C&#43;&#43;/Java&#41;, the idiomatic code might involve a special class. See, for example this C# code to count substrings:</p>
-<pre><code class=language-csharp >using System;
+<pre><code class="csharp hljs"><span class=hljs-keyword >using</span> System;
  
-class SubStringTestClass
-&#123;
-   public static int CountSubStrings&#40;this string testString, string testSubstring&#41;
-   &#123;
-        int count &#61; 0;
+<span class=hljs-keyword >class</span> <span class=hljs-title >SubStringTestClass</span>
+{
+   <span class=hljs-function ><span class=hljs-keyword >public</span> <span class=hljs-keyword >static</span> <span class=hljs-built_in >int</span> <span class=hljs-title >CountSubStrings</span>(<span class=hljs-params ><span class=hljs-keyword >this</span> <span class=hljs-built_in >string</span> testString, <span class=hljs-built_in >string</span> testSubstring</span>)</span>
+   {
+        <span class=hljs-built_in >int</span> count = <span class=hljs-number >0</span>;
  
-        if &#40;testString.Contains&#40;testSubstring&#41;&#41;
-        &#123;
-            for &#40;int i &#61; 0; i &lt; testString.Length; i&#43;&#43;&#41;
-            &#123;
-                if &#40;testString.Substring&#40;i&#41;.Length &gt;&#61; testSubstring.Length&#41;
-                &#123;
-                    bool equals &#61; testString.Substring&#40;i, testSubstring.Length&#41;.Equals&#40;testSubstring&#41;;
-                    if &#40;equals&#41;
-                    &#123;
-                        count&#43;&#43;;
-                        i &#43;&#61; testSubstring.Length - 1;
-                    &#125;
-                &#125;
-            &#125;
-        &#125;
-        return count;
-   &#125;
-&#125;</code></pre>
+        <span class=hljs-keyword >if</span> (testString.Contains(testSubstring))
+        {
+            <span class=hljs-keyword >for</span> (<span class=hljs-built_in >int</span> i = <span class=hljs-number >0</span>; i &lt; testString.Length; i++)
+            {
+                <span class=hljs-keyword >if</span> (testString.Substring(i).Length &gt;= testSubstring.Length)
+                {
+                    <span class=hljs-built_in >bool</span> <span class=hljs-keyword >equals</span> = testString.Substring(i, testSubstring.Length).Equals(testSubstring);
+                    <span class=hljs-keyword >if</span> (<span class=hljs-keyword >equals</span>)
+                    {
+                        count++;
+                        i += testSubstring.Length - <span class=hljs-number >1</span>;
+                    }
+                }
+            }
+        }
+        <span class=hljs-keyword >return</span> count;
+   }
+}</code></pre>
 <p>The takeaway from this point, though, is that there is a natural draw towards more expressive, powerful languages than less expressive languages, especially when dealing with mathematically based ideas. So high expressiveness is something we want from a language that solves the LMP.</p>
 <h2 id=benchmarks ><a href="#benchmarks" class=header-anchor >Benchmarks</a></h2>
 <p>After the original user submitted a proposal, others chimed in and submitted versions in their favorite languages. I have collected those versions, and run them on a consistent set of hardware<sup id="fnref:3"><a href="#fndef:3" class=fnref >[2]</a></sup>.</p>
 <p>Some &quot;submissions&quot; were excluded because they involved an entirely different approach, such as <a href="https://en.wikipedia.org/wiki/Memoization">memoizing</a> the function calls<sup id="fnref:2"><a href="#fndef:2" class=fnref >[3]</a></sup>.</p>
-<pre><code class=language-plaintext >Times are nanoseconds:
+<pre><code class="plaintext hljs">Times are nanoseconds:
 ┌────────────────┬─────────────┬───────────────┬──────────┬──────────┐
 │       Language │   Algorithm │ Function Name │   Median │     Mean │
 ├────────────────┼─────────────┼───────────────┼──────────┼──────────┤
-│ R &#40;data.table&#41; │  Vectorized │           npv │ 770554.0 │ 842767.3 │
+│ R (data.table) │  Vectorized │           npv │ 770554.0 │ 842767.3 │
 │              R │  Vectorized │      npv base │   4264.0 │  46617.0 │
 │              R │ Accumulator │      npv_loop │   4346.0 │  62275.7 │
 │           Rust │ Accumulator │           npv │     24.0 │  missing │
-│ Python &#40;NumPy&#41; │  Vectorized │           npv │  missing │  14261.0 │
+│ Python (NumPy) │  Vectorized │           npv │  missing │  14261.0 │
 │         Python │ Accumulator │      npv_loop │  missing │   2314.0 │
-│ Python &#40;Numba&#41; │ Accumulator │     npv_numba │  missing │    626.0 │
+│ Python (Numba) │ Accumulator │     npv_numba │  missing │    626.0 │
 │          Julia │  Vectorized │          npv1 │    235.3 │    228.2 │
 │          Julia │  Vectorized │          npv2 │    235.8 │    218.4 │
 │          Julia │ Accumulator │          npv3 │     14.5 │     14.5 │
@@ -102,23 +102,23 @@ class SubStringTestClass
 <p>One negative about R&#39;s flexibility is the fact that the language is <a href="https://www.r-project.org/Licenses/AGPL-3">GPL licensed</a>, meaning that there are quite a few restrictions. For example, if you distribute an application that relies on R &#40;e.g. it becomes part of your sales platform distributed to agents&#41; you would need to be able to provide the source code for your application to the said users<sup id="fnref:6"><a href="#fndef:6" class=fnref >[6]</a></sup>. The other languages discussed on this page have much more permissive licenses.</p>
 <h5 id=readability ><a href="#readability" class=header-anchor >Readability</a></h5>
 <p>R reads pretty easily, with very little boiler plate and terse syntax:</p>
-<pre><code class=language-R ># via Houstonwp
-q &lt;- c&#40;0.001,0.002,0.003,0.003,0.004,0.004,0.005,0.007,0.009,0.011&#41;
-w &lt;- c&#40;0.05,0.07,0.08,0.10,0.14,0.20,0.20,0.20,0.10,0.04&#41;
-P &lt;- 100
-S &lt;- 25000
-r &lt;- 0.02
+<pre><code class="R hljs"><span class=hljs-comment ># via Houstonwp</span>
+q <span class=hljs-operator >&lt;-</span> <span class=hljs-built_in >c</span><span class=hljs-punctuation >(</span><span class=hljs-number >0.001</span><span class=hljs-punctuation >,</span><span class=hljs-number >0.002</span><span class=hljs-punctuation >,</span><span class=hljs-number >0.003</span><span class=hljs-punctuation >,</span><span class=hljs-number >0.003</span><span class=hljs-punctuation >,</span><span class=hljs-number >0.004</span><span class=hljs-punctuation >,</span><span class=hljs-number >0.004</span><span class=hljs-punctuation >,</span><span class=hljs-number >0.005</span><span class=hljs-punctuation >,</span><span class=hljs-number >0.007</span><span class=hljs-punctuation >,</span><span class=hljs-number >0.009</span><span class=hljs-punctuation >,</span><span class=hljs-number >0.011</span><span class=hljs-punctuation >)</span>
+w <span class=hljs-operator >&lt;-</span> <span class=hljs-built_in >c</span><span class=hljs-punctuation >(</span><span class=hljs-number >0.05</span><span class=hljs-punctuation >,</span><span class=hljs-number >0.07</span><span class=hljs-punctuation >,</span><span class=hljs-number >0.08</span><span class=hljs-punctuation >,</span><span class=hljs-number >0.10</span><span class=hljs-punctuation >,</span><span class=hljs-number >0.14</span><span class=hljs-punctuation >,</span><span class=hljs-number >0.20</span><span class=hljs-punctuation >,</span><span class=hljs-number >0.20</span><span class=hljs-punctuation >,</span><span class=hljs-number >0.20</span><span class=hljs-punctuation >,</span><span class=hljs-number >0.10</span><span class=hljs-punctuation >,</span><span class=hljs-number >0.04</span><span class=hljs-punctuation >)</span>
+P <span class=hljs-operator >&lt;-</span> 100
+S <span class=hljs-operator >&lt;-</span> 25000
+r <span class=hljs-operator >&lt;-</span> 0.02
 
-base_r_npv &lt;- function&#40;q,w,P,S,r&#41; &#123;
-  inforce &lt;- c&#40;1,head&#40;cumprod&#40;1-q-w&#41;, -1&#41;&#41;
-  ncf &lt;- inforce * P - inforce * q * S
-  d &lt;- &#40;1/&#40;1&#43;r&#41;&#41; ^ seq_along&#40;ncf&#41;
-  sum&#40;ncf * d&#41;
-&#125;
+base_r_npv <span class=hljs-operator >&lt;-</span> <span class=hljs-keyword >function</span><span class=hljs-punctuation >(</span>q<span class=hljs-punctuation >,</span>w<span class=hljs-punctuation >,</span>P<span class=hljs-punctuation >,</span>S<span class=hljs-punctuation >,</span>r<span class=hljs-punctuation >)</span> <span class=hljs-punctuation >{</span>
+  inforce <span class=hljs-operator >&lt;-</span> <span class=hljs-built_in >c</span><span class=hljs-punctuation >(</span><span class=hljs-number >1</span><span class=hljs-punctuation >,</span>head<span class=hljs-punctuation >(</span><span class=hljs-built_in >cumprod</span><span class=hljs-punctuation >(</span><span class=hljs-number >1</span><span class=hljs-operator >-</span>q<span class=hljs-operator >-</span>w<span class=hljs-punctuation >)</span><span class=hljs-punctuation >,</span> <span class=hljs-operator >-</span><span class=hljs-number >1</span><span class=hljs-punctuation >)</span><span class=hljs-punctuation >)</span>
+  ncf <span class=hljs-operator >&lt;-</span> inforce <span class=hljs-operator >*</span> P <span class=hljs-operator >-</span> inforce <span class=hljs-operator >*</span> q <span class=hljs-operator >*</span> S
+  d <span class=hljs-operator >&lt;-</span> <span class=hljs-punctuation >(</span><span class=hljs-number >1</span><span class=hljs-operator >/</span><span class=hljs-punctuation >(</span><span class=hljs-number >1</span><span class=hljs-operator >+</span>r<span class=hljs-punctuation >)</span><span class=hljs-punctuation >)</span> <span class=hljs-operator >^</span> <span class=hljs-built_in >seq_along</span><span class=hljs-punctuation >(</span>ncf<span class=hljs-punctuation >)</span>
+  <span class=hljs-built_in >sum</span><span class=hljs-punctuation >(</span>ncf <span class=hljs-operator >*</span> d<span class=hljs-punctuation >)</span>
+<span class=hljs-punctuation >}</span>
 
-base_r_npv&#40;q,w,P,S,r&#41;
-#&gt; &#91;1&#93; 50.32483
-microbenchmark::microbenchmark&#40;base_r_npv&#40;q,w,P,S,r&#41;&#41;</code></pre>
+base_r_npv<span class=hljs-punctuation >(</span>q<span class=hljs-punctuation >,</span>w<span class=hljs-punctuation >,</span>P<span class=hljs-punctuation >,</span>S<span class=hljs-punctuation >,</span>r<span class=hljs-punctuation >)</span>
+<span class=hljs-comment >#&gt; [1] 50.32483</span>
+microbenchmark<span class=hljs-operator >::</span>microbenchmark<span class=hljs-punctuation >(</span>base_r_npv<span class=hljs-punctuation >(</span>q<span class=hljs-punctuation >,</span>w<span class=hljs-punctuation >,</span>P<span class=hljs-punctuation >,</span>S<span class=hljs-punctuation >,</span>r<span class=hljs-punctuation >)</span><span class=hljs-punctuation >)</span></code></pre>
 <p>R is the oldest of the languages commonly used in actuarial contexts and carries a lot of that weight for better or worse: over several decades, it&#39;s accumulated a sizeable community but is left with a number of rough edges. The data scientist Evan Patterson has written <a href="https://www.epatters.org/post/r-lang/">a nice summary of &quot;the good, the bad, and the ugly&quot; of R</a>.</p>
 <h4 id=rust ><a href="#rust" class=header-anchor >Rust</a></h4>
 <p>Rust is a newer, statically compiled language designed for performance and safety &#40;in the don&#39;t let your program do memory management mistakes that crash the computer&#41;.</p>
@@ -129,44 +129,44 @@ microbenchmark::microbenchmark&#40;base_r_npv&#40;q,w,P,S,r&#41;&#41;</code></pr
 <h5 id=readability__2 ><a href="#readability__2" class=header-anchor >Readability</a></h5>
 <p>I really like the explicit function contract: you give it various floating point &#40;<code>f64</code>&#41; vectors and numbers, and it returns a float: <code>-&gt; f64</code>.</p>
 <p>Other than that it&#39;s pretty straightforward but definitely more verbose than any of the others.</p>
-<pre><code class=language-julia >#&#33;&#91;feature&#40;test&#41;&#93;
+<pre><code class="julia hljs"><span class=hljs-comment >#![feature(test)]</span>
 extern crate test;
 use test::Bencher;
 
 // Via Paddy Horan
-pub fn npv&#40;mortality_rates: &amp;Vec&lt;f64&gt;, lapse_rates: &amp;Vec&lt;f64&gt;, interest_rate: f64, sum_assured: f64, premium: f64, init_pols: f64, term: Option&lt;usize&gt;&#41; -&gt; f64 &#123;
+pub fn npv(mortality_rates: &amp;Vec&lt;f64&gt;, lapse_rates: &amp;Vec&lt;f64&gt;, interest_rate: f64, sum_assured: f64, premium: f64, init_pols: f64, term: Option&lt;usize&gt;) -&gt; f64 {
 
-    let term &#61; term.unwrap_or_else&#40;|| mortality_rates.len&#40;&#41;&#41;;
-    let mut result &#61; 0.0;
-    let mut inforce &#61; init_pols;
-    let v: f64 &#61; 1.0 / &#40;1.0 &#43; interest_rate&#41;;
+    <span class=hljs-keyword >let</span> term = term.unwrap_or_else(|| mortality_rates.len());
+    <span class=hljs-keyword >let</span> mut result = <span class=hljs-number >0.0</span>;
+    <span class=hljs-keyword >let</span> mut inforce = init_pols;
+    <span class=hljs-keyword >let</span> v: f64 = <span class=hljs-number >1.0</span> / (<span class=hljs-number >1.0</span> + interest_rate);
 
-    for &#40;t, &#40;q, w&#41;&#41; in mortality_rates.iter&#40;&#41;.zip&#40;lapse_rates&#41;.enumerate&#40;&#41; &#123;
-        let no_deaths &#61; if t &lt; term &#123;inforce * q&#125; else &#123;0.0&#125;;
-        let no_lapses &#61; if t &lt; term &#123;inforce * w&#125; else &#123;0.0&#125;;
-        let premiums &#61; inforce * premium;
-        let claims &#61; no_deaths * sum_assured;
-        let net_cashflow &#61; premiums - claims;
-        result &#43;&#61; net_cashflow * v.powi&#40;t as i32&#41;;
-        inforce &#61; inforce - no_deaths - no_lapses;
-    &#125;
+    <span class=hljs-keyword >for</span> (t, (q, w)) <span class=hljs-keyword >in</span> mortality_rates.iter().zip(lapse_rates).enumerate() {
+        <span class=hljs-keyword >let</span> no_deaths = <span class=hljs-keyword >if</span> t &lt; term {inforce * q} <span class=hljs-keyword >else</span> {<span class=hljs-number >0.0</span>};
+        <span class=hljs-keyword >let</span> no_lapses = <span class=hljs-keyword >if</span> t &lt; term {inforce * w} <span class=hljs-keyword >else</span> {<span class=hljs-number >0.0</span>};
+        <span class=hljs-keyword >let</span> premiums = inforce * premium;
+        <span class=hljs-keyword >let</span> claims = no_deaths * sum_assured;
+        <span class=hljs-keyword >let</span> net_cashflow = premiums - claims;
+        result += net_cashflow * v.powi(t as i32);
+        inforce = inforce - no_deaths - no_lapses;
+    }
 
     result
-&#125;
-#&#91;bench&#93;
-fn bench_xor_1000_ints&#40;b: &amp;mut Bencher&#41; &#123;
+}
+<span class=hljs-comment >#[bench]</span>
+fn bench_xor_1000_ints(b: &amp;mut Bencher) {
 
-let q: Vec&lt;f64&gt; &#61; vec&#33;&#91;0.001,0.002,0.003,0.003,0.004,0.004,0.005,0.007,0.009,0.011&#93;;
-let w: Vec&lt;f64&gt; &#61; vec&#33;&#91;0.05,0.07,0.08,0.10,0.14,0.20,0.20,0.20,0.10,0.04&#93;;
-let p: f64 &#61; 100.0;
-let s: f64 &#61; 25000.0;
-let r: f64 &#61; 0.02;
-    b.iter&#40;|| &#123;
-        // use &#96;test::black_box&#96; to prevent compiler optimizations from disregarding
+<span class=hljs-keyword >let</span> q: Vec&lt;f64&gt; = vec![<span class=hljs-number >0.001</span>,<span class=hljs-number >0.002</span>,<span class=hljs-number >0.003</span>,<span class=hljs-number >0.003</span>,<span class=hljs-number >0.004</span>,<span class=hljs-number >0.004</span>,<span class=hljs-number >0.005</span>,<span class=hljs-number >0.007</span>,<span class=hljs-number >0.009</span>,<span class=hljs-number >0.011</span>];
+<span class=hljs-keyword >let</span> w: Vec&lt;f64&gt; = vec![<span class=hljs-number >0.05</span>,<span class=hljs-number >0.07</span>,<span class=hljs-number >0.08</span>,<span class=hljs-number >0.10</span>,<span class=hljs-number >0.14</span>,<span class=hljs-number >0.20</span>,<span class=hljs-number >0.20</span>,<span class=hljs-number >0.20</span>,<span class=hljs-number >0.10</span>,<span class=hljs-number >0.04</span>];
+<span class=hljs-keyword >let</span> p: f64 = <span class=hljs-number >100.0</span>;
+<span class=hljs-keyword >let</span> s: f64 = <span class=hljs-number >25000.0</span>;
+<span class=hljs-keyword >let</span> r: f64 = <span class=hljs-number >0.02</span>;
+    b.iter(|| {
+        // use <span class=hljs-string >`test::black_box`</span> to prevent compiler optimizations from disregarding
         // unused values
-        test::black_box&#40;npv&#40;&amp;q,&amp;w,r,s,p,1.0,Some&#40;10&#41;&#41;&#41;;
-    &#125;&#41;;
-&#125;</code></pre>
+        test::black_box(npv(&amp;q,&amp;w,r,s,p,<span class=hljs-number >1.0</span>,<span class=hljs-built_in >Some</span>(<span class=hljs-number >10</span>)));
+    });
+}</code></pre>
 <h4 id=python ><a href="#python" class=header-anchor >Python</a></h4>
 <h5 id=performance__3 ><a href="#performance__3" class=header-anchor >Performance</a></h5>
 <p>With <a href="https://numpy.org/">NumPy</a>, Python was the second fastest <code>Vectorized</code> approach and 3rd place for the <code>Accumulator</code> loop, both cases were still more than an order of magnitude slower than the next place.</p>
@@ -179,27 +179,27 @@ let r: f64 &#61; 0.02;
 <p><img src="https://imgs.xkcd.com/comics/python_environment.png" alt="Python XKCD" /></p>
 <h5 id=readability__3 ><a href="#readability__3" class=header-anchor >Readability</a></h5>
 <p>One of Python&#39;s seminal features is the pleasant syntax, though opinions differ as to whether the indentation should matter to how your program runs.</p>
-<pre><code class=language-Python >import timeit
-setup&#61;&#39;&#39;&#39;
+<pre><code class="Python hljs"><span class=hljs-keyword >import</span> timeit
+setup=<span class=hljs-string >&#x27;&#x27;&#x27;
 import numpy as np
-q &#61; np.array&#40;&#91;0.001,0.002,0.003,0.003,0.004,0.004,0.005,0.007,0.009,0.011&#93;&#41;
-w &#61; np.array&#40;&#91;0.05,0.07,0.08,0.10,0.14,0.20,0.20,0.20,0.10,0.04&#93;&#41;
-P &#61; 100
-S &#61; 25000
-r &#61; 0.02
-def npv&#40;q,w,P,S,r&#41;:
-    decrements &#61; np.cumprod&#40;1-q-w&#41;
-    inforce &#61; np.empty_like&#40;decrements&#41;
-    inforce&#91;:1&#93; &#61; 1
-    inforce&#91;1:&#93; &#61; decrements&#91;:-1&#93;
-    ncf &#61; inforce * P - inforce * q * S
-    t &#61; np.arange&#40;np.size&#40;q&#41;&#41;
-    d &#61; np.power&#40;1/&#40;1&#43;r&#41;, t&#41;
-    return np.sum&#40;ncf * d&#41;
-&#39;&#39;&#39;
-benchmark &#61; &#39;&#39;&#39;npv&#40;q,w,P,S,r&#41;&#39;&#39;&#39;
+q = np.array([0.001,0.002,0.003,0.003,0.004,0.004,0.005,0.007,0.009,0.011])
+w = np.array([0.05,0.07,0.08,0.10,0.14,0.20,0.20,0.20,0.10,0.04])
+P = 100
+S = 25000
+r = 0.02
+def npv(q,w,P,S,r):
+    decrements = np.cumprod(1-q-w)
+    inforce = np.empty_like(decrements)
+    inforce[:1] = 1
+    inforce[1:] = decrements[:-1]
+    ncf = inforce * P - inforce * q * S
+    t = np.arange(np.size(q))
+    d = np.power(1/(1+r), t)
+    return np.sum(ncf * d)
+&#x27;&#x27;&#x27;</span>
+benchmark = <span class=hljs-string >&#x27;&#x27;&#x27;npv(q,w,P,S,r)&#x27;&#x27;&#x27;</span>
 
-print&#40;timeit.timeit&#40;stmt&#61;benchmark,setup&#61;setup,number &#61; 1000000&#41;&#41;</code></pre>
+<span class=hljs-built_in >print</span>(timeit.timeit(stmt=benchmark,setup=setup,number = <span class=hljs-number >1000000</span>))</code></pre>
 <p>To do non standard things like benchmarking &#40;or The benchmarking setup with Python&#39;s <code>timeit</code> is definitely the most painful, needing to wrap the whole thing in a string. And then only get a single number result, without normalizing for the number of runs is very annoying.</p>
 <h4 id=julia ><a href="#julia" class=header-anchor >Julia</a></h4>
 <h5 id=performance__4 ><a href="#performance__4" class=header-anchor >Performance</a></h5>
@@ -220,36 +220,36 @@ print&#40;timeit.timeit&#40;stmt&#61;benchmark,setup&#61;setup,number &#61; 1000
 <p>The former is actually a very powerful concept/tool called <a href="https://docs.julialang.org/en/v1/manual/arrays/#Broadcasting">broadcasting</a>. Kind of like R &#40;where everything is a vector and will combine in vector-like ways&#41;. Julia lets you both worlds: really effective scalars and highly efficient vector operations. Once you know what it does, it&#39;s hard to think of a shorter/more concise way to express it than the dot &#40;<code>.</code>&#41;.</p>
 <p>The latter, <code>@benchmark</code> is a way to get Julia to work with the code itself, again kind of like R does. <code>@benchmark</code> is a <a href="https://docs.julialang.org/en/v1/manual/metaprogramming/#man-macros">macro</a> that will run a really comprehensive and informative benchmarking set on the code given.</p>
 <p>The <code>Vectorized</code> version:</p>
-<pre><code class=language-Julia >using BenchmarkTools
+<pre><code class="Julia hljs"><span class=hljs-keyword >using</span> BenchmarkTools
 
-q &#61; &#91;0.001,0.002,0.003,0.003,0.004,0.004,0.005,0.007,0.009,0.011&#93;
-w &#61; &#91;0.05,0.07,0.08,0.10,0.14,0.20,0.20,0.20,0.10,0.04&#93;
-P &#61; 100
-S &#61; 25000
-r &#61; 0.02
+q = [<span class=hljs-number >0.001</span>,<span class=hljs-number >0.002</span>,<span class=hljs-number >0.003</span>,<span class=hljs-number >0.003</span>,<span class=hljs-number >0.004</span>,<span class=hljs-number >0.004</span>,<span class=hljs-number >0.005</span>,<span class=hljs-number >0.007</span>,<span class=hljs-number >0.009</span>,<span class=hljs-number >0.011</span>]
+w = [<span class=hljs-number >0.05</span>,<span class=hljs-number >0.07</span>,<span class=hljs-number >0.08</span>,<span class=hljs-number >0.10</span>,<span class=hljs-number >0.14</span>,<span class=hljs-number >0.20</span>,<span class=hljs-number >0.20</span>,<span class=hljs-number >0.20</span>,<span class=hljs-number >0.10</span>,<span class=hljs-number >0.04</span>]
+P = <span class=hljs-number >100</span>
+S = <span class=hljs-number >25000</span>
+r = <span class=hljs-number >0.02</span>
 
-function npv1&#40;q,w,P,S,r&#41; 
-	inforce &#61; &#91;1.; cumprod&#40;1 .- q .- w&#41;&#91;1:end-1&#93;&#93; 
-  	ncf &#61; inforce .* P .- inforce .* q .* S
- 	d &#61; &#40;1 ./ &#40;1 &#43; r&#41;&#41; .^ &#40;1:length&#40;ncf&#41;&#41;
-  	return sum&#40;ncf .* d&#41;
-end
+<span class=hljs-keyword >function</span> npv1(q,w,P,S,r) 
+	inforce = [<span class=hljs-number >1.</span>; cumprod(<span class=hljs-number >1</span> .- q .- w)[<span class=hljs-number >1</span>:<span class=hljs-keyword >end</span>-<span class=hljs-number >1</span>]] 
+  	ncf = inforce .* P .- inforce .* q .* S
+ 	d = (<span class=hljs-number >1</span> ./ (<span class=hljs-number >1</span> + r)) .^ (<span class=hljs-number >1</span>:length(ncf))
+  	<span class=hljs-keyword >return</span> sum(ncf .* d)
+<span class=hljs-keyword >end</span>
 
-@benchmark npv&#40;&#36;q,&#36;w,&#36;P,&#36;S,&#36;r&#41;</code></pre>
+<span class=hljs-meta >@benchmark</span> npv($q,$w,$P,$S,$r)</code></pre>
 <p>And the <code>Accumulator</code> version:</p>
-<pre><code class=language-julia >function npv5&#40;q,w,P,S,r,term&#61;nothing&#41;
-    term &#61; term &#61;&#61;&#61; nothing ? length&#40;q&#41; : term
-    inforce &#61; 1.0
-    result &#61; 0.0
-    v &#61; &#40;1 / &#40; 1 &#43; r&#41;&#41;
-    v_t &#61; v
-    for &#40;q,w,_&#41; in zip&#40;q,w,1:term&#41;
-        result &#43;&#61; inforce * &#40;P - S * q&#41; * v_t
-        inforce -&#61; inforce * q &#43; inforce * w
-        v_t *&#61; v
-    end
-    return result
-end</code></pre>
+<pre><code class="julia hljs"><span class=hljs-keyword >function</span> npv5(q,w,P,S,r,term=<span class=hljs-literal >nothing</span>)
+    term = term === <span class=hljs-literal >nothing</span> ? length(q) : term
+    inforce = <span class=hljs-number >1.0</span>
+    result = <span class=hljs-number >0.0</span>
+    v = (<span class=hljs-number >1</span> / ( <span class=hljs-number >1</span> + r))
+    v_t = v
+    <span class=hljs-keyword >for</span> (q,w,_) <span class=hljs-keyword >in</span> zip(q,w,<span class=hljs-number >1</span>:term)
+        result += inforce * (P - S * q) * v_t
+        inforce -= inforce * q + inforce * w
+        v_t *= v
+    <span class=hljs-keyword >end</span>
+    <span class=hljs-keyword >return</span> result
+<span class=hljs-keyword >end</span></code></pre>
 <h2 id=more_flexibility_more_performance_from_julia ><a href="#more_flexibility_more_performance_from_julia" class=header-anchor >More flexibility, more performance from Julia</a></h2>
 <p>I wanted to go a little bit deeper and show how 1&#41; Julia just runs fast even if your not explicitly focused on performance. But for where it <em>really</em> matters, you can go even deeper. This is a little advanced, but I think it can be useful to introduce some basics as to why some languages and approaches are going to be fundamentally slower than others.</p>
 <p>Notes: The accumulator approach vectors and allocations talk about stack/heap? pick a faster approach and explain why it&#39;s even faster.</p>
@@ -261,19 +261,19 @@ end</code></pre>
 <h3 id=software ><a href="#software" class=header-anchor >Software</a></h3>
 <p>All languages/libraries are Mac M1 native unless otherwise noted</p>
 <h4 id=julia__2 ><a href="#julia__2" class=header-anchor >Julia</a></h4>
-<pre><code class=language-julia >Julia Version 1.7.0-DEV.938
-Commit 2b4c088ee7* &#40;2021-04-16 20:37 UTC&#41;
+<pre><code class="julia hljs">Julia Version <span class=hljs-number >1.7</span><span class=hljs-number >.0</span>-DEV<span class=hljs-number >.938</span>
+Commit <span class=hljs-number >2</span>b4c088ee7* (<span class=hljs-number >2021</span>-<span class=hljs-number >04</span>-<span class=hljs-number >16</span> <span class=hljs-number >20</span>:<span class=hljs-number >37</span> UTC)
 Platform Info:
-  OS: macOS &#40;arm64-apple-darwin20.3.0&#41;
+  OS: macOS (arm64-apple-darwin20<span class=hljs-number >.3</span><span class=hljs-number >.0</span>)
   CPU: Apple M1
-  WORD_SIZE: 64
+  WORD_SIZE: <span class=hljs-number >64</span>
   LIBM: libopenlibm
-  LLVM: libLLVM-11.0.1 &#40;ORCJIT, cyclone&#41;</code></pre>
+  LLVM: libLLVM-<span class=hljs-number >11.0</span><span class=hljs-number >.1</span> (ORCJIT, cyclone)</code></pre>
 <h4 id=rust__2 ><a href="#rust__2" class=header-anchor >Rust</a></h4>
-<pre><code class=language-julia >1.53.0-nightly &#40;b0c818c5e 2021-04-16&#41;</code></pre>
+<pre><code class="julia hljs"><span class=hljs-number >1.53</span><span class=hljs-number >.0</span>-nightly (b0c818c5e <span class=hljs-number >2021</span>-<span class=hljs-number >04</span>-<span class=hljs-number >16</span>)</code></pre>
 <h4 id=python__2 ><a href="#python__2" class=header-anchor >Python</a></h4>
-<pre><code class=language-julia >Python 3.9.4 &#40;default, Apr  4 2021, 17:42:23&#41; 
-&#91;Clang 12.0.0 &#40;clang-1200.0.32.29&#41;&#93; on darwin</code></pre>
+<pre><code class="julia hljs">Python <span class=hljs-number >3.9</span><span class=hljs-number >.4</span> (default, Apr  <span class=hljs-number >4</span> <span class=hljs-number >2021</span>, <span class=hljs-number >17</span>:<span class=hljs-number >42</span>:<span class=hljs-number >23</span>) 
+[Clang <span class=hljs-number >12.0</span><span class=hljs-number >.0</span> (clang-<span class=hljs-number >1200.0</span><span class=hljs-number >.32</span><span class=hljs-number >.29</span>)] on darwin</code></pre>
 <h2 id=footnotes ><a href="#footnotes" class=header-anchor >Footnotes</a></h2>
 <p><sup id="fnref:1"><a href="#fndef:1" class=fnref >[1]</a></sup> A take on <a href="https://en.wikipedia.org/wiki/Andy_and_Bill&#37;27s_law">Andy and Bill&#39;s law</a></p>
 <p><sup id="fnref:2"><a href="#fndef:2" class=fnref >[3]</a></sup> If benchmarking memoization, it&#39;s essentially benchmarking how long it takes to perform hashing in a language. While interesting, especially in the context of <a href="https://scattered-thoughts.net/writing/an-opinionated-map-of-incremental-and-streaming-systems">incremental computing</a>, it&#39;s not the core issue at hand. Incremental computing libraries exist for all of the modern languages discussed here.</p>
@@ -292,8 +292,8 @@ Platform Info:
 </div></div>
     
     
-        <script src="/previews/PR28/libs/highlight/highlight.pack.js"></script>
-<script>hljs.initHighlightingOnLoad();hljs.configure({tabReplace: '    '});</script>
+        
+
 
     
     <script data-goatcounter="https://juliaactuary.goatcounter.com/count" async src="/previews/PR28//gc.zgo.at/count.js"></script>
