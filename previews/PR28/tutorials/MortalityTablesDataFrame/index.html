@@ -1,4 +1,4 @@
-<!doctype html> <html lang=en > <meta charset=UTF-8 > <meta name=viewport  content="width=device-width, initial-scale=1"> <meta name=Description  content="Practical, extensible, and open-source actuarial modeling and analysis."> <meta property="og:description" content="Practical, extensible, and open-source actuarial modeling and analysis."> <meta property="og:image" content="/assets/logo_square.svg"> <link rel=stylesheet  href="/previews/PR28/css/franklin.css"> <link rel=stylesheet  href="/previews/PR28/css/basic.css"> <link rel=icon  href="/previews/PR28/assets/favicon.png"> <title> | JuliaActuary</title> <link rel=apple-touch-icon  sizes=180x180  href="/previews/PR28/assets/apple-touch-icon.png"> <link rel=icon  type="image/png" sizes=32x32  href="/previews/PR28/assets/favicon-32x32.png"> <link rel=icon  type="image/png" sizes=16x16  href="/previews/PR28/assets/favicon-16x16.png"> <link rel=manifest  href="/previews/PR28/assets/site.webmanifest"> <script src="https://cdn.jsdelivr.net/npm/swiffy-slider@1.2.0/dist/js/swiffy-slider.min.js" crossorigin=anonymous  defer></script> <link href="/previews/PR28/css/slider.css" rel=stylesheet > <header> <div class=blog-name > <a href="/previews/PR28/"> <div class=blog-name-logo-container > <div class=blog-name-logo > <img src="/previews/PR28/assets/logo_square.svg" alt=logo  height=100px  width=100px  /> </div> <div>JuliaActuary</div> </div> </a> <div class=tagline >Practical, extensible, and open-source actuarial modeling and analysis. </div> </div> <nav> <ul> <li><a href="/previews/PR28/">Home</a> <li><a href="/previews/PR28/packages">Packages</a> <li><a href="/previews/PR28/community">Community</a> <ul> <li><a href="/previews/PR28/community/#learn">Learn</a> <li><a href="/previews/PR28/community/#integration_with_r_and_python">Integration</a> <li><a href="/previews/PR28/community/#contributing">Contributing</a> </ul> <li><a href="/previews/PR28/#blog">Blog</a> </ul> <img src="/previews/PR28/assets/hamburger.svg" id=menu-icon > </nav> </header> <div class=franklin-content > <!-- # This information is used for caching. [PlutoStaticHTML.State] input_sha = "9919ce1b8f34efce340e5f8291c0715ed9c9ef897f4fb3be30834533ef64c286" julia_version = "1.8.0" --> <div class=markdown ><h1>Using MortaltiyTables.jl with DataFrames</h1> <h2>MortalityTables.jl standard representation</h2> <p>MortalityTables.jl stores the rates in a very efficient manner as a collection of vectors indexed by attained age.</p> </div> <div class=markdown ><p>First, we include the package, and then we&#39;ll pick a table, where all of the <code>mort.soa.org</code> tables are mirrored into your MortalityTables.jl installation.</p> </div> <pre class='language-julia'><code class='julia hljs pluto-input'>begin
+<!doctype html> <html lang=en > <meta charset=UTF-8 > <meta name=viewport  content="width=device-width, initial-scale=1"> <meta name=Description  content="Practical, extensible, and open-source actuarial modeling and analysis."> <meta property="og:description" content="Practical, extensible, and open-source actuarial modeling and analysis."> <meta property="og:image" content="/assets/logo_square.svg"> <link rel=stylesheet  href="/previews/PR28/css/franklin.css"> <link rel=stylesheet  href="/previews/PR28/css/basic.css"> <link rel=icon  href="/previews/PR28/assets/favicon.png"> <title>Run this Pluto Notebook | JuliaActuary</title> <link rel=apple-touch-icon  sizes=180x180  href="/previews/PR28/assets/apple-touch-icon.png"> <link rel=icon  type="image/png" sizes=32x32  href="/previews/PR28/assets/favicon-32x32.png"> <link rel=icon  type="image/png" sizes=16x16  href="/previews/PR28/assets/favicon-16x16.png"> <link rel=manifest  href="/previews/PR28/assets/site.webmanifest"> <script src="https://cdn.jsdelivr.net/npm/swiffy-slider@1.2.0/dist/js/swiffy-slider.min.js" crossorigin=anonymous  defer></script> <link href="/previews/PR28/css/slider.css" rel=stylesheet > <header> <div class=blog-name > <a href="/previews/PR28/"> <div class=blog-name-logo-container > <div class=blog-name-logo > <img src="/previews/PR28/assets/logo_square.svg" alt=logo  height=100px  width=100px  /> </div> <div>JuliaActuary</div> </div> </a> <div class=tagline >Practical, extensible, and open-source actuarial modeling and analysis. </div> </div> <nav> <ul> <li><a href="/previews/PR28/">Home</a> <li><a href="/previews/PR28/packages">Packages</a> <li><a href="/previews/PR28/community">Community</a> <ul> <li><a href="/previews/PR28/community/#learn">Learn</a> <li><a href="/previews/PR28/community/#integration_with_r_and_python">Integration</a> <li><a href="/previews/PR28/community/#contributing">Contributing</a> </ul> <li><a href="/previews/PR28/#blog">Blog</a> </ul> <img src="/previews/PR28/assets/hamburger.svg" id=menu-icon > </nav> </header> <div class=franklin-content > <!-- # This information is used for caching. [PlutoStaticHTML.State] input_sha = "9919ce1b8f34efce340e5f8291c0715ed9c9ef897f4fb3be30834533ef64c286" julia_version = "1.8.0" --> <div class=markdown ><h1>Using MortaltiyTables.jl with DataFrames</h1> <h2>MortalityTables.jl standard representation</h2> <p>MortalityTables.jl stores the rates in a very efficient manner as a collection of vectors indexed by attained age.</p> </div> <div class=markdown ><p>First, we include the package, and then we&#39;ll pick a table, where all of the <code>mort.soa.org</code> tables are mirrored into your MortalityTables.jl installation.</p> </div> <pre class='language-julia'><code class='julia hljs pluto-input'>begin
     using MortalityTables
 
     vbt = MortalityTables.table("2001 VBT Residual Standard Select and Ultimate - Male Nonsmoker, ANB") #or any other table
@@ -72,73 +72,73 @@ end</code></pre>
 
 <tr>
 <td>1
-<td>"Female"
+<td>"Male"
 <td>"Smoker"
-<td>31
-<td>39
+<td>25
+<td>26
 
 <tr>
 <td>2
-<td>"Male"
-<td>"Smoker"
-<td>57
-<td>63
+<td>"Female"
+<td>"Nonsmoker"
+<td>34
+<td>43
 
 <tr>
 <td>3
-<td>"Male"
+<td>"Female"
 <td>"Nonsmoker"
-<td>64
+<td>61
 <td>70
 
 <tr>
 <td>4
 <td>"Female"
-<td>"Smoker"
-<td>37
-<td>39
+<td>"Nonsmoker"
+<td>27
+<td>33
 
 <tr>
 <td>5
 <td>"Female"
-<td>"Nonsmoker"
-<td>44
-<td>50
+<td>"Smoker"
+<td>46
+<td>52
 
 <tr>
 <td>6
 <td>"Female"
-<td>"Smoker"
-<td>57
-<td>65
+<td>"Nonsmoker"
+<td>34
+<td>44
 
 <tr>
 <td>7
 <td>"Female"
 <td>"Smoker"
-<td>54
-<td>55
+<td>26
+<td>27
 
 <tr>
 <td>8
 <td>"Female"
-<td>"Nonsmoker"
-<td>36
-<td>42
+<td>"Smoker"
+<td>34
+<td>41
 
 <tr>
 <td>9
-<td>"Male"
+<td>"Female"
 <td>"Smoker"
-<td>32
+<td>33
 <td>41
 
 <tr>
 <td>10
 <td>"Male"
-<td>"Smoker"
-<td>32
-<td>42
+<td>"Nonsmoker"
+<td>52
+<td>62
 
 <tr>
 <td>...
@@ -147,8 +147,8 @@ end</code></pre>
 <td>10000
 <td>"Female"
 <td>"Nonsmoker"
-<td>59
-<td>62
+<td>33
+<td>35
 
 </table>
 
@@ -204,20 +204,20 @@ end
     rate_lookup(rate_map,row.sex,row.smoke,row.issue_age,row.attained_age)
 end</code></pre>
 <pre id='var-rates' class='pluto-output'>10000-element Vector{Float64}:
- 0.00134
- 0.01574
- 0.01426
- 0.00077
- 0.00187
- 0.0142
- 0.00424
+ 0.00079
+ 0.00104
+ 0.01174
+ 0.0005
+ 0.00495
+ 0.00119
+ 0.00033
  ⋮
- 0.00091
- 0.01017
- 0.0224
- 0.0069
- 0.00043
- 0.0037</pre>
+ 0.0007
+ 0.00125
+ 0.00141
+ 0.00369
+ 0.00768
+ 0.00035</pre>
 
 
 <div class=markdown ><p>And finally, we can just add this to the dataframe:</p>
@@ -238,83 +238,83 @@ end</code></pre>
 
 <tr>
 <td>1
-<td>"Female"
+<td>"Male"
 <td>"Smoker"
-<td>31
-<td>39
-<td>0.00134
+<td>25
+<td>26
+<td>0.00079
 
 <tr>
 <td>2
-<td>"Male"
-<td>"Smoker"
-<td>57
-<td>63
-<td>0.01574
+<td>"Female"
+<td>"Nonsmoker"
+<td>34
+<td>43
+<td>0.00104
 
 <tr>
 <td>3
-<td>"Male"
+<td>"Female"
 <td>"Nonsmoker"
-<td>64
+<td>61
 <td>70
-<td>0.01426
+<td>0.01174
 
 <tr>
 <td>4
 <td>"Female"
-<td>"Smoker"
-<td>37
-<td>39
-<td>0.00077
+<td>"Nonsmoker"
+<td>27
+<td>33
+<td>0.0005
 
 <tr>
 <td>5
 <td>"Female"
-<td>"Nonsmoker"
-<td>44
-<td>50
-<td>0.00187
+<td>"Smoker"
+<td>46
+<td>52
+<td>0.00495
 
 <tr>
 <td>6
 <td>"Female"
-<td>"Smoker"
-<td>57
-<td>65
-<td>0.0142
+<td>"Nonsmoker"
+<td>34
+<td>44
+<td>0.00119
 
 <tr>
 <td>7
 <td>"Female"
 <td>"Smoker"
-<td>54
-<td>55
-<td>0.00424
+<td>26
+<td>27
+<td>0.00033
 
 <tr>
 <td>8
 <td>"Female"
-<td>"Nonsmoker"
-<td>36
-<td>42
-<td>0.00082
+<td>"Smoker"
+<td>34
+<td>41
+<td>0.00152
 
 <tr>
 <td>9
-<td>"Male"
+<td>"Female"
 <td>"Smoker"
-<td>32
+<td>33
 <td>41
-<td>0.00243
+<td>0.00158
 
 <tr>
 <td>10
 <td>"Male"
-<td>"Smoker"
-<td>32
-<td>42
-<td>0.00273
+<td>"Nonsmoker"
+<td>52
+<td>62
+<td>0.00886
 
 <tr>
 <td>...
@@ -323,9 +323,9 @@ end</code></pre>
 <td>10000
 <td>"Female"
 <td>"Nonsmoker"
-<td>59
-<td>62
-<td>0.0037
+<td>33
+<td>35
+<td>0.00035
 
 </table>
 
@@ -507,7 +507,8 @@ PlutoUI 0.7.9
 
 
 
-<p><em>To run this tutorial locally, download <a href="/previews/PR28/tutorials/MortalityTablesDataFrame.jl">this file</a> and open it with <a href="https://plutojl.org">Pluto.jl</a>.</em></p>
+<h2 id=run_this_pluto_notebook ><a href="#run_this_pluto_notebook" class=header-anchor >Run this Pluto Notebook</a></h2>
+<p><em>To run this page locally, download <a href="/previews/PR28/tutorials/MortalityTablesDataFrame.jl">this file</a> and open it with <a href="https://plutojl.org">Pluto.jl</a>.</em></p>
 
 
 <link rel=stylesheet  href="/previews/PR28/libs/highlight/github.min.css">
