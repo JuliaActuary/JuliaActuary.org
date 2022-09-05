@@ -99,81 +99,81 @@ end</code></pre>
 <td>1</td>
 <td>"Male"</td>
 <td>"Smoker"</td>
-<td>25</td>
-<td>26</td>
+<td>34</td>
+<td>39</td>
 </tr>
 <tr>
 <td>2</td>
 <td>"Female"</td>
-<td>"Nonsmoker"</td>
-<td>34</td>
-<td>43</td>
+<td>"Smoker"</td>
+<td>42</td>
+<td>52</td>
 </tr>
 <tr>
 <td>3</td>
-<td>"Female"</td>
+<td>"Male"</td>
 <td>"Nonsmoker"</td>
-<td>61</td>
-<td>70</td>
+<td>42</td>
+<td>47</td>
 </tr>
 <tr>
 <td>4</td>
 <td>"Female"</td>
-<td>"Nonsmoker"</td>
-<td>27</td>
-<td>33</td>
+<td>"Smoker"</td>
+<td>52</td>
+<td>55</td>
 </tr>
 <tr>
 <td>5</td>
 <td>"Female"</td>
 <td>"Smoker"</td>
-<td>46</td>
-<td>52</td>
+<td>48</td>
+<td>53</td>
 </tr>
 <tr>
 <td>6</td>
-<td>"Female"</td>
+<td>"Male"</td>
 <td>"Nonsmoker"</td>
 <td>34</td>
-<td>44</td>
+<td>42</td>
 </tr>
 <tr>
 <td>7</td>
-<td>"Female"</td>
-<td>"Smoker"</td>
-<td>26</td>
-<td>27</td>
+<td>"Male"</td>
+<td>"Nonsmoker"</td>
+<td>60</td>
+<td>63</td>
 </tr>
 <tr>
 <td>8</td>
 <td>"Female"</td>
 <td>"Smoker"</td>
-<td>34</td>
-<td>41</td>
+<td>27</td>
+<td>28</td>
 </tr>
 <tr>
 <td>9</td>
 <td>"Female"</td>
-<td>"Smoker"</td>
-<td>33</td>
+<td>"Nonsmoker"</td>
+<td>35</td>
 <td>41</td>
 </tr>
 <tr>
 <td>10</td>
 <td>"Male"</td>
-<td>"Nonsmoker"</td>
-<td>52</td>
-<td>62</td>
+<td>"Smoker"</td>
+<td>63</td>
+<td>64</td>
 </tr>
 <tr>
 <td>...</td>
 </tr>
 <tr>
 <td>10000</td>
-<td>"Female"</td>
-<td>"Nonsmoker"</td>
-<td>33</td>
-<td>35</td>
+<td>"Male"</td>
+<td>"Smoker"</td>
+<td>37</td>
+<td>41</td>
 </tr>
 </table>
 
@@ -229,20 +229,20 @@ end
     rate_lookup(rate_map,row.sex,row.smoke,row.issue_age,row.attained_age)
 end</code></pre>
 <pre id='var-rates' class='pluto-output'>10000-element Vector{Float64}:
- 0.00079
- 0.00104
- 0.01174
- 0.0005
- 0.00495
- 0.00119
- 0.00033
+ 0.0019
+ 0.00563
+ 0.00176
+ 0.00512
+ 0.00518
+ 0.00123
+ 0.00547
  ⋮
- 0.0007
- 0.00125
- 0.00141
- 0.00369
- 0.00768
- 0.00035</pre>
+ 0.00248
+ 0.00115
+ 0.0005
+ 0.00474
+ 0.00403
+ 0.00188</pre>
 
 
 <div class="markdown"><p>And finally, we can just add this to the dataframe:</p>
@@ -265,92 +265,92 @@ end</code></pre>
 <td>1</td>
 <td>"Male"</td>
 <td>"Smoker"</td>
-<td>25</td>
-<td>26</td>
-<td>0.00079</td>
+<td>34</td>
+<td>39</td>
+<td>0.0019</td>
 </tr>
 <tr>
 <td>2</td>
 <td>"Female"</td>
-<td>"Nonsmoker"</td>
-<td>34</td>
-<td>43</td>
-<td>0.00104</td>
+<td>"Smoker"</td>
+<td>42</td>
+<td>52</td>
+<td>0.00563</td>
 </tr>
 <tr>
 <td>3</td>
-<td>"Female"</td>
+<td>"Male"</td>
 <td>"Nonsmoker"</td>
-<td>61</td>
-<td>70</td>
-<td>0.01174</td>
+<td>42</td>
+<td>47</td>
+<td>0.00176</td>
 </tr>
 <tr>
 <td>4</td>
 <td>"Female"</td>
-<td>"Nonsmoker"</td>
-<td>27</td>
-<td>33</td>
-<td>0.0005</td>
+<td>"Smoker"</td>
+<td>52</td>
+<td>55</td>
+<td>0.00512</td>
 </tr>
 <tr>
 <td>5</td>
 <td>"Female"</td>
 <td>"Smoker"</td>
-<td>46</td>
-<td>52</td>
-<td>0.00495</td>
+<td>48</td>
+<td>53</td>
+<td>0.00518</td>
 </tr>
 <tr>
 <td>6</td>
-<td>"Female"</td>
+<td>"Male"</td>
 <td>"Nonsmoker"</td>
 <td>34</td>
-<td>44</td>
-<td>0.00119</td>
+<td>42</td>
+<td>0.00123</td>
 </tr>
 <tr>
 <td>7</td>
-<td>"Female"</td>
-<td>"Smoker"</td>
-<td>26</td>
-<td>27</td>
-<td>0.00033</td>
+<td>"Male"</td>
+<td>"Nonsmoker"</td>
+<td>60</td>
+<td>63</td>
+<td>0.00547</td>
 </tr>
 <tr>
 <td>8</td>
 <td>"Female"</td>
 <td>"Smoker"</td>
-<td>34</td>
-<td>41</td>
-<td>0.00152</td>
+<td>27</td>
+<td>28</td>
+<td>0.00035</td>
 </tr>
 <tr>
 <td>9</td>
 <td>"Female"</td>
-<td>"Smoker"</td>
-<td>33</td>
+<td>"Nonsmoker"</td>
+<td>35</td>
 <td>41</td>
-<td>0.00158</td>
+<td>0.00075</td>
 </tr>
 <tr>
 <td>10</td>
 <td>"Male"</td>
-<td>"Nonsmoker"</td>
-<td>52</td>
-<td>62</td>
-<td>0.00886</td>
+<td>"Smoker"</td>
+<td>63</td>
+<td>64</td>
+<td>0.00881</td>
 </tr>
 <tr>
 <td>...</td>
 </tr>
 <tr>
 <td>10000</td>
-<td>"Female"</td>
-<td>"Nonsmoker"</td>
-<td>33</td>
-<td>35</td>
-<td>0.00035</td>
+<td>"Male"</td>
+<td>"Smoker"</td>
+<td>37</td>
+<td>41</td>
+<td>0.00188</td>
 </tr>
 </table>
 

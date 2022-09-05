@@ -74,81 +74,81 @@ end</code></pre>
 <td>1
 <td>"Male"
 <td>"Smoker"
-<td>25
-<td>26
+<td>34
+<td>39
 
 <tr>
 <td>2
 <td>"Female"
-<td>"Nonsmoker"
-<td>34
-<td>43
+<td>"Smoker"
+<td>42
+<td>52
 
 <tr>
 <td>3
-<td>"Female"
+<td>"Male"
 <td>"Nonsmoker"
-<td>61
-<td>70
+<td>42
+<td>47
 
 <tr>
 <td>4
 <td>"Female"
-<td>"Nonsmoker"
-<td>27
-<td>33
+<td>"Smoker"
+<td>52
+<td>55
 
 <tr>
 <td>5
 <td>"Female"
 <td>"Smoker"
-<td>46
-<td>52
+<td>48
+<td>53
 
 <tr>
 <td>6
-<td>"Female"
+<td>"Male"
 <td>"Nonsmoker"
 <td>34
-<td>44
+<td>42
 
 <tr>
 <td>7
-<td>"Female"
-<td>"Smoker"
-<td>26
-<td>27
+<td>"Male"
+<td>"Nonsmoker"
+<td>60
+<td>63
 
 <tr>
 <td>8
 <td>"Female"
 <td>"Smoker"
-<td>34
-<td>41
+<td>27
+<td>28
 
 <tr>
 <td>9
 <td>"Female"
-<td>"Smoker"
-<td>33
+<td>"Nonsmoker"
+<td>35
 <td>41
 
 <tr>
 <td>10
 <td>"Male"
-<td>"Nonsmoker"
-<td>52
-<td>62
+<td>"Smoker"
+<td>63
+<td>64
 
 <tr>
 <td>...
 
 <tr>
 <td>10000
-<td>"Female"
-<td>"Nonsmoker"
-<td>33
-<td>35
+<td>"Male"
+<td>"Smoker"
+<td>37
+<td>41
 
 </table>
 
@@ -204,20 +204,20 @@ end
     rate_lookup(rate_map,row.sex,row.smoke,row.issue_age,row.attained_age)
 end</code></pre>
 <pre id='var-rates' class='pluto-output'>10000-element Vector{Float64}:
- 0.00079
- 0.00104
- 0.01174
- 0.0005
- 0.00495
- 0.00119
- 0.00033
+ 0.0019
+ 0.00563
+ 0.00176
+ 0.00512
+ 0.00518
+ 0.00123
+ 0.00547
  ⋮
- 0.0007
- 0.00125
- 0.00141
- 0.00369
- 0.00768
- 0.00035</pre>
+ 0.00248
+ 0.00115
+ 0.0005
+ 0.00474
+ 0.00403
+ 0.00188</pre>
 
 
 <div class=markdown ><p>And finally, we can just add this to the dataframe:</p>
@@ -240,92 +240,92 @@ end</code></pre>
 <td>1
 <td>"Male"
 <td>"Smoker"
-<td>25
-<td>26
-<td>0.00079
+<td>34
+<td>39
+<td>0.0019
 
 <tr>
 <td>2
 <td>"Female"
-<td>"Nonsmoker"
-<td>34
-<td>43
-<td>0.00104
+<td>"Smoker"
+<td>42
+<td>52
+<td>0.00563
 
 <tr>
 <td>3
-<td>"Female"
+<td>"Male"
 <td>"Nonsmoker"
-<td>61
-<td>70
-<td>0.01174
+<td>42
+<td>47
+<td>0.00176
 
 <tr>
 <td>4
 <td>"Female"
-<td>"Nonsmoker"
-<td>27
-<td>33
-<td>0.0005
+<td>"Smoker"
+<td>52
+<td>55
+<td>0.00512
 
 <tr>
 <td>5
 <td>"Female"
 <td>"Smoker"
-<td>46
-<td>52
-<td>0.00495
+<td>48
+<td>53
+<td>0.00518
 
 <tr>
 <td>6
-<td>"Female"
+<td>"Male"
 <td>"Nonsmoker"
 <td>34
-<td>44
-<td>0.00119
+<td>42
+<td>0.00123
 
 <tr>
 <td>7
-<td>"Female"
-<td>"Smoker"
-<td>26
-<td>27
-<td>0.00033
+<td>"Male"
+<td>"Nonsmoker"
+<td>60
+<td>63
+<td>0.00547
 
 <tr>
 <td>8
 <td>"Female"
 <td>"Smoker"
-<td>34
-<td>41
-<td>0.00152
+<td>27
+<td>28
+<td>0.00035
 
 <tr>
 <td>9
 <td>"Female"
-<td>"Smoker"
-<td>33
+<td>"Nonsmoker"
+<td>35
 <td>41
-<td>0.00158
+<td>0.00075
 
 <tr>
 <td>10
 <td>"Male"
-<td>"Nonsmoker"
-<td>52
-<td>62
-<td>0.00886
+<td>"Smoker"
+<td>63
+<td>64
+<td>0.00881
 
 <tr>
 <td>...
 
 <tr>
 <td>10000
-<td>"Female"
-<td>"Nonsmoker"
-<td>33
-<td>35
-<td>0.00035
+<td>"Male"
+<td>"Smoker"
+<td>37
+<td>41
+<td>0.00188
 
 </table>
 
