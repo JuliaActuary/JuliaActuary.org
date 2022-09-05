@@ -2,7 +2,7 @@
     using MortalityTables
 
     vbt = MortalityTables.table("2001 VBT Residual Standard Select and Ultimate - Male Nonsmoker, ANB") #or any other table
-end</code></pre> <pre id='var-vbt' class=''>MortalityTable (Insured Lives Mortality):
+end</code></pre> <pre id='var-vbt' class='pluto-output'>MortalityTable (Insured Lives Mortality):
    Name:
        2001 VBT Residual Standard Select and Ultimate - Male Nonsmoker, ANB
    Fields: 
@@ -16,7 +16,7 @@ end</code></pre> <pre id='var-vbt' class=''>MortalityTable (Insured Lives Mortal
    Description:
        2001 Valuation Basic Table (VBT) Residual Standard Select and Ultimate Table -  Male Nonsmoker. Basis: Age Nearest Birthday. Minimum Select Age: 0. Maximum Select Age: 99. Minimum Ultimate Age: 25. Maximum Ultimate Age: 120
 </pre> <div class=markdown ><p>To see how the data is represented, we can look at the the select data for a 55 year old and see the attained age and mortality rates:</p> </div> <pre class='language-julia'><code class='julia hljs'>vbt.select[55]</code></pre>
-<pre id='var-hash107198' class=''>66-element OffsetArray(::Vector{Float64}, 55:120) with eltype Float64 with indices 55:120:
+<pre id='var-hash107198' class='pluto-output'>66-element OffsetArray(::Vector{Float64}, 55:120) with eltype Float64 with indices 55:120:
  0.00139
  0.00218
  0.00288
@@ -48,7 +48,7 @@ end</code></pre> <pre id='var-vbt' class=''>MortalityTable (Insured Lives Mortal
 
 
 <pre class='language-julia'><code class='julia hljs'>sample_size = 10_000</code></pre>
-<pre id='var-sample_size' class=''>10000</pre>
+<pre id='var-sample_size' class='pluto-output'>10000</pre>
 
 <pre class='language-julia'><code class='julia hljs'>sample_data = let
     # generate fake data
@@ -72,73 +72,73 @@ end</code></pre>
 
 <tr>
 <td>1
-<td>"Female"
-<td>"Smoker"
+<td>"Male"
+<td>"Nonsmoker"
 <td>40
 <td>41
 
 <tr>
 <td>2
-<td>"Female"
+<td>"Male"
 <td>"Smoker"
-<td>48
-<td>51
+<td>61
+<td>71
 
 <tr>
 <td>3
-<td>"Female"
-<td>"Nonsmoker"
-<td>61
-<td>62
+<td>"Male"
+<td>"Smoker"
+<td>32
+<td>34
 
 <tr>
 <td>4
-<td>"Female"
+<td>"Male"
 <td>"Nonsmoker"
-<td>48
-<td>51
+<td>59
+<td>68
 
 <tr>
 <td>5
 <td>"Female"
 <td>"Smoker"
+<td>59
 <td>64
-<td>74
 
 <tr>
 <td>6
 <td>"Male"
 <td>"Smoker"
-<td>65
-<td>66
+<td>27
+<td>34
 
 <tr>
 <td>7
 <td>"Female"
 <td>"Smoker"
-<td>50
-<td>51
+<td>54
+<td>57
 
 <tr>
 <td>8
-<td>"Female"
+<td>"Male"
 <td>"Nonsmoker"
-<td>40
-<td>41
+<td>43
+<td>52
 
 <tr>
 <td>9
 <td>"Male"
-<td>"Smoker"
+<td>"Nonsmoker"
+<td>35
 <td>36
-<td>43
 
 <tr>
 <td>10
-<td>"Female"
+<td>"Male"
 <td>"Smoker"
-<td>26
-<td>31
+<td>27
+<td>34
 
 <tr>
 <td>...
@@ -147,8 +147,8 @@ end</code></pre>
 <td>10000
 <td>"Male"
 <td>"Smoker"
-<td>32
 <td>40
+<td>42
 
 </table>
 
@@ -193,7 +193,7 @@ end</code></pre>
 end
     
     </code></pre>
-<pre id='var-rate_lookup' class=''>rate_lookup (generic function with 1 method)</pre>
+<pre id='var-rate_lookup' class='pluto-output'>rate_lookup (generic function with 1 method)</pre>
 
 
 <div class=markdown ><h3>Lining up with dataframe</h3>
@@ -203,21 +203,21 @@ end
 <pre class='language-julia'><code class='julia hljs'>rates = map(eachrow(sample_data)) do row
     rate_lookup(rate_map,row.sex,row.smoke,row.issue_age,row.attained_age)
 end</code></pre>
-<pre id='var-rates' class=''>10000-element Vector{Float64}:
- 0.00081
- 0.0037
- 0.00275
- 0.00166
- 0.03329
- 0.01045
- 0.00282
+<pre id='var-rates' class='pluto-output'>10000-element Vector{Float64}:
+ 0.00068
+ 0.03845
+ 0.00105
+ 0.01467
+ 0.01071
+ 0.00143
+ 0.0059
  ⋮
- 0.00081
- 0.00062
- 0.00479
- 0.01335
- 0.00166
- 0.00222</pre>
+ 0.01577
+ 0.00155
+ 0.0208
+ 0.00518
+ 0.02502
+ 0.00172</pre>
 
 
 <div class=markdown ><p>And finally, we can just add this to the dataframe:</p>
@@ -238,83 +238,83 @@ end</code></pre>
 
 <tr>
 <td>1
-<td>"Female"
-<td>"Smoker"
+<td>"Male"
+<td>"Nonsmoker"
 <td>40
 <td>41
-<td>0.00081
+<td>0.00068
 
 <tr>
 <td>2
-<td>"Female"
+<td>"Male"
 <td>"Smoker"
-<td>48
-<td>51
-<td>0.0037
+<td>61
+<td>71
+<td>0.03845
 
 <tr>
 <td>3
-<td>"Female"
-<td>"Nonsmoker"
-<td>61
-<td>62
-<td>0.00275
+<td>"Male"
+<td>"Smoker"
+<td>32
+<td>34
+<td>0.00105
 
 <tr>
 <td>4
-<td>"Female"
+<td>"Male"
 <td>"Nonsmoker"
-<td>48
-<td>51
-<td>0.00166
+<td>59
+<td>68
+<td>0.01467
 
 <tr>
 <td>5
 <td>"Female"
 <td>"Smoker"
+<td>59
 <td>64
-<td>74
-<td>0.03329
+<td>0.01071
 
 <tr>
 <td>6
 <td>"Male"
 <td>"Smoker"
-<td>65
-<td>66
-<td>0.01045
+<td>27
+<td>34
+<td>0.00143
 
 <tr>
 <td>7
 <td>"Female"
 <td>"Smoker"
-<td>50
-<td>51
-<td>0.00282
+<td>54
+<td>57
+<td>0.0059
 
 <tr>
 <td>8
-<td>"Female"
+<td>"Male"
 <td>"Nonsmoker"
-<td>40
-<td>41
-<td>0.00041
+<td>43
+<td>52
+<td>0.00323
 
 <tr>
 <td>9
 <td>"Male"
-<td>"Smoker"
+<td>"Nonsmoker"
+<td>35
 <td>36
-<td>43
-<td>0.00277
+<td>0.00048
 
 <tr>
 <td>10
-<td>"Female"
+<td>"Male"
 <td>"Smoker"
-<td>26
-<td>31
-<td>0.00073
+<td>27
+<td>34
+<td>0.00143
 
 <tr>
 <td>...
@@ -323,9 +323,9 @@ end</code></pre>
 <td>10000
 <td>"Male"
 <td>"Smoker"
-<td>32
 <td>40
-<td>0.00222
+<td>42
+<td>0.00172
 
 </table>
 
@@ -508,6 +508,13 @@ PlutoUI 0.7.9
 
 
 <p><em>To run this tutorial locally, download <a href="/previews/PR28/notebooks/MortalityTablesDataFrame.jl">this file</a> and open it with <a href="https://plutojl.org">Pluto.jl</a>.</em></p>
+
+
+<link rel=stylesheet  href="/previews/PR28/libs/highlight/github.min.css">
+<script src="/previews/PR28/libs/highlight/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+
+
 <div class=page-foot >
   The packages in JuliaActuary are open-source and liberally licensed (MIT License) to allow wide private and commercial
   usage of the packages, like the base Julia language and many other packages in the ecosystem.

@@ -6,7 +6,7 @@ const PKGDIR = pkgdir(JuliaActuarySite)
 
 export build_notebooks
 
-const TUTORIALS_DIR = joinpath(PKGDIR, "notebooks")
+const TUTORIALS_DIR = joinpath(PKGDIR, "tutorials")
 
 "Get files from a previous run. Assumes that the files are inside a `gh-pages` branch."
 function prev_dir()::Union{Nothing,AbstractString}
@@ -23,7 +23,7 @@ function prev_dir()::Union{Nothing,AbstractString}
     try
         # This can fail if there is no gh-pages branch yet.
         run(`git clone --depth=1 --branch=gh-pages $url $dir`)
-        prev_dir = joinpath(dir, "notebooks")
+        prev_dir = joinpath(dir, "tutorials")
         return prev_dir
     catch
         return nothing
@@ -37,8 +37,8 @@ function build()
     previous_dir = prev_dir()
     bopts = BuildOptions(dir; output_format, previous_dir)
     hopts = HTMLOptions(; append_build_context=true,
-    code_class="julia hljs",
-    output_pre_class="",
+    code_class="julia hljs pluto-input",
+    output_pre_class="pluto-output",
     )
     PlutoStaticHTML.build_notebooks(bopts, hopts)
     return nothing
@@ -51,14 +51,24 @@ function append_notebook_links()
     for md_path in md_paths
         md_file = basename(md_path)
         without_extension, _ = splitext(md_file)
-        jl_file = "$(without_extension).jl"
-        url = "/notebooks/$jl_file"
-        open(md_path, "a") do io
-            text = """\n
-                _To run this tutorial locally, download [this file]($url) and open it with
-                [Pluto.jl](https://plutojl.org)._
-                """
-            write(io, text)
+        if isfile(replace(md_path,"md"=>"jl"))
+            jl_file = "$(without_extension).jl"
+            url = "/tutorials/$jl_file"
+            open(md_path, "a") do io
+                text = """\n
+                    _To run this tutorial locally, download [this file]($url) and open it with
+                    [Pluto.jl](https://plutojl.org)._
+
+                    ~~~
+
+                    <link rel="stylesheet" href="/libs/highlight/github.min.css">
+                    <script src="/libs/highlight/highlight.min.js"></script>
+                    <script>hljs.highlightAll();</script>
+                    
+                    ~~~
+                    """
+                write(io, text)
+            end
         end
     end
     return nothing
@@ -68,7 +78,7 @@ end
 function copy_markdown_files()
     from_dir = TUTORIALS_DIR
     md_files = filter(endswith(".md"), readdir(from_dir))
-    to_dir = joinpath(PKGDIR, "__site", "notebooks")
+    to_dir = joinpath(PKGDIR, "__site", "tutorials")
     mkpath(to_dir)
     for md_file in md_files
         from = joinpath(from_dir, md_file)
@@ -76,6 +86,11 @@ function copy_markdown_files()
         cp(from, to; force=true)
     end
     return nothing
+end
+
+function is_Pluto_notebook(filepath)
+   lines = eachline(filepath)
+   return first(lines) == "### A Pluto.jl notebook ###" 
 end
 
 "Build the tutorials."
