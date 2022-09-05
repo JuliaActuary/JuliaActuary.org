@@ -63,7 +63,7 @@ Actuaries, even the [10x Actuary](/blog/coding-for-the-future/), aren't pure com
 Interestingly, [APL](https://en.wikipedia.org/wiki/APL_(programming_language)) took off and was one of the dominant languages used by actuaries before the advent of [vendor-supplied modeling solutions](/blog/coding-for-the-future/#the_10x_actuary).
 
 Counting the occurrences of a string looks like this in APL:
-```APL
+```
 csubs←{0=x←⊃⍸⍺⍷⍵:0 ⋄ 1+⍺∇(¯1+x+⍴⍺)↓⍵}
 ```
 
