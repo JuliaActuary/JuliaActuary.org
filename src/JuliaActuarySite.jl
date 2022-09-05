@@ -4,7 +4,7 @@ using PlutoStaticHTML
 
 const PKGDIR = pkgdir(JuliaActuarySite)
 
-export build_tutorials
+export build_notebooks
 
 const TUTORIALS_DIR = joinpath(PKGDIR, "notebooks")
 
@@ -76,12 +76,12 @@ function copy_markdown_files()
 end
 
 "Build the tutorials."
-function build_tutorials()
+function build_notebooks()
     build()
     # Copy the Markdown first or the appended notebook links will add up.
     copy_markdown_files()
     append_notebook_links()
 end
-precompile(build_tutorials, ())
+precompile(build_notebooks, ())
 
 end # module
