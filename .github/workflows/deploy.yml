@@ -32,7 +32,7 @@ jobs:
       with:
         version: '1.8'
     - name: Build notebooks
-      run: julia --project -e 'Pkg.activate("."); Pkg.instantiate(); using JuliaActuarySite; build_notebooks()'
+      run: julia --project -e 'using Pkg; Pkg.activate("."); Pkg.instantiate(); using JuliaActuarySite; build_notebooks()'
       env:
         JULIA_NUM_THREADS: '2'
         DISABLE_CACHE: '${{ github.event.inputs.disableCache }}'
