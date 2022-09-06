@@ -72,73 +72,73 @@ end</code></pre>
 
 <tr>
 <td>1
-<td>"Male"
-<td>"Smoker"
-<td>34
-<td>39
+<td>"Female"
+<td>"Nonsmoker"
+<td>25
+<td>32
 
 <tr>
 <td>2
-<td>"Female"
+<td>"Male"
 <td>"Smoker"
-<td>42
-<td>52
+<td>58
+<td>66
 
 <tr>
 <td>3
 <td>"Male"
 <td>"Nonsmoker"
-<td>42
-<td>47
+<td>59
+<td>61
 
 <tr>
 <td>4
 <td>"Female"
 <td>"Smoker"
-<td>52
-<td>55
+<td>64
+<td>65
 
 <tr>
 <td>5
-<td>"Female"
+<td>"Male"
 <td>"Smoker"
-<td>48
-<td>53
+<td>49
+<td>54
 
 <tr>
 <td>6
-<td>"Male"
+<td>"Female"
 <td>"Nonsmoker"
-<td>34
-<td>42
+<td>32
+<td>37
 
 <tr>
 <td>7
 <td>"Male"
-<td>"Nonsmoker"
-<td>60
-<td>63
+<td>"Smoker"
+<td>41
+<td>49
 
 <tr>
 <td>8
-<td>"Female"
+<td>"Male"
 <td>"Smoker"
-<td>27
-<td>28
+<td>38
+<td>47
 
 <tr>
 <td>9
-<td>"Female"
-<td>"Nonsmoker"
-<td>35
-<td>41
+<td>"Male"
+<td>"Smoker"
+<td>30
+<td>40
 
 <tr>
 <td>10
 <td>"Male"
-<td>"Smoker"
-<td>63
-<td>64
+<td>"Nonsmoker"
+<td>45
+<td>49
 
 <tr>
 <td>...
@@ -147,8 +147,8 @@ end</code></pre>
 <td>10000
 <td>"Male"
 <td>"Smoker"
-<td>37
-<td>41
+<td>52
+<td>60
 
 </table>
 
@@ -204,20 +204,20 @@ end
     rate_lookup(rate_map,row.sex,row.smoke,row.issue_age,row.attained_age)
 end</code></pre>
 <pre id='var-rates' class='pluto-output'>10000-element Vector{Float64}:
- 0.0019
- 0.00563
- 0.00176
- 0.00512
+ 0.00053
+ 0.02309
+ 0.00384
+ 0.00805
+ 0.00626
+ 0.00053
  0.00518
- 0.00123
- 0.00547
  ⋮
- 0.00248
- 0.00115
- 0.0005
- 0.00474
- 0.00403
- 0.00188</pre>
+ 0.00108
+ 0.00227
+ 0.00385
+ 0.0011
+ 0.00814
+ 0.01273</pre>
 
 
 <div class=markdown ><p>And finally, we can just add this to the dataframe:</p>
@@ -238,83 +238,83 @@ end</code></pre>
 
 <tr>
 <td>1
-<td>"Male"
-<td>"Smoker"
-<td>34
-<td>39
-<td>0.0019
+<td>"Female"
+<td>"Nonsmoker"
+<td>25
+<td>32
+<td>0.00053
 
 <tr>
 <td>2
-<td>"Female"
+<td>"Male"
 <td>"Smoker"
-<td>42
-<td>52
-<td>0.00563
+<td>58
+<td>66
+<td>0.02309
 
 <tr>
 <td>3
 <td>"Male"
 <td>"Nonsmoker"
-<td>42
-<td>47
-<td>0.00176
+<td>59
+<td>61
+<td>0.00384
 
 <tr>
 <td>4
 <td>"Female"
 <td>"Smoker"
-<td>52
-<td>55
-<td>0.00512
+<td>64
+<td>65
+<td>0.00805
 
 <tr>
 <td>5
-<td>"Female"
+<td>"Male"
 <td>"Smoker"
-<td>48
-<td>53
-<td>0.00518
+<td>49
+<td>54
+<td>0.00626
 
 <tr>
 <td>6
-<td>"Male"
+<td>"Female"
 <td>"Nonsmoker"
-<td>34
-<td>42
-<td>0.00123
+<td>32
+<td>37
+<td>0.00053
 
 <tr>
 <td>7
 <td>"Male"
-<td>"Nonsmoker"
-<td>60
-<td>63
-<td>0.00547
+<td>"Smoker"
+<td>41
+<td>49
+<td>0.00518
 
 <tr>
 <td>8
-<td>"Female"
+<td>"Male"
 <td>"Smoker"
-<td>27
-<td>28
-<td>0.00035
+<td>38
+<td>47
+<td>0.00446
 
 <tr>
 <td>9
-<td>"Female"
-<td>"Nonsmoker"
-<td>35
-<td>41
-<td>0.00075
+<td>"Male"
+<td>"Smoker"
+<td>30
+<td>40
+<td>0.00245
 
 <tr>
 <td>10
 <td>"Male"
-<td>"Smoker"
-<td>63
-<td>64
-<td>0.00881
+<td>"Nonsmoker"
+<td>45
+<td>49
+<td>0.00177
 
 <tr>
 <td>...
@@ -323,9 +323,9 @@ end</code></pre>
 <td>10000
 <td>"Male"
 <td>"Smoker"
-<td>37
-<td>41
-<td>0.00188
+<td>52
+<td>60
+<td>0.01273
 
 </table>
 
@@ -522,7 +522,7 @@ PlutoUI 0.7.9
   
   
   <div class=copyright >
-    &copy; JuliaActuary Contributors. Last modified: September 05, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and <a href="https://julialang.org">Julia</a>.
+    &copy; JuliaActuary Contributors. Last modified: September 06, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and <a href="https://julialang.org">Julia</a>.
   </div>
 </div></div>
     
