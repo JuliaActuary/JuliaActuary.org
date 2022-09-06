@@ -1,13 +1,39 @@
-<!doctype html> <html lang=en > <meta charset=UTF-8 > <meta name=viewport  content="width=device-width, initial-scale=1"> <meta name=Description  content="Practical, extensible, and open-source actuarial modeling and analysis."> <meta property="og:description" content="Practical, extensible, and open-source actuarial modeling and analysis."> <meta property="og:image" content="/assets/logo_square.svg"> <link rel=stylesheet  href="/css/franklin.css"> <link rel=stylesheet  href="/css/basic.css"> <link rel=icon  href="/assets/favicon.png"> <title>Run this Pluto Notebook | JuliaActuary</title> <link rel=apple-touch-icon  sizes=180x180  href="/assets/apple-touch-icon.png"> <link rel=icon  type="image/png" sizes=32x32  href="/assets/favicon-32x32.png"> <link rel=icon  type="image/png" sizes=16x16  href="/assets/favicon-16x16.png"> <link rel=manifest  href="/assets/site.webmanifest"> <script src="https://cdn.jsdelivr.net/npm/swiffy-slider@1.2.0/dist/js/swiffy-slider.min.js" crossorigin=anonymous  defer></script> <link href="/css/slider.css" rel=stylesheet > <header> <div class=blog-name > <a href="/"> <div class=blog-name-logo-container > <div class=blog-name-logo > <img src="/assets/logo_square.svg" alt=logo  height=100px  width=100px  /> </div> <div>JuliaActuary</div> </div> </a> <div class=tagline >Practical, extensible, and open-source actuarial modeling and analysis. </div> </div> <nav> <ul> <li><a href="/">Home</a> <li><a href="/packages">Packages</a> <li><a href="/community">Community</a> <ul> <li><a href="/community/#learn">Learn</a> <li><a href="/community/#integration_with_r_and_python">Integration</a> <li><a href="/community/#contributing">Contributing</a> </ul> <li><a href="/#blog">Blog</a> </ul> <img src="/assets/hamburger.svg" id=menu-icon > </nav> </header> <div class=franklin-content > <!-- # This information is used for caching. [PlutoStaticHTML.State] input_sha = "0028f2ac237bd8d172dc32ab49d149d5debdec59eedf67319b24eab74e2a8c75" julia_version = "1.8.0" --> <div class=markdown ><h1>Stochastic claims projections demo</h1> </div> <pre class='language-julia'><code class='julia hljs pluto-input'>begin
+~~~
+<!-- PlutoStaticHTML.Begin -->
+<!--
+    # This information is used for caching.
+    [PlutoStaticHTML.State]
+    input_sha = "0028f2ac237bd8d172dc32ab49d149d5debdec59eedf67319b24eab74e2a8c75"
+    julia_version = "1.8.0"
+-->
+
+<div class="markdown"><h1>Stochastic claims projections demo</h1>
+</div>
+
+<pre class='language-julia'><code class='julia hljs pluto-input'>begin
     using CSV, DataFrames
     using MortalityTables, ActuaryUtilities
     using Dates
     using ThreadsX
     using BenchmarkTools
-end</code></pre> <div class=markdown ><p>Define a datatype. Not strictly necessary, but will make extending the program with more functions easier.</p> </div> <div class=markdown ><p>Type annotations are optional, but providing them is able to coerce the values to be all plain bits &#40;i.e. simple, non-referenced values like arrays are&#41; when the type is constructed. This makes the whole data be stored in the stack and is an example of data-oriented design. It&#39;s much slower without the type annotations &#40;~0.5 million policies per second, ~50x slower&#41;</p> </div> <pre class='language-julia'><code class='julia hljs pluto-input'>begin
+end</code></pre>
+
+
+
+<div class="markdown"><p>Define a datatype. Not strictly necessary, but will make extending the program with more functions easier.</p>
+</div>
+
+
+<div class="markdown"><p>Type annotations are optional, but providing them is able to coerce the values to be all plain bits &#40;i.e. simple, non-referenced values like arrays are&#41; when the type is constructed. This makes the whole data be stored in the stack and is an example of data-oriented design. It&#39;s much slower without the type annotations &#40;~0.5 million policies per second, ~50x slower&#41;</p>
+</div>
+
+<pre class='language-julia'><code class='julia hljs pluto-input'>begin
     @enum Sex Female = 1 Male = 2 
     @enum Risk Standard = 1 Preferred = 2
-end</code></pre> <pre class='language-julia'><code class='julia hljs pluto-input'>struct Policy
+end</code></pre>
+
+
+<pre class='language-julia'><code class='julia hljs pluto-input'>struct Policy
     id::Int
     sex::Sex
     benefit_base::Float64
@@ -16,13 +42,21 @@ end</code></pre> <pre class='language-julia'><code class='julia hljs pluto-input
     issue_date::Date
     issue_age::Int
     risk::Risk
-end</code></pre> <div class=markdown ><p>Load the data:</p> </div> <pre class='language-julia'><code class='julia hljs pluto-input'>sample_csv_data = 
+end</code></pre>
+
+
+
+<div class="markdown"><p>Load the data:</p>
+</div>
+
+<pre class='language-julia'><code class='julia hljs pluto-input'>sample_csv_data = 
 IOBuffer(
     raw"id,sex,benefit_base,COLA,mode,issue_date,issue_age,risk
         1,M,100000.0,0.03,12,1999-12-05,30,Std
         2,F,200000.0,0.03,12,1999-12-05,30,Pref"
 )
-</code></pre> <pre id='var-sample_csv_data' class='pluto-output'>IOBuffer(data=UInt8[...], readable=true, writable=false, seekable=true, append=false, size=138, maxsize=Inf, ptr=1, mark=-1)</pre>
+</code></pre>
+<pre id='var-sample_csv_data' class='pluto-output'>IOBuffer(data=UInt8[...], readable=true, writable=false, seekable=true, append=false, size=138, maxsize=Inf, ptr=1, mark=-1)</pre>
 
 <pre class='language-julia'><code class='julia hljs pluto-input'>policies = let 
 
@@ -51,7 +85,7 @@ end</code></pre>
  Policy(2, Female, 200000.0, 0.03, 12, Date("1999-12-05"), 30, Preferred)</pre>
 
 
-<div class=markdown ><p>Define what mortality gets used:</p>
+<div class="markdown"><p>Define what mortality gets used:</p>
 </div>
 
 <pre class='language-julia'><code class='julia hljs pluto-input'>mort = Dict(
@@ -68,7 +102,7 @@ end</code></pre>
 <pre id='var-mortality' class='pluto-output'>mortality (generic function with 1 method)</pre>
 
 
-<div class=markdown ><p>This defines the core logic of the policy projection and will write the results to the given <code>out</code> container &#40;here, a named tuple of arrays&#41;.</p>
+<div class="markdown"><p>This defines the core logic of the policy projection and will write the results to the given <code>out</code> container &#40;here, a named tuple of arrays&#41;.</p>
 <p>This is using a threaded approach where it could be operating on any of the computer&#39;s available threads, thus acheiving thread-based parallelism &#40;as opposed to multi-processor &#40;multi-machine&#41; or GPU-based computation which requires formulating the problem a bit differently &#40;array/matrix based&#41;. For the scale of computation here, I think I&#39;d apply this model of parallelism.</p>
 </div>
 
@@ -105,7 +139,7 @@ end</code></pre>
 <pre id='var-pol_project!' class='pluto-output'>pol_project! (generic function with 1 method)</pre>
 
 
-<div class=markdown ><p>Parameters for our projection:</p>
+<div class="markdown"><p>Parameters for our projection:</p>
 </div>
 
 <pre class='language-julia'><code class='julia hljs pluto-input'>using Random</code></pre>
@@ -119,7 +153,7 @@ end</code></pre>
 <pre id='var-params' class='pluto-output'>(val_date = Date("2021-12-31"), proj_length = 100, mortality = Dict{Main.var"workspace#5".Sex, OffsetArrays.OffsetVector{Float64, Vector{Float64}}}(Female => [0.00745, 0.00745, 0.00745, 0.00745, 0.00745, 0.00745, 0.00745, 0.00745, 0.00745, 0.00745  …  0.376246, 0.386015, 0.393507, 0.398308, 0.4, 0.4, 0.4, 0.4, 0.4, 1.0], Male => [0.022571, 0.022571, 0.022571, 0.022571, 0.022571, 0.022571, 0.022571, 0.022571, 0.022571, 0.022571  …  0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4]))</pre>
 
 
-<div class=markdown ><p>Check the number of threads we&#39;re using:</p>
+<div class="markdown"><p>Check the number of threads we&#39;re using:</p>
 </div>
 
 <pre class='language-julia'><code class='julia hljs pluto-input'>Threads.nthreads()</code></pre>
@@ -138,18 +172,18 @@ end</code></pre>
 <pre id='var-project' class='pluto-output'>project (generic function with 1 method)</pre>
 
 
-<div class=markdown ><p>Example of single projection:</p>
+<div class="markdown"><p>Example of single projection:</p>
 </div>
 
 <pre class='language-julia'><code class='julia hljs pluto-input'>project(repeat(policies,100_000),params)</code></pre>
 <pre id='var-hash143281' class='pluto-output'>(benefits = [5.629837552799815e10, 5.674140162953136e10, 5.709712086227114e10, 5.742960669907202e10, 5.766250599340425e10, 5.786413433727712e10, 5.8017727586935776e10, 5.808580487482805e10, 5.80491956298455e10, 5.797161303932019e10  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [195260, 190483, 185493, 180543, 175434, 170382, 165278, 160076, 154802, 149562  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])</pre>
 
 
-<div class=markdown ><h2>Benchmarking</h2>
+<div class="markdown"><h2>Benchmarking</h2>
 </div>
 
 
-<div class=markdown ><p>Using a Macbook Air laptop, about 30 million policies able to be stochastically projected per second:</p>
+<div class="markdown"><p>Using a Macbook Air laptop, about 30 million policies able to be stochastically projected per second:</p>
 </div>
 
 <pre class='language-julia'><code class='julia hljs pluto-input'>let
@@ -172,7 +206,7 @@ end</code></pre>
  Memory estimate: 16.30 KiB, allocs estimate: 144.</pre>
 
 
-<div class=markdown ><h2>Stochastic Set</h2>
+<div class="markdown"><h2>Stochastic Set</h2>
 <p>Loop through and calculate the reults <code>n</code> times &#40;this is only running the two policies in the sample data&quot; <code>n</code> times&#41;.</p>
 </div>
 
@@ -226,15 +260,15 @@ end</code></pre>
                                    Frequency                 </pre>
 
 
-<div class=markdown ><h1>Further Optimization</h1>
+<div class="markdown"><h1>Further Optimization</h1>
 <p>In no particular order:</p>
 <ul>
 <li><p>the RNG could be made faster: https://bkamins.github.io/julialang/2020/11/20/rand.html</p>
-
+</li>
 <li><p>Could make the stochastic set distributed, but at the current speed the overhead of distributed computing is probably more time than it would save. Same thing with GPU projections</p>
-
+</li>
 <li><p>...</p>
-
+</li>
 </ul>
 </div>
 <div class='manifest-versions'>
@@ -248,26 +282,5 @@ ThreadsX 0.1.10<br>
 UnicodePlots 2.11.2
 </div>
 
-
-
-<h2 id=run_this_pluto_notebook ><a href="#run_this_pluto_notebook" class=header-anchor >Run this Pluto Notebook</a></h2>
-<p><em>To run this page locally, download <a href="/tutorials/StochasticMortality.jl">this file</a> and open it with <a href="https://plutojl.org">Pluto.jl</a>.</em></p>
-
-
-<link rel=stylesheet  href="/libs/highlight/github.min.css">
-<script src="/libs/highlight/highlight.min.js"></script>
-<script>hljs.highlightAll();</script>
-
-
-<div class=page-foot >
-  The packages in JuliaActuary are open-source and liberally licensed (MIT License) to allow wide private and commercial
-  usage of the packages, like the base Julia language and many other packages in the ecosystem.
-  
-  
-  <div class=copyright >
-    &copy; JuliaActuary Contributors. Last modified: September 06, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and <a href="https://julialang.org">Julia</a>.
-  </div>
-</div></div>
-    
-    
-    <script data-goatcounter="https://juliaactuary.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<!-- PlutoStaticHTML.End -->
+~~~
