@@ -1,4 +1,4 @@
-<!doctype html> <html lang=en > <meta charset=UTF-8 > <meta name=viewport  content="width=device-width, initial-scale=1"> <meta name=Description  content="Practical, extensible, and open-source actuarial modeling and analysis."> <meta property="og:description" content="Practical, extensible, and open-source actuarial modeling and analysis."> <meta property="og:image" content="/assets/logo_square.svg"> <script> MathJax = { tex: { inlineMath: [['$', '$'], ["\\(", "\\)"]], processEscapes: true, } }; </script> <script async src="/assets/MathJax/MathJax-3.2.2/es5/tex-mml-chtml.js"> </script> <style> @font-face { src: url("//assets/MathJax/MathJax-3.2.2/es5/output/chtml/fonts/woff-v2/MathJax_Main-Regular.woff"> } </style> <style> @font-face { src: url("//assets/MathJax/MathJax-3.2.2/es5/output/chtml/fonts/woff-v2/MathJax_Zero.woff"> } </style> <style> @font-face { src: url("//assets/MathJax/MathJax-3.2.2/es5/output/chtml/fonts/woff-v2/MathJax_Math-Italic.woff"> } </style> <link rel=stylesheet  href="/css/franklin.css"> <link rel=stylesheet  href="/css/basic.css"> <link rel=icon  href="/assets/favicon.png"> <title>Run this Pluto Notebook | JuliaActuary</title> <link rel=apple-touch-icon  sizes=180x180  href="/assets/apple-touch-icon.png"> <link rel=icon  type="image/png" sizes=32x32  href="/assets/favicon-32x32.png"> <link rel=icon  type="image/png" sizes=16x16  href="/assets/favicon-16x16.png"> <link rel=manifest  href="/assets/site.webmanifest"> <script src="https://cdn.jsdelivr.net/npm/swiffy-slider@1.2.0/dist/js/swiffy-slider.min.js" crossorigin=anonymous  defer></script> <link href="/css/slider.css" rel=stylesheet > <header> <div class=blog-name > <a href="/"> <div class=blog-name-logo-container > <div class=blog-name-logo > <img src="/assets/logo_square.svg" alt=logo  height=100px  width=100px  /> </div> <div>JuliaActuary</div> </div> </a> <div class=tagline >Practical, extensible, and open-source actuarial modeling and analysis. </div> </div> <nav> <ul> <li><a href="/">Home</a> <li><a href="/packages">Packages</a> <li><a href="/community">Community</a> <ul> <li><a href="/community/#learn">Learn</a> <li><a href="/community/#integration_with_r_and_python">Integration</a> <li><a href="/community/#contributing">Contributing</a> </ul> <li><a href="/#blog">Blog</a> </ul> <img src="/assets/hamburger.svg" id=menu-icon > </nav> </header> <div class=franklin-content > <!-- # This information is used for caching. [PlutoStaticHTML.State] input_sha = "9919ce1b8f34efce340e5f8291c0715ed9c9ef897f4fb3be30834533ef64c286" julia_version = "1.8.0" --> <div class=markdown ><h1>Using MortaltiyTables.jl with DataFrames</h1> <h2>MortalityTables.jl standard representation</h2> <p>MortalityTables.jl stores the rates in a very efficient manner as a collection of vectors indexed by attained age.</p> </div> <div class=markdown ><p>First, we include the package, and then we&#39;ll pick a table, where all of the <code>mort.soa.org</code> tables are mirrored into your MortalityTables.jl installation.</p> </div> <pre class='language-julia'><code class='julia hljs pluto-input'>begin
+<!doctype html> <html lang=en > <meta charset=UTF-8 > <meta name=viewport  content="width=device-width, initial-scale=1"> <meta name=Description  content="Practical, extensible, and open-source actuarial modeling and analysis."> <meta property="og:description" content="Practical, extensible, and open-source actuarial modeling and analysis."> <meta property="og:image" content="/assets/logo_square.svg"> <script> MathJax = { tex: { inlineMath: [['$', '$'], ["\\(", "\\)"]], processEscapes: true, } }; </script> <script async src="/assets/MathJax/MathJax-3.2.2/es5/tex-mml-chtml.js"> </script> <style> @font-face { src: url("//assets/MathJax/MathJax-3.2.2/es5/output/chtml/fonts/woff-v2/MathJax_Main-Regular.woff"> } </style> <style> @font-face { src: url("//assets/MathJax/MathJax-3.2.2/es5/output/chtml/fonts/woff-v2/MathJax_Zero.woff"> } </style> <style> @font-face { src: url("//assets/MathJax/MathJax-3.2.2/es5/output/chtml/fonts/woff-v2/MathJax_Math-Italic.woff"> } </style> <link rel=stylesheet  href="/css/franklin.css"> <link rel=stylesheet  href="/css/basic.css"> <link rel=icon  href="/assets/favicon.png"> <title>Run this Pluto Notebook | JuliaActuary</title> <link rel=apple-touch-icon  sizes=180x180  href="/assets/apple-touch-icon.png"> <link rel=icon  type="image/png" sizes=32x32  href="/assets/favicon-32x32.png"> <link rel=icon  type="image/png" sizes=16x16  href="/assets/favicon-16x16.png"> <link rel=manifest  href="/assets/site.webmanifest"> <script src="https://cdn.jsdelivr.net/npm/swiffy-slider@1.2.0/dist/js/swiffy-slider.min.js" crossorigin=anonymous  defer></script> <link href="/css/slider.css" rel=stylesheet > <header> <div class=blog-name > <a href="/"> <div class=blog-name-logo-container > <div class=blog-name-logo > <img src="/assets/logo_square.svg" alt=logo  height=100px  width=100px  /> </div> <div>JuliaActuary</div> </div> </a> <div class=tagline >Practical, extensible, and open-source actuarial modeling and analysis. </div> </div> <nav> <ul> <li><a href="/">Home</a> <li><a href="/packages">Packages</a> <li><a href="/community">Community</a> <ul> <li><a href="/community/#learn">Learn</a> <li><a href="/community/#integration_with_r_and_python">Integration</a> <li><a href="/community/#contributing">Contributing</a> </ul> <li><a href="/#blog">Blog</a> </ul> <img src="/assets/hamburger.svg" id=menu-icon > </nav> </header> <div class=franklin-content > <!-- # This information is used for caching. [PlutoStaticHTML.State] input_sha = "9919ce1b8f34efce340e5f8291c0715ed9c9ef897f4fb3be30834533ef64c286" julia_version = "1.8.1" --> <div class=markdown ><h1>Using MortaltiyTables.jl with DataFrames</h1> <h2>MortalityTables.jl standard representation</h2> <p>MortalityTables.jl stores the rates in a very efficient manner as a collection of vectors indexed by attained age.</p> </div> <div class=markdown ><p>First, we include the package, and then we&#39;ll pick a table, where all of the <code>mort.soa.org</code> tables are mirrored into your MortalityTables.jl installation.</p> </div> <pre class='language-julia'><code class='julia hljs pluto-input'>begin
     using MortalityTables
 
     vbt = MortalityTables.table("2001 VBT Residual Standard Select and Ultimate - Male Nonsmoker, ANB") #or any other table
@@ -73,72 +73,72 @@ end</code></pre>
 <tr>
 <td>1
 <td>"Male"
-<td>"Nonsmoker"
-<td>42
-<td>48
+<td>"Smoker"
+<td>35
+<td>41
 
 <tr>
 <td>2
 <td>"Male"
-<td>"Smoker"
-<td>37
-<td>40
+<td>"Nonsmoker"
+<td>35
+<td>42
 
 <tr>
 <td>3
-<td>"Male"
+<td>"Female"
 <td>"Smoker"
-<td>44
-<td>50
+<td>56
+<td>63
 
 <tr>
 <td>4
 <td>"Male"
-<td>"Smoker"
-<td>53
-<td>54
+<td>"Nonsmoker"
+<td>38
+<td>47
 
 <tr>
 <td>5
-<td>"Female"
+<td>"Male"
 <td>"Smoker"
+<td>34
 <td>42
-<td>52
 
 <tr>
 <td>6
-<td>"Female"
-<td>"Nonsmoker"
-<td>44
-<td>54
+<td>"Male"
+<td>"Smoker"
+<td>51
+<td>61
 
 <tr>
 <td>7
-<td>"Male"
+<td>"Female"
 <td>"Smoker"
-<td>28
-<td>34
+<td>65
+<td>71
 
 <tr>
 <td>8
 <td>"Male"
 <td>"Nonsmoker"
-<td>46
-<td>47
+<td>50
+<td>57
 
 <tr>
 <td>9
 <td>"Male"
-<td>"Smoker"
-<td>64
-<td>65
+<td>"Nonsmoker"
+<td>49
+<td>58
 
 <tr>
 <td>10
-<td>"Male"
-<td>"Nonsmoker"
-<td>62
-<td>70
+<td>"Female"
+<td>"Smoker"
+<td>45
+<td>48
 
 <tr>
 <td>...
@@ -148,7 +148,7 @@ end</code></pre>
 <td>"Male"
 <td>"Nonsmoker"
 <td>36
-<td>43
+<td>46
 
 </table>
 
@@ -204,20 +204,20 @@ end
     rate_lookup(rate_map,row.sex,row.smoke,row.issue_age,row.attained_age)
 end</code></pre>
 <pre id='var-rates' class='pluto-output'>10000-element Vector{Float64}:
- 0.00206
- 0.0016
- 0.00502
- 0.00422
- 0.00563
- 0.00339
- 0.00141
+ 0.00226
+ 0.00122
+ 0.0116
+ 0.0021
+ 0.00254
+ 0.01601
+ 0.01809
  ⋮
- 0.00166
+ 0.001
+ 0.00345
+ 0.00051
  0.00176
- 0.00268
- 0.00686
- 0.00066
- 0.00134</pre>
+ 0.00084
+ 0.00194</pre>
 
 
 <div class=markdown ><p>And finally, we can just add this to the dataframe:</p>
@@ -239,82 +239,82 @@ end</code></pre>
 <tr>
 <td>1
 <td>"Male"
-<td>"Nonsmoker"
-<td>42
-<td>48
-<td>0.00206
+<td>"Smoker"
+<td>35
+<td>41
+<td>0.00226
 
 <tr>
 <td>2
 <td>"Male"
-<td>"Smoker"
-<td>37
-<td>40
-<td>0.0016
+<td>"Nonsmoker"
+<td>35
+<td>42
+<td>0.00122
 
 <tr>
 <td>3
-<td>"Male"
+<td>"Female"
 <td>"Smoker"
-<td>44
-<td>50
-<td>0.00502
+<td>56
+<td>63
+<td>0.0116
 
 <tr>
 <td>4
 <td>"Male"
-<td>"Smoker"
-<td>53
-<td>54
-<td>0.00422
+<td>"Nonsmoker"
+<td>38
+<td>47
+<td>0.0021
 
 <tr>
 <td>5
-<td>"Female"
+<td>"Male"
 <td>"Smoker"
+<td>34
 <td>42
-<td>52
-<td>0.00563
+<td>0.00254
 
 <tr>
 <td>6
-<td>"Female"
-<td>"Nonsmoker"
-<td>44
-<td>54
-<td>0.00339
+<td>"Male"
+<td>"Smoker"
+<td>51
+<td>61
+<td>0.01601
 
 <tr>
 <td>7
-<td>"Male"
+<td>"Female"
 <td>"Smoker"
-<td>28
-<td>34
-<td>0.00141
+<td>65
+<td>71
+<td>0.01809
 
 <tr>
 <td>8
 <td>"Male"
 <td>"Nonsmoker"
-<td>46
-<td>47
-<td>0.00103
+<td>50
+<td>57
+<td>0.0046
 
 <tr>
 <td>9
 <td>"Male"
-<td>"Smoker"
-<td>64
-<td>65
-<td>0.00965
+<td>"Nonsmoker"
+<td>49
+<td>58
+<td>0.00572
 
 <tr>
 <td>10
-<td>"Male"
-<td>"Nonsmoker"
-<td>62
-<td>70
-<td>0.01506
+<td>"Female"
+<td>"Smoker"
+<td>45
+<td>48
+<td>0.00264
 
 <tr>
 <td>...
@@ -324,8 +324,8 @@ end</code></pre>
 <td>"Male"
 <td>"Nonsmoker"
 <td>36
-<td>43
-<td>0.00134
+<td>46
+<td>0.00194
 
 </table>
 
@@ -499,7 +499,7 @@ return tocNode
 }
 </style>
 <div class='manifest-versions'>
-<p>Built with Julia 1.8.0 and</p>
+<p>Built with Julia 1.8.1 and</p>
 DataFrames 1.2.2<br>
 MortalityTables 2.1.4<br>
 PlutoUI 0.7.9
