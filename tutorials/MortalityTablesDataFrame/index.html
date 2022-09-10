@@ -74,71 +74,71 @@ end</code></pre>
 <td>1
 <td>"Male"
 <td>"Smoker"
-<td>35
-<td>41
+<td>52
+<td>61
 
 <tr>
 <td>2
 <td>"Male"
 <td>"Nonsmoker"
-<td>35
-<td>42
+<td>32
+<td>33
 
 <tr>
 <td>3
-<td>"Female"
+<td>"Male"
 <td>"Smoker"
-<td>56
-<td>63
+<td>36
+<td>44
 
 <tr>
 <td>4
 <td>"Male"
-<td>"Nonsmoker"
-<td>38
-<td>47
+<td>"Smoker"
+<td>54
+<td>58
 
 <tr>
 <td>5
 <td>"Male"
 <td>"Smoker"
-<td>34
-<td>42
+<td>63
+<td>71
 
 <tr>
 <td>6
 <td>"Male"
 <td>"Smoker"
-<td>51
-<td>61
+<td>46
+<td>56
 
 <tr>
 <td>7
 <td>"Female"
 <td>"Smoker"
-<td>65
-<td>71
+<td>26
+<td>27
 
 <tr>
 <td>8
-<td>"Male"
+<td>"Female"
 <td>"Nonsmoker"
-<td>50
-<td>57
+<td>42
+<td>45
 
 <tr>
 <td>9
-<td>"Male"
+<td>"Female"
 <td>"Nonsmoker"
-<td>49
-<td>58
+<td>36
+<td>44
 
 <tr>
 <td>10
-<td>"Female"
-<td>"Smoker"
-<td>45
-<td>48
+<td>"Male"
+<td>"Nonsmoker"
+<td>43
+<td>50
 
 <tr>
 <td>...
@@ -146,9 +146,9 @@ end</code></pre>
 <tr>
 <td>10000
 <td>"Male"
-<td>"Nonsmoker"
-<td>36
-<td>46
+<td>"Smoker"
+<td>61
+<td>71
 
 </table>
 
@@ -204,20 +204,20 @@ end
     rate_lookup(rate_map,row.sex,row.smoke,row.issue_age,row.attained_age)
 end</code></pre>
 <pre id='var-rates' class='pluto-output'>10000-element Vector{Float64}:
- 0.00226
- 0.00122
- 0.0116
- 0.0021
- 0.00254
- 0.01601
- 0.01809
+ 0.01501
+ 0.00042
+ 0.00316
+ 0.00805
+ 0.03201
+ 0.0109
+ 0.00033
  ⋮
- 0.001
- 0.00345
- 0.00051
- 0.00176
- 0.00084
- 0.00194</pre>
+ 0.0073
+ 0.00655
+ 0.00906
+ 0.00151
+ 0.00087
+ 0.03845</pre>
 
 
 <div class=markdown ><p>And finally, we can just add this to the dataframe:</p>
@@ -240,81 +240,81 @@ end</code></pre>
 <td>1
 <td>"Male"
 <td>"Smoker"
-<td>35
-<td>41
-<td>0.00226
+<td>52
+<td>61
+<td>0.01501
 
 <tr>
 <td>2
 <td>"Male"
 <td>"Nonsmoker"
-<td>35
-<td>42
-<td>0.00122
+<td>32
+<td>33
+<td>0.00042
 
 <tr>
 <td>3
-<td>"Female"
+<td>"Male"
 <td>"Smoker"
-<td>56
-<td>63
-<td>0.0116
+<td>36
+<td>44
+<td>0.00316
 
 <tr>
 <td>4
 <td>"Male"
-<td>"Nonsmoker"
-<td>38
-<td>47
-<td>0.0021
+<td>"Smoker"
+<td>54
+<td>58
+<td>0.00805
 
 <tr>
 <td>5
 <td>"Male"
 <td>"Smoker"
-<td>34
-<td>42
-<td>0.00254
+<td>63
+<td>71
+<td>0.03201
 
 <tr>
 <td>6
 <td>"Male"
 <td>"Smoker"
-<td>51
-<td>61
-<td>0.01601
+<td>46
+<td>56
+<td>0.0109
 
 <tr>
 <td>7
 <td>"Female"
 <td>"Smoker"
-<td>65
-<td>71
-<td>0.01809
+<td>26
+<td>27
+<td>0.00033
 
 <tr>
 <td>8
-<td>"Male"
+<td>"Female"
 <td>"Nonsmoker"
-<td>50
-<td>57
-<td>0.0046
+<td>42
+<td>45
+<td>0.00084
 
 <tr>
 <td>9
-<td>"Male"
+<td>"Female"
 <td>"Nonsmoker"
-<td>49
-<td>58
-<td>0.00572
+<td>36
+<td>44
+<td>0.00112
 
 <tr>
 <td>10
-<td>"Female"
-<td>"Smoker"
-<td>45
-<td>48
-<td>0.00264
+<td>"Male"
+<td>"Nonsmoker"
+<td>43
+<td>50
+<td>0.00251
 
 <tr>
 <td>...
@@ -322,10 +322,10 @@ end</code></pre>
 <tr>
 <td>10000
 <td>"Male"
-<td>"Nonsmoker"
-<td>36
-<td>46
-<td>0.00194
+<td>"Smoker"
+<td>61
+<td>71
+<td>0.03845
 
 </table>
 
@@ -518,7 +518,7 @@ PlutoUI 0.7.9
 
 <div class=page-foot >
   The packages in JuliaActuary are open-source and liberally licensed (MIT License) to allow wide private and commercial
-  usage of the packages, like the base Julia language and many other packages in the ecosystem.
+  usage of the packages, like the base Julia language and many other packages in the ecosystem. See <a href="/terms/" >terms of this site.</a>
   
   
   <div class=copyright >

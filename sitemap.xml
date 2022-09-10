@@ -104,6 +104,12 @@
     <priority>0.5</priority>
 </url>
 <url>
+    <loc>https://JuliaActuary.org/terms/index.html</loc>
+    <lastmod>2022-09-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+</url>
+<url>
     <loc>https://JuliaActuary.org/tutorials/CashflowAnalysis/index.html</loc>
     <lastmod>2022-09-10</lastmod>
     <changefreq>monthly</changefreq>
