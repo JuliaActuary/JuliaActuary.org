@@ -13,6 +13,7 @@ begin
 	using DataFrames
 	using ThreadsX
 	using Logging
+	using Markdown
 end
 
 # ╔═╡ 8432d88b-58cd-48fc-9cb1-0bba406c394a
@@ -54,14 +55,14 @@ md" ## Simulation Parameters"
 trials = 30
 
 # ╔═╡ 15b90365-97de-49a4-9393-3922731cf0d3
-md"## Approach
+Markdown.parse("""## Approach
 
-We will use Julia and Turing.jl to simulate the posterior distribution. Our prior for the parameter ``q`` will be ``Unifrom = Beta(1,1)``.
+We will use Julia and Turing.jl to simulate the posterior distribution. Our prior for the parameter \$q\$ will be \${Uniform} = Beta(1,1)\$.
 
-We will sample from the posterior using the No-U-Turn (NUTS) sampler, and aggregate the results of the chains over $trials trials of simulated outcomes for the given ``q`` and ``N``.
+We will sample from the posterior using the No-U-Turn (NUTS) sampler, and aggregate the results of the chains over $(trials) trials of simulated outcomes for the given \$q\$ and \$N\$.
 
 We begin by importing the relevant packages:
-"
+""")
 
 # ╔═╡ 0b846cdb-1444-433e-b846-f0eeb6cc3ad2
 qs = [0.05,0.25,0.5,0.75,0.95]
@@ -92,12 +93,12 @@ Logging.disable_logging(Logging.Warn); #Disable warning logs to improve sampling
 end
 
 # ╔═╡ 426b3cb1-e160-4800-b0a5-9cfe4c6a13e0
-md""" ## Results
+Markdown.parse(""" ## Results
 
-The results indicate that the Poisson is a good fit when ``q`` is small, where "small" depends on N, but in general it seems to provide a good fit in less restrictive cases than the "rule of thumb" quoted below. E.g. go ahead and use the Poisson approximation when you've got enough expsoures even if ``q`` is well above ``0.10``. The Poisson approximation also isn't terrible when ``N`` is as low as 10 as long as ``q`` is very small (``<0.05`` ).
+The results indicate that the Poisson is a good fit when \$q\$ is small, where "small" depends on N, but in general it seems to provide a good fit in less restrictive cases than the "rule of thumb" quoted below. E.g. go ahead and use the Poisson approximation when you've got enough expsoures even if \$q\$ is well above \$0.10\$. The Poisson approximation also isn't terrible when \$N\$ is as low as 10 as long as \$q\$ is very small (e.g.  \$<0.05\$ ).
 
-The fit remains poor when ``q >> 0.5`` and when ``N`` is small.
-"""
+The fit remains poor when \$q >> 0.5\$ and when \$N\$ is small.
+""")
 
 # ╔═╡ 70b82a0d-f8d5-4c4d-9991-40693603567c
 md"### Visualization
@@ -188,6 +189,7 @@ CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 Logging = "56ddb016-857b-54e1-b83d-db4d58db5568"
 MCMCChains = "c7f686f2-ff18-58e9-bc7b-31028e88f75d"
+Markdown = "d6f4376e-aef5-505a-96c1-9c027394607a"
 StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 ThreadsX = "ac1d9e8a-700a-412c-b207-f0111f4b6c0d"
 Turing = "fce5fe82-541a-59a6-adf8-730c64b5f9a0"
@@ -207,7 +209,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.8.0"
 manifest_format = "2.0"
-project_hash = "9796969e2a253cc30bf51baed04ba8f52f301ca8"
+project_hash = "110585321a7ff9a5028159ce3fcaa685e61b9a96"
 
 [[deps.AbstractFFTs]]
 deps = ["ChainRulesCore", "LinearAlgebra"]
