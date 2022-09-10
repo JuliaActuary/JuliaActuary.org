@@ -99,81 +99,81 @@ end</code></pre>
 <td>1</td>
 <td>"Male"</td>
 <td>"Smoker"</td>
-<td>52</td>
-<td>61</td>
+<td>35</td>
+<td>39</td>
 </tr>
 <tr>
 <td>2</td>
 <td>"Male"</td>
-<td>"Nonsmoker"</td>
-<td>32</td>
-<td>33</td>
+<td>"Smoker"</td>
+<td>56</td>
+<td>63</td>
 </tr>
 <tr>
 <td>3</td>
 <td>"Male"</td>
 <td>"Smoker"</td>
-<td>36</td>
-<td>44</td>
+<td>65</td>
+<td>67</td>
 </tr>
 <tr>
 <td>4</td>
-<td>"Male"</td>
-<td>"Smoker"</td>
-<td>54</td>
-<td>58</td>
+<td>"Female"</td>
+<td>"Nonsmoker"</td>
+<td>62</td>
+<td>72</td>
 </tr>
 <tr>
 <td>5</td>
-<td>"Male"</td>
+<td>"Female"</td>
 <td>"Smoker"</td>
-<td>63</td>
-<td>71</td>
+<td>28</td>
+<td>35</td>
 </tr>
 <tr>
 <td>6</td>
-<td>"Male"</td>
-<td>"Smoker"</td>
-<td>46</td>
-<td>56</td>
+<td>"Female"</td>
+<td>"Nonsmoker"</td>
+<td>37</td>
+<td>45</td>
 </tr>
 <tr>
 <td>7</td>
-<td>"Female"</td>
-<td>"Smoker"</td>
-<td>26</td>
-<td>27</td>
+<td>"Male"</td>
+<td>"Nonsmoker"</td>
+<td>25</td>
+<td>33</td>
 </tr>
 <tr>
 <td>8</td>
-<td>"Female"</td>
-<td>"Nonsmoker"</td>
+<td>"Male"</td>
+<td>"Smoker"</td>
 <td>42</td>
-<td>45</td>
+<td>48</td>
 </tr>
 <tr>
 <td>9</td>
 <td>"Female"</td>
 <td>"Nonsmoker"</td>
-<td>36</td>
-<td>44</td>
+<td>39</td>
+<td>43</td>
 </tr>
 <tr>
 <td>10</td>
-<td>"Male"</td>
+<td>"Female"</td>
 <td>"Nonsmoker"</td>
-<td>43</td>
-<td>50</td>
+<td>45</td>
+<td>46</td>
 </tr>
 <tr>
 <td>...</td>
 </tr>
 <tr>
 <td>10000</td>
-<td>"Male"</td>
-<td>"Smoker"</td>
-<td>61</td>
-<td>71</td>
+<td>"Female"</td>
+<td>"Nonsmoker"</td>
+<td>39</td>
+<td>45</td>
 </tr>
 </table>
 
@@ -229,20 +229,20 @@ end
     rate_lookup(rate_map,row.sex,row.smoke,row.issue_age,row.attained_age)
 end</code></pre>
 <pre id='var-rates' class='pluto-output'>10000-element Vector{Float64}:
- 0.01501
- 0.00042
- 0.00316
- 0.00805
- 0.03201
- 0.0109
- 0.00033
+ 0.00174
+ 0.01693
+ 0.01463
+ 0.01528
+ 0.00105
+ 0.00124
+ 0.00073
  ⋮
- 0.0073
- 0.00655
- 0.00906
- 0.00151
- 0.00087
- 0.03845</pre>
+ 0.01789
+ 0.00377
+ 0.00091
+ 0.00401
+ 0.00705
+ 0.0011</pre>
 
 
 <div class="markdown"><p>And finally, we can just add this to the dataframe:</p>
@@ -265,92 +265,92 @@ end</code></pre>
 <td>1</td>
 <td>"Male"</td>
 <td>"Smoker"</td>
-<td>52</td>
-<td>61</td>
-<td>0.01501</td>
+<td>35</td>
+<td>39</td>
+<td>0.00174</td>
 </tr>
 <tr>
 <td>2</td>
 <td>"Male"</td>
-<td>"Nonsmoker"</td>
-<td>32</td>
-<td>33</td>
-<td>0.00042</td>
+<td>"Smoker"</td>
+<td>56</td>
+<td>63</td>
+<td>0.01693</td>
 </tr>
 <tr>
 <td>3</td>
 <td>"Male"</td>
 <td>"Smoker"</td>
-<td>36</td>
-<td>44</td>
-<td>0.00316</td>
+<td>65</td>
+<td>67</td>
+<td>0.01463</td>
 </tr>
 <tr>
 <td>4</td>
-<td>"Male"</td>
-<td>"Smoker"</td>
-<td>54</td>
-<td>58</td>
-<td>0.00805</td>
+<td>"Female"</td>
+<td>"Nonsmoker"</td>
+<td>62</td>
+<td>72</td>
+<td>0.01528</td>
 </tr>
 <tr>
 <td>5</td>
-<td>"Male"</td>
+<td>"Female"</td>
 <td>"Smoker"</td>
-<td>63</td>
-<td>71</td>
-<td>0.03201</td>
+<td>28</td>
+<td>35</td>
+<td>0.00105</td>
 </tr>
 <tr>
 <td>6</td>
-<td>"Male"</td>
-<td>"Smoker"</td>
-<td>46</td>
-<td>56</td>
-<td>0.0109</td>
+<td>"Female"</td>
+<td>"Nonsmoker"</td>
+<td>37</td>
+<td>45</td>
+<td>0.00124</td>
 </tr>
 <tr>
 <td>7</td>
-<td>"Female"</td>
-<td>"Smoker"</td>
-<td>26</td>
-<td>27</td>
-<td>0.00033</td>
+<td>"Male"</td>
+<td>"Nonsmoker"</td>
+<td>25</td>
+<td>33</td>
+<td>0.00073</td>
 </tr>
 <tr>
 <td>8</td>
-<td>"Female"</td>
-<td>"Nonsmoker"</td>
+<td>"Male"</td>
+<td>"Smoker"</td>
 <td>42</td>
-<td>45</td>
-<td>0.00084</td>
+<td>48</td>
+<td>0.00439</td>
 </tr>
 <tr>
 <td>9</td>
 <td>"Female"</td>
 <td>"Nonsmoker"</td>
-<td>36</td>
-<td>44</td>
-<td>0.00112</td>
+<td>39</td>
+<td>43</td>
+<td>0.00075</td>
 </tr>
 <tr>
 <td>10</td>
-<td>"Male"</td>
+<td>"Female"</td>
 <td>"Nonsmoker"</td>
-<td>43</td>
-<td>50</td>
-<td>0.00251</td>
+<td>45</td>
+<td>46</td>
+<td>0.00075</td>
 </tr>
 <tr>
 <td>...</td>
 </tr>
 <tr>
 <td>10000</td>
-<td>"Male"</td>
-<td>"Smoker"</td>
-<td>61</td>
-<td>71</td>
-<td>0.03845</td>
+<td>"Female"</td>
+<td>"Nonsmoker"</td>
+<td>39</td>
+<td>45</td>
+<td>0.0011</td>
 </tr>
 </table>
 
