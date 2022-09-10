@@ -49,6 +49,7 @@ Benchmarks of Actuarial workflows can be found on the [Benchmarks](/benchmarks/)
 - [Interactive mortality table comparison tool](/tutorials/MortalityTableComparison/) for any `mort.soa.org` table
 - [Interactive cashflow analysis](/tutorials/CashflowAnalysis/)
 - [Universal Life Policy Account Mechanics as a Differential Equation](/tutorials/PolicyDiffEq/)
+- [The Poisson approximation to the Binomial Distribution](/tutorials/poissonbinomial/)
 
 ### Other Repositories of Interest for Actuaries
 
