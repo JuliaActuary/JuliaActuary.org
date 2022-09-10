@@ -17,6 +17,7 @@ begin
 end
 
 # ╔═╡ 8432d88b-58cd-48fc-9cb1-0bba406c394a
+# hideall
 md"""# Poisson approximation to Binomial
 
 This notebook explores across a range of parameters ``q`` (the probabilty a binomial event occurs) and ``N`` (the number of chances for the event to occur, or "exposures"). 
@@ -55,6 +56,7 @@ md" ## Simulation Parameters"
 trials = 30
 
 # ╔═╡ 15b90365-97de-49a4-9393-3922731cf0d3
+# hideall
 Markdown.parse("""## Approach
 
 We will use Julia and Turing.jl to simulate the posterior distribution. Our prior for the parameter \$q\$ will be \${Uniform} = Beta(1,1)\$.
@@ -93,6 +95,7 @@ Logging.disable_logging(Logging.Warn); #Disable warning logs to improve sampling
 end
 
 # ╔═╡ 426b3cb1-e160-4800-b0a5-9cfe4c6a13e0
+# hideall
 Markdown.parse(""" ## Results
 
 The results indicate that the Poisson is a good fit when \$q\$ is small, where "small" depends on N, but in general it seems to provide a good fit in less restrictive cases than the "rule of thumb" quoted below. E.g. go ahead and use the Poisson approximation when you've got enough expsoures even if \$q\$ is well above \$0.10\$. The Poisson approximation also isn't terrible when \$N\$ is as low as 10 as long as \$q\$ is very small (e.g.  \$<0.05\$ ).
@@ -171,6 +174,7 @@ end
 
 
 # ╔═╡ ea621f6d-4bc2-4dfe-bf50-7715a2983e1e
+# hidealll
 html"""
 <style>
 	main {
@@ -209,7 +213,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.8.0"
 manifest_format = "2.0"
-project_hash = "110585321a7ff9a5028159ce3fcaa685e61b9a96"
+project_hash = "94c4217da012678d53f62c373e7bbc94534341d4"
 
 [[deps.AbstractFFTs]]
 deps = ["ChainRulesCore", "LinearAlgebra"]
