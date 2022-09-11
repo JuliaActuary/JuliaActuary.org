@@ -20,7 +20,12 @@ end
 # hideall
 md"""# Poisson approximation to Binomial
 
-This notebook explores across a range of parameters ``q`` (the probabilty a binomial event occurs) and ``N`` (the number of chances for the event to occur, or "exposures"). 
+This notebook explores using the Poissson approximation to the Binomial. This can be useful for a number of reasons:
+
+1. The Binomial probability mass formula becomes more unwieldy for large ``N`` faster than it does for the Poisson.
+2. In actuarial, and other contexts, ``N`` can be a non-integer value (think partial period exposures) and rounding up or down could materially distort the posterior estimate if ``N`` is small.
+
+We will look at the approximation across a range of parameters ``q`` (the probabilty a binomial event occurs) and ``N`` (the number of chances for the event to occur, or "exposures"). 
 
 Under certain conditions, the Poisson distribution can approximate the Binomial, where the average number of events, ``λ=N*q``.
 
