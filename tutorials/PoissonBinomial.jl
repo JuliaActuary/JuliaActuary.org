@@ -68,6 +68,8 @@ We will use Julia and Turing.jl to simulate the posterior distribution. Our prio
 
 We will sample from the posterior using the No-U-Turn (NUTS) sampler, and aggregate the results of the chains over $(trials) trials of simulated outcomes for the given \$q\$ and \$N\$.
 
+This is overkill for a toy problem where we could just model the parameters themselves, but it demonstrates using Bayesian MCMC techniques in a simple, exploratory fashion.
+
 We begin by importing the relevant packages:
 """)
 
