@@ -87,6 +87,9 @@ md" ## Sample from the Posterior
 # ╔═╡ bc44706c-3ecf-43e5-a794-eb6987743e69
 Logging.disable_logging(Logging.Warn); #Disable warning logs to improve sampling time
 
+# ╔═╡ f600049f-1165-4420-8237-7485764fa338
+md" This is a collection of samples (chains) from Markov chains that are sampled in proportion to the posterior density. If this is new to you, I highly recommend the book *Statistical Rethinking*:"
+
 # ╔═╡ 216032cf-b8ed-4bbd-9892-32ed58ac877e
 @time bpchains = map(model_points) do mp
 	
@@ -114,7 +117,7 @@ md"### Visualization
 This visualization shows the aggregated posterior distribution across all of the trials and model points. The darker shaded band indicates the middle 50% of the posterior:"
 
 # ╔═╡ 4e555af6-c486-4d68-b960-0d78df3bbb82
-function plot_band_under(ax,plot,y,low,high)
+function plot_band_under!(ax,plot,y,low,high,label="")
     function points(plot)
         pts = plot.plots[2].converted[1][]
         [p[1] for p in pts], [p[2] for p in pts]
@@ -130,7 +133,7 @@ end
 
 # ╔═╡ b963dfd0-8849-4d1a-9aea-646b339db394
 let
-    f = Figure(resolution=(1600,1200))
+    f = Figure(resolution=(1280,960))
     a = Any # outer variable to set as axis for to grab legend
     
     for (i,N) in enumerate(reverse(Ns))
@@ -148,16 +151,29 @@ let
             y = model_points[n].N
             bpoints = vcat([x.bc["q"][:] for x in c]...)
             ppoints = vcat([x.pc["q"][:] for x in c]...)
+			@show bpoints
             bqtls = quantile(bpoints,[.25,.75])
             pqtls = quantile(ppoints,[.25,.75])
-            j = density!(bpoints,linewidth=10,strokewidth = 1, strokecolor = (:black,0.6),label="Binomial",
-            color=(:red,.25),transparency=true,shading = false,
+            j = density!(
+				bpoints,
+				linewidth=10,
+				strokewidth = 1, 
+				strokecolor = (:grey30,0.6),
+				label="Binomial",
+            	color=(:red,.25),
             )
-            plot_band_under(ax,j,0,bqtls[1],bqtls[2])
+            plot_band_under!(ax,j,0,bqtls[1],bqtls[2],"Binomial")
         
 
-            j = density!(ppoints, color=(:blue,.25),linewidth=10,strokewidth = 1, strokecolor = (:grey30,0.6),label="Poisson",transparency=true,shading = false,)
-            plot_band_under(ax,j,0,pqtls[1],pqtls[2])
+            j = density!(
+				ppoints, 
+				color=(:blue,.25),
+				linewidth=10,
+				strokewidth = 1, 
+				strokecolor = (:grey30,0.6),
+				label="Poisson",
+			)
+            plot_band_under!(ax,j,0,pqtls[1],pqtls[2],"Poisson")
 
             hideydecorations!(ax,label=false)
         end
@@ -173,7 +189,6 @@ let
     end
 
     Legend(f[1,5],a,unique=true,orientation=:horizontal)
-    # Axis(f[1,5],title="How well does the Poisson approximate a Binomial outcome?")
     f
 end
 
@@ -216,7 +231,7 @@ Turing = "~0.21.12"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.8.0"
+julia_version = "1.8.1"
 manifest_format = "2.0"
 project_hash = "94c4217da012678d53f62c373e7bbc94534341d4"
 
@@ -1797,6 +1812,7 @@ version = "3.5.0+0"
 # ╠═3cb42e1f-8484-448b-a678-c959a89faeed
 # ╟─f5bc4ab6-c1fd-42bd-9827-427faad4b1f3
 # ╠═bc44706c-3ecf-43e5-a794-eb6987743e69
+# ╟─f600049f-1165-4420-8237-7485764fa338
 # ╠═216032cf-b8ed-4bbd-9892-32ed58ac877e
 # ╟─426b3cb1-e160-4800-b0a5-9cfe4c6a13e0
 # ╟─70b82a0d-f8d5-4c4d-9991-40693603567c
