@@ -4,7 +4,7 @@
     # This information is used for caching.
     [PlutoStaticHTML.State]
     input_sha = "9919ce1b8f34efce340e5f8291c0715ed9c9ef897f4fb3be30834533ef64c286"
-    julia_version = "1.8.1"
+    julia_version = "1.8.2"
 -->
 
 <div class="markdown"><h1>Using MortaltiyTables.jl with DataFrames</h1>
@@ -98,82 +98,82 @@ end</code></pre>
 <tr>
 <td>1</td>
 <td>"Male"</td>
-<td>"Smoker"</td>
-<td>35</td>
-<td>39</td>
+<td>"Nonsmoker"</td>
+<td>55</td>
+<td>56</td>
 </tr>
 <tr>
 <td>2</td>
 <td>"Male"</td>
-<td>"Smoker"</td>
-<td>56</td>
-<td>63</td>
+<td>"Nonsmoker"</td>
+<td>31</td>
+<td>41</td>
 </tr>
 <tr>
 <td>3</td>
-<td>"Male"</td>
-<td>"Smoker"</td>
-<td>65</td>
-<td>67</td>
+<td>"Female"</td>
+<td>"Nonsmoker"</td>
+<td>59</td>
+<td>61</td>
 </tr>
 <tr>
 <td>4</td>
 <td>"Female"</td>
 <td>"Nonsmoker"</td>
-<td>62</td>
-<td>72</td>
+<td>28</td>
+<td>32</td>
 </tr>
 <tr>
 <td>5</td>
-<td>"Female"</td>
-<td>"Smoker"</td>
-<td>28</td>
-<td>35</td>
+<td>"Male"</td>
+<td>"Nonsmoker"</td>
+<td>37</td>
+<td>38</td>
 </tr>
 <tr>
 <td>6</td>
-<td>"Female"</td>
+<td>"Male"</td>
 <td>"Nonsmoker"</td>
-<td>37</td>
-<td>45</td>
+<td>38</td>
+<td>48</td>
 </tr>
 <tr>
 <td>7</td>
 <td>"Male"</td>
 <td>"Nonsmoker"</td>
-<td>25</td>
-<td>33</td>
+<td>41</td>
+<td>47</td>
 </tr>
 <tr>
 <td>8</td>
-<td>"Male"</td>
-<td>"Smoker"</td>
-<td>42</td>
-<td>48</td>
+<td>"Female"</td>
+<td>"Nonsmoker"</td>
+<td>54</td>
+<td>59</td>
 </tr>
 <tr>
 <td>9</td>
 <td>"Female"</td>
 <td>"Nonsmoker"</td>
-<td>39</td>
-<td>43</td>
+<td>42</td>
+<td>45</td>
 </tr>
 <tr>
 <td>10</td>
-<td>"Female"</td>
+<td>"Male"</td>
 <td>"Nonsmoker"</td>
-<td>45</td>
-<td>46</td>
+<td>31</td>
+<td>35</td>
 </tr>
 <tr>
 <td>...</td>
 </tr>
 <tr>
 <td>10000</td>
-<td>"Female"</td>
+<td>"Male"</td>
 <td>"Nonsmoker"</td>
-<td>39</td>
-<td>45</td>
+<td>26</td>
+<td>36</td>
 </tr>
 </table>
 
@@ -229,20 +229,20 @@ end
     rate_lookup(rate_map,row.sex,row.smoke,row.issue_age,row.attained_age)
 end</code></pre>
 <pre id='var-rates' class='pluto-output'>10000-element Vector{Float64}:
- 0.00174
- 0.01693
- 0.01463
- 0.01528
- 0.00105
- 0.00124
- 0.00073
+ 0.00218
+ 0.00128
+ 0.00321
+ 0.0004
+ 0.00052
+ 0.00231
+ 0.0019
  ⋮
- 0.01789
- 0.00377
- 0.00091
- 0.00401
- 0.00705
- 0.0011</pre>
+ 0.00144
+ 0.00458
+ 0.00046
+ 0.00155
+ 0.0242
+ 0.00087</pre>
 
 
 <div class="markdown"><p>And finally, we can just add this to the dataframe:</p>
@@ -264,93 +264,93 @@ end</code></pre>
 <tr>
 <td>1</td>
 <td>"Male"</td>
-<td>"Smoker"</td>
-<td>35</td>
-<td>39</td>
-<td>0.00174</td>
+<td>"Nonsmoker"</td>
+<td>55</td>
+<td>56</td>
+<td>0.00218</td>
 </tr>
 <tr>
 <td>2</td>
 <td>"Male"</td>
-<td>"Smoker"</td>
-<td>56</td>
-<td>63</td>
-<td>0.01693</td>
+<td>"Nonsmoker"</td>
+<td>31</td>
+<td>41</td>
+<td>0.00128</td>
 </tr>
 <tr>
 <td>3</td>
-<td>"Male"</td>
-<td>"Smoker"</td>
-<td>65</td>
-<td>67</td>
-<td>0.01463</td>
+<td>"Female"</td>
+<td>"Nonsmoker"</td>
+<td>59</td>
+<td>61</td>
+<td>0.00321</td>
 </tr>
 <tr>
 <td>4</td>
 <td>"Female"</td>
 <td>"Nonsmoker"</td>
-<td>62</td>
-<td>72</td>
-<td>0.01528</td>
+<td>28</td>
+<td>32</td>
+<td>0.0004</td>
 </tr>
 <tr>
 <td>5</td>
-<td>"Female"</td>
-<td>"Smoker"</td>
-<td>28</td>
-<td>35</td>
-<td>0.00105</td>
+<td>"Male"</td>
+<td>"Nonsmoker"</td>
+<td>37</td>
+<td>38</td>
+<td>0.00052</td>
 </tr>
 <tr>
 <td>6</td>
-<td>"Female"</td>
+<td>"Male"</td>
 <td>"Nonsmoker"</td>
-<td>37</td>
-<td>45</td>
-<td>0.00124</td>
+<td>38</td>
+<td>48</td>
+<td>0.00231</td>
 </tr>
 <tr>
 <td>7</td>
 <td>"Male"</td>
 <td>"Nonsmoker"</td>
-<td>25</td>
-<td>33</td>
-<td>0.00073</td>
+<td>41</td>
+<td>47</td>
+<td>0.0019</td>
 </tr>
 <tr>
 <td>8</td>
-<td>"Male"</td>
-<td>"Smoker"</td>
-<td>42</td>
-<td>48</td>
-<td>0.00439</td>
+<td>"Female"</td>
+<td>"Nonsmoker"</td>
+<td>54</td>
+<td>59</td>
+<td>0.00348</td>
 </tr>
 <tr>
 <td>9</td>
 <td>"Female"</td>
 <td>"Nonsmoker"</td>
-<td>39</td>
-<td>43</td>
-<td>0.00075</td>
+<td>42</td>
+<td>45</td>
+<td>0.00084</td>
 </tr>
 <tr>
 <td>10</td>
-<td>"Female"</td>
+<td>"Male"</td>
 <td>"Nonsmoker"</td>
-<td>45</td>
-<td>46</td>
-<td>0.00075</td>
+<td>31</td>
+<td>35</td>
+<td>0.00074</td>
 </tr>
 <tr>
 <td>...</td>
 </tr>
 <tr>
 <td>10000</td>
-<td>"Female"</td>
+<td>"Male"</td>
 <td>"Nonsmoker"</td>
-<td>39</td>
-<td>45</td>
-<td>0.0011</td>
+<td>26</td>
+<td>36</td>
+<td>0.00087</td>
 </tr>
 </table>
 
@@ -527,7 +527,7 @@ return tocNode
 }
 </style>
 <div class='manifest-versions'>
-<p>Built with Julia 1.8.1 and</p>
+<p>Built with Julia 1.8.2 and</p>
 DataFrames 1.2.2<br>
 MortalityTables 2.1.4<br>
 PlutoUI 0.7.9

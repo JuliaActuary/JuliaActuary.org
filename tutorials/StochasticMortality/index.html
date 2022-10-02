@@ -1,4 +1,4 @@
-<!doctype html> <html lang=en > <meta charset=UTF-8 > <meta name=viewport  content="width=device-width, initial-scale=1"> <meta name=Description  content="Practical, extensible, and open-source actuarial modeling and analysis."> <meta property="og:description" content="Practical, extensible, and open-source actuarial modeling and analysis."> <meta property="og:image" content="/assets/logo_square.svg"> <script> MathJax = { tex: { inlineMath: [['$', '$'], ["\\(", "\\)"]], processEscapes: true, } }; </script> <script async src="/assets/MathJax/MathJax-3.2.2/es5/tex-mml-chtml.js"> </script> <style> @font-face { src: url("//assets/MathJax/MathJax-3.2.2/es5/output/chtml/fonts/woff-v2/MathJax_Main-Regular.woff"> } </style> <style> @font-face { src: url("//assets/MathJax/MathJax-3.2.2/es5/output/chtml/fonts/woff-v2/MathJax_Zero.woff"> } </style> <style> @font-face { src: url("//assets/MathJax/MathJax-3.2.2/es5/output/chtml/fonts/woff-v2/MathJax_Math-Italic.woff"> } </style> <link rel=stylesheet  href="/css/franklin.css"> <link rel=stylesheet  href="/css/basic.css"> <link rel=icon  href="/assets/favicon.png"> <title>Run this Pluto Notebook | JuliaActuary</title> <link rel=apple-touch-icon  sizes=180x180  href="/assets/apple-touch-icon.png"> <link rel=icon  type="image/png" sizes=32x32  href="/assets/favicon-32x32.png"> <link rel=icon  type="image/png" sizes=16x16  href="/assets/favicon-16x16.png"> <link rel=manifest  href="/assets/site.webmanifest"> <script src="https://cdn.jsdelivr.net/npm/swiffy-slider@1.2.0/dist/js/swiffy-slider.min.js" crossorigin=anonymous  defer></script> <link href="/css/slider.css" rel=stylesheet > <header> <div class=blog-name > <a href="/"> <div class=blog-name-logo-container > <div class=blog-name-logo > <img src="/assets/logo_square.svg" alt=logo  height=100px  width=100px  /> </div> <div>JuliaActuary</div> </div> </a> <div class=tagline >Practical, extensible, and open-source actuarial modeling and analysis. </div> </div> <nav> <ul> <li><a href="/">Home</a> <li><a href="/packages">Packages</a> <li><a href="/community">Community</a> <ul> <li><a href="/community/#learn">Learn</a> <li><a href="/community/#integration_with_r_and_python">Integration</a> <li><a href="/community/#contributing">Contributing</a> </ul> <li><a href="/#blog">Blog</a> </ul> <img src="/assets/hamburger.svg" id=menu-icon > </nav> </header> <div class=franklin-content > <!-- # This information is used for caching. [PlutoStaticHTML.State] input_sha = "0028f2ac237bd8d172dc32ab49d149d5debdec59eedf67319b24eab74e2a8c75" julia_version = "1.8.1" --> <div class=markdown ><h1>Stochastic claims projections demo</h1> </div> <pre class='language-julia'><code class='julia hljs pluto-input'>begin
+<!doctype html> <html lang=en > <meta charset=UTF-8 > <meta name=viewport  content="width=device-width, initial-scale=1"> <meta name=Description  content="Practical, extensible, and open-source actuarial modeling and analysis."> <meta property="og:description" content="Practical, extensible, and open-source actuarial modeling and analysis."> <meta property="og:image" content="/assets/logo_square.svg"> <script> MathJax = { tex: { inlineMath: [['$', '$'], ["\\(", "\\)"]], processEscapes: true, } }; </script> <script async src="/assets/MathJax/MathJax-3.2.2/es5/tex-mml-chtml.js"> </script> <style> @font-face { src: url("//assets/MathJax/MathJax-3.2.2/es5/output/chtml/fonts/woff-v2/MathJax_Main-Regular.woff"> } </style> <style> @font-face { src: url("//assets/MathJax/MathJax-3.2.2/es5/output/chtml/fonts/woff-v2/MathJax_Zero.woff"> } </style> <style> @font-face { src: url("//assets/MathJax/MathJax-3.2.2/es5/output/chtml/fonts/woff-v2/MathJax_Math-Italic.woff"> } </style> <link rel=stylesheet  href="/css/franklin.css"> <link rel=stylesheet  href="/css/basic.css"> <link rel=icon  href="/assets/favicon.png"> <title>Run this Pluto Notebook | JuliaActuary</title> <link rel=apple-touch-icon  sizes=180x180  href="/assets/apple-touch-icon.png"> <link rel=icon  type="image/png" sizes=32x32  href="/assets/favicon-32x32.png"> <link rel=icon  type="image/png" sizes=16x16  href="/assets/favicon-16x16.png"> <link rel=manifest  href="/assets/site.webmanifest"> <script src="https://cdn.jsdelivr.net/npm/swiffy-slider@1.2.0/dist/js/swiffy-slider.min.js" crossorigin=anonymous  defer></script> <link href="/css/slider.css" rel=stylesheet > <header> <div class=blog-name > <a href="/"> <div class=blog-name-logo-container > <div class=blog-name-logo > <img src="/assets/logo_square.svg" alt=logo  height=100px  width=100px  /> </div> <div>JuliaActuary</div> </div> </a> <div class=tagline >Practical, extensible, and open-source actuarial modeling and analysis. </div> </div> <nav> <ul> <li><a href="/">Home</a> <li><a href="/packages">Packages</a> <li><a href="/community">Community</a> <ul> <li><a href="/community/#learn">Learn</a> <li><a href="/community/#integration_with_r_and_python">Integration</a> <li><a href="/community/#contributing">Contributing</a> </ul> <li><a href="/#blog">Blog</a> </ul> <img src="/assets/hamburger.svg" id=menu-icon > </nav> </header> <div class=franklin-content > <!-- # This information is used for caching. [PlutoStaticHTML.State] input_sha = "0028f2ac237bd8d172dc32ab49d149d5debdec59eedf67319b24eab74e2a8c75" julia_version = "1.8.2" --> <div class=markdown ><h1>Stochastic claims projections demo</h1> </div> <pre class='language-julia'><code class='julia hljs pluto-input'>begin
     using CSV, DataFrames
     using MortalityTables, ActuaryUtilities
     using Dates
@@ -59,8 +59,8 @@ end</code></pre>
     Female =&gt; MortalityTables.table(992).ultimate,
 )</code></pre>
 <pre id='var-mort' class='pluto-output'>Dict{Sex, OffsetArrays.OffsetVector{Float64, Vector{Float64}}} with 2 entries:
-  Female => [0.00745, 0.00745, 0.00745, 0.00745, 0.00745, 0.00745, 0.00745, 0.00745, 0.…
-  Male   => [0.022571, 0.022571, 0.022571, 0.022571, 0.022571, 0.022571, 0.022571, 0.02…</pre>
+  Male   => [0.022571, 0.022571, 0.022571, 0.022571, 0.022571, 0.022571, 0.022571, 0.02…
+  Female => [0.00745, 0.00745, 0.00745, 0.00745, 0.00745, 0.00745, 0.00745, 0.00745, 0.…</pre>
 
 <pre class='language-julia'><code class='julia hljs pluto-input'>function mortality(pol::Policy,params)
     return params.mortality[pol.sex]
@@ -116,7 +116,7 @@ end</code></pre>
     proj_length = 100,
     mortality = mort,
 )</code></pre>
-<pre id='var-params' class='pluto-output'>(val_date = Date("2021-12-31"), proj_length = 100, mortality = Dict{Main.var"workspace#5".Sex, OffsetArrays.OffsetVector{Float64, Vector{Float64}}}(Female => [0.00745, 0.00745, 0.00745, 0.00745, 0.00745, 0.00745, 0.00745, 0.00745, 0.00745, 0.00745  …  0.376246, 0.386015, 0.393507, 0.398308, 0.4, 0.4, 0.4, 0.4, 0.4, 1.0], Male => [0.022571, 0.022571, 0.022571, 0.022571, 0.022571, 0.022571, 0.022571, 0.022571, 0.022571, 0.022571  …  0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4]))</pre>
+<pre id='var-params' class='pluto-output'>(val_date = Date("2021-12-31"), proj_length = 100, mortality = Dict{Main.var"workspace#5".Sex, OffsetArrays.OffsetVector{Float64, Vector{Float64}}}(Male => [0.022571, 0.022571, 0.022571, 0.022571, 0.022571, 0.022571, 0.022571, 0.022571, 0.022571, 0.022571  …  0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4], Female => [0.00745, 0.00745, 0.00745, 0.00745, 0.00745, 0.00745, 0.00745, 0.00745, 0.00745, 0.00745  …  0.376246, 0.386015, 0.393507, 0.398308, 0.4, 0.4, 0.4, 0.4, 0.4, 1.0]))</pre>
 
 
 <div class=markdown ><p>Check the number of threads we&#39;re using:</p>
@@ -142,7 +142,7 @@ end</code></pre>
 </div>
 
 <pre class='language-julia'><code class='julia hljs pluto-input'>project(repeat(policies,100_000),params)</code></pre>
-<pre id='var-hash143281' class='pluto-output'>(benefits = [5.627921449390965e10, 5.671633708084009e10, 5.70914290387731e10, 5.74337942549313e10, 5.763037278351778e10, 5.782681668198353e10, 5.800651674132469e10, 5.806247487631868e10, 5.809895451050519e10, 5.80101142766381e10  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [195178, 190333, 185405, 180535, 175298, 170214, 165295, 160128, 154991, 149712  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])</pre>
+<pre id='var-hash143281' class='pluto-output'>(benefits = [5.630220773481583e10, 5.674357257469366e10, 5.708024867118756e10, 5.7388987407236855e10, 5.761872719067303e10, 5.779527437810445e10, 5.791042377894348e10, 5.7977874174653046e10, 5.7972736862002785e10, 5.79248615368625e10  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [195267, 190456, 185382, 180382, 175278, 170154, 164990, 159817, 154644, 149528  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])</pre>
 
 
 <div class=markdown ><h2>Benchmarking</h2>
@@ -161,13 +161,13 @@ end</code></pre>
     @benchmark project(p,r) setup=(p=repeat($policies,$n);r=$params)
 end</code></pre>
 <pre id='var-hash968469' class='pluto-output'>BenchmarkTools.Trial: 7 samples with 1 evaluation.
- Range (min … max):  587.246 ms … 828.177 ms  ┊ GC (min … max): 0.00% … 0.00%
- Time  (median):     600.848 ms               ┊ GC (median):    0.00%
- Time  (mean ± σ):   648.147 ms ±  86.980 ms  ┊ GC (mean ± σ):  0.00% ± 0.00%
+ Range (min … max):  605.691 ms … 797.052 ms  ┊ GC (min … max): 0.00% … 0.00%
+ Time  (median):     626.636 ms               ┊ GC (median):    0.00%
+ Time  (mean ± σ):   668.100 ms ±  76.671 ms  ┊ GC (mean ± σ):  0.00% ± 0.00%
 
-  █  █            ▁      ▁                                    ▁  
-  █▁▁█▁▁▁▁▁▁▁▁▁▁▁▁█▁▁▁▁▁▁█▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁█ ▁
-  587 ms           Histogram: frequency by time          828 ms <
+  ▁    █▁     ▁                                   ▁           ▁  
+  █▁▁▁▁██▁▁▁▁▁█▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁█▁▁▁▁▁▁▁▁▁▁▁█ ▁
+  606 ms           Histogram: frequency by time          797 ms <
 
  Memory estimate: 16.30 KiB, allocs estimate: 144.</pre>
 
@@ -186,16 +186,16 @@ end</code></pre>
 
 <pre class='language-julia'><code class='julia hljs pluto-input'>stoch = stochastic_proj(policies,params,1000)</code></pre>
 <pre id='var-stoch' class='pluto-output'>1000-element Vector{NamedTuple{(:benefits, :lives), Tuple{Vector{Float64}, Vector{Int64}}}}:
- (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 628133.3788962648, 646977.3802631528, 222128.9005570158, 228792.76757372628, 235656.55060093806, 242726.24711896622, 250008.0345325352  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 2, 2, 1, 1, 1, 1, 1  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
- (benefits = [574831.0226582347, 197358.65111266056, 203279.41064604037, 209377.7929654216, 215659.12675438426, 222128.9005570158, 228792.76757372628, 235656.55060093806, 242726.24711896622, 250008.0345325352  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 1, 1, 1, 1, 1, 1, 1, 1, 1  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
- (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 628133.3788962648, 646977.3802631528, 666386.7016710474, 686378.3027211789, 706969.6518028142, 728178.7413568987, 500016.0690650704  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 2, 2, 2, 2, 2, 2, 1  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
- (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 628133.3788962648, 646977.3802631528, 666386.7016710474, 686378.3027211789, 706969.6518028142, 728178.7413568987, 750024.1035976056  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 2, 2, 2, 2, 2, 2, 2  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
- (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 628133.3788962648, 646977.3802631528, 444257.8011140316, 457585.53514745255, 471313.1012018761, 485452.49423793243, 500016.0690650704  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 2, 2, 1, 1, 1, 1, 1  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
  (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 628133.3788962648, 646977.3802631528, 666386.7016710474, 686378.3027211789, 706969.6518028142, 728178.7413568987, 750024.1035976056  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 2, 2, 2, 2, 2, 2, 2  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
  (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 628133.3788962648, 646977.3802631528, 666386.7016710474, 686378.3027211789, 706969.6518028142, 728178.7413568987, 750024.1035976056  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 2, 2, 2, 2, 2, 2, 2  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+ (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 628133.3788962648, 646977.3802631528, 666386.7016710474, 686378.3027211789, 706969.6518028142, 728178.7413568987, 750024.1035976056  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 2, 2, 2, 2, 2, 2, 2  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+ (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 628133.3788962648, 646977.3802631528, 666386.7016710474, 686378.3027211789, 706969.6518028142, 728178.7413568987, 750024.1035976056  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 2, 2, 2, 2, 2, 2, 2  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+ (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 628133.3788962648, 646977.3802631528, 666386.7016710474, 686378.3027211789, 706969.6518028142, 728178.7413568987, 750024.1035976056  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 2, 2, 2, 2, 2, 2, 2  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+ (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 628133.3788962648, 646977.3802631528, 666386.7016710474, 686378.3027211789, 706969.6518028142, 728178.7413568987, 750024.1035976056  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 2, 2, 2, 2, 2, 2, 2  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+ (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 628133.3788962648, 646977.3802631528, 666386.7016710474, 686378.3027211789, 706969.6518028142, 485452.49423793243, 500016.0690650704  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 2, 2, 2, 2, 2, 1, 1  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
  ⋮
- (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 628133.3788962648, 646977.3802631528, 444257.8011140316, 457585.53514745255, 0.0, 0.0, 0.0  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 2, 2, 1, 1, 0, 0, 0  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
- (benefits = [574831.0226582347, 197358.65111266056, 203279.41064604037, 209377.7929654216, 215659.12675438426, 222128.9005570158, 0.0, 0.0, 0.0, 0.0  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 1, 1, 1, 1, 1, 0, 0, 0, 0  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+ (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 628133.3788962648, 215659.12675438426, 222128.9005570158, 228792.76757372628, 235656.55060093806, 242726.24711896622, 250008.0345325352  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 2, 1, 1, 1, 1, 1, 1  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+ (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 628133.3788962648, 646977.3802631528, 666386.7016710474, 686378.3027211789, 706969.6518028142, 728178.7413568987, 750024.1035976056  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 2, 2, 2, 2, 2, 2, 2  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
  (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 628133.3788962648, 646977.3802631528, 666386.7016710474, 686378.3027211789, 706969.6518028142, 728178.7413568987, 750024.1035976056  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 2, 2, 2, 2, 2, 2, 2  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
  (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 628133.3788962648, 646977.3802631528, 666386.7016710474, 686378.3027211789, 706969.6518028142, 728178.7413568987, 750024.1035976056  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 2, 2, 2, 2, 2, 2, 2  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
  (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 628133.3788962648, 646977.3802631528, 666386.7016710474, 686378.3027211789, 706969.6518028142, 728178.7413568987, 750024.1035976056  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 2, 2, 2, 2, 2, 2, 2  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
@@ -209,19 +209,19 @@ end</code></pre>
     histogram(v,nbins=15)
 end</code></pre>
 <pre id='var-hash170662' class='pluto-output'>                  ┌                                        ┐ 
-   [0.0  , 2.0e6) ┤████▉ 22                                  
-   [2.0e6, 4.0e6) ┤███████████▌ 51                           
-   [4.0e6, 6.0e6) ┤██████████████████▌ 82                    
-   [6.0e6, 8.0e6) ┤██████████████████████████▎ 116           
-   [8.0e6, 1.0e7) ┤█████████████████████████▉ 115            
-   [1.0e7, 1.2e7) ┤███████████████████████████████████  155  
-   [1.2e7, 1.4e7) ┤█████████████████████████████████▎ 147    
-   [1.4e7, 1.6e7) ┤██████████████████████████▊ 119           
-   [1.6e7, 1.8e7) ┤██████████████████▋ 83                    
-   [1.8e7, 2.0e7) ┤███████████████▊ 70                       
-   [2.0e7, 2.2e7) ┤█████▊ 26                                 
-   [2.2e7, 2.4e7) ┤██▌ 11                                    
-   [2.4e7, 2.6e7) ┤▋ 3                                       
+   [0.0  , 2.0e6) ┤████▉ 20                                  
+   [2.0e6, 4.0e6) ┤██████████████▊ 60                        
+   [4.0e6, 6.0e6) ┤███████████████████████▊ 96               
+   [6.0e6, 8.0e6) ┤██████████████████████████████████▍ 138   
+   [8.0e6, 1.0e7) ┤███████████████████████████████▌ 127      
+   [1.0e7, 1.2e7) ┤████████████████████████████████▍ 130     
+   [1.2e7, 1.4e7) ┤███████████████████████████████████  141  
+   [1.4e7, 1.6e7) ┤█████████████████████████████▍ 118        
+   [1.6e7, 1.8e7) ┤██████████████████▊ 76                    
+   [1.8e7, 2.0e7) ┤████████████▋ 51                          
+   [2.0e7, 2.2e7) ┤███████▋ 31                               
+   [2.2e7, 2.4e7) ┤██▋ 11                                    
+   [2.4e7, 2.6e7) ┤▎ 1                                       
                   └                                        ┘ 
                                    Frequency                 </pre>
 
@@ -238,7 +238,7 @@ end</code></pre>
 </ul>
 </div>
 <div class='manifest-versions'>
-<p>Built with Julia 1.8.1 and</p>
+<p>Built with Julia 1.8.2 and</p>
 ActuaryUtilities 3.2.1<br>
 BenchmarkTools 1.3.1<br>
 CSV 0.10.4<br>
@@ -265,7 +265,7 @@ UnicodePlots 2.11.2
   
   
   <div class=copyright >
-    &copy; JuliaActuary Contributors. Last modified: September 13, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and <a href="https://julialang.org">Julia</a>.
+    &copy; JuliaActuary Contributors. Last modified: October 02, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and <a href="https://julialang.org">Julia</a>.
   </div>
 </div></div>
     

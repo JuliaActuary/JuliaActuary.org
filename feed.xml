@@ -23,6 +23,25 @@
 
 <item>
   <title>
+    <![CDATA[  JuliaActuary and Hacktoberfest 2022  ]]>
+  </title>
+  <link> https://JuliaActuary.org/blog/hacktoberfest2022/index.html </link>
+  <guid> https://JuliaActuary.org/blog/hacktoberfest2022/index.html </guid>
+  <description>
+    <![CDATA[  JuliaActuary will participate in Hacktoberfest 2022  ]]>
+  </description>  
+    
+  <pubDate>Sat, 24 Sep 2022 00:00:00 +0000</pubDate>  
+  
+  
+  <atom:author>
+    <atom:name>Alec Loudenback</atom:name>
+  </atom:author>
+        
+</item>
+
+<item>
+  <title>
     <![CDATA[  Getting Started with Julia for Actuaries  ]]>
   </title>
   <link> https://JuliaActuary.org/blog/julia-getting-started-actuaries/index.html </link>
