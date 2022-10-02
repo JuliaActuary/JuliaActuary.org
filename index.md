@@ -226,6 +226,8 @@ Then check out the [Community](/community) page!
   - Getting started with Julia with a bent towards things actuaries care about.
 - [The Life Modeling Problem: A Comparison of Julia, Rust, Python, and R](/blog/life-modeling-problem/) 
   - Why Julia works so well for actuarial science.
+- [Hacktoberfest 2022](/blog/hacktoberfest2022/)
+  - Contirbute to open source in this community event.
 
 
 ~~~
