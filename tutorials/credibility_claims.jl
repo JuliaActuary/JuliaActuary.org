@@ -34,6 +34,7 @@ describe(raw)
 
 # ╔═╡ dc7b7872-f6c5-4163-a984-954d97ab8546
 claims_summary = @chain raw begin
+	@subset :Calendar_Year .< 2007
 	@transform :claim = :Claim_Amount .> 0
 	@subset .~ismissing.(:Blind_Model)
 	groupby(:Blind_Model)
@@ -79,6 +80,25 @@ end
 # ╔═╡ 51525876-341c-44dd-8dbb-03fca95e84f4
 dplot(cg, "μ")
 
+# ╔═╡ 905e383c-f713-4bd0-ae95-3a580c5be204
+cg.name_map
+
+# ╔═╡ afbc8ae7-d5ab-4850-a6fd-08e93f970f8e
+test = let
+	
+	@chain raw begin
+		@subset :Calendar_Year .== 2007
+		@transform :claim = :Claim_Amount .> 0
+		@subset .~ismissing.(:Blind_Model)
+		groupby(:Blind_Model)
+		@combine begin
+			:n = length(:claim)
+			:claims = sum(:claim)
+		end
+		@transform :p_observed = :claims ./ :n
+	end
+end
+
 # ╔═╡ c635df7f-0b36-47da-9a2f-3fad7fd6aa38
 claims_summary_posterior = let
 	df = deepcopy(claims_summary)
@@ -87,17 +107,25 @@ claims_summary_posterior = let
 		(est = mean(d), se=std(d))
 	end
 
-	df.p_claim = df.claims ./ df.n
+	df.p_observed = df.claims ./ df.n
 	df.bayes_μ = [x.est for x in means]
 	df.bayes_se = [x.se for x in means]
 	pop_μ = sum(df.claims) / sum(df.n)
 	df[!,:pop_μ] .= pop_μ
 
+	# Limited Fluctuation 
 	# using the square-root rule
 	df.LF_Z = min.(1, .√(df.claims ./ 1082))
 	df.LF_μ = let Z = df.LF_Z
-		Z .* (df.p_claim) .+ Z .* pop_μ
+		Z .* (df.p_observed) .+ (1 .- Z) .* pop_μ
 	end
+	
+	df = innerjoin(df,test;on=:Blind_Model,renamecols= "_train" => "_test")
+
+	df.pred_bayes = df.n_test .* df.bayes_μ_train
+	df.pred_LF = df.n_test .* df.LF_μ_train
+	df.pred_naive = df.n_test .* df.p_observed_train
+
 	df
 end
 
@@ -106,8 +134,26 @@ end
 		
 	
 
-# ╔═╡ 905e383c-f713-4bd0-ae95-3a580c5be204
-cg.name_map
+# ╔═╡ 43c97485-b776-4ea2-a62b-1e8373270bc5
+let df = claims_summary_posterior
+	f = Figure()
+	ax = Axis(f[1,1],title="Predictive Residuals")
+	scatter!(ax,df.pred_LF .- df.claims_test,label="LFC",color=(:purple,0.5))
+	scatter!(ax,df.pred_bayes .- df.claims_test,label="Bayesian",color=(:red,0.5))
+	scatter!(ax,df.pred_naive .- df.claims_test,label="Naive",color=(:grey10,0.5))
+	# scatter!(ax,df.pred_naive .- df.claims_test)
+	# Legend(f[1,1],[s1,s2],["LFC"halign=:right,valign=:top)
+	axislegend(ax)
+	f
+end
+
+# ╔═╡ 6af923fc-56cd-45b9-9a07-34265c756130
+let df = claims_summary_posterior
+	sum(df.LF_μ_train .* df.n_train),sum(df.bayes_μ_train .* df.n_train), sum(df.claims_train)
+end
+
+# ╔═╡ 2043edea-ebdb-4d40-8424-78dee780144e
+unique(raw.Calendar_Year)
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -2318,6 +2364,10 @@ version = "1.4.1+0"
 # ╠═9f979421-d35c-473b-b384-f575c2e8dadd
 # ╠═51525876-341c-44dd-8dbb-03fca95e84f4
 # ╠═c635df7f-0b36-47da-9a2f-3fad7fd6aa38
+# ╠═43c97485-b776-4ea2-a62b-1e8373270bc5
+# ╠═6af923fc-56cd-45b9-9a07-34265c756130
 # ╠═905e383c-f713-4bd0-ae95-3a580c5be204
+# ╠═afbc8ae7-d5ab-4850-a6fd-08e93f970f8e
+# ╠═2043edea-ebdb-4d40-8424-78dee780144e
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
