@@ -7,7 +7,7 @@
     julia_version = "1.8.0"
 -->
 
-<div class="markdown"><h1>Using MortaltiyTables.jl with DataFrames</h1>
+<div class="markdown"><h1>Using MortalityTables.jl with DataFrames</h1>
 <h2>MortalityTables.jl standard representation</h2>
 <p>MortalityTables.jl stores the rates in a very efficient manner as a collection of vectors indexed by attained age.</p>
 </div>
@@ -58,7 +58,7 @@ end</code></pre>
  1.0</pre>
 
 
-<div class="markdown"><p>This is very efficient and convienent for modeling, but a lot of times you want the data matched up with policy data in a DataFrame.</p>
+<div class="markdown"><p>This is very efficient and convenient for modeling, but a lot of times you want the data matched up with policy data in a DataFrame.</p>
 </div>
 
 
@@ -209,7 +209,7 @@ end</code></pre>
     # pick the relevant table
     table = assumption_map[sex][smoke]
     
-    # check if the select rate exists, otherwise look to the ulitmate table
+    # check if the select rate exists, otherwise look to the ultimate table
     if issue_age in eachindex(table.select)
         table.select[issue_age][attained_age]
     else

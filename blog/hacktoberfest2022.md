@@ -1,5 +1,5 @@
 @def author = "Alec Loudenback"
-@def date = "September 24, 2021"
+@def date = "September 24, 2022"
 @def title = "JuliaActuary and Hacktoberfest 2022"
 
 @def rss_pubdate = Date(2022,9,24)
@@ -19,11 +19,11 @@
 
 By contributing to open source, you can get a t-shirt (or a tree planted!) upon submitting four contributions to open source projects. See the [Hacktoberfest site](https://hacktoberfest.com/) for more details.
 
-## JuliaActuary participiation
+## JuliaActuary participation
 
-JuliaActuary has a number of "issues" with the `hacktoberfest` tag on Github across all the repositories which identify "easier" or introductory contribution ideas. See this [project board](https://github.com/orgs/JuliaActuary/projects/3) for items with the hacktoberfest tag or browse indivual packages' issues page.
+JuliaActuary has a number of "issues" with the `hacktoberfest` tag on Github across all the repositories which identify "easier" or introductory contribution ideas. See this [project board](https://github.com/orgs/JuliaActuary/projects/3) for items with the hacktoberfest tag or browse individual packages' issues page.
 
-If you particpate and submit at least two of your contributions to JuliaActuary, we will mail you a JuliaActuary sticker as thanks!
+If you participate and submit at least two of your contributions to JuliaActuary, we will mail you a JuliaActuary sticker as thanks!
 
 ![JuliaActuaryStickers](/blog/assets/stickers.jpg)
 
