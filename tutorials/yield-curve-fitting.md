@@ -14,8 +14,8 @@ mats = [1/12, 2/12, 3/12, 6/12, 1, 2, 3, 5, 7, 10, 20, 30]
 Then fit the rates under four methods:
 
 - Nelson-Siegel
-- Nelson-Siegel-Svennson
-- Boostrapping with splines (the default `Bootstrap` option)
+- Nelson-Siegel-Svensson
+- Bootstrapping with splines (the default `Bootstrap` option)
 - Bootstrapping with linear splines
 
 ```julia

@@ -304,7 +304,7 @@ Python wins large points for interactive usage in the REPL, notebooks, and wide 
 
 What I mean by that, is that if you look at the code example below, in order to test the code you have to turn it into string and then call the `timeit` function to read and parse the string. In none of the other tested languages was that sort of boiler-plate required.
 
-Python scores partial points for meta-programming: decorators (`@` syntax) is syntactic sugar for macro-like modifications to functions, but Python metapgrogramming is [fundamentally limited](https://softwareengineering.stackexchange.com/a/253377/37060) by the language design.
+Python scores partial points for meta-programming: decorators (`@` syntax) is syntactic sugar for macro-like modifications to functions, but Python metaprogramming is [fundamentally limited](https://softwareengineering.stackexchange.com/a/253377/37060) by the language design.
 
 Python has perhaps the most robust ecosystem of all the languages discussed here, but in many ways its limiting: once you get deep into an ecosystem (e.g. NumPy), you are sort of at the mercy of package developers to ensure that the packages are compatible. As a key example, many common types and data structures are not shareable between libraries: there are [efforts](https://data-apis.org/) to standardize data types/classes for better compatibility across the Python ecosystem, but may require fundamental changes to the language or ecosystem to accomplish.
 

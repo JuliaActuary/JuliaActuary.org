@@ -40,7 +40,7 @@ Julia is a high level language, with syntax that should feel familiar to someone
 
 - [Matlab-Python-Julia Cheatsheet](https://cheatsheets.quantecon.org/)
 - [Learn Julia in Y minutes](https://learnxinyminutes.com/docs/julia/)
-- [Julia Official Documenation](https://docs.julialang.org/en/v1/manual/getting-started/)
+- [Julia Official Documentation](https://docs.julialang.org/en/v1/manual/getting-started/)
 
 Julia code is compiled on-the-fly, generating efficient code for the specific data that you are currently working with. This is kind of an in-between of a fully interpreted language (like pure Python or R) and a complied language like C++ which must compile everything in advance.
 
@@ -163,10 +163,10 @@ Julia has first-class support for `missing` values, which follows the rules of [
 
 Others include:
 
-- [`Turing.jl`](https://turing.ml/stable/), a probablistic programming (Bayesian statistics) library, which is outstanding in its combination of clear model syntax with performance.
+- [`Turing.jl`](https://turing.ml/stable/), a probabilistic programming (Bayesian statistics) library, which is outstanding in its combination of clear model syntax with performance.
 - [`GLM.jl`](https://github.com/JuliaStats/GLM.jl) for any type of linear modeling (mimicking R's `glm` functionality).
 - [`LsqFit.jl`](https://github.com/JuliaNLSolvers/LsqFit.jl) for fitting data to non-linear models.
-- [`MultvariateStats.jl`](https://github.com/JuliaStats/MultivariateStats.jl) for multivarate statistics, such as PCA.
+- [`MultivariateStats.jl`](https://github.com/JuliaStats/MultivariateStats.jl) for multivariate statistics, such as PCA.
 
 You can find more packages and learn about them [here](https://juliastats.org/).
 
@@ -254,4 +254,4 @@ This article introduced Julia, getting setup with running and editing, and point
 [^1]: https://ocw.mit.edu/courses/mathematics/18-335j-introduction-to-numerical-methods-spring-2019/week-1/Julia-intro.pdf
 [^2]: As of July 2021.
 [^3]: https://discourse.julialang.org/t/claim-false-julia-isnt-multiple-dispatch-but-overloading/42370/114
-[^4]: Perhaps benchmarking isn't the best example because of the 'magic' `%timeit` keyworkd in Jupyter. However, the [documentation](https://ipython.readthedocs.io/en/stable/interactive/magics.html) for IPython itself reveals the limitations: "To Jupyter users: Magics are specific to and provided by the IPython kernel. Whether Magics are available on a kernel is a decision that is made by the kernel developer on a per-kernel basis. To work properly, Magics must use a syntax element which is not valid in the underlying language."
+[^4]: Perhaps benchmarking isn't the best example because of the 'magic' `%timeit` keyword in Jupyter. However, the [documentation](https://ipython.readthedocs.io/en/stable/interactive/magics.html) for IPython itself reveals the limitations: "To Jupyter users: Magics are specific to and provided by the IPython kernel. Whether Magics are available on a kernel is a decision that is made by the kernel developer on a per-kernel basis. To work properly, Magics must use a syntax element which is not valid in the underlying language."
