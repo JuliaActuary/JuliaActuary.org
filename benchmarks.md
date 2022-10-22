@@ -3,7 +3,7 @@
 @def title = "Benchmarks"
 
 @def rss_pubdate = Date(2021,8,7)
-@def rss = "Acturial-related benchmarks."
+@def rss = "Actuarial-related benchmarks."
 
 # {{fill title}}
 
@@ -92,7 +92,7 @@ Times are in nanoseconds:
 
 ### Discussion
 
-The ActuaryUtilities implemenation is over 300,000 times faster than `numpy_financial`, and 59 to 384 times faster than the `better` Python package. The [ActuaryUtililites.jl](/#actuaryutilitiesjl) implementation is also more flexible, as it can be given an argument with timepoints, similar to Excel's `XIRR`.
+The ActuaryUtilities implementation is over 300,000 times faster than `numpy_financial`, and 59 to 384 times faster than the `better` Python package. The [ActuaryUtilities.jl](/#actuaryutilitiesjl) implementation is also more flexible, as it can be given an argument with timepoints, similar to Excel's `XIRR`.
 
 Excel was used to attempt a benchmark, but the `IRR` formula returned a `#DIV/0!` error.
 
@@ -189,6 +189,6 @@ Platform: aarch64-apple-darwin20.0 (64-bit)
 
 ## Footnotes
 
-[^1] If benchmarking memoiziation, it's essentially benchmarking how long it takes to perform hashing in a language. While interesting, especially in the context of [incremental computing](https://scattered-thoughts.net/writing/an-opinionated-map-of-incremental-and-streaming-systems), it's not the core issue at hand. Incremental computing libraries exist for all of the modern languages discussed here.
+[^1] If benchmarking memoization, it's essentially benchmarking how long it takes to perform hashing in a language. While interesting, especially in the context of [incremental computing](https://scattered-thoughts.net/writing/an-opinionated-map-of-incremental-and-streaming-systems), it's not the core issue at hand. Incremental computing libraries exist for all of the modern languages discussed here.
 
 [^2] Note that not all languages have both a mean and median result in their benchmarking libraries. Mean is a better representation for a garbage-collected modern language, because sometimes the computation just takes longer than the median result. Where the mean is not available in the graph below, median is substituted.

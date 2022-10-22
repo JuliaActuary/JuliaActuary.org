@@ -412,7 +412,7 @@ convert(Yields.Continuous(),r)          # convert monthly rate to continuous
 
 ##### Arithmetic
 
-Adding, substracting, and comparing rates is supported.
+Adding, subtracting, and comparing rates is supported.
 
 #### Curves
 
@@ -707,4 +707,4 @@ julia> ? survival
 ### Other Repositories of Interest for Actuaries
 
 - [RMInsurance](https://github.com/mkriele/RMInsurance.jl) is the code and examples for the second edition of the book "Value-Oriented Risk Management of Insurance Companies"
-- [LifeTable.jl](https://github.com/klpn/LifeTable.jl) will caculate life tables from the Human Mortality Database.
+- [LifeTable.jl](https://github.com/klpn/LifeTable.jl) will calculate life tables from the Human Mortality Database.
