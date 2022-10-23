@@ -26,10 +26,8 @@ begin
 	using Logging; Logging.disable_logging(Logging.Warn);
 	using StatsFuns
 	using StatisticalRethinking
+	using CairoMakie
 end
-
-# ╔═╡ 5f49e646-b1c6-4bee-8349-712535d97aa0
-using GLMakie
 
 # ╔═╡ 80a9acb0-a01f-4be4-b342-880452f5e402
 md"https://www.kaggle.com/competitions/ClaimPredictionChallenge/data?select=dictionary.html"
@@ -114,10 +112,47 @@ The issue is that once the probability distribtuions and data become non-trivial
 
 A full overview is beyond the scope of this notebook, which is simply to demonstrate that Limited Fluctuation Crediblity is of questionable use in practice and that superior tools exist. For references on modern Bayesian statistics, see the end notes.
 
+
+Note that this is describing a *different* from the Buhlman Bayesian approach.
+
 ### The formulation
 
-Contrary to Limited Fluctuation, the Bayesian approach forces one to be explicity about the presumed strucutre of the probability model. The flexibility of the statistical model allows one to incorporate actuarial judgement in a quantitative way. For example, in this example we assume that the claims experience of each group informs a global (hyperparameter) prior distribution which we could use as a starting point for a new type of observation.
+Contrary to Limited Fluctuation, the Bayesian approach forces one to be explicit about the presumed strucutre of the probability model. The flexibility of the statistical model allows one to incorporate actuarial judgement in a quantitative way. For example, in this example we assume that the claims experience of each group informs a global (hyperparameter) prior distribution which we could use as a starting point for a new type of observation. More on this once the data is introduced.
 """
+
+# ╔═╡ 05d0b5b2-b622-4ba3-b826-0dc9ac1f806d
+md"""
+## Sample Claims Prediction
+
+The data comes from an [Allstate auto-claims data via Kaggle](https://www.kaggle.com/competitions/ClaimPredictionChallenge/data?select=dictionary.html). It contains exposure level information about predictor variable and claim amounts for calendar years 2005-2007. 
+
+For simplicity, we will focus on the narrow objective of estimating the claims rate at the level of automobile make and model. We will use the years 2005 and 2006 as the training data set and then 2007 to evaluate the predictive model.
+"""
+
+# ╔═╡ b1da1095-3ba5-4b6a-939c-7ba4e1e13a59
+md"""
+### Discussion of Bayesian model
+
+Each group (make and model combination) has an expected claim rate $μ_i$, which is informed by the global hyperparameter $μ$ and variance $\sigma^2$. Then, the observed claims by group are assumed to be distributed according to a [Poisson distribution](https://juliaactuary.org/tutorials/poissonbinomial/).
+
+"""
+
+# ╔═╡ d93f8d2b-ee85-4dee-9dcb-049ec314d221
+@model function model_poisson(data)
+	μ ~ Normal(0.05,0.1)
+	σ ~ Exponential(0.25)
+	μ_i ~ filldist(Normal(μ,σ),length(unique(data.Blind_Model)))
+
+	data.claims .~ Poisson.(data.n .* logistic.(μ_i))
+end
+
+# ╔═╡ f1698f70-9849-4013-bd88-c60db9ddb166
+md" The model is combined with the data and [Turing.jl](https://turing.ml/stable/) is used to computationally arrive at the posterior distribution for the parameters in the statistical model, $\mu$, $\mu_i$, and $\sigma$.
+
+The result of the `sample` fucntion is a set of data containing individual outcomes for the parameters that appear in proportion to the posterior probability for those parameters. In a sense, we can empirically derive the posterior distribution for each paramters."
+
+# ╔═╡ 97fc61e5-56be-4470-ba12-e021f460e8e8
+md" This is a plot of the posterior density for all of the many, many $\mu$ parameters in our model:"
 
 # ╔═╡ fe642fb3-49b9-40cf-853e-c23aa5e82de7
 raw = let
@@ -139,20 +174,11 @@ claims_summary = @chain raw begin
 	end
 end
 
-# ╔═╡ d93f8d2b-ee85-4dee-9dcb-049ec314d221
-@model function model_poisson(data)
-	μ ~ Normal(0.05,0.1)
-	σ ~ Exponential(0.25)
-	μ_i ~ filldist(Normal(μ,σ),length(unique(data.Blind_Model)))
-
-	data.claims .~ Poisson.(data.n .* logistic.(μ_i))
-end
-
 # ╔═╡ b4a592d2-57e8-4ce6-8fdf-8744aae72d5b
-mp = model_poisson(claims_summary)
+mp = model_poisson(claims_summary);
 
 # ╔═╡ 06866f75-d8f8-4eab-9a54-699e51473d53
-cp = sample(mp, NUTS(), 500)
+cp = sample(mp, NUTS(), 500);
 
 # ╔═╡ 9f979421-d35c-473b-b384-f575c2e8dadd
 function dplot(ch,param_string)
@@ -170,17 +196,14 @@ function dplot(ch,param_string)
 	f
 end
 
+# ╔═╡ 33709da6-9a38-4621-81b2-130ce5613d53
+dplot(cp, "μ")
+
 # ╔═╡ 51525876-341c-44dd-8dbb-03fca95e84f4
 dplot(cg, "μ")
 
 # ╔═╡ 6dc97665-046c-4ee9-a1c8-0b5145880d47
 dplot(cgh, "μ")
-
-# ╔═╡ 33709da6-9a38-4621-81b2-130ce5613d53
-dplot(cp, "μ")
-
-# ╔═╡ 905e383c-f713-4bd0-ae95-3a580c5be204
-cg.name_map
 
 # ╔═╡ afbc8ae7-d5ab-4850-a6fd-08e93f970f8e
 test = let
@@ -243,11 +266,6 @@ let df = claims_summary_posterior
 	
 end
 
-# ╔═╡ 7ab64f45-030e-4b7f-8bbc-98a92ea0802d
-let df = claims_summary_posterior
-	MAPE(df.pred_naive,df.claims_test)
-end
-
 # ╔═╡ 43c97485-b776-4ea2-a62b-1e8373270bc5
 let df = claims_summary_posterior
 	f = Figure()
@@ -299,17 +317,14 @@ let df = raw
 	f
 end
 
-# ╔═╡ 2043edea-ebdb-4d40-8424-78dee780144e
-unique(raw.Calendar_Year)
-
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
 CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
+CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 DataFramesMeta = "1313f7d8-7da2-5740-9ea0-a2ca25f37964"
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
-GLMakie = "e9467ef8-e4e7-5192-8a1a-b1aee30e663a"
 Logging = "56ddb016-857b-54e1-b83d-db4d58db5568"
 MCMCChains = "c7f686f2-ff18-58e9-bc7b-31028e88f75d"
 PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
@@ -319,10 +334,10 @@ Turing = "fce5fe82-541a-59a6-adf8-730c64b5f9a0"
 
 [compat]
 CSV = "~0.10.6"
+CairoMakie = "~0.9.0"
 DataFrames = "~1.3.6"
 DataFramesMeta = "~0.12.0"
 Distributions = "~0.25.76"
-GLMakie = "~0.7.0"
 MCMCChains = "~5.5.0"
 PlutoUI = "~0.7.48"
 StatisticalRethinking = "~4.5.2"
@@ -336,7 +351,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.8.2"
 manifest_format = "2.0"
-project_hash = "c2f481f8d4d208bff3508a310ce29a6d44e53a7a"
+project_hash = "a0b33b08599e8e49ea74ea2c42d812d9ee786b8a"
 
 [[deps.ANSIColoredPrinters]]
 git-tree-sha1 = "574baf8110975760d391c710b6341da1afa48d8c"
@@ -539,6 +554,18 @@ deps = ["CodecZlib", "Dates", "FilePathsBase", "InlineStrings", "Mmap", "Parsers
 git-tree-sha1 = "76c8d77a76c564bbc39ae351c075ef3cafceef83"
 uuid = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
 version = "0.10.6"
+
+[[deps.Cairo]]
+deps = ["Cairo_jll", "Colors", "Glib_jll", "Graphics", "Libdl", "Pango_jll"]
+git-tree-sha1 = "d0b3f8b4ad16cb0a2988c6788646a5e6a17b6b1b"
+uuid = "159f3aea-2a34-519c-b102-8c37f9878175"
+version = "1.0.5"
+
+[[deps.CairoMakie]]
+deps = ["Base64", "Cairo", "Colors", "FFTW", "FileIO", "FreeType", "GeometryBasics", "LinearAlgebra", "Makie", "SHA", "SnoopPrecompile"]
+git-tree-sha1 = "f53b586e9489163ece213144a5a6417742f0388e"
+uuid = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
+version = "0.9.0"
 
 [[deps.Cairo_jll]]
 deps = ["Artifacts", "Bzip2_jll", "Fontconfig_jll", "FreeType2_jll", "Glib_jll", "JLLWrappers", "LZO_jll", "Libdl", "Pixman_jll", "Pkg", "Xorg_libXext_jll", "Xorg_libXrender_jll", "Zlib_jll", "libpng_jll"]
@@ -964,23 +991,11 @@ version = "0.3.0"
 deps = ["Random"]
 uuid = "9fa8497b-333b-5362-9e8d-4d0656e87820"
 
-[[deps.GLFW]]
-deps = ["GLFW_jll"]
-git-tree-sha1 = "35dbc482f0967d8dceaa7ce007d16f9064072166"
-uuid = "f7f18e0c-5ee9-5ccd-a5bf-e8befd85ed98"
-version = "3.4.1"
-
 [[deps.GLFW_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Libglvnd_jll", "Pkg", "Xorg_libXcursor_jll", "Xorg_libXi_jll", "Xorg_libXinerama_jll", "Xorg_libXrandr_jll"]
 git-tree-sha1 = "d972031d28c8c8d9d7b41a536ad7bb0c2579caca"
 uuid = "0656b61e-2033-5cc2-a64a-77c0f6c09b89"
 version = "3.3.8+0"
-
-[[deps.GLMakie]]
-deps = ["ColorTypes", "Colors", "FileIO", "FixedPointNumbers", "FreeTypeAbstraction", "GLFW", "GeometryBasics", "LinearAlgebra", "Makie", "Markdown", "MeshIO", "ModernGL", "Observables", "Printf", "Serialization", "ShaderAbstractions", "SnoopPrecompile", "StaticArrays"]
-git-tree-sha1 = "88313da2862d1737d0cd6fcb84ec5553f33e15e2"
-uuid = "e9467ef8-e4e7-5192-8a1a-b1aee30e663a"
-version = "0.7.0"
 
 [[deps.GPUArraysCore]]
 deps = ["Adapt"]
@@ -1490,12 +1505,6 @@ git-tree-sha1 = "e498ddeee6f9fdb4551ce855a46f54dbd900245f"
 uuid = "442fdcdd-2543-5da2-b0f3-8c86c306513e"
 version = "0.3.1"
 
-[[deps.MeshIO]]
-deps = ["ColorTypes", "FileIO", "GeometryBasics", "Printf"]
-git-tree-sha1 = "8be09d84a2d597c7c0c34d7d604c039c9763e48c"
-uuid = "7269a6da-0436-5bbc-96c2-40638cbb6118"
-version = "0.4.10"
-
 [[deps.MicroCollections]]
 deps = ["BangBang", "InitialValues", "Setfield"]
 git-tree-sha1 = "4d5917a26ca33c66c8e5ca3247bd163624d35493"
@@ -1516,12 +1525,6 @@ version = "1.0.2"
 
 [[deps.Mmap]]
 uuid = "a63ad114-7e13-5084-954f-fe012c677804"
-
-[[deps.ModernGL]]
-deps = ["Libdl"]
-git-tree-sha1 = "713fd24142921db94e5f7d7961f9ee033c6573d5"
-uuid = "66fc600b-dfda-50eb-8b99-91cfa97b1301"
-version = "1.1.5"
 
 [[deps.MonteCarloMeasurements]]
 deps = ["Distributed", "Distributions", "ForwardDiff", "LinearAlgebra", "MacroTools", "Random", "RecipesBase", "Requires", "SLEEFPirates", "StaticArrays", "Statistics", "StatsBase", "Test"]
@@ -1709,6 +1712,12 @@ deps = ["OffsetArrays"]
 git-tree-sha1 = "03a7a85b76381a3d04c7a1656039197e70eda03d"
 uuid = "5432bcbf-9aad-5242-b902-cca2824c8663"
 version = "0.5.11"
+
+[[deps.Pango_jll]]
+deps = ["Artifacts", "Cairo_jll", "Fontconfig_jll", "FreeType2_jll", "FriBidi_jll", "Glib_jll", "HarfBuzz_jll", "JLLWrappers", "Libdl", "Pkg"]
+git-tree-sha1 = "84a314e3926ba9ec66ac097e3635e270986b0f10"
+uuid = "36c8627f-9965-5494-a995-c6b170f724f3"
+version = "1.50.9+0"
 
 [[deps.Parameters]]
 deps = ["OrderedCollections", "UnPack"]
@@ -1996,12 +2005,6 @@ deps = ["ConstructionBase", "Future", "MacroTools", "Requires"]
 git-tree-sha1 = "38d88503f695eb0301479bc9b0d4320b378bafe5"
 uuid = "efcf1570-3423-57d1-acb7-fd33fddbac46"
 version = "0.8.2"
-
-[[deps.ShaderAbstractions]]
-deps = ["ColorTypes", "FixedPointNumbers", "GeometryBasics", "LinearAlgebra", "Observables", "StaticArrays", "StructArrays", "Tables"]
-git-tree-sha1 = "6b5bba824b515ec026064d1e7f5d61432e954b71"
-uuid = "65257c39-d410-5151-9873-9b3e5be5013e"
-version = "0.2.9"
 
 [[deps.SharedArrays]]
 deps = ["Distributed", "Mmap", "Random", "Serialization"]
@@ -2551,27 +2554,27 @@ version = "1.4.1+0"
 # ╟─18718718-dc10-411d-abea-6b7467f3f65b
 # ╟─aeb4eeb2-8abc-41eb-8e5c-31db88589b21
 # ╟─165a95e3-41ad-4817-9c5f-d5a0db459b00
-# ╟─948bbc8e-ad53-4ce0-9138-4661a65ac767
+# ╠═948bbc8e-ad53-4ce0-9138-4661a65ac767
+# ╟─05d0b5b2-b622-4ba3-b826-0dc9ac1f806d
+# ╟─b1da1095-3ba5-4b6a-939c-7ba4e1e13a59
+# ╠═d93f8d2b-ee85-4dee-9dcb-049ec314d221
+# ╟─f1698f70-9849-4013-bd88-c60db9ddb166
+# ╠═b4a592d2-57e8-4ce6-8fdf-8744aae72d5b
+# ╠═06866f75-d8f8-4eab-9a54-699e51473d53
+# ╠═97fc61e5-56be-4470-ba12-e021f460e8e8
+# ╠═33709da6-9a38-4621-81b2-130ce5613d53
 # ╠═fe642fb3-49b9-40cf-853e-c23aa5e82de7
 # ╠═813d0d26-e04a-4501-89e8-621a796d87df
 # ╠═dc7b7872-f6c5-4163-a984-954d97ab8546
-# ╠═d93f8d2b-ee85-4dee-9dcb-049ec314d221
-# ╠═b4a592d2-57e8-4ce6-8fdf-8744aae72d5b
-# ╠═06866f75-d8f8-4eab-9a54-699e51473d53
-# ╠═5f49e646-b1c6-4bee-8349-712535d97aa0
 # ╠═9f979421-d35c-473b-b384-f575c2e8dadd
 # ╠═51525876-341c-44dd-8dbb-03fca95e84f4
 # ╠═6dc97665-046c-4ee9-a1c8-0b5145880d47
-# ╠═33709da6-9a38-4621-81b2-130ce5613d53
 # ╠═c635df7f-0b36-47da-9a2f-3fad7fd6aa38
 # ╠═96b5b98a-25e0-4f7d-af73-2b209b6d32a0
-# ╠═7ab64f45-030e-4b7f-8bbc-98a92ea0802d
 # ╠═43c97485-b776-4ea2-a62b-1e8373270bc5
 # ╠═f1128e03-39c2-4ef8-9a45-fa3b3bbdb943
 # ╠═6af923fc-56cd-45b9-9a07-34265c756130
 # ╠═67b240ac-6e11-48fa-9327-e28237804b53
-# ╠═905e383c-f713-4bd0-ae95-3a580c5be204
 # ╠═afbc8ae7-d5ab-4850-a6fd-08e93f970f8e
-# ╠═2043edea-ebdb-4d40-8424-78dee780144e
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
