@@ -203,6 +203,8 @@ These packages are available for use in your project.
 [`ExperienceAnalysis.jl`](/packages/#experienceanalysisjl)
 - Meeting your exposure calculation needs.
 
+[`EconomicScenarioGenerators.jl`](/packages/#economicscenariogeneratorsjl)
+- Easy-to-use scenario generation that's Yields.jl compatible.
 
 # JuliaActuary Community
 
