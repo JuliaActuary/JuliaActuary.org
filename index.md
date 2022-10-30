@@ -1,9 +1,8 @@
 @def title = "Home"
 @def tags = ["syntax", "code"]
 
-<!-- =============================
-     ABOUT
-    ============================== -->
+# About
+
 **JuliaActuary** is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.
 
 **Julia** is [an ideal language for Actuaries](/blog/julia-actuaries/) and other financial professionals.
@@ -181,9 +180,6 @@ V(lc,5)                                  # Net premium reserve for whole life in
     
 ~~~
 
-<!-- =============================
-     PACKAGES
-     ============================== -->
 # Packages
 
 These packages are available for use in your project.
@@ -205,6 +201,18 @@ These packages are available for use in your project.
 
 [`EconomicScenarioGenerators.jl`](/packages/#economicscenariogeneratorsjl)
 - Easy-to-use scenario generation that's Yields.jl compatible.
+
+# Tutorials
+
+| Bayesian| Cashflow Analysis | DiffEq |
+|:-------------:|:-------------:|:-------------:|
+|<img src="https://github.com/JuliaActuary/JuliaActuary.org/blob/master/tutorials/_assets/Bayesian/bayesian_notebook.png" width="400" height="400"/>|<img src="https://github.com/JuliaActuary/JuliaActuary.org/blob/master/tutorials/_assets/CashflowAnalysis/demo.gif" width="400" height="400"/>|<img src="https://github.com/JuliaActuary/JuliaActuary.org/blob/master/tutorials/_assets/DiffEq/DiffEq.png" width="400" height="400"/>|
+| Mortality Table Comparison | Mortality Tables DataFrame | PlutoESG |
+|<img src="https://github.com/JuliaActuary/JuliaActuary.org/blob/master/tutorials/_assets/MortalityTableComparison/demo.gif" width="400" height="400"/>|<img src="https://github.com/JuliaActuary/JuliaActuary.org/blob/master/tutorials/_assets/MortalityTablesDataFrame/PlutoScreenshot.png" width="400" height="400"/>|<img src="https://github.com/JuliaActuary/JuliaActuary.org/tree/master/tutorials/_assets/PlutoESG/PlutoESG.png" width="400" height="400"/>|
+| Stochastic Mortality | Survival Fitting | US Treasury |
+|<img src="https://github.com/JuliaActuary/JuliaActuary.org/blob/master/tutorials/_assets/StochasticMortality/demo.png" width="400" height="400"/>|<img src="https://github.com/JuliaActuary/JuliaActuary.org/blob/master/tutorials/_assets/SurvivalFitting/FittingSurvivalData.png" width="400" height="400"/>|<img src="https://github.com/JuliaActuary/JuliaActuary.org/blob/master/tutorials/_assets/USTreasury/PlutoScreenshot.png" width="400" height="400"/>|
+| Nested Stochastic | Yield Curve Fitting |
+|<img src="https://github.com/JuliaActuary/JuliaActuary.org/blob/master/tutorials/_assets/nested_stochastic/nested_stochastic.png" width="400" height="400"/>|<img src="https://github.com/JuliaActuary/JuliaActuary.org/blob/master/tutorials/_assets/yield-curve-fitting/anim_fps2.gif" width="400" height="400"/>|
 
 # JuliaActuary Community
 
