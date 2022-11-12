@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.12
+# v0.19.14
 
 using Markdown
 using InteractiveUtils
@@ -127,7 +127,22 @@ md"""
 The data comes from an [Allstate auto-claims data via Kaggle](https://www.kaggle.com/competitions/ClaimPredictionChallenge/data?select=dictionary.html). It contains exposure level information about predictor variable and claim amounts for calendar years 2005-2007. 
 
 For simplicity, we will focus on the narrow objective of estimating the claims rate at the level of automobile make and model. We will use the years 2005 and 2006 as the training data set and then 2007 to evaluate the predictive model.
+
+The original data is over 13 million rows, we will load an already summarized CSV and split it into `train` and `test` sets based on the `Calendar_Year`.
 """
+
+# ╔═╡ 92b98880-fe55-493d-85b4-25ef2fe0b584
+train,test = let
+	df = CSV.read("_data/condensed_auto_claims.csv",DataFrame,normalizenames=true)
+	df.p_observed = df.claims ./ df.n
+	
+
+	train = df[df.Calendar_Year .< 2007,:]
+	test  = df[df.Calendar_Year .== 2007,:]
+
+	train, test
+	
+end
 
 # ╔═╡ b1da1095-3ba5-4b6a-939c-7ba4e1e13a59
 md"""
@@ -151,80 +166,58 @@ md" The model is combined with the data and [Turing.jl](https://turing.ml/stable
 
 The result of the `sample` fucntion is a set of data containing individual outcomes for the parameters that appear in proportion to the posterior probability for those parameters. In a sense, we can empirically derive the posterior distribution for each paramters."
 
-# ╔═╡ 97fc61e5-56be-4470-ba12-e021f460e8e8
-md" This is a plot of the posterior density for all of the many, many $\mu$ parameters in our model:"
-
-# ╔═╡ fe642fb3-49b9-40cf-853e-c23aa5e82de7
-raw = let
-	CSV.read("/Users/alec/Downloads/train_set.csv",DataFrame,normalizenames=true)
-end
-
-# ╔═╡ 813d0d26-e04a-4501-89e8-621a796d87df
-describe(raw)
-
-# ╔═╡ dc7b7872-f6c5-4163-a984-954d97ab8546
-claims_summary = @chain raw begin
-	@subset :Calendar_Year .< 2007
-	@transform :claim = :Claim_Amount .> 0
-	@subset .~ismissing.(:Blind_Model)
-	groupby(:Blind_Model)
-	@combine begin
-		:n = length(:claim)
-		:claims = sum(:claim)
-	end
-end
-
 # ╔═╡ b4a592d2-57e8-4ce6-8fdf-8744aae72d5b
-mp = model_poisson(claims_summary);
+mp = let
+	# combine the different years in the training set
+	condensed = @chain train begin
+		groupby(:Blind_Model)
+		@combine begin
+			:n = sum(:n)
+			:claims = sum(:claims)
+		end
+	end
+	model_poisson(condensed);
+end
 
 # ╔═╡ 06866f75-d8f8-4eab-9a54-699e51473d53
 cp = sample(mp, NUTS(), 500);
 
-# ╔═╡ 9f979421-d35c-473b-b384-f575c2e8dadd
-function dplot(ch,param_string)
-	f = Figure()
-	ax = Axis(f[1, 1])
-   for (ind, param) in enumerate(ch.name_map.parameters)
-		if contains(string(param),param_string)
-			v = vec(getindex(ch, param).data)
-			density!(ax,logistic.(v), color = (:red, 0.0),
-    strokecolor = (:red,0.3), strokewidth = 1, strokearound = false)
-		end
-   end
-	xlims!(0.0,0.03)
-	hideydecorations!(ax)
-	f
-end
+# ╔═╡ 97fc61e5-56be-4470-ba12-e021f460e8e8
+md" This is a plot of the posterior density for all of the many, many $\mu$ parameters in our model. The black line shows the the distribution which comes from our hyperparameters μ and σ. In the even of facing a new group of interest (in our case, a new make of car), this is the prior distrubtion for the expected claims rate. The model has learned this from the data itself, and serves to regularize predictions."
 
-# ╔═╡ 33709da6-9a38-4621-81b2-130ce5613d53
-dplot(cp, "μ")
+# ╔═╡ 8984903b-7e8b-4dc8-855a-1e1090b22093
+md" ## Predictions and Results"
 
-# ╔═╡ 51525876-341c-44dd-8dbb-03fca95e84f4
-dplot(cg, "μ")
+# ╔═╡ f874c696-d325-4eea-b910-8c0635b3482d
+# An alternate approach to LFC where the first year becomes the prior, adjusted by data from the seonc year.
+LF2 = let 
+	# split dataset by year and recombine
+	df2005 = @subset(train,:Calendar_Year .== 2005)
+	df2006 = @subset(train,:Calendar_Year .== 2006)
+	df = outerjoin(df2005,df2006,on=:Blind_Model,renamecols= "_2005" => "_2006")
 
-# ╔═╡ 6dc97665-046c-4ee9-a1c8-0b5145880d47
-dplot(cgh, "μ")
-
-# ╔═╡ afbc8ae7-d5ab-4850-a6fd-08e93f970f8e
-test = let
+	# use 2005 actuals as LFC prior, and the overall mean if model is missing
+	μ_2005 = sum(skipmissing(df.claims_2005)) / sum(skipmissing(df.n_2005))
+	df.assumed = coalesce.(df.p_observed_2005,μ_2005)
 	
-	@chain raw begin
-		@subset :Calendar_Year .== 2007
-		@transform :claim = :Claim_Amount .> 0
-		@subset .~ismissing.(:Blind_Model)
-		groupby(:Blind_Model)
-		@combine begin
-			:n = length(:claim)
-			:claims = sum(:claim)
-		end
-		@transform :p_observed = :claims ./ :n
+	df.LF2_Z = min.(1, .√(coalesce.(df.claims_2006,0.) ./ LC_full_credibility))
+	df.LF2_μ = let Z = df.LF2_Z
+		# use the 2005 mean if the model not observed in 2006
+		Z .* coalesce.(df.p_observed_2006,μ_2005) .+ (1 .- Z) .* df.assumed
 	end
+	df
 end
 
 # ╔═╡ c635df7f-0b36-47da-9a2f-3fad7fd6aa38
 claims_summary_posterior = let
-	df = deepcopy(claims_summary)
-	means = map(1:nrow(df)) do i
+	df = @chain train begin
+		groupby(:Blind_Model)
+		@combine begin
+			:n = sum(:n)
+			:claims = sum(:claims)
+		end
+	end
+	means = map(1:length(unique(df.Blind_Model))) do i
 		d = logistic.(getindex(cp, Symbol("μ_i[$i]")).data)
 		(est = mean(d), se=std(d))
 	end
@@ -241,11 +234,22 @@ claims_summary_posterior = let
 	df.LF_μ = let Z = df.LF_Z
 		Z .* (df.p_observed) .+ (1 .- Z) .* pop_μ
 	end
+
+	# Limited Fluctuation 
+	# using the first year as the prior, 2nd year as new data
+	df2005 = @subset(train, :Calendar_Year .== 2005)
+	dict2005 = Dict(
+		model => rate 
+		for (model, rate) in zip(df2005.Blind_Model,df2005.p_observed)
+	)
+	
+	df = leftjoin(df,LF2[:,[:Blind_Model,:LF2_μ]],on=:Blind_Model,)
 	
 	df = innerjoin(df,test;on=:Blind_Model,renamecols= "_train" => "_test")
 
 	df.pred_bayes = df.n_test .* df.bayes_μ_train
 	df.pred_LF = df.n_test .* df.LF_μ_train
+	df.pred_LF2 = df.n_test .* df.LF2_μ_train
 	df.pred_naive = df.n_test .* df.p_observed_train
 
 	df
@@ -262,6 +266,7 @@ let df = claims_summary_posterior
 		sum(x->x^2, df.pred_naive - df.claims_test),
 		sum(x->x^2, df.pred_bayes - df.claims_test),
 		sum(x->x^2, df.pred_LF - df.claims_test),
+		sum(x->x^2, df.pred_LF2 - df.claims_test),
 	)
 	
 end
@@ -269,8 +274,9 @@ end
 # ╔═╡ 43c97485-b776-4ea2-a62b-1e8373270bc5
 let df = claims_summary_posterior
 	f = Figure()
-	ax = Axis(f[1,1],title="Cumulative Predictive Residual Error", subtitle="(Lower is better predictive accuracy)",xlabel=L"$i^{th}$ vehicle group",ylabel="absolute error")
-	lines!(ax,cumsum(abs.(df.pred_LF .- df.claims_test)),label="Limited Fluctuation",color=(:purple,0.5))
+	ax = Axis(f[1,1],title="Cumulative Predictive Residual Error", subtitle="(Lower is better predictive accuracy)",xlabel=L"$i^{th}$ vehicle group",ylabel=L"absolute error")
+	lines!(ax,cumsum(abs.(df.pred_LF .- df.claims_test)),label="Limited Fluctuation Overall",color=(:purple,0.5))
+	lines!(ax,cumsum(abs.(df.pred_LF2 .- df.claims_test)),label="Limited Fluctuation Year-by-Year",color=(:blue,0.5))
 	lines!(ax,cumsum(abs.(df.pred_bayes .- df.claims_test)),label="Bayesian",color=(:red,0.5))
 	lines!(ax,cumsum(abs.(df.pred_naive .- df.claims_test)),label="Naive",color=(:grey10,0.5))
 	# xlims!(0,40)
@@ -279,43 +285,67 @@ let df = claims_summary_posterior
 	f
 end
 
-# ╔═╡ f1128e03-39c2-4ef8-9a45-fa3b3bbdb943
-let df = claims_summary_posterior
-	colors = Makie.wong_colors()
-	category_labels = repeat(["LF","Bayes","Naive"],inner=length(df.claims_test))
-	data_array = vcat(
-		df.pred_LF .- df.claims_test,
-		df.pred_bayes.- df.claims_test,
-		df.pred_naive .- df.claims_test,
-	)
-	rainclouds(category_labels, data_array;
-    xlabel = "Categories of Distributions", ylabel = "Samples", title = "My Title",
-    plot_boxplots = true, cloud_width=0.5, side = :right,
-    color = colors[indexin(category_labels, unique(category_labels))])
-end
-
 # ╔═╡ 6af923fc-56cd-45b9-9a07-34265c756130
 let df = claims_summary_posterior
 	[sum(df.pred_LF),sum(df.pred_bayes),sum(df.pred_naive)] ./ sum(df.claims_test)
 end
 
 # ╔═╡ 67b240ac-6e11-48fa-9327-e28237804b53
-let df = raw
+let 
 	post = claims_summary_posterior
-	X = @chain df begin
+	X = @chain vcat(train,test) begin
 		groupby(:Calendar_Year)
-		@combine :claim_rate = sum(:Claim_Amount .> 0) / length(:Claim_Amount)
+		@combine :claim_rate = sum(:claims) / sum(:n)
 	end
 	f = Figure()
 	ax = Axis(f[1,1])
 	scatter!(ax,X.Calendar_Year,X.claim_rate, label="data")
 	scatter!(ax,[2007],[sum(post.pred_bayes)/sum(post.n_test)], label="Bayes", marker=:hline,markersize=30)
-	scatter!(ax,[2007],[sum(post.pred_LF)/sum(post.n_test)], label="LF",marker=:hline,markersize=30)
+	scatter!(ax,[2007],[sum(post.pred_LF)/sum(post.n_test)], label="LF Overall",marker=:hline,markersize=30)
+	scatter!(ax,[2007],[sum(post.pred_LF2)/sum(post.n_test)], label="LF Year-by-Year",marker=:hline,markersize=30)
 	scatter!(ax,[2007],[sum(post.pred_naive)/sum(post.n_test)], label="naive",marker=:hline,markersize=30)
 	axislegend(ax,position=:rb)
-	ylims!(0,0.01)
+	ylims!(0.005,0.008)
 	f
 end
+
+# ╔═╡ 5c8ec074-0148-4bba-92a0-2ac27886a7b5
+md" ## Misc utility functions"
+
+# ╔═╡ 9f979421-d35c-473b-b384-f575c2e8dadd
+"""
+	dplot(chain,parameter_string)
+
+plot the posterior density for model parameters matching the given string.
+"""
+function dplot(ch,param_string)
+	f = Figure()
+	ax = Axis(f[1, 1])
+
+	# plot each group posterior
+   for (ind, param) in enumerate(ch.name_map.parameters)
+		if contains(string(param),param_string)
+			v = vec(getindex(ch, param).data)
+			density!(ax,logistic.(v), color = (:red, 0.0),
+    strokecolor = (:red,0.3), strokewidth = 1, strokearound = false, label="Individual group posterior")
+		end
+   end
+	
+	# Plot hyperparameters
+	hyper_mean = mean(getindex(ch, :μ).data)
+	hyper_sigma = mean(getindex(ch, :σ).data)
+	d = density!(ax,logistic.(rand(Normal(hyper_mean,hyper_sigma),1000)),color = (:black, 0.),
+    strokecolor = (:black,0.3), strokewidth = 3, strokearound = false,label="Hyper-parameter distribution")
+
+	
+	xlims!(0.0,0.03)
+	hideydecorations!(ax)
+	axislegend(ax,unique=true)
+	f
+end
+
+# ╔═╡ 33709da6-9a38-4621-81b2-130ce5613d53
+dplot(cp, "μ")
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -333,8 +363,8 @@ StatsFuns = "4c63d2b9-4356-54db-8cca-17b64c39e42c"
 Turing = "fce5fe82-541a-59a6-adf8-730c64b5f9a0"
 
 [compat]
-CSV = "~0.10.6"
-CairoMakie = "~0.9.0"
+CSV = "~0.10.7"
+CairoMakie = "~0.9.1"
 DataFrames = "~1.3.6"
 DataFramesMeta = "~0.12.0"
 Distributions = "~0.25.76"
@@ -452,9 +482,9 @@ version = "6.0.23"
 
 [[deps.ArrayInterfaceCore]]
 deps = ["LinearAlgebra", "SparseArrays", "SuiteSparse"]
-git-tree-sha1 = "e6cba4aadba7e8a7574ab2ba2fcfb307b4c4b02a"
+git-tree-sha1 = "732cddf5c7a3d4e7d4829012042221a724a30674"
 uuid = "30b0a656-2188-435a-8636-2ec0e6a096e2"
-version = "0.1.23"
+version = "0.1.24"
 
 [[deps.ArrayInterfaceOffsetArrays]]
 deps = ["ArrayInterface", "OffsetArrays", "Static"]
@@ -550,10 +580,10 @@ uuid = "2a0fbf3d-bb9c-48f3-b0a9-814d99fd7ab9"
 version = "0.1.27"
 
 [[deps.CSV]]
-deps = ["CodecZlib", "Dates", "FilePathsBase", "InlineStrings", "Mmap", "Parsers", "PooledArrays", "SentinelArrays", "SnoopPrecompile", "Tables", "Unicode", "WeakRefStrings"]
-git-tree-sha1 = "76c8d77a76c564bbc39ae351c075ef3cafceef83"
+deps = ["CodecZlib", "Dates", "FilePathsBase", "InlineStrings", "Mmap", "Parsers", "PooledArrays", "SentinelArrays", "Tables", "Unicode", "WeakRefStrings"]
+git-tree-sha1 = "c5fd7cd27ac4aed0acf4b73948f0110ff2a854b2"
 uuid = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
-version = "0.10.6"
+version = "0.10.7"
 
 [[deps.Cairo]]
 deps = ["Cairo_jll", "Colors", "Glib_jll", "Graphics", "Libdl", "Pango_jll"]
@@ -563,9 +593,9 @@ version = "1.0.5"
 
 [[deps.CairoMakie]]
 deps = ["Base64", "Cairo", "Colors", "FFTW", "FileIO", "FreeType", "GeometryBasics", "LinearAlgebra", "Makie", "SHA", "SnoopPrecompile"]
-git-tree-sha1 = "f53b586e9489163ece213144a5a6417742f0388e"
+git-tree-sha1 = "906cffea7bf8f17098477c435f5b35d867b2c4ef"
 uuid = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
-version = "0.9.0"
+version = "0.9.1"
 
 [[deps.Cairo_jll]]
 deps = ["Artifacts", "Bzip2_jll", "Fontconfig_jll", "FreeType2_jll", "Glib_jll", "JLLWrappers", "LZO_jll", "Libdl", "Pixman_jll", "Pkg", "Xorg_libXext_jll", "Xorg_libXrender_jll", "Zlib_jll", "libpng_jll"]
@@ -650,9 +680,9 @@ uuid = "861a8166-3701-5b0c-9a16-15d98fcdc6aa"
 version = "1.0.2"
 
 [[deps.CommonSolve]]
-git-tree-sha1 = "332a332c97c7071600984b3c31d9067e1a4e6e25"
+git-tree-sha1 = "9441451ee712d1aec22edad62db1a9af3dc8d852"
 uuid = "38540f10-b2f7-11e9-35d8-d573e4eb0ff2"
-version = "0.2.1"
+version = "0.2.3"
 
 [[deps.CommonSubexpressions]]
 deps = ["MacroTools", "Test"]
@@ -1149,9 +1179,9 @@ version = "0.3.1"
 
 [[deps.InlineStrings]]
 deps = ["Parsers"]
-git-tree-sha1 = "db619c421554e1e7e07491b85a8f4b96b3f04ca0"
+git-tree-sha1 = "a62189e59d33e1615feb7a48c0bea7c11e4dc61d"
 uuid = "842dd82b-1e85-43dc-bf29-5d0ee9dffc48"
-version = "1.2.2"
+version = "1.3.0"
 
 [[deps.InplaceOps]]
 deps = ["LinearAlgebra", "Test"]
@@ -1454,15 +1484,15 @@ version = "0.5.10"
 
 [[deps.Makie]]
 deps = ["Animations", "Base64", "ColorBrewer", "ColorSchemes", "ColorTypes", "Colors", "Contour", "Distributions", "DocStringExtensions", "FFMPEG", "FileIO", "FixedPointNumbers", "Formatting", "FreeType", "FreeTypeAbstraction", "GeometryBasics", "GridLayoutBase", "ImageIO", "InteractiveUtils", "IntervalSets", "Isoband", "KernelDensity", "LaTeXStrings", "LinearAlgebra", "MakieCore", "Markdown", "Match", "MathTeXEngine", "MiniQhull", "Observables", "OffsetArrays", "Packing", "PlotUtils", "PolygonOps", "Printf", "Random", "RelocatableFolders", "Serialization", "Showoff", "SignedDistanceFields", "SnoopPrecompile", "SparseArrays", "Statistics", "StatsBase", "StatsFuns", "StructArrays", "TriplotBase", "UnicodeFun"]
-git-tree-sha1 = "51e40869d076fbff25ab61d0aa3e198d80176c75"
+git-tree-sha1 = "c3d53bc3aaf3b908f47e217e80d723f5af1bcf80"
 uuid = "ee78f7c6-11fb-53f2-987a-cfe4a2b5a57a"
-version = "0.18.0"
+version = "0.18.1"
 
 [[deps.MakieCore]]
 deps = ["Observables"]
-git-tree-sha1 = "b87650f61f85fc2d4fb5923a479dbf05ba65ae4d"
+git-tree-sha1 = "78611339550d29a783cc781c6ebd79f90b51e78b"
 uuid = "20f20a25-4f0e-4fdf-b5d1-57303727442b"
-version = "0.5.0"
+version = "0.5.1"
 
 [[deps.ManualMemory]]
 git-tree-sha1 = "bcaef4fc7a0cfe2cba636d84cda54b5e4e4ca3cd"
@@ -1556,9 +1586,9 @@ version = "7.8.2"
 
 [[deps.NNlib]]
 deps = ["Adapt", "ChainRulesCore", "LinearAlgebra", "Pkg", "Requires", "Statistics"]
-git-tree-sha1 = "415108fd88d6f55cedf7ee940c7d4b01fad85421"
+git-tree-sha1 = "00bcfcea7b2063807fdcab2e0ce86ef00b8b8000"
 uuid = "872c559c-99b0-510c-b3b7-b6c96a88d5cd"
-version = "0.8.9"
+version = "0.8.10"
 
 [[deps.NaNMath]]
 deps = ["OpenLibm_jll"]
@@ -1860,9 +1890,9 @@ version = "5.15.3+1"
 
 [[deps.QuadGK]]
 deps = ["DataStructures", "LinearAlgebra"]
-git-tree-sha1 = "3c009334f45dfd546a16a57960a821a1a023d241"
+git-tree-sha1 = "97aa253e65b784fd13e83774cadc95b38011d734"
 uuid = "1fd47b50-473d-5c70-9696-f719f8f3bcdc"
-version = "2.5.0"
+version = "2.6.0"
 
 [[deps.REPL]]
 deps = ["InteractiveUtils", "Markdown", "Sockets", "Unicode"]
@@ -1903,9 +1933,9 @@ version = "0.5.2"
 
 [[deps.RecursiveArrayTools]]
 deps = ["Adapt", "ArrayInterfaceCore", "ArrayInterfaceStaticArraysCore", "ChainRulesCore", "DocStringExtensions", "FillArrays", "GPUArraysCore", "IteratorInterfaceExtensions", "LinearAlgebra", "RecipesBase", "StaticArraysCore", "Statistics", "Tables", "ZygoteRules"]
-git-tree-sha1 = "3004608dc42101a944e44c1c68b599fa7c669080"
+git-tree-sha1 = "fe25988dce8dd3b763cf39d0ca39b09db3571ff7"
 uuid = "731186ca-8d62-57ce-b412-fbd966d074cd"
-version = "2.32.0"
+version = "2.32.1"
 
 [[deps.Reexport]]
 git-tree-sha1 = "45e428421666073eab6f2da5c9d310d99bb12f9b"
@@ -1944,9 +1974,9 @@ version = "2.0.8"
 
 [[deps.RuntimeGeneratedFunctions]]
 deps = ["ExprTools", "SHA", "Serialization"]
-git-tree-sha1 = "cdc1e4278e91a6ad530770ebb327f9ed83cf10c4"
+git-tree-sha1 = "50314d2ef65fce648975a8e80ae6d8409ebbf835"
 uuid = "7e49a35a-f44a-4d26-94aa-eba1b4ca6b47"
-version = "0.5.3"
+version = "0.5.5"
 
 [[deps.SHA]]
 uuid = "ea8e919c-243c-51af-8825-aaa63cd721ce"
@@ -1976,9 +2006,9 @@ version = "0.3.3"
 
 [[deps.SciMLBase]]
 deps = ["ArrayInterfaceCore", "CommonSolve", "ConstructionBase", "Distributed", "DocStringExtensions", "EnumX", "FunctionWrappersWrappers", "IteratorInterfaceExtensions", "LinearAlgebra", "Logging", "Markdown", "Preferences", "RecipesBase", "RecursiveArrayTools", "RuntimeGeneratedFunctions", "StaticArraysCore", "Statistics", "Tables"]
-git-tree-sha1 = "bb721d406b9002ccd5636f576041f077b6d06371"
+git-tree-sha1 = "12e532838db2f2a435a84ab7c01003ceb45baa53"
 uuid = "0bca4576-84f4-4d90-8ffe-ffa030f20462"
-version = "1.64.0"
+version = "1.67.0"
 
 [[deps.ScientificTypesBase]]
 git-tree-sha1 = "a8e18eb383b5ecf1b5e6fc237eb39255044fd92b"
@@ -2556,25 +2586,22 @@ version = "1.4.1+0"
 # ╟─165a95e3-41ad-4817-9c5f-d5a0db459b00
 # ╠═948bbc8e-ad53-4ce0-9138-4661a65ac767
 # ╟─05d0b5b2-b622-4ba3-b826-0dc9ac1f806d
+# ╠═92b98880-fe55-493d-85b4-25ef2fe0b584
 # ╟─b1da1095-3ba5-4b6a-939c-7ba4e1e13a59
 # ╠═d93f8d2b-ee85-4dee-9dcb-049ec314d221
 # ╟─f1698f70-9849-4013-bd88-c60db9ddb166
 # ╠═b4a592d2-57e8-4ce6-8fdf-8744aae72d5b
 # ╠═06866f75-d8f8-4eab-9a54-699e51473d53
-# ╠═97fc61e5-56be-4470-ba12-e021f460e8e8
+# ╟─97fc61e5-56be-4470-ba12-e021f460e8e8
 # ╠═33709da6-9a38-4621-81b2-130ce5613d53
-# ╠═fe642fb3-49b9-40cf-853e-c23aa5e82de7
-# ╠═813d0d26-e04a-4501-89e8-621a796d87df
-# ╠═dc7b7872-f6c5-4163-a984-954d97ab8546
-# ╠═9f979421-d35c-473b-b384-f575c2e8dadd
-# ╠═51525876-341c-44dd-8dbb-03fca95e84f4
-# ╠═6dc97665-046c-4ee9-a1c8-0b5145880d47
+# ╠═8984903b-7e8b-4dc8-855a-1e1090b22093
 # ╠═c635df7f-0b36-47da-9a2f-3fad7fd6aa38
+# ╠═f874c696-d325-4eea-b910-8c0635b3482d
 # ╠═96b5b98a-25e0-4f7d-af73-2b209b6d32a0
 # ╠═43c97485-b776-4ea2-a62b-1e8373270bc5
-# ╠═f1128e03-39c2-4ef8-9a45-fa3b3bbdb943
 # ╠═6af923fc-56cd-45b9-9a07-34265c756130
 # ╠═67b240ac-6e11-48fa-9327-e28237804b53
-# ╠═afbc8ae7-d5ab-4850-a6fd-08e93f970f8e
+# ╠═5c8ec074-0148-4bba-92a0-2ac27886a7b5
+# ╠═9f979421-d35c-473b-b384-f575c2e8dadd
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
