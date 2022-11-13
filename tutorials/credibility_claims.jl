@@ -4,16 +4,6 @@
 using Markdown
 using InteractiveUtils
 
-# This Pluto notebook uses @bind for interactivity. When running this notebook outside of Pluto, the following 'mock version' of @bind gives bound variables a default value (instead of an error).
-macro bind(def, element)
-    quote
-        local iv = try Base.loaded_modules[Base.PkgId(Base.UUID("6e696c72-6542-2067-7265-42206c756150"), "AbstractPlutoDingetjes")].Bonds.initial_value catch; b -> missing; end
-        local el = $(esc(element))
-        global $(esc(def)) = Core.applicable(Base.get, el) ? Base.get(el) : iv(el)
-        el
-    end
-end
-
 # ╔═╡ 52b1ca34-38d5-4bf5-a00f-71b55a2d8d0a
 begin 
 	using CSV
@@ -64,10 +54,10 @@ Observed Rate, and a Prior Rate.
 \text{Credibility-Weighted Rate} = Z × \text{Observed Rate} + (1 – Z) × \text{Prior Rate}
 ```
 
-With probability equal to $(@bind LC_p Scrubbable(0.50 : 0.01 : 0.99, default=.9, format=".0%"))
+With probability equal to $(LC_p = 0.9)
 that the
 Observed Rate does not differ from the true rate by more than 
-$(@bind LC_r Scrubbable(0.01 : 0.01 : 0.25, default=.05, format=".0%")).
+$(LC_r  = 0.05).
 
 ```math
 \text{Claims for full credibility} = (\frac{\text{Z-Score}}{\text{ratio}})^{2}
@@ -467,7 +457,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.8.2"
 manifest_format = "2.0"
-project_hash = "25c323b274864b7dd24f3761069c3306d40c3064"
+project_hash = "8ef561e17ce72f554398f9158a1b315101935477"
 
 [[deps.ANSIColoredPrinters]]
 git-tree-sha1 = "574baf8110975760d391c710b6341da1afa48d8c"
