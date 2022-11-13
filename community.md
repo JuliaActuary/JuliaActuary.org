@@ -50,6 +50,7 @@ Benchmarks of Actuarial workflows can be found on the [Benchmarks](/benchmarks/)
 - [Interactive cashflow analysis](/tutorials/CashflowAnalysis/)
 - [Universal Life Policy Account Mechanics as a Differential Equation](/tutorials/PolicyDiffEq/)
 - [The Poisson approximation to the Binomial Distribution](/tutorials/poissonbinomial/)
+- [Limited Fluctuation vs Bayesian Experience Analysis](/tutorials/credibility_claims/)
 
 ### Other Repositories of Interest for Actuaries
 
