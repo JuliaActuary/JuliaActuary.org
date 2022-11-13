@@ -1,0 +1,151 @@
+<!doctype html> <html lang=en > <meta charset=UTF-8 > <meta name=viewport  content="width=device-width, initial-scale=1"> <meta name=Description  content="Practical, extensible, and open-source actuarial modeling and analysis."> <meta property="og:description" content="Practical, extensible, and open-source actuarial modeling and analysis."> <meta property="og:image" content="/assets/logo_square.svg"> <script> MathJax = { tex: { inlineMath: [['$', '$'], ["\\(", "\\)"]], processEscapes: true, } }; </script> <script async src="/previews/PR30/assets/MathJax/MathJax-3.2.2/es5/tex-mml-chtml.js"> </script> <style> @font-face { src: url("//assets/MathJax/MathJax-3.2.2/es5/output/chtml/fonts/woff-v2/MathJax_Main-Regular.woff"> } </style> <style> @font-face { src: url("//assets/MathJax/MathJax-3.2.2/es5/output/chtml/fonts/woff-v2/MathJax_Zero.woff"> } </style> <style> @font-face { src: url("//assets/MathJax/MathJax-3.2.2/es5/output/chtml/fonts/woff-v2/MathJax_Math-Italic.woff"> } </style> <link rel=stylesheet  href="/previews/PR30/libs/highlight/github.min.css"> <link rel=stylesheet  href="/previews/PR30/css/franklin.css"> <link rel=stylesheet  href="/previews/PR30/css/basic.css"> <link rel=icon  href="/previews/PR30/assets/favicon.png"> <title>Exposure Calculation with ExperienceAnalysis.jl | JuliaActuary</title> <link rel=apple-touch-icon  sizes=180x180  href="/previews/PR30/assets/apple-touch-icon.png"> <link rel=icon  type="image/png" sizes=32x32  href="/previews/PR30/assets/favicon-32x32.png"> <link rel=icon  type="image/png" sizes=16x16  href="/previews/PR30/assets/favicon-16x16.png"> <link rel=manifest  href="/previews/PR30/assets/site.webmanifest"> <script src="https://cdn.jsdelivr.net/npm/swiffy-slider@1.2.0/dist/js/swiffy-slider.min.js" crossorigin=anonymous  defer></script> <link href="/previews/PR30/css/slider.css" rel=stylesheet > <header> <div class=blog-name > <a href="/previews/PR30/"> <div class=blog-name-logo-container > <div class=blog-name-logo > <img src="/previews/PR30/assets/logo_square.svg" alt=logo  height=100px  width=100px  /> </div> <div>JuliaActuary</div> </div> </a> <div class=tagline >Practical, extensible, and open-source actuarial modeling and analysis. </div> </div> <nav> <ul> <li><a href="/previews/PR30/">Home</a> <li><a href="/previews/PR30/packages">Packages</a> <li><a href="/previews/PR30/community">Community</a> <ul> <li><a href="/previews/PR30/community/#learn">Learn</a> <li><a href="/previews/PR30/community/#integration_with_r_and_python">Integration</a> <li><a href="/previews/PR30/community/#contributing">Contributing</a> </ul> <li><a href="/previews/PR30/#blog">Blog</a> </ul> <img src="/previews/PR30/assets/hamburger.svg" id=menu-icon > </nav> </header> <div class=franklin-content ><h1 id=exposure_calculation_with_experienceanalysisjl ><a href="#exposure_calculation_with_experienceanalysisjl" class=header-anchor >Exposure Calculation with ExperienceAnalysis.jl</a></h1> <p>In this tutorial, we will walk through how to calculate exposures using the <a href="/previews/PR30/packages/#lifecontingenciesjl">ExperienceAnalysis.jl package</a>.</p> <p>In summary, the package will help calculate the exposure periods given parameters about the kind of period and timepoints under consideration:</p> <pre><code class="julia hljs"><span class=hljs-keyword >using</span> ExperienceAnalysis
+<span class=hljs-keyword >using</span> Dates
+
+issue = Date(<span class=hljs-number >2016</span>, <span class=hljs-number >7</span>, <span class=hljs-number >4</span>)
+termination = Date(<span class=hljs-number >2020</span>, <span class=hljs-number >1</span>, <span class=hljs-number >17</span>)
+basis = ExperienceAnalysis.Anniversary(Year(<span class=hljs-number >1</span>))
+exposure(basis, issue, termination)</code></pre> <p>This will return an array of tuples with a <code>from</code> and <code>to</code> date:</p> <pre><code class="julia hljs"><span class=hljs-number >4</span>-element <span class=hljs-built_in >Array</span>{<span class=hljs-built_in >NamedTuple</span>{(:from, :to),<span class=hljs-built_in >Tuple</span>{Date,Date}},<span class=hljs-number >1</span>}:
+ (from = Date(<span class=hljs-string >&quot;2016-07-04&quot;</span>), to = Date(<span class=hljs-string >&quot;2017-07-04&quot;</span>))
+ (from = Date(<span class=hljs-string >&quot;2017-07-04&quot;</span>), to = Date(<span class=hljs-string >&quot;2018-07-04&quot;</span>))
+ (from = Date(<span class=hljs-string >&quot;2018-07-04&quot;</span>), to = Date(<span class=hljs-string >&quot;2019-07-04&quot;</span>))
+ (from = Date(<span class=hljs-string >&quot;2019-07-04&quot;</span>), to = Date(<span class=hljs-string >&quot;2020-01-17&quot;</span>))</code></pre> <h2 id=available_exposure_basis ><a href="#available_exposure_basis" class=header-anchor >Available Exposure Basis</a></h2> <ul> <li><p><code>ExperienceAnalysis.Anniversary&#40;period&#41;</code> will give exposures periods based on the first date</p> <li><p><code>ExperienceAnalysis.Calendar&#40;period&#41;</code> will follow calendar periods &#40;e.g. month or year&#41;</p> <li><p><code>ExperienceAnalysis.AnniversaryCalendar&#40;period,period&#41;</code> will split into the smaller of the calendar or policy anniversary period.</p> </ul> <p>Where <code>period</code> is a <a href="https://docs.julialang.org/en/v1/stdlib/Dates/#Period-Types">Period Type from the Dates standard library</a>.</p> <p>Calculate exposures with <code>exposures&#40;basis,from,to,continue_exposure&#41;</code>. </p> <ul> <li><p><code>continue_exposures</code> indicates whether the exposure should be extended through the full exposure period rather than terminate at the <code>to</code> date.</p> </ul> <h2 id=full_example ><a href="#full_example" class=header-anchor >Full Example</a></h2> <p>We&#39;ll start with this as our data:</p> <pre><code class="julia hljs">julia&gt; df
+
+<span class=hljs-number >3</span>×<span class=hljs-number >4</span> DataFrame
+│ Row │ id     │ issue      │ termination │ status  │
+│     │ <span class=hljs-built_in >String</span> │ Date       │ Date?       │ <span class=hljs-built_in >String</span>  │
+├─────┼────────┼────────────┼─────────────┼─────────┤
+│ <span class=hljs-number >1</span>   │ <span class=hljs-number >1</span>      │ <span class=hljs-number >2016</span>-<span class=hljs-number >07</span>-<span class=hljs-number >04</span> │ <span class=hljs-number >2020</span>-<span class=hljs-number >01</span>-<span class=hljs-number >17</span>  │ Claim   │
+│ <span class=hljs-number >2</span>   │ <span class=hljs-number >2</span>      │ <span class=hljs-number >2016</span>-<span class=hljs-number >01</span>-<span class=hljs-number >01</span> │ <span class=hljs-number >2018</span>-<span class=hljs-number >05</span>-<span class=hljs-number >04</span>  │ Lapse   │
+│ <span class=hljs-number >3</span>   │ <span class=hljs-number >3</span>      │ <span class=hljs-number >2016</span>-<span class=hljs-number >01</span>-<span class=hljs-number >01</span> │ <span class=hljs-literal >missing</span>     │ Inforce │</code></pre> <p>Define the study end:</p> <pre><code class="julia hljs">study_end = Date(<span class=hljs-number >2020</span>,<span class=hljs-number >12</span>,<span class=hljs-number >31</span>)</code></pre>
+<p>Next, we do two things by iterating over and creating a new array of dates:</p>
+<ol>
+<li><p>Handle the <code>missing</code> case by letting the <code>to</code> reflect the <code>study_end</code></p>
+
+<li><p>Cap the ending date at the <code>study_end</code>. This doesn&#39;t come into play in this example, but it&#39;s included for demonstration purposes.</p>
+
+</ol>
+<pre><code class="julia hljs">to = [ismissing(d) ? study_end : min(study_end,d) <span class=hljs-keyword >for</span> d <span class=hljs-keyword >in</span> df.termination]</code></pre>
+<p>Calculate the exposure by <a href="https://docs.julialang.org/en/v1/manual/mathematical-operations/#man-dot-operators">broadcasting</a> the exposure function over the three arrays we are passing to it: </p>
+<pre><code class="julia hljs">df.exposure = exposure.(
+    ExperienceAnalysis.Anniversary(Year(<span class=hljs-number >1</span>)),   <span class=hljs-comment ># The basis for our exposures</span>
+    df.issue,                             <span class=hljs-comment ># The `from` date</span>
+    to                                    <span class=hljs-comment ># the `to` date array we created above</span>
+    )</code></pre>
+<p>In our dataframe, we actually have a column that contains an array of tuples now, so to expand it so that each exposure period gets a row, we <code>flatten</code> the dataframe:</p>
+<pre><code class="julia hljs">df = flatten(df,:exposure)</code></pre>
+<p>So now we have our exposures:</p>
+<pre><code class="julia hljs">│ id     │ issue      │ termination │ status  │ exposure                                             │
+│ <span class=hljs-built_in >String</span> │ Date       │ Date?       │ <span class=hljs-built_in >String</span>  │ <span class=hljs-built_in >NamedTuple</span>{(:from, :to),<span class=hljs-built_in >Tuple</span>{Date,Date}}            │
+┼────────┼────────────┼─────────────┼─────────┼──────────────────────────────────────────────────────┼
+│ <span class=hljs-number >1</span>      │ <span class=hljs-number >2016</span>-<span class=hljs-number >07</span>-<span class=hljs-number >04</span> │ <span class=hljs-number >2020</span>-<span class=hljs-number >01</span>-<span class=hljs-number >17</span>  │ Claim   │ (from = Date(<span class=hljs-string >&quot;2016-07-04&quot;</span>), to = Date(<span class=hljs-string >&quot;2017-07-04&quot;</span>)) │
+│ <span class=hljs-number >1</span>      │ <span class=hljs-number >2016</span>-<span class=hljs-number >07</span>-<span class=hljs-number >04</span> │ <span class=hljs-number >2020</span>-<span class=hljs-number >01</span>-<span class=hljs-number >17</span>  │ Claim   │ (from = Date(<span class=hljs-string >&quot;2017-07-04&quot;</span>), to = Date(<span class=hljs-string >&quot;2018-07-04&quot;</span>)) │
+│ <span class=hljs-number >1</span>      │ <span class=hljs-number >2016</span>-<span class=hljs-number >07</span>-<span class=hljs-number >04</span> │ <span class=hljs-number >2020</span>-<span class=hljs-number >01</span>-<span class=hljs-number >17</span>  │ Claim   │ (from = Date(<span class=hljs-string >&quot;2018-07-04&quot;</span>), to = Date(<span class=hljs-string >&quot;2019-07-04&quot;</span>)) │
+│ <span class=hljs-number >1</span>      │ <span class=hljs-number >2016</span>-<span class=hljs-number >07</span>-<span class=hljs-number >04</span> │ <span class=hljs-number >2020</span>-<span class=hljs-number >01</span>-<span class=hljs-number >17</span>  │ Claim   │ (from = Date(<span class=hljs-string >&quot;2019-07-04&quot;</span>), to = Date(<span class=hljs-string >&quot;2020-01-17&quot;</span>)) │
+│ <span class=hljs-number >2</span>      │ <span class=hljs-number >2016</span>-<span class=hljs-number >01</span>-<span class=hljs-number >01</span> │ <span class=hljs-number >2018</span>-<span class=hljs-number >05</span>-<span class=hljs-number >04</span>  │ Lapse   │ (from = Date(<span class=hljs-string >&quot;2016-01-01&quot;</span>), to = Date(<span class=hljs-string >&quot;2017-01-01&quot;</span>)) │
+│ <span class=hljs-number >2</span>      │ <span class=hljs-number >2016</span>-<span class=hljs-number >01</span>-<span class=hljs-number >01</span> │ <span class=hljs-number >2018</span>-<span class=hljs-number >05</span>-<span class=hljs-number >04</span>  │ Lapse   │ (from = Date(<span class=hljs-string >&quot;2017-01-01&quot;</span>), to = Date(<span class=hljs-string >&quot;2018-01-01&quot;</span>)) │
+│ <span class=hljs-number >2</span>      │ <span class=hljs-number >2016</span>-<span class=hljs-number >01</span>-<span class=hljs-number >01</span> │ <span class=hljs-number >2018</span>-<span class=hljs-number >05</span>-<span class=hljs-number >04</span>  │ Lapse   │ (from = Date(<span class=hljs-string >&quot;2018-01-01&quot;</span>), to = Date(<span class=hljs-string >&quot;2018-05-04&quot;</span>)) │
+│ <span class=hljs-number >3</span>      │ <span class=hljs-number >2016</span>-<span class=hljs-number >01</span>-<span class=hljs-number >01</span> │ <span class=hljs-literal >missing</span>     │ Inforce │ (from = Date(<span class=hljs-string >&quot;2016-01-01&quot;</span>), to = Date(<span class=hljs-string >&quot;2017-01-01&quot;</span>)) │
+│ <span class=hljs-number >3</span>      │ <span class=hljs-number >2016</span>-<span class=hljs-number >01</span>-<span class=hljs-number >01</span> │ <span class=hljs-literal >missing</span>     │ Inforce │ (from = Date(<span class=hljs-string >&quot;2017-01-01&quot;</span>), to = Date(<span class=hljs-string >&quot;2018-01-01&quot;</span>)) │
+│ <span class=hljs-number >3</span>      │ <span class=hljs-number >2016</span>-<span class=hljs-number >01</span>-<span class=hljs-number >01</span> │ <span class=hljs-literal >missing</span>     │ Inforce │ (from = Date(<span class=hljs-string >&quot;2018-01-01&quot;</span>), to = Date(<span class=hljs-string >&quot;2019-01-01&quot;</span>)) │
+│ <span class=hljs-number >3</span>      │ <span class=hljs-number >2016</span>-<span class=hljs-number >01</span>-<span class=hljs-number >01</span> │ <span class=hljs-literal >missing</span>     │ Inforce │ (from = Date(<span class=hljs-string >&quot;2019-01-01&quot;</span>), to = Date(<span class=hljs-string >&quot;2020-01-01&quot;</span>)) │
+│ <span class=hljs-number >3</span>      │ <span class=hljs-number >2016</span>-<span class=hljs-number >01</span>-<span class=hljs-number >01</span> │ <span class=hljs-literal >missing</span>     │ Inforce │ (from = Date(<span class=hljs-string >&quot;2020-01-01&quot;</span>), to = Date(<span class=hljs-string >&quot;2020-12-31&quot;</span>)) │</code></pre>
+<h3 id=exposure_fraction ><a href="#exposure_fraction" class=header-anchor >Exposure Fraction</a></h3>
+<p>This can be extended to calculate the decimal fraction of the year under different day count conventions, such as assuming 30/360 or Actual/365, etc. using the <a href="https://github.com/JuliaFinance/DayCounts.jl"><code>DayCounts.jl</code> package</a>.</p>
+<pre><code class="julia hljs"><span class=hljs-keyword >using</span> DayCounts
+
+df.exposure_fraction = map(e -&gt; yearfrac(e.from,e.to,DayCounts.Actual360()),df.exposure)</code></pre>
+<p>So now we have:</p>
+<pre><code class="julia hljs">│ exposure                                             │ exposure_fraction │
+│ <span class=hljs-built_in >NamedTuple</span>{(:from, :to),<span class=hljs-built_in >Tuple</span>{Date,Date}}            │ <span class=hljs-built_in >Float64</span>           │
+┼──────────────────────────────────────────────────────┼───────────────────┤
+│ (from = Date(<span class=hljs-string >&quot;2016-07-04&quot;</span>), to = Date(<span class=hljs-string >&quot;2017-07-04&quot;</span>)) │ <span class=hljs-number >1.01389</span>           │
+│ (from = Date(<span class=hljs-string >&quot;2017-07-04&quot;</span>), to = Date(<span class=hljs-string >&quot;2018-07-04&quot;</span>)) │ <span class=hljs-number >1.01389</span>           │
+│ (from = Date(<span class=hljs-string >&quot;2018-07-04&quot;</span>), to = Date(<span class=hljs-string >&quot;2019-07-04&quot;</span>)) │ <span class=hljs-number >1.01389</span>           │
+│ (from = Date(<span class=hljs-string >&quot;2019-07-04&quot;</span>), to = Date(<span class=hljs-string >&quot;2020-07-04&quot;</span>)) │ <span class=hljs-number >0.54722</span>           │
+│ (from = Date(<span class=hljs-string >&quot;2016-01-01&quot;</span>), to = Date(<span class=hljs-string >&quot;2017-01-01&quot;</span>)) │ <span class=hljs-number >1.01667</span>           │
+│ (from = Date(<span class=hljs-string >&quot;2017-01-01&quot;</span>), to = Date(<span class=hljs-string >&quot;2018-01-01&quot;</span>)) │ <span class=hljs-number >1.01389</span>           │
+│ (from = Date(<span class=hljs-string >&quot;2018-01-01&quot;</span>), to = Date(<span class=hljs-string >&quot;2018-05-04&quot;</span>)) │ <span class=hljs-number >0.34167</span>           │
+│ (from = Date(<span class=hljs-string >&quot;2016-01-01&quot;</span>), to = Date(<span class=hljs-string >&quot;2017-01-01&quot;</span>)) │ <span class=hljs-number >1.01667</span>           │
+│ (from = Date(<span class=hljs-string >&quot;2017-01-01&quot;</span>), to = Date(<span class=hljs-string >&quot;2018-01-01&quot;</span>)) │ <span class=hljs-number >1.01389</span>           │
+│ (from = Date(<span class=hljs-string >&quot;2018-01-01&quot;</span>), to = Date(<span class=hljs-string >&quot;2019-01-01&quot;</span>)) │ <span class=hljs-number >1.01389</span>           │
+│ (from = Date(<span class=hljs-string >&quot;2019-01-01&quot;</span>), to = Date(<span class=hljs-string >&quot;2020-01-01&quot;</span>)) │ <span class=hljs-number >1.01389</span>           │
+│ (from = Date(<span class=hljs-string >&quot;2020-01-01&quot;</span>), to = Date(<span class=hljs-string >&quot;2020-12-31&quot;</span>)) │ <span class=hljs-number >1.01389</span>           │</code></pre>
+<h3 id=continued_exposure ><a href="#continued_exposure" class=header-anchor >Continued Exposure</a></h3>
+<p>To get the proper exposure for the termination type under consideration, <code>exposure</code> takes an optional fourth argument which will continue the exposure until the end of what would be the period notwithstanding the termination.</p>
+<p>Extending the above analysis, we want a full exposure period for any <code>&quot;Claim&quot;</code> in this case:</p>
+<pre><code class="julia hljs">continue_exposure = df.status .== <span class=hljs-string >&quot;Claim&quot;</span>
+
+df.exposure = exposure.(
+    ExperienceAnalysis.Anniversary(Year(<span class=hljs-number >1</span>)),   <span class=hljs-comment ># The basis for our exposures</span>
+    df.issue,                             <span class=hljs-comment ># The `from` date</span>
+    to,                                   <span class=hljs-comment ># the `to` date array we created above</span>
+    continue_exposure                     <span class=hljs-comment ># full exposure or not (true/false)</span>
+    )</code></pre>
+<p>And then the exposures look like the following. Note the difference in the fourth row:</p>
+<pre><code class="julia hljs">│ exposure                                             │ exposure_fraction │
+│ <span class=hljs-built_in >NamedTuple</span>{(:from, :to),<span class=hljs-built_in >Tuple</span>{Date,Date}}            │ <span class=hljs-built_in >Float64</span>           │
+┼──────────────────────────────────────────────────────┼───────────────────┤
+│ (from = Date(<span class=hljs-string >&quot;2016-07-04&quot;</span>), to = Date(<span class=hljs-string >&quot;2017-07-04&quot;</span>)) │ <span class=hljs-number >1.01389</span>           │
+│ (from = Date(<span class=hljs-string >&quot;2017-07-04&quot;</span>), to = Date(<span class=hljs-string >&quot;2018-07-04&quot;</span>)) │ <span class=hljs-number >1.01389</span>           │
+│ (from = Date(<span class=hljs-string >&quot;2018-07-04&quot;</span>), to = Date(<span class=hljs-string >&quot;2019-07-04&quot;</span>)) │ <span class=hljs-number >1.01389</span>           │
+│ (from = Date(<span class=hljs-string >&quot;2019-07-04&quot;</span>), to = Date(<span class=hljs-string >&quot;2020-07-04&quot;</span>)) │ <span class=hljs-number >1.01667</span>           │
+│ (from = Date(<span class=hljs-string >&quot;2016-01-01&quot;</span>), to = Date(<span class=hljs-string >&quot;2017-01-01&quot;</span>)) │ <span class=hljs-number >1.01667</span>           │
+│ (from = Date(<span class=hljs-string >&quot;2017-01-01&quot;</span>), to = Date(<span class=hljs-string >&quot;2018-01-01&quot;</span>)) │ <span class=hljs-number >1.01389</span>           │
+│ (from = Date(<span class=hljs-string >&quot;2018-01-01&quot;</span>), to = Date(<span class=hljs-string >&quot;2018-05-04&quot;</span>)) │ <span class=hljs-number >0.341667</span>          │
+│ (from = Date(<span class=hljs-string >&quot;2016-01-01&quot;</span>), to = Date(<span class=hljs-string >&quot;2017-01-01&quot;</span>)) │ <span class=hljs-number >1.01667</span>           │
+│ (from = Date(<span class=hljs-string >&quot;2017-01-01&quot;</span>), to = Date(<span class=hljs-string >&quot;2018-01-01&quot;</span>)) │ <span class=hljs-number >1.01389</span>           │
+│ (from = Date(<span class=hljs-string >&quot;2018-01-01&quot;</span>), to = Date(<span class=hljs-string >&quot;2019-01-01&quot;</span>)) │ <span class=hljs-number >1.01389</span>           │
+│ (from = Date(<span class=hljs-string >&quot;2019-01-01&quot;</span>), to = Date(<span class=hljs-string >&quot;2020-01-01&quot;</span>)) │ <span class=hljs-number >1.01389</span>           │
+│ (from = Date(<span class=hljs-string >&quot;2020-01-01&quot;</span>), to = Date(<span class=hljs-string >&quot;2020-12-31&quot;</span>)) │ <span class=hljs-number >1.01389</span>           │</code></pre>
+<h3 id=study_endstart_dates ><a href="#study_endstart_dates" class=header-anchor >Study End/Start dates</a></h3>
+<p>The examples above already incorporated the study end date. However, the study start date must be truncated as a post-processing step. This is because the <code>to</code> argument to the <code>exposure&#40;...&#41;</code> function defines the anchor point for the policy anniversary iteration. If the <code>to</code> was the study start date, then the anniversaries would follow that calendar date.</p>
+<p>To truncate the exposures, you would need to drop/update exposures. Continuing the example above:</p>
+<pre><code class="julia hljs">study_start = Date(<span class=hljs-number >2017</span>,<span class=hljs-number >1</span>,<span class=hljs-number >1</span>)
+
+<span class=hljs-comment ># drop rows where the whole exposure is before the study_start</span>
+df_truncated = filter(row -&gt; row.exposure.to &gt;= study_start,df)
+
+<span class=hljs-comment ># update the `from` where remaining exposures start before the study_start</span>
+df_truncated.exposure = map(e -&gt; (from = max(study_start,e.from),to = e.to), df_truncated.exposure)</code></pre>
+<p>And then <code>df_truncated</code> contains:</p>
+<pre><code class="julia hljs">│ exposure                                             │
+│ <span class=hljs-built_in >NamedTuple</span>{(:from, :to),<span class=hljs-built_in >Tuple</span>{Date,Date}}            │
+┼──────────────────────────────────────────────────────┼
+│ (from = Date(<span class=hljs-string >&quot;2017-01-01&quot;</span>), to = Date(<span class=hljs-string >&quot;2017-07-04&quot;</span>)) │
+│ (from = Date(<span class=hljs-string >&quot;2017-07-04&quot;</span>), to = Date(<span class=hljs-string >&quot;2018-07-04&quot;</span>)) │
+│ (from = Date(<span class=hljs-string >&quot;2018-07-04&quot;</span>), to = Date(<span class=hljs-string >&quot;2019-07-04&quot;</span>)) │
+│ (from = Date(<span class=hljs-string >&quot;2019-07-04&quot;</span>), to = Date(<span class=hljs-string >&quot;2020-07-04&quot;</span>)) │
+│ (from = Date(<span class=hljs-string >&quot;2017-01-01&quot;</span>), to = Date(<span class=hljs-string >&quot;2017-01-01&quot;</span>)) │
+│ (from = Date(<span class=hljs-string >&quot;2017-01-01&quot;</span>), to = Date(<span class=hljs-string >&quot;2018-01-01&quot;</span>)) │
+│ (from = Date(<span class=hljs-string >&quot;2018-01-01&quot;</span>), to = Date(<span class=hljs-string >&quot;2018-05-04&quot;</span>)) │
+│ (from = Date(<span class=hljs-string >&quot;2017-01-01&quot;</span>), to = Date(<span class=hljs-string >&quot;2017-01-01&quot;</span>)) │
+│ (from = Date(<span class=hljs-string >&quot;2017-01-01&quot;</span>), to = Date(<span class=hljs-string >&quot;2018-01-01&quot;</span>)) │
+│ (from = Date(<span class=hljs-string >&quot;2018-01-01&quot;</span>), to = Date(<span class=hljs-string >&quot;2019-01-01&quot;</span>)) │
+│ (from = Date(<span class=hljs-string >&quot;2019-01-01&quot;</span>), to = Date(<span class=hljs-string >&quot;2020-01-01&quot;</span>)) │
+│ (from = Date(<span class=hljs-string >&quot;2020-01-01&quot;</span>), to = Date(<span class=hljs-string >&quot;2020-12-31&quot;</span>)) │</code></pre>
+<p>Last item to note is that you need to recalculate the <code>exposure_fraction</code> as it currently reflects the pre-truncated values. When actually building a process, you could truncate before calculating the fraction to begin with.</p>
+<h2 id=discussion_and_questions ><a href="#discussion_and_questions" class=header-anchor >Discussion and Questions</a></h2>
+<p>If you have other ideas or questions, feel free to also open an issue, or discuss on the community <a href="https://julialang.zulipchat.com/#narrow/stream/249536-actuary">Zulip</a> or <a href="https://slackinvite.julialang.org/">Slack #actuary channel</a>. We welcome all actuarial and related disciplines&#33;</p>
+<h3 id=references ><a href="#references" class=header-anchor >References</a></h3>
+<ul>
+<li><p><a href="https://www.soa.org/globalassets/assets/files/research/experience-study-calculations.pdf">Experience Study Calculations</a> by the Society of Actuaries</p>
+
+<li><p><a href="https://github.com/JuliaActuary/ExperienceAnalysis.jl">ExperienceAnalysis.jl package on GitHub</a></p>
+
+</ul>
+<div class=page-foot >
+  The packages in JuliaActuary are open-source and liberally licensed (MIT License) to allow wide private and commercial
+  usage of the packages, like the base Julia language and many other packages in the ecosystem. See <a href="/previews/PR30/terms/" >terms of this site.</a>
+  
+  
+  <div class=copyright >
+    &copy; JuliaActuary Contributors. Last modified: November 13, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and <a href="https://julialang.org">Julia</a>.
+  </div>
+</div></div>
+    
+    
+        
+
+
+    
+    <script data-goatcounter="https://juliaactuary.goatcounter.com/count" async src="/previews/PR30//gc.zgo.at/count.js"></script>
