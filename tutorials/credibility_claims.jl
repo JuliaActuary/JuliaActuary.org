@@ -14,31 +14,42 @@ macro bind(def, element)
     end
 end
 
-# ╔═╡ 99ea4130-4805-11ed-0620-df8fbd0c2ecd
+# ╔═╡ 52b1ca34-38d5-4bf5-a00f-71b55a2d8d0a
 begin 
 	using CSV
 	using DataFramesMeta
 	using Distributions
 	using Turing
 	using MCMCChains
-	using PlutoUI
+	using PlutoUI; TableOfContents()
 	using DataFrames
 	using Logging; Logging.disable_logging(Logging.Warn);
 	using StatsFuns
 	using StatisticalRethinking
 	using CairoMakie
+	using MCMCChainsStorage, HDF5
 end
 
-# ╔═╡ 80a9acb0-a01f-4be4-b342-880452f5e402
-md"https://www.kaggle.com/competitions/ClaimPredictionChallenge/data?select=dictionary.html"
-
 # ╔═╡ 33f8f7c3-b5a5-454a-bd69-801463839fb5
+md""" # Bayesian vs Limited Fluctuation Experience Analysis
 
+Alternate title: Why actuaries should cease to care about the number 1082.
+
+## Introduction
+
+This notebook briefly discusses two approaches to experience analysis (rate setting). One traditional method, Limited Fluctuation Credibility (LFC), has been around for a very long time although was never intended to be the most accurate predictive method. However, many actuaries still discuss the notion of "full" or "partially" credible indicating a reliance on the LFC concepts.
+
+The Bayesian approach uses explicit assumptions about the statistical relationships and all data given to the model to make inferences. Small datasets lead to greater uncertainty, while larger datasets never reach a point that could be considered "fully credible", although the posterior density may narrow considerably.
+
+This notebook argues that the Bayesian approach is superior to the LFC heuristics and should be adopted more widely in actuarial practice.
+
+The example will use an auto-claims dataset and will use the first two years of experience to predict the third.
+"""
 
 # ╔═╡ fc27cba8-8559-404a-b278-2e1f5b6c072b
 md"""
 
-## Limited Fluction Credibility
+## Limited Fluctuation Credibility
 
 > The Limited Fluctuation Method was so named because it allowed premiums to fluctuate fromyear to year based on experience, while limiting those fluctuations by giving less than full credibility to premiums based on limited data. In contrast, setting premium rates by giving full credibility to recent experience could be called the Full Fluctuation Method. While every credibility method serves to limit fluctuations, this method acquired its name because it was the first. The Limited Fluctuation Method, also known as Classical Credibility, is the most widely-used credibility method because it can be relatively simple to apply. Outside North America, this method is sometimes referred to as American Credibility.
 
@@ -53,10 +64,10 @@ Observed Rate, and a Prior Rate.
 \text{Credibility-Weighted Rate} = Z × \text{Observed Rate} + (1 – Z) × \text{Prior Rate}
 ```
 
-With probability equal to $(@bind LC_p Scrubbable(0.50 : 0.01 : 0.99, default=.9, format=".0%", suffix="⇹"))
+With probability equal to $(@bind LC_p Scrubbable(0.50 : 0.01 : 0.99, default=.9, format=".0%"))
 that the
 Observed Rate does not differ from the true rate by more than 
-$(@bind LC_r Scrubbable(0.01 : 0.01 : 0.25, default=.05, format=".0%", suffix="⇹")).
+$(@bind LC_r Scrubbable(0.01 : 0.01 : 0.25, default=.05, format=".0%")).
 
 ```math
 \text{Claims for full credibility} = (\frac{\text{Z-Score}}{\text{ratio}})^{2}
@@ -74,7 +85,7 @@ Using the inputs above, we have a z-score corresponding to $LC_p of $(quantile(N
 """
 
 # ╔═╡ aeb4eeb2-8abc-41eb-8e5c-31db88589b21
-md"[Atkinson](https://www.soa.org/globalassets/assets/files/resources/tables-calcs-tools/credibility-methods-life-health-pensions.pdf) goes on to nicely summarize the square root method which assigns full crediblity, $$Z = 1$$, when the number of actual claims equals or exceeds the full crediblity threshold of $LC_full_credibility claims. 
+md"[Atkinson](https://www.soa.org/globalassets/assets/files/resources/tables-calcs-tools/credibility-methods-life-health-pensions.pdf) goes on to nicely summarize the square root method which assigns full credibility, $$Z = 1$$, when the number of actual claims equals or exceeds the full credibility threshold of $LC_full_credibility claims. 
 
 When the number of claims is less than full credibility:
 
@@ -89,7 +100,7 @@ md"""
 
 - Ignores available information: 
   - Why does our $Z$ not vary by exposures?
-  - No mechansim for a related group to inform the credibility of another
+  - No mechanism for a related group to inform the credibility of another
   - Results in a single point estimate with only approximate measure of estimate uncertainty
 - Relies on a number of assumptions/constraints:
   - That aggregated claims can be approximated by a normal distribution
@@ -108,16 +119,16 @@ P(A\mid B) = \frac{P(B \mid A) P(A)}{P(B)}
 
 This is well known to most actuaries... but generally not applied frequently in practice!
 
-The issue is that once the probability distribtuions and data become non-trivial, the formlua becomes analyically intractable. Work over the last several decades has set the stage for addressing these situations by developing algorithms that let you sample the bayesian posterior, even if you can't analytically say what that is.
+The issue is that once the probability distributions and data become non-trivial, the formula becomes analytically intractable. Work over the last several decades has set the stage for addressing these situations by developing algorithms that let you sample the Bayesian posterior, even if you can't analytically say what that is.
 
-A full overview is beyond the scope of this notebook, which is simply to demonstrate that Limited Fluctuation Crediblity is of questionable use in practice and that superior tools exist. For references on modern Bayesian statistics, see the end notes.
+A full overview is beyond the scope of this notebook, which is simply to demonstrate that Limited Fluctuation Credibility is of questionable use in practice and that superior tools exist. For references on modern Bayesian statistics, see the end notes.
 
 
 Note that this is describing a *different* from the Buhlman Bayesian approach.
 
 ### The formulation
 
-Contrary to Limited Fluctuation, the Bayesian approach forces one to be explicit about the presumed strucutre of the probability model. The flexibility of the statistical model allows one to incorporate actuarial judgement in a quantitative way. For example, in this example we assume that the claims experience of each group informs a global (hyperparameter) prior distribution which we could use as a starting point for a new type of observation. More on this once the data is introduced.
+Contrary to Limited Fluctuation, the Bayesian approach forces one to be explicit about the presumed structure of the probability model. The flexibility of the statistical model allows one to incorporate actuarial judgement in a quantitative way. For example, in this example we assume that the claims experience of each group informs a global (hyperparameter) prior distribution which we could use as a starting point for a new type of observation. More on this once the data is introduced.
 """
 
 # ╔═╡ 05d0b5b2-b622-4ba3-b826-0dc9ac1f806d
@@ -133,7 +144,8 @@ The original data is over 13 million rows, we will load an already summarized CS
 
 # ╔═╡ 92b98880-fe55-493d-85b4-25ef2fe0b584
 train,test = let
-	df = CSV.read("_data/condensed_auto_claims.csv",DataFrame,normalizenames=true)
+	pth = download("https://raw.githubusercontent.com/JuliaActuary/Learn/master/data/condensed_auto_claims.csv")
+	df = CSV.read(pth,DataFrame,normalizenames=true)
 	df.p_observed = df.claims ./ df.n
 	
 
@@ -154,17 +166,22 @@ Each group (make and model combination) has an expected claim rate $μ_i$, which
 
 # ╔═╡ d93f8d2b-ee85-4dee-9dcb-049ec314d221
 @model function model_poisson(data)
-	μ ~ Normal(0.05,0.1)
+	# hyperparameter that informs the prior for each group
+	μ ~ Normal(0.05,0.1) 
 	σ ~ Exponential(0.25)
+
+	# the random variable representing the average claim rate for each group
 	μ_i ~ filldist(Normal(μ,σ),length(unique(data.Blind_Model)))
 
+	# use the poisson appproximation to the binomial claim outcome with a 
+	# logisitc link function to keep the probability between 0 and 1
 	data.claims .~ Poisson.(data.n .* logistic.(μ_i))
 end
 
 # ╔═╡ f1698f70-9849-4013-bd88-c60db9ddb166
 md" The model is combined with the data and [Turing.jl](https://turing.ml/stable/) is used to computationally arrive at the posterior distribution for the parameters in the statistical model, $\mu$, $\mu_i$, and $\sigma$.
 
-The result of the `sample` fucntion is a set of data containing individual outcomes for the parameters that appear in proportion to the posterior probability for those parameters. In a sense, we can empirically derive the posterior distribution for each paramters."
+The result of the `sample` function is a set of data containing individual outcomes for the parameters that appear in proportion to the posterior probability for those parameters. In a sense, we can empirically derive the posterior distribution for each parameters."
 
 # ╔═╡ b4a592d2-57e8-4ce6-8fdf-8744aae72d5b
 mp = let
@@ -179,138 +196,85 @@ mp = let
 	model_poisson(condensed);
 end
 
+# ╔═╡ 1165ac0a-ca79-449c-9ca0-ba7afe0d00e3
+md"Run or download the chain:"
+
 # ╔═╡ 06866f75-d8f8-4eab-9a54-699e51473d53
-cp = sample(mp, NUTS(), 500);
+# on an M1 Macbook Air, the sampler takes about 10 minutes to run. We use saved results by default in order to avoid uneccesary website build time or to make it easier for users to open the notebook and see results quickly
+# change `use_saved_results` to false in order to rerun the chain within this notebook
+cp = let
+	use_saved_results = true
+	cp = if use_saved_results
+		pth = download("https://github.com/JuliaActuary/Learn/raw/master/data/claims_model_chain.h5")
+		 	h5open(pth, "r") do f
+  				read(f, Chains)
+			end
+	else
+		chain = sample(mp, NUTS(), 500) # this is the line that runs the MCMC sampler
+
+		# uncomment this section to save the chain to the given location
+		h5open("_data/claims_model_chain.h5", "w") do f
+		  write(f, chain)
+		end
+		chain
+	end
+	cp
+end;
+
+# ╔═╡ b0374a9f-eb42-4d76-b8b2-9469387b1ce4
+
 
 # ╔═╡ 97fc61e5-56be-4470-ba12-e021f460e8e8
-md" This is a plot of the posterior density for all of the many, many $\mu$ parameters in our model. The black line shows the the distribution which comes from our hyperparameters μ and σ. In the even of facing a new group of interest (in our case, a new make of car), this is the prior distrubtion for the expected claims rate. The model has learned this from the data itself, and serves to regularize predictions."
+md" 
+### Visualizing the Posterior Density
+
+This is a plot of the posterior density for all of the many, many $\mu$ parameters in our model. The black line shows the distribution which comes from our hyperparameters μ and σ. In the even of facing a new group of interest (in our case, a new make of car), this is the prior distribution for the expected claims rate. The model has learned this from the data itself, and serves to regularize predictions."
 
 # ╔═╡ 8984903b-7e8b-4dc8-855a-1e1090b22093
-md" ## Predictions and Results"
+md""" ## Predictions and Results
 
-# ╔═╡ f874c696-d325-4eea-b910-8c0635b3482d
-# An alternate approach to LFC where the first year becomes the prior, adjusted by data from the seonc year.
-LF2 = let 
-	# split dataset by year and recombine
-	df2005 = @subset(train,:Calendar_Year .== 2005)
-	df2006 = @subset(train,:Calendar_Year .== 2006)
-	df = outerjoin(df2005,df2006,on=:Blind_Model,renamecols= "_2005" => "_2006")
+Here we compare four predictive models:
 
-	# use 2005 actuals as LFC prior, and the overall mean if model is missing
-	μ_2005 = sum(skipmissing(df.claims_2005)) / sum(skipmissing(df.n_2005))
-	df.assumed = coalesce.(df.p_observed_2005,μ_2005)
-	
-	df.LF2_Z = min.(1, .√(coalesce.(df.claims_2006,0.) ./ LC_full_credibility))
-	df.LF2_μ = let Z = df.LF2_Z
-		# use the 2005 mean if the model not observed in 2006
-		Z .* coalesce.(df.p_observed_2006,μ_2005) .+ (1 .- Z) .* df.assumed
-	end
-	df
-end
+1. Naive, where the predicted rate for the 2007 year is the average of each groups' for 2005-2006
+2. Limitied Fluctuation Overall, where the "prior" in the LFC formula is the overall mean claim rate for 2005-2006
+3. Limited Fluctuation Year-by-Year where the "prior" in the LFC formula is the claim rate for the ith group in 2005 and updated using 2006 claim rates.
+4. Bayesian approach where the predicted claim rate is based on the bayesian model discussed above.
 
-# ╔═╡ c635df7f-0b36-47da-9a2f-3fad7fd6aa38
-claims_summary_posterior = let
-	df = @chain train begin
-		groupby(:Blind_Model)
-		@combine begin
-			:n = sum(:n)
-			:claims = sum(:claims)
-		end
-	end
-	means = map(1:length(unique(df.Blind_Model))) do i
-		d = logistic.(getindex(cp, Symbol("μ_i[$i]")).data)
-		(est = mean(d), se=std(d))
-	end
+### Predictions
 
-	df.p_observed = df.claims ./ df.n
-	df.bayes_μ = [x.est for x in means]
-	df.bayes_se = [x.se for x in means]
-	pop_μ = sum(df.claims) / sum(df.n)
-	df[!,:pop_μ] .= pop_μ
+"""
 
-	# Limited Fluctuation 
-	# using the square-root rule
-	df.LF_Z = min.(1, .√(df.claims ./ LC_full_credibility))
-	df.LF_μ = let Z = df.LF_Z
-		Z .* (df.p_observed) .+ (1 .- Z) .* pop_μ
-	end
+# ╔═╡ e22b9150-57b9-4086-8f8f-6d361ea9cd02
+md" ### Bayesian approach has lower error
 
-	# Limited Fluctuation 
-	# using the first year as the prior, 2nd year as new data
-	df2005 = @subset(train, :Calendar_Year .== 2005)
-	dict2005 = Dict(
-		model => rate 
-		for (model, rate) in zip(df2005.Blind_Model,df2005.p_observed)
-	)
-	
-	df = leftjoin(df,LF2[:,[:Blind_Model,:LF2_μ]],on=:Blind_Model,)
-	
-	df = innerjoin(df,test;on=:Blind_Model,renamecols= "_train" => "_test")
+Looking at the accumulated absolute error, the bayesian approach has about 16% lower error than the Limited Fluctuation approaches."
 
-	df.pred_bayes = df.n_test .* df.bayes_μ_train
-	df.pred_LF = df.n_test .* df.LF_μ_train
-	df.pred_LF2 = df.n_test .* df.LF2_μ_train
-	df.pred_naive = df.n_test .* df.p_observed_train
+# ╔═╡ 9cdc93c4-e037-4357-b9b3-85d1f64f03a7
+md"### Total Actual to Expected
 
-	df
-end
+Here, offsetting errors happen to make the naive and LF year-by-year (the latter is a good proxy for the former) such that their total A/E is better than the Bayesian approach. 
 
-	
-	
-		
-	
+Given the lower error of the Bayesian approach, one would expect that over multiple years that it would produce more accurate predictions than the alternative methods.
+"
 
-# ╔═╡ 96b5b98a-25e0-4f7d-af73-2b209b6d32a0
-let df = claims_summary_posterior
-	(
-		sum(x->x^2, df.pred_naive - df.claims_test),
-		sum(x->x^2, df.pred_bayes - df.claims_test),
-		sum(x->x^2, df.pred_LF - df.claims_test),
-		sum(x->x^2, df.pred_LF2 - df.claims_test),
-	)
-	
-end
+# ╔═╡ a8c3e301-b7cb-4131-b3dd-d048421a7894
+md""" ## Conclusion
 
-# ╔═╡ 43c97485-b776-4ea2-a62b-1e8373270bc5
-let df = claims_summary_posterior
-	f = Figure()
-	ax = Axis(f[1,1],title="Cumulative Predictive Residual Error", subtitle="(Lower is better predictive accuracy)",xlabel=L"$i^{th}$ vehicle group",ylabel=L"absolute error")
-	lines!(ax,cumsum(abs.(df.pred_LF .- df.claims_test)),label="Limited Fluctuation Overall",color=(:purple,0.5))
-	lines!(ax,cumsum(abs.(df.pred_LF2 .- df.claims_test)),label="Limited Fluctuation Year-by-Year",color=(:blue,0.5))
-	lines!(ax,cumsum(abs.(df.pred_bayes .- df.claims_test)),label="Bayesian",color=(:red,0.5))
-	lines!(ax,cumsum(abs.(df.pred_naive .- df.claims_test)),label="Naive",color=(:grey10,0.5))
-	# xlims!(0,40)
-	# Legend(f[1,1],[s1,s2],["LFC"halign=:right,valign=:top)
-	axislegend(ax,position=:rb)
-	f
-end
+This notebook shows that the bayesian approach results in claims predictions with less total predictive error than the limited fluctuation method.
 
-# ╔═╡ 6af923fc-56cd-45b9-9a07-34265c756130
-let df = claims_summary_posterior
-	[sum(df.pred_LF),sum(df.pred_bayes),sum(df.pred_naive)] ./ sum(df.claims_test)
-end
+### Further thoughts
 
-# ╔═╡ 67b240ac-6e11-48fa-9327-e28237804b53
-let 
-	post = claims_summary_posterior
-	X = @chain vcat(train,test) begin
-		groupby(:Calendar_Year)
-		@combine :claim_rate = sum(:claims) / sum(:n)
-	end
-	f = Figure()
-	ax = Axis(f[1,1])
-	scatter!(ax,X.Calendar_Year,X.claim_rate, label="data")
-	scatter!(ax,[2007],[sum(post.pred_bayes)/sum(post.n_test)], label="Bayes", marker=:hline,markersize=30)
-	scatter!(ax,[2007],[sum(post.pred_LF)/sum(post.n_test)], label="LF Overall",marker=:hline,markersize=30)
-	scatter!(ax,[2007],[sum(post.pred_LF2)/sum(post.n_test)], label="LF Year-by-Year",marker=:hline,markersize=30)
-	scatter!(ax,[2007],[sum(post.pred_naive)/sum(post.n_test)], label="naive",marker=:hline,markersize=30)
-	axislegend(ax,position=:rb)
-	ylims!(0.005,0.008)
-	f
-end
+The Bayesian approach could be extended to improve its accuracy even further:
+
+- Using vehicle make data to add more hierarchical structure to the statistical model. For example, one may observe that Porsches experience crashes at a higher rate than Volvos. LFC cannot embed that sort of overlapping hierarchy into its framework.
+- The Bayesian hyperparameter provides a framework to think about "unseen" make-model combinations
+"""
+
+# ╔═╡ 42201302-e8ed-4ec3-86ac-f5288b060f4a
+md"## Appendices"
 
 # ╔═╡ 5c8ec074-0148-4bba-92a0-2ac27886a7b5
-md" ## Misc utility functions"
+md" ### 1. Misc utility functions"
 
 # ╔═╡ 9f979421-d35c-473b-b384-f575c2e8dadd
 """
@@ -347,6 +311,124 @@ end
 # ╔═╡ 33709da6-9a38-4621-81b2-130ce5613d53
 dplot(cp, "μ")
 
+# ╔═╡ d36b68a2-c445-4642-b0b7-ffdc743f7742
+md" Additional legwork to get the alternate limited fluctuation approach data:"
+
+# ╔═╡ f874c696-d325-4eea-b910-8c0635b3482d
+# An alternate approach to LFC where the first year becomes the prior, adjusted by data from the seonc year.
+LF2 = let 
+	# split dataset by year and recombine
+	df2005 = @subset(train,:Calendar_Year .== 2005)
+	df2006 = @subset(train,:Calendar_Year .== 2006)
+	df = outerjoin(df2005,df2006,on=:Blind_Model,renamecols= "_2005" => "_2006")
+
+	# use 2005 actuals as LFC prior, and the overall mean if model is missing
+	μ_2005 = sum(skipmissing(df.claims_2005)) / sum(skipmissing(df.n_2005))
+	df.assumed = coalesce.(df.p_observed_2005,μ_2005)
+	
+	df.LF2_Z = min.(1, .√(coalesce.(df.claims_2006,0.) ./ LC_full_credibility))
+	df.LF2_μ = let Z = df.LF2_Z
+		# use the 2005 mean if the model not observed in 2006
+		Z .* coalesce.(df.p_observed_2006,μ_2005) .+ (1 .- Z) .* df.assumed
+	end
+	df
+end
+
+# ╔═╡ c635df7f-0b36-47da-9a2f-3fad7fd6aa38
+claims_summary_posterior = let
+	# combine the dataset by model
+	df = @chain train begin
+		groupby(:Blind_Model)
+		@combine begin
+			:n = sum(:n)
+			:claims = sum(:claims)
+		end
+	end
+	pop_μ = sum(df.claims) / sum(df.n)
+	df[!,:pop_μ] .= pop_μ
+
+	## Bayesian prediction
+	# get the mean of the posterior estimate for the ith model group
+	means = map(1:length(unique(df.Blind_Model))) do i
+		d = logistic.(getindex(cp, Symbol("μ_i[$i]")).data)
+		(est = mean(d), se=std(d))
+	end
+
+	df.p_observed = df.claims ./ df.n
+	df.bayes_μ = [x.est for x in means]
+	df.bayes_se = [x.se for x in means]
+
+	## Limited Fluctuation (square root rule)
+	# using overall population mean
+	# using the square-root rule
+	df.LF_Z = min.(1, .√(df.claims ./ LC_full_credibility))
+	df.LF_μ = let Z = df.LF_Z
+		Z .* (df.p_observed) .+ (1 .- Z) .* pop_μ
+	end
+
+	## Limited Fluctuation 
+	# using the first year as the prior, 2nd year as new data
+	# using some additional procesing to get the LF2 dataframe, see appendix
+	df2005 = @subset(train, :Calendar_Year .== 2005)
+	dict2005 = Dict(
+		model => rate 
+		for (model, rate) in zip(df2005.Blind_Model,df2005.p_observed)
+	)
+	
+	df = leftjoin(df,LF2[:,[:Blind_Model,:LF2_μ]],on=:Blind_Model,)
+	
+	df = innerjoin(df,test;on=:Blind_Model,renamecols= "_train" => "_test")
+
+	# predictions on the test set using the predictive rates time exposures
+	df.pred_bayes = df.n_test .* df.bayes_μ_train
+	df.pred_LF = df.n_test .* df.LF_μ_train
+	df.pred_LF2 = df.n_test .* df.LF2_μ_train
+	df.pred_naive = df.n_test .* df.p_observed_train
+
+	df
+end
+
+	
+	
+		
+	
+
+# ╔═╡ 43c97485-b776-4ea2-a62b-1e8373270bc5
+let df = claims_summary_posterior
+	f = Figure()
+	ax = Axis(f[1,1],title="Cumulative Predictive Residual Error", subtitle="(Lower is better predictive accuracy)",xlabel=L"$i^{th}$ vehicle group",ylabel=L"absolute error")
+	lines!(ax,cumsum(abs.(df.pred_LF .- df.claims_test)),label="Limited Fluctuation Overall",color=(:purple,0.5))
+	lines!(ax,cumsum(abs.(df.pred_LF2 .- df.claims_test)),label="Limited Fluctuation Year-by-Year",color=(:blue,0.5))
+	lines!(ax,cumsum(abs.(df.pred_bayes .- df.claims_test)),label="Bayesian",color=(:red,0.5))
+	lines!(ax,cumsum(abs.(df.pred_naive .- df.claims_test)),label="Naive",color=(:grey10,0.5))
+	# xlims!(0,40)
+	# Legend(f[1,1],[s1,s2],["LFC"halign=:right,valign=:top)
+	axislegend(ax,position=:rb)
+	f
+end
+
+# ╔═╡ 67b240ac-6e11-48fa-9327-e28237804b53
+let 
+	post = claims_summary_posterior
+	X = @chain vcat(train,test) begin
+		groupby(:Calendar_Year)
+		@combine :claim_rate = sum(:claims) / sum(:n)
+	end
+	f = Figure()
+	ax = Axis(f[1,1],xlabel="year",ylabel="claims rate")
+	scatter!(ax,X.Calendar_Year,X.claim_rate, label="data")
+	scatter!(ax,[2007],[sum(post.pred_bayes)/sum(post.n_test)], label="Bayes", marker=:hline,markersize=30)
+	scatter!(ax,[2007],[sum(post.pred_LF)/sum(post.n_test)], label="LF Overall",marker=:hline,markersize=30)
+	scatter!(ax,[2007],[sum(post.pred_LF2)/sum(post.n_test)], label="LF Year-by-Year",marker=:hline,markersize=30)
+	scatter!(ax,[2007],[sum(post.pred_naive)/sum(post.n_test)], label="naive",marker=:hline,markersize=30)
+	axislegend(ax,position=:rb)
+	ylims!(0.005,0.008)
+	f
+end
+
+# ╔═╡ 309da61f-88ac-4c9b-a730-e14296e7a6bc
+md"### 2. Packages used"
+
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
@@ -355,8 +437,10 @@ CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 DataFramesMeta = "1313f7d8-7da2-5740-9ea0-a2ca25f37964"
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
+HDF5 = "f67ccb44-e63f-5c2f-98bd-6dc0ccc4ba2f"
 Logging = "56ddb016-857b-54e1-b83d-db4d58db5568"
 MCMCChains = "c7f686f2-ff18-58e9-bc7b-31028e88f75d"
+MCMCChainsStorage = "51a256e2-afd8-4c38-88d8-a98ba8ad53ca"
 PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
 StatisticalRethinking = "2d09df54-9d0f-5258-8220-54c2a3d4fbee"
 StatsFuns = "4c63d2b9-4356-54db-8cca-17b64c39e42c"
@@ -368,7 +452,9 @@ CairoMakie = "~0.9.1"
 DataFrames = "~1.3.6"
 DataFramesMeta = "~0.12.0"
 Distributions = "~0.25.76"
+HDF5 = "~0.16.12"
 MCMCChains = "~5.5.0"
+MCMCChainsStorage = "~0.1.2"
 PlutoUI = "~0.7.48"
 StatisticalRethinking = "~4.5.2"
 StatsFuns = "~1.0.1"
@@ -381,7 +467,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.8.2"
 manifest_format = "2.0"
-project_hash = "a0b33b08599e8e49ea74ea2c42d812d9ee786b8a"
+project_hash = "25c323b274864b7dd24f3761069c3306d40c3064"
 
 [[deps.ANSIColoredPrinters]]
 git-tree-sha1 = "574baf8110975760d391c710b6341da1afa48d8c"
@@ -1092,6 +1178,18 @@ git-tree-sha1 = "53bb909d1151e57e2484c3d1b53e19552b887fb2"
 uuid = "42e2da0e-8278-4e71-bc24-59509adca0fe"
 version = "1.0.2"
 
+[[deps.HDF5]]
+deps = ["Compat", "HDF5_jll", "Libdl", "Mmap", "Random", "Requires"]
+git-tree-sha1 = "19effd6b5af759c8aaeb9c77f89422d3f975ab65"
+uuid = "f67ccb44-e63f-5c2f-98bd-6dc0ccc4ba2f"
+version = "0.16.12"
+
+[[deps.HDF5_jll]]
+deps = ["Artifacts", "JLLWrappers", "LibCURL_jll", "Libdl", "OpenSSL_jll", "Pkg", "Zlib_jll"]
+git-tree-sha1 = "4cc2bb72df6ff40b055295fdef6d92955f9dede8"
+uuid = "0234f1f7-429e-5d53-9886-15a909be8d59"
+version = "1.12.2+2"
+
 [[deps.HTTP]]
 deps = ["Base64", "CodecZlib", "Dates", "IniFile", "Logging", "LoggingExtras", "MbedTLS", "NetworkOptions", "OpenSSL", "Random", "SimpleBufferStream", "Sockets", "URIs", "UUIDs"]
 git-tree-sha1 = "a97d47758e933cd5fe5ea181d178936a9fc60427"
@@ -1452,6 +1550,12 @@ deps = ["AbstractMCMC", "AxisArrays", "Compat", "Dates", "Distributions", "Forma
 git-tree-sha1 = "f5f347b828fd95ece7398f412c81569789361697"
 uuid = "c7f686f2-ff18-58e9-bc7b-31028e88f75d"
 version = "5.5.0"
+
+[[deps.MCMCChainsStorage]]
+deps = ["HDF5", "MCMCChains", "Test"]
+git-tree-sha1 = "0aa2b282637548d6a8df81167b8a301533b594d1"
+uuid = "51a256e2-afd8-4c38-88d8-a98ba8ad53ca"
+version = "0.1.2"
 
 [[deps.MCMCDiagnosticTools]]
 deps = ["AbstractFFTs", "DataAPI", "Distributions", "LinearAlgebra", "MLJModelInterface", "Random", "SpecialFunctions", "Statistics", "StatsBase", "Tables"]
@@ -1884,9 +1988,9 @@ version = "8.0.1000+0"
 
 [[deps.Qt5Base_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "Fontconfig_jll", "Glib_jll", "JLLWrappers", "Libdl", "Libglvnd_jll", "OpenSSL_jll", "Pkg", "Xorg_libXext_jll", "Xorg_libxcb_jll", "Xorg_xcb_util_image_jll", "Xorg_xcb_util_keysyms_jll", "Xorg_xcb_util_renderutil_jll", "Xorg_xcb_util_wm_jll", "Zlib_jll", "xkbcommon_jll"]
-git-tree-sha1 = "c6c0f690d0cc7caddb74cef7aa847b824a16b256"
+git-tree-sha1 = "0c03844e2231e12fda4d0086fd7cbe4098ee8dc5"
 uuid = "ea2cea3b-5b76-57ae-a6ef-0a8af62496e1"
-version = "5.15.3+1"
+version = "5.15.3+2"
 
 [[deps.QuadGK]]
 deps = ["DataStructures", "LinearAlgebra"]
@@ -2576,32 +2680,37 @@ version = "1.4.1+0"
 """
 
 # ╔═╡ Cell order:
-# ╠═80a9acb0-a01f-4be4-b342-880452f5e402
-# ╠═99ea4130-4805-11ed-0620-df8fbd0c2ecd
-# ╠═33f8f7c3-b5a5-454a-bd69-801463839fb5
+# ╟─33f8f7c3-b5a5-454a-bd69-801463839fb5
 # ╟─fc27cba8-8559-404a-b278-2e1f5b6c072b
 # ╟─19131b10-add7-447d-b199-906cb8e8d6dc
 # ╟─18718718-dc10-411d-abea-6b7467f3f65b
 # ╟─aeb4eeb2-8abc-41eb-8e5c-31db88589b21
 # ╟─165a95e3-41ad-4817-9c5f-d5a0db459b00
-# ╠═948bbc8e-ad53-4ce0-9138-4661a65ac767
+# ╟─948bbc8e-ad53-4ce0-9138-4661a65ac767
 # ╟─05d0b5b2-b622-4ba3-b826-0dc9ac1f806d
 # ╠═92b98880-fe55-493d-85b4-25ef2fe0b584
 # ╟─b1da1095-3ba5-4b6a-939c-7ba4e1e13a59
 # ╠═d93f8d2b-ee85-4dee-9dcb-049ec314d221
 # ╟─f1698f70-9849-4013-bd88-c60db9ddb166
 # ╠═b4a592d2-57e8-4ce6-8fdf-8744aae72d5b
+# ╟─1165ac0a-ca79-449c-9ca0-ba7afe0d00e3
 # ╠═06866f75-d8f8-4eab-9a54-699e51473d53
+# ╠═b0374a9f-eb42-4d76-b8b2-9469387b1ce4
 # ╟─97fc61e5-56be-4470-ba12-e021f460e8e8
 # ╠═33709da6-9a38-4621-81b2-130ce5613d53
-# ╠═8984903b-7e8b-4dc8-855a-1e1090b22093
+# ╟─8984903b-7e8b-4dc8-855a-1e1090b22093
 # ╠═c635df7f-0b36-47da-9a2f-3fad7fd6aa38
-# ╠═f874c696-d325-4eea-b910-8c0635b3482d
-# ╠═96b5b98a-25e0-4f7d-af73-2b209b6d32a0
+# ╟─e22b9150-57b9-4086-8f8f-6d361ea9cd02
 # ╠═43c97485-b776-4ea2-a62b-1e8373270bc5
-# ╠═6af923fc-56cd-45b9-9a07-34265c756130
-# ╠═67b240ac-6e11-48fa-9327-e28237804b53
-# ╠═5c8ec074-0148-4bba-92a0-2ac27886a7b5
+# ╟─9cdc93c4-e037-4357-b9b3-85d1f64f03a7
+# ╟─67b240ac-6e11-48fa-9327-e28237804b53
+# ╟─a8c3e301-b7cb-4131-b3dd-d048421a7894
+# ╟─42201302-e8ed-4ec3-86ac-f5288b060f4a
+# ╟─5c8ec074-0148-4bba-92a0-2ac27886a7b5
 # ╠═9f979421-d35c-473b-b384-f575c2e8dadd
+# ╟─d36b68a2-c445-4642-b0b7-ffdc743f7742
+# ╠═f874c696-d325-4eea-b910-8c0635b3482d
+# ╟─309da61f-88ac-4c9b-a730-e14296e7a6bc
+# ╠═52b1ca34-38d5-4bf5-a00f-71b55a2d8d0a
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
