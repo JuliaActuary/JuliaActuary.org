@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.14
+# v0.19.15
 
 using Markdown
 using InteractiveUtils
@@ -41,7 +41,7 @@ md"""
 
 ## Limited Fluctuation Credibility
 
-> The Limited Fluctuation Method was so named because it allowed premiums to fluctuate fromyear to year based on experience, while limiting those fluctuations by giving less than full credibility to premiums based on limited data. In contrast, setting premium rates by giving full credibility to recent experience could be called the Full Fluctuation Method. While every credibility method serves to limit fluctuations, this method acquired its name because it was the first. The Limited Fluctuation Method, also known as Classical Credibility, is the most widely-used credibility method because it can be relatively simple to apply. Outside North America, this method is sometimes referred to as American Credibility.
+> The Limited Fluctuation Method was so named because it allowed premiums to fluctuate from year to year based on experience, while limiting those fluctuations by giving less than full credibility to premiums based on limited data. In contrast, setting premium rates by giving full credibility to recent experience could be called the Full Fluctuation Method. While every credibility method serves to limit fluctuations, this method acquired its name because it was the first. The Limited Fluctuation Method, also known as Classical Credibility, is the most widely-used credibility method because it can be relatively simple to apply. Outside North America, this method is sometimes referred to as American Credibility.
 
 Quoted from [Atkinson, 2019](https://www.soa.org/globalassets/assets/files/resources/tables-calcs-tools/credibility-methods-life-health-pensions.pdf).
 
@@ -54,13 +54,13 @@ Observed Rate, and a Prior Rate.
 \text{Credibility-Weighted Rate} = Z × \text{Observed Rate} + (1 – Z) × \text{Prior Rate}
 ```
 
-With probability equal to $(LC_p = 0.9)
+With probability equal to $(LC_p = 0.9) (we'll call this `LC_p`)
 that the
 Observed Rate does not differ from the true rate by more than 
-$(LC_r  = 0.05).
+$(LC_r  = 0.05) (we'll call this `LC_r`).
 
 ```math
-\text{Claims for full credibility} = (\frac{\text{Z-Score}}{\text{ratio}})^{2}
+\text{Claims for full credibility} = \left(\frac{\text{Z-Score}}{\text{ratio}}\right)^{2}
 ```
 
 
@@ -114,7 +114,7 @@ The issue is that once the probability distributions and data become non-trivial
 A full overview is beyond the scope of this notebook, which is simply to demonstrate that Limited Fluctuation Credibility is of questionable use in practice and that superior tools exist. For references on modern Bayesian statistics, see the end notes.
 
 
-Note that this is describing a *different* from the Buhlman Bayesian approach.
+Note that this is describing a *different*, more first-principles approach than the the Buhlman Bayesian approach, which attempts to simply relate group experience to population experience. The Bayesian approach described here is much more general and extensible.
 
 ### The formulation
 
@@ -152,6 +152,13 @@ md"""
 
 Each group (make and model combination) has an expected claim rate $μ_i$, which is informed by the global hyperparameter $μ$ and variance $\sigma^2$. Then, the observed claims by group are assumed to be distributed according to a [Poisson distribution](https://juliaactuary.org/tutorials/poissonbinomial/).
 
+A complete overview of modern Bayesian models is beyond the scope of this notebook, but a few key points:
+
+- We are forced with the Bayesian approach to be explicit about the assumptions (versus all of the implicit assumptions of alternative techniques like LF)
+- We set *priors* which are the assumed distribution of model parameters before "learning" from the observations. With enough data, it can result in a posterior that the prior was very skeptical of beforehad.
+- With the volume of data in the training set, the priors we select here are not that important. Some comments on why they were chosen though:
+  - ``μ \sim Normal(0.05,0.1) `` says that we expect the population of auto claims rate to be centered around 
+
 """
 
 # ╔═╡ d93f8d2b-ee85-4dee-9dcb-049ec314d221
@@ -171,7 +178,7 @@ end
 # ╔═╡ f1698f70-9849-4013-bd88-c60db9ddb166
 md" The model is combined with the data and [Turing.jl](https://turing.ml/stable/) is used to computationally arrive at the posterior distribution for the parameters in the statistical model, $\mu$, $\mu_i$, and $\sigma$.
 
-The result of the `sample` function is a set of data containing individual outcomes for the parameters that appear in proportion to the posterior probability for those parameters. In a sense, we can empirically derive the posterior distribution for each parameters."
+The result of the `sample` function is a set of data containing individual outcomes for the parameters that appear in proportion to the posterior probability for those parameters. In a sense, we can empirically derive the posterior distribution for each parameter."
 
 # ╔═╡ b4a592d2-57e8-4ce6-8fdf-8744aae72d5b
 mp = let
@@ -185,6 +192,12 @@ mp = let
 	end
 	model_poisson(condensed);
 end
+
+# ╔═╡ e2ceb6cc-1037-4a6d-9e5c-534d1b9e723c
+sample(mp,Prior(),500)
+
+# ╔═╡ 6b5d2186-78ac-48ae-8529-e0dcd51d0b00
+
 
 # ╔═╡ 1165ac0a-ca79-449c-9ca0-ba7afe0d00e3
 md"Run or download the chain:"
@@ -211,14 +224,11 @@ cp = let
 	cp
 end;
 
-# ╔═╡ b0374a9f-eb42-4d76-b8b2-9469387b1ce4
-
-
 # ╔═╡ 97fc61e5-56be-4470-ba12-e021f460e8e8
 md" 
 ### Visualizing the Posterior Density
 
-This is a plot of the posterior density for all of the many, many $\mu$ parameters in our model. The black line shows the distribution which comes from our hyperparameters μ and σ. In the even of facing a new group of interest (in our case, a new make of car), this is the prior distribution for the expected claims rate. The model has learned this from the data itself, and serves to regularize predictions."
+This is a plot of the posterior density for all of the many, many $\mu$ parameters in our model. The black line shows the distribution which comes from our hyperparameters μ and σ. In the event of coming across a new group of interest (in our case, a new make of car), this is the prior distribution for the expected claims rate. The model has learned this from the data itself, and serves to regularize predictions."
 
 # ╔═╡ 8984903b-7e8b-4dc8-855a-1e1090b22093
 md""" ## Predictions and Results
@@ -226,7 +236,7 @@ md""" ## Predictions and Results
 Here we compare four predictive models:
 
 1. Naive, where the predicted rate for the 2007 year is the average of each groups' for 2005-2006
-2. Limitied Fluctuation Overall, where the "prior" in the LFC formula is the overall mean claim rate for 2005-2006
+2. Limited Fluctuation Overall, where the "prior" in the LFC formula is the overall mean claim rate for 2005-2006
 3. Limited Fluctuation Year-by-Year where the "prior" in the LFC formula is the claim rate for the ith group in 2005 and updated using 2006 claim rates.
 4. Bayesian approach where the predicted claim rate is based on the bayesian model discussed above.
 
@@ -375,7 +385,7 @@ claims_summary_posterior = let
 	df.pred_LF2 = df.n_test .* df.LF2_μ_train
 	df.pred_naive = df.n_test .* df.p_observed_train
 
-	df
+	sort!(df,:n_train,rev=true)
 end
 
 	
@@ -415,6 +425,18 @@ let
 	ylims!(0.005,0.008)
 	f
 end
+
+# ╔═╡ 1e3ac9f1-5970-4189-9a07-399808a010c1
+md"""
+## Some Remarks about the Results
+
+With limited, real-world data drawing conclusions is a little bit messy because we don't know what the ground-truth should be, but here are some thoughts that seem to be consistent with what the data and results suggest:
+
+- The Bayesian approach partially pools the data: it's an approach in-between assuming each group is independent from the rest and assuming that a single rate applies to all exposures.
+- The partial pooling limits over-fitting, which happens with the naive approach. Our Bayesian approach is somewhat skeptical of groups with low observation counts that stand out from the rest. But it also doesn't forgoe useful data, as it learns from even low exposures according to what's consistent with probability theory (Baye's rule).
+- The naive approach is pretty close to the textbook definition of over-fitting. The LF approaches appear to be under-fitting group-level as there are only $(sum(claims_summary_posterior.LF_Z_train .>= .9999)) groups with "full credibility" (``Z=1``), even though there are groups with less than "full credibility" with over 100,000 observations in the training set.
+
+"""
 
 # ╔═╡ 309da61f-88ac-4c9b-a730-e14296e7a6bc
 md"### 2. Packages used"
@@ -2679,13 +2701,14 @@ version = "1.4.1+0"
 # ╟─948bbc8e-ad53-4ce0-9138-4661a65ac767
 # ╟─05d0b5b2-b622-4ba3-b826-0dc9ac1f806d
 # ╠═92b98880-fe55-493d-85b4-25ef2fe0b584
-# ╟─b1da1095-3ba5-4b6a-939c-7ba4e1e13a59
+# ╠═b1da1095-3ba5-4b6a-939c-7ba4e1e13a59
 # ╠═d93f8d2b-ee85-4dee-9dcb-049ec314d221
 # ╟─f1698f70-9849-4013-bd88-c60db9ddb166
 # ╠═b4a592d2-57e8-4ce6-8fdf-8744aae72d5b
+# ╠═e2ceb6cc-1037-4a6d-9e5c-534d1b9e723c
+# ╠═6b5d2186-78ac-48ae-8529-e0dcd51d0b00
 # ╟─1165ac0a-ca79-449c-9ca0-ba7afe0d00e3
 # ╠═06866f75-d8f8-4eab-9a54-699e51473d53
-# ╠═b0374a9f-eb42-4d76-b8b2-9469387b1ce4
 # ╟─97fc61e5-56be-4470-ba12-e021f460e8e8
 # ╠═33709da6-9a38-4621-81b2-130ce5613d53
 # ╟─8984903b-7e8b-4dc8-855a-1e1090b22093
@@ -2694,6 +2717,7 @@ version = "1.4.1+0"
 # ╠═43c97485-b776-4ea2-a62b-1e8373270bc5
 # ╟─9cdc93c4-e037-4357-b9b3-85d1f64f03a7
 # ╟─67b240ac-6e11-48fa-9327-e28237804b53
+# ╠═1e3ac9f1-5970-4189-9a07-399808a010c1
 # ╟─a8c3e301-b7cb-4131-b3dd-d048421a7894
 # ╟─42201302-e8ed-4ec3-86ac-f5288b060f4a
 # ╟─5c8ec074-0148-4bba-92a0-2ac27886a7b5
