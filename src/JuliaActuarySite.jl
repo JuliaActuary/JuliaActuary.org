@@ -58,8 +58,8 @@ function append_notebook_links()
                 text = """\n
                     ## Run this Pluto Notebook
                     
-                    _To run this page locally, download [this file]($url) and open it with
-                    [Pluto.jl](https://plutojl.org)._
+                    To run this page locally, download [this file]($url) and open it with
+                    [Pluto.jl](https://plutojl.org).
 
                     ~~~
 
