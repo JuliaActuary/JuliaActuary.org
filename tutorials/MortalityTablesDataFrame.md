@@ -546,3 +546,31 @@ _To run this tutorial locally, download [this file](/tutorials/MortalityTablesDa
 <script>hljs.highlightAll();</script>
 
 ~~~
+
+
+## Run this Pluto Notebook
+
+_To run this page locally, download [this file](/tutorials/MortalityTablesDataFrame.jl) and open it with
+[Pluto.jl](https://plutojl.org)._
+
+~~~
+
+<link rel="stylesheet" href="/libs/highlight/github.min.css">
+<script src="/libs/highlight/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+
+~~~
+
+
+## Run this Pluto Notebook
+
+_To run this page locally, download [this file](/tutorials/MortalityTablesDataFrame.jl) and open it with
+[Pluto.jl](https://plutojl.org)._
+
+~~~
+
+<link rel="stylesheet" href="/libs/highlight/github.min.css">
+<script src="/libs/highlight/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+
+~~~
