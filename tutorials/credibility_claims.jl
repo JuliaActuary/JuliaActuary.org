@@ -161,6 +161,9 @@ A complete overview of modern Bayesian models is beyond the scope of this notebo
   - ``μ \sim Normal(-2,4) `` says that we expect the population of auto claims rate to be less than 0.5 (`logistic(-2) ≈ .12) but very wide range of possible values given the wide standard deviation.
   - ``σ \sim Exponential(0.25)`` says that we expect the standard devation of an individual group to be positive, but not super wide.
   - ``μ_i \sim Normal(μ,σ)`` is the actual prior for each group's rate of claim and is informed by the above hyperparameters. 
+- `@model` is a Turing.jl macro which enables interpreting the nice `~` syntax, which makes the Julia code look very similar to the traditional mathematical notation.
+- Note the use of broadcasting with the dot syntax (e.g. the `.` in `.~`). This tells Julia to vectorize and fuse the computation. 
+  - `data.claims .~ Poisson.(data.n .* logistic.(μ_i))` means "each value in `data.claims` is a random outcome (`.~`) distributed accroding to a corresponding Poisson distribution with ``\lambda =n \times \text{logistic}(\mu_i)`` where ``text{logistic}(\mu_i)`` is the average claims rate for each group.
 
 """
 
@@ -171,6 +174,7 @@ A complete overview of modern Bayesian models is beyond the scope of this notebo
 	σ ~ Exponential(0.25)
 
 	# the random variable representing the average claim rate for each group
+	# filldist creates a set of random variable without needing to list out each one
 	μ_i ~ filldist(Normal(μ,σ),length(unique(data.Blind_Model)))
 
 	# use the poisson appproximation to the binomial claim outcome with a 
@@ -188,7 +192,7 @@ md" The model is combined with the data and [Turing.jl](https://turing.ml/stable
 
 # ╔═╡ b4a592d2-57e8-4ce6-8fdf-8744aae72d5b
 mp = let
-	# combine the different years in the training set
+	# combine the different years in the training set 
 	condensed = @chain train begin
 		groupby(:Blind_Model)
 		@combine begin
@@ -293,6 +297,10 @@ The Bayesian approach could be extended to improve its accuracy even further:
 
 - Using vehicle make data to add more hierarchical structure to the statistical model. For example, one may observe that Porsches experience crashes at a higher rate than Volvos. LFC cannot embed that sort of overlapping hierarchy into its framework.
 - The Bayesian hyperparameter provides a framework to think about "unseen" make-model combinations
+
+### Downsides to the Bayesian approach
+
+- Computationally intensive. Complex `@models` can take very long time to run (many hours), compared to relatively quick frequentest methods like maximum likelihood estimation.
 
 ### Further Reading
 
