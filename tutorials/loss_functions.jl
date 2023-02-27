@@ -16,6 +16,9 @@ begin
 	using Optim
 end 
 
+# ╔═╡ 5081b41b-65ce-4f9d-9143-464e667e0e94
+# inspired by https://nbviewer.org/github/CamDavidsonPilon/Probabilistic-Programming-and-Bayesian-Methods-for-Hackers/blob/master/Chapter5_LossFunctions/Ch5_LossFunctions_PyMC_current.ipynb
+
 # ╔═╡ 009c828d-22b0-42f8-82fd-351a9b4a3eda
 function penalty(actual,estimated;α=2)
 	if actual > estimated
@@ -72,6 +75,13 @@ function loss_result(x,loss_function)
 	μ = chain[:μ]
 	mean(loss_function.(μ,x))
 end
+
+# ╔═╡ 1032430c-4678-4149-b69b-c4523db1b307
+md"
+
+- Squared error is posterior mean
+- Absoulte error is posterior median
+"
 
 # ╔═╡ 53f81be6-85a8-4644-a2fc-fb9afa1a434a
 let
@@ -2148,6 +2158,7 @@ version = "3.5.0+0"
 """
 
 # ╔═╡ Cell order:
+# ╠═5081b41b-65ce-4f9d-9143-464e667e0e94
 # ╠═7a9ec6ba-b653-11ed-08a8-e7c315aa5002
 # ╠═009c828d-22b0-42f8-82fd-351a9b4a3eda
 # ╠═c5ad8980-581d-4fb5-bd89-9bafa74f3e14
@@ -2162,6 +2173,7 @@ version = "3.5.0+0"
 # ╠═3cba0a55-3bd3-4450-b6a3-155fe91f0164
 # ╠═af428751-6bb1-4cf1-b958-69f44ea7d510
 # ╠═7109be91-e52c-4443-9aee-dee04e6bb72f
+# ╠═1032430c-4678-4149-b69b-c4523db1b307
 # ╠═53f81be6-85a8-4644-a2fc-fb9afa1a434a
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
