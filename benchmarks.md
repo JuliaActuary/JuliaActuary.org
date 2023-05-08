@@ -143,50 +143,6 @@ These benchmarks have been performed by others, but provide relevant information
 
 All of the benchmarked code can be found in the [JuliaActuary Learn repository](https://github.com/JuliaActuary/Learn/tree/master/Benchmarks/). Please file an issue or submit a PR request there for issues/suggestions.
 
-### Hardware
-
-Macbook Air (M1, 2020)
-
-### Software
-
-All languages/libraries are Mac M1 native unless otherwise noted
-
-#### Julia
-
-```
-Julia Version 1.7.0-DEV.938
-Commit 2b4c088ee7* (2021-04-16 20:37 UTC)
-Platform Info:
-  OS: macOS (arm64-apple-darwin20.3.0)
-  CPU: Apple M1
-  WORD_SIZE: 64
-  LIBM: libopenlibm
-  LLVM: libLLVM-11.0.1 (ORCJIT, cyclone)
-```
- 
-#### Rust
-
-```
-1.61.0-nightly (f103b2969 2022-03-12)
-```
-
-#### Python
-
-```
-Python 3.9.7
-
-numba                     0.54.1           py39hae1ba45_0
-numpy                     1.20.3           py39h4b4dc7a_0
-```
-
-#### R
-
-```
-R Under development (unstable) (2021-04-16 r80179) -- "Unsuffered Consequences"
-Copyright (C) 2021 The R Foundation for Statistical Computing
-Platform: aarch64-apple-darwin20.0 (64-bit)
-```
-
 ## Footnotes
 
 [^1] If benchmarking memoization, it's essentially benchmarking how long it takes to perform hashing in a language. While interesting, especially in the context of [incremental computing](https://scattered-thoughts.net/writing/an-opinionated-map-of-incremental-and-streaming-systems), it's not the core issue at hand. Incremental computing libraries exist for all of the modern languages discussed here.
