@@ -74,7 +74,7 @@ All of the benchmarked code can be found in the [JuliaActuary Learn repository](
 
 ## IRRs
 
-**Task:** determine the IRR for a series of cashflows 701 elements long.
+**Task:** determine the IRR for a series of cashflows 701 elements long (e.g. monthly cashflows for 60 years).
 
 ### Benchmarks
 
@@ -83,16 +83,16 @@ Times are in nanoseconds:
 ┌──────────┬──────────────────┬───────────────────┬─────────┬─────────────┬───────────────┐
 │ Language │          Package │          Function │  Median │        Mean │ Relative Mean │
 ├──────────┼──────────────────┼───────────────────┼─────────┼─────────────┼───────────────┤
-│   Python │  numpy_financial │               irr │ missing │  5339167688 │       332824x │
-│   Python │           better │ irr_binary_search │ missing │     6167798 │          384x │
-│   Python │           better │        irr_newton │ missing │      945813 │           59x │
-│    Julia │ ActuaryUtilities │               irr │   16000 │       16042 │            1x │
+│   Python │  numpy_financial │               irr │ missing │   519306422 │       123146x │
+│   Python │           better │ irr_binary_search │ missing │     3045229 │          722x │
+│   Python │           better │        irr_newton │ missing │      382166 │           91x │
+│    Julia │ ActuaryUtilities │               irr │    4185 │        4217 │            1x │
 └──────────┴──────────────────┴───────────────────┴─────────┴─────────────┴───────────────┘
 ```
 
 ### Discussion
 
-The ActuaryUtilities implementation is over 300,000 times faster than `numpy_financial`, and 59 to 384 times faster than the `better` Python package. The [ActuaryUtilities.jl](/#actuaryutilitiesjl) implementation is also more flexible, as it can be given an argument with timepoints, similar to Excel's `XIRR`.
+The ActuaryUtilities implementation is over 100,000 times faster than `numpy_financial`, and 91 to 722 times faster than the `better` Python package. The [ActuaryUtilities.jl](/#actuaryutilitiesjl) implementation is also more flexible, as it can be given an argument with timepoints, similar to Excel's `XIRR`.
 
 Excel was used to attempt a benchmark, but the `IRR` formula returned a `#DIV/0!` error.
 
