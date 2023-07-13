@@ -5,7 +5,6 @@
 @def rss_pubdate = Date(2020,9,27)
 @def rss = "Evolving actuarial analysis by going back to the statistical basics"
 
-
 # Modern Bayesian Statistics for Actuaries
 
 One of the first probabilistic theorems everyone learns is Bayes' Theorem, but that theorem is conspicuously absent from most applications and practice. The reason for this is that outside of trivial introductory examples ("you tested positive for a disease...") is that Bayes' Theorem becomes intractably complicated to calculate the posterior distribution. Modern advances in computing power, algorithms, and open-source libraries have made it possible to start applying the most powerful theorem to much more complex problems.
@@ -62,7 +61,7 @@ Moreover, the availability of open-source libraries, such as Turing.jl, PyMC3, a
 
 Two ways one might react to subjectivity in a Bayesian context: it's a feature that should be embraced or it’s a flaw that should be avoided.
 
-### As a feature
+### Subjectivity as a feature
 
 **A Bayesian approach to defining a statistical model is an approach that allows for explicitly incorporating actuarial judgment.** Establishing prior beliefs in a Bayesian model would force the actuary to be explicit about othewise fuzzy predilections. The explicit assumption is also more amenable to productive debate about its merits and biases than an implicit judgemental override.
 
