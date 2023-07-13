@@ -134,4 +134,23 @@
   </atom:author>
         
 </item>
+
+<item>
+  <title>
+    <![CDATA[  Modern Bayesian Statistics for Actuaries  ]]>
+  </title>
+  <link> https://JuliaActuary.org/blog/bayesian_intro/index.html </link>
+  <guid> https://JuliaActuary.org/blog/bayesian_intro/index.html </guid>
+  <description>
+    <![CDATA[  Evolving actuarial analysis by going back to the statistical basics  ]]>
+  </description>  
+    
+  <pubDate>Sun, 27 Sep 2020 00:00:00 +0000</pubDate>  
+  
+  
+  <atom:author>
+    <atom:name>Alec Loudenback</atom:name>
+  </atom:author>
+        
+</item>
 </channel></rss>
