@@ -37,9 +37,10 @@ The main advantages of this approach over traditional actuarial techniques are:
 With the Bayesian approach, there are a handful of things that are challenging. Many of the listed items are not unique to the Bayesian approach, but there are different facets of the issues that arise.
 
 1. **Model Construction** - One must be thoughtful about the model and how variables interact. However, with the flexibility of modeling, you can apply (actuarial) science to makes better models! 
-2. **Model Diagnostics** Instead of R^2 values, there are unique diagnostics that one must monitor to ensure that the posterior sampling 
+2. **Model Diagnostics** - Instead of R^2 values, there are unique diagnostics that one must monitor to ensure that the posterior sampling 
 Algorithm choice
 3. **Model Complexity and Size of Data** - The sampling algorithms are computationally intensive - as the amount of data grows and model complexity grows, the runtime demands cluster computing.
+4. **Model Representation** - The statistical derivation of the posterior can only reflect the complexity of the world as defined by your model. A Bayesian model won't automatically infer all possible real-world relationships and constraints.
 
 ## Why now?
 
