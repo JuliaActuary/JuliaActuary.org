@@ -8,7 +8,7 @@
 
 # Modern Bayesian Statistics for Actuaries
 
-One of the first probabilistic theorems everyone learns is Bayes' Theorem, but that theorem is conspicuously absent from most applications and practice. The reason for this is that outside of trivial introductory examples ("you tested positive for a disease, given the test's false positive/negative rates and population rates, what's the probability you have the disease?") that Bayes' Theorem becomes intractably complicated to calculate. Modern advances in computing power, algorithms, and open-source libraries have made it possible to start applying the most powerful theorem to much more complex problems.
+One of the first probabilistic theorems everyone learns is Bayes' Theorem, but that theorem is conspicuously absent from most applications and practice. The reason for this is that outside of trivial introductory examples ("you tested positive for a disease...") is that Bayes' Theorem becomes intractably complicated to calculate the posterior distribution. Modern advances in computing power, algorithms, and open-source libraries have made it possible to start applying the most powerful theorem to much more complex problems.
 
 The advantage of this is that actuaries can now apply these techniques to problems in a principled and flexible way to understand uncertainty better than we have before by explicitly looking at the posterior distribution of the parameters in our model.
 
@@ -21,7 +21,7 @@ A Bayesian statistical model has four main components to focus on:
 3. **Data** which we use to update our prior beliefs
 4. **Posterior** distributions of our random variables, conditioned on the observed data and our model
 
-Having defined the first two components and collected our data, the workflow involves computationally sampling the posterior distribution, often using a technique called Markov Chain Monte-Carlo (MCMC)[^1]. The result is a series of values that are sampled statistically from the posterior distribution.
+Having defined the first two components and collected our data, the workflow involves computationally sampling the posterior distribution, often using a technique called Markov Chain Monte-Carlo (MCMC). The result is a series of values that are sampled statistically from the posterior distribution.
 
 ## Advantages of the Bayesian Approach
 
@@ -29,12 +29,12 @@ The main advantages of this approach over traditional actuarial techniques are:
 
 1. **Focus on distributions rather than point estimates of the posterior's mean or mode.** We are often interested in the distribution of the parameters and a focus on a single parameter estimate will understate the risk distribution.
 2. **Model flexibility.** A Bayesian model can be as simple as an ordinary linear regression, but as complex as modeling a full insurance mechanics.
-3. **Simpler mental model.** Fundamentally, Bayes' theorem could be distilled down to an approach where you count the ways that things could occur and update your beliefs accordingly. 
+3. **Simpler mental model.** Fundamentally, Bayes' theorem could be distilled down to an approach where you count the ways that things could occur and update your beliefs accordingly.
 4. **Explicit Assumptions.**: Enumerating the random variables in your model and explicitly parameterizing prior beliefs avoids ambiguity of the assumptions inside the statistical model.
 
 ## Challenges with the Bayesian Approach
 
-With the Bayesian approach, there are a handful of things that are challenging. Many of the listed items are not unique to the Bayesian approach, but there are different facets of the issue.
+With the Bayesian approach, there are a handful of things that are challenging. Many of the listed items are not unique to the Bayesian approach, but there are different facets of the issues that arise.
 
 1. **Model Construction** - One must be thoughtful about the model and how variables interact. However, with the flexibility of modeling, you can apply (actuarial) science to makes better models! 
 2. **Model Diagnostics** Instead of R^2 values, there are unique diagnostics that one must monitor to ensure that the posterior sampling 
@@ -51,23 +51,25 @@ For example, when estimating an unknown quantity, a Bayesian probability interva
 
 *Practically*, recent advances in computational power, algorithm development, and open-source libraries have enabled practitioners to adapt the Bayesian workflow.
 
-Deriving the posterior distribution is analytically intractable so computational methods must be used. Advances in raw computing power only in the 1990's made non-trivial Bayesian analysis possible, and recent advances in algorithms have made the computations more efficient. Many problems require the use of compute clusters to manage runtime, but if there is any place to invest in understanding posterior probability distributions, its insurance companies trying to manage risk!
+Deriving the posterior distribution is analytically intractable so computational methods must be used. Advances in raw computing power only in the 1990's made non-trivial Bayesian analysis possible, and recent advances in algorithms have made the computations more efficient. For example, one of the most popular algorithms, NUTS, was only published in the 2010's. 
+
+Many problems require the use of compute clusters to manage runtime, but if there is any place to invest in understanding posterior probability distributions, its insurance companies trying to manage risk!
 
 Moreover, the availability of open-source libraries, such as Turing.jl, PyMC3, and Stan provide access to the core routines in an accessible interface.
 
-## Subjectivity?
+## Subjectivity of the Priors?
 
-Two ways one might think about subjectivity in a Bayesian context: it's a feature that should be embraced or it’s a flaw that should be avoided.
+Two ways one might react to subjectivity in a Bayesian context: it's a feature that should be embraced or it’s a flaw that should be avoided.
 
-### As a feature 
+### As a feature
 
-**A Bayesian approach to defining a statistical model is an approach that allows for explicitly incorporating actuarial judgment.**
+**A Bayesian approach to defining a statistical model is an approach that allows for explicitly incorporating actuarial judgment.** Establishing prior beliefs in a Bayesian model would force the actuary to be explicit about othewise fuzzy predilections. The explicit assumption is also more amenable to productive debate about its merits and biases than an implicit judgemental override.
 
 ### Subjectivity as a flaw
 
 Subjectivity is inherent in all useful statistical methods. Subjectivity in traditional approaches include how the data was collected, which hypothesis to test, what significant levels to use, and assumptions about the data-generating processes. 
 
-In fact, the "objective" approach to null hypothesis testing is so prone to abuse and misinterpretation that in 2016, the American Statistical Association issued a statement intended to steer statistical analysis into a post `post p<0.05 era`. That `p<0.05` approach is embedded in most traditional approaches to actuarial credibility.
+In fact, the "objective" approach to null hypothesis testing is so prone to abuse and misinterpretation that in 2016, the American Statistical Association issued a statement intended to steer statistical analysis into a "post p<0.05 era". That "p<0.05" approach is embedded in most traditional approaches to actuarial credibility[^1] and therefore should be similarly reconsidered.
 
 ### Maximum Entropy Distributions
 
@@ -98,3 +100,5 @@ For actuaries interested in learning more, there are number of available resourc
 - Bayesian Data Analysis (Gelman, et. al.)
 
 Additionally, the author has published a few examples of actuarial analysis on JuliaActuary.org
+
+[^1]: Note that the approach discussed here is much more encompassing than the Buhlman-Straub Bayesian approach described in the Actuarial literature.
