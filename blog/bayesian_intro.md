@@ -15,9 +15,9 @@ The advantage of this is that actuaries can now apply these techniques to proble
 
 A Bayesian statistical model has four main components to focus on:
 
-1. **Prior** beliefs about the random variables related to the problem at hand.
+1. **Prior** encoding assumptions about the random variables related to the problem at hand, before conditioning on the data.
 2. A **Model** which defines how the random variables give rise to the observed outcome
-3. **Data** which we use to update our prior beliefs
+3. **Data** which we use to update our prior prior assumptions
 4. **Posterior** distributions of our random variables, conditioned on the observed data and our model
 
 Having defined the first two components and collected our data, the workflow involves computationally sampling the posterior distribution, often using a technique called Markov Chain Monte-Carlo (MCMC). The result is a series of values that are sampled statistically from the posterior distribution.
@@ -28,8 +28,8 @@ The main advantages of this approach over traditional actuarial techniques are:
 
 1. **Focus on distributions rather than point estimates of the posterior's mean or mode.** We are often interested in the distribution of the parameters and a focus on a single parameter estimate will understate the risk distribution.
 2. **Model flexibility.** A Bayesian model can be as simple as an ordinary linear regression, but as complex as modeling a full insurance mechanics.
-3. **Simpler mental model.** Fundamentally, Bayes' theorem could be distilled down to an approach where you count the ways that things could occur and update your beliefs accordingly.
-4. **Explicit Assumptions.**: Enumerating the random variables in your model and explicitly parameterizing prior beliefs avoids ambiguity of the assumptions inside the statistical model.
+3. **Simpler mental model.** Fundamentally, Bayes' theorem could be distilled down to an approach where you count the ways that things could occur and update the probabilities accordingly.
+4. **Explicit Assumptions.**: Enumerating the random variables in your model and explicitly parameterizing prior assumptions avoids ambiguity of the assumptions inside the statistical model.
 
 ## Challenges with the Bayesian Approach
 
@@ -49,6 +49,14 @@ There are both philosophical and practical reasons why Bayesian analysis is rapi
 
 For example, when estimating an unknown quantity, a Bayesian probability interval can be directly understood as having a high probability of containing that quantity. In contrast, a frequentist confidence interval is typically interpreted only in the context of a series of similar inferences that could be made in repeated practice. In recent years, there has been a growing emphasis on interval estimation rather than hypothesis testing in applied statistics. This shift has strengthened the Bayesian perspective since it is likely that many users of standard confidence intervals intuitively interpret them in a manner consistent with Bayesian thinking.
 
+Another meaningful way to understand the contrast between Bayesian and frequentist approaches is through the lens of decision theory, specifically how each view treats the concept of randomness. This perspective pertains to whether you regard the data being random or the parameters being random.
+
+Frequentist statistics treats parameters as fixed and unknown, and the data as random - this is reflective of the view that data you collect is but one realization of an infinitely repeatable random process. Consequently, frequentist procedures, like hypothesis testing or confidence intervals, are generally based on the idea of long-run frequency or repeatable sampling.
+
+Conversely, Bayesian statistics turns this on its head by treating the data as fixed - after all, once you've collected your data, it's no longer random but a fixed observed quantity. Parameters, which are unknown, are treated as random variables. The Bayesian approach then allows us to use probability to quantify our uncertainty about these parameters.
+
+From a practical perspective, the Bayesian approach tends to align more closely with our intuitive way of reasoning about problems. Often, you are given specific data and you want to understand what that particular set of data tells you about the world. You're likely less interested in what might happen if you had infinite data, but rather in drawing the best conclusions you can from the data you do have.
+
 *Practically*, recent advances in computational power, algorithm development, and open-source libraries have enabled practitioners to adapt the Bayesian workflow.
 
 Deriving the posterior distribution is analytically intractable so computational methods must be used. Advances in raw computing power only in the 1990's made non-trivial Bayesian analysis possible, and recent advances in algorithms have made the computations more efficient. For example, one of the most popular algorithms, NUTS, was only published in the 2010's. 
@@ -63,7 +71,7 @@ Two ways one might react to subjectivity in a Bayesian context: it's a feature t
 
 ### Subjectivity as a feature
 
-**A Bayesian approach to defining a statistical model is an approach that allows for explicitly incorporating actuarial judgment.** Establishing prior beliefs in a Bayesian model would force the actuary to be explicit about othewise fuzzy predilections. The explicit assumption is also more amenable to productive debate about its merits and biases than an implicit judgemental override.
+**A Bayesian approach to defining a statistical model is an approach that allows for explicitly incorporating actuarial judgment.** Encoding assumptions into a Bayesian model forces the actuary to be explicit about othewise fuzzy predilections. The explicit assumption is also more amenable to productive debate about its merits and biases than an implicit judgemental override.
 
 ### Subjectivity as a flaw
 
