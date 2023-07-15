@@ -9,7 +9,7 @@
 
 One of the first probabilistic theorems everyone learns is Bayes' Theorem, but that theorem is conspicuously absent from most applications and practice. The reason for this is that outside of trivial introductory examples ("you tested positive for a disease...") is that Bayes' Theorem becomes intractably complicated to calculate the posterior distribution. Modern advances in computing power, algorithms, and open-source libraries have made it possible to start applying the most powerful theorem to much more complex problems.
 
-The advantage of this is that actuaries can now apply these techniques to problems in a principled and flexible way to understand uncertainty better than we have before by explicitly looking at the posterior distribution of the parameters in our model.
+The advantage of this is that actuaries can now apply these techniques to problems in a principled and flexible way to understand uncertainty better than we have before by explicitly looking at the posterior distribution of the parameters in our model. This would serve to enhance risk management via moving away from singular estimates of model parameters to a culture of considering the parameter distribution of modeled risk.
 
 ## What is modern Bayesian Statistics?
 
@@ -17,7 +17,7 @@ A Bayesian statistical model has four main components to focus on:
 
 1. **Prior** encoding assumptions about the random variables related to the problem at hand, before conditioning on the data.
 2. A **Model** which defines how the random variables give rise to the observed outcome
-3. **Data** which we use to update our prior prior assumptions
+3. **Data** which we use to update our prior assumptions
 4. **Posterior** distributions of our random variables, conditioned on the observed data and our model
 
 Having defined the first two components and collected our data, the workflow involves computationally sampling the posterior distribution, often using a technique called Markov Chain Monte-Carlo (MCMC). The result is a series of values that are sampled statistically from the posterior distribution.
@@ -70,7 +70,7 @@ Two ways one might react to subjectivity in a Bayesian context: it's a feature t
 
 ### Subjectivity as a feature
 
-**A Bayesian approach to defining a statistical model is an approach that allows for explicitly incorporating actuarial judgment.** Encoding assumptions into a Bayesian model forces the actuary to be explicit about othewise fuzzy predilections. The explicit assumption is also more amenable to productive debate about its merits and biases than an implicit judgemental override.
+**A Bayesian approach to defining a statistical model is an approach that allows for explicitly incorporating actuarial judgment.** Encoding assumptions into a Bayesian model forces the actuary to be explicit about otherwise fuzzy predilections. The explicit assumption is also more amenable to productive debate about its merits and biases than an implicit judgmental override.
 
 ### Subjectivity as a flaw
 
@@ -96,9 +96,17 @@ However, to the extent that actuaries have leaned on ML approaches due to the sh
 - Missing data: mechanisms to handle the different kinds of missing data
 - Model averaging: posteriors can be combined from different models to synthesize different approaches
 
+## Implications for Risk Management
+
+Like Bayes' Formula itself, another aspect of actuarial literature that is taught but often glossed over in practice is the difference between process risk (volatility), parameter risk, and model formulation risk. Often when performing analysis that relies on stochastic result, in practice only process/volatility risk is assessed. 
+
+Bayesian statistics provides the tools to help actuaries address parameter risk and model formulation. The posterior distribution of parameters derived is consistent with the observed data and modeled relationships. This posterior distribution of parameters can then be run as an additional dimension to the risk analysis. 
+
+Additionally, best practices include skepticism of the model construction itself, and testing different formulation of the modeled relationships and variable combinations to identify models which are best fit for purpose. Tools such as Information Criterion, posterior predictive checks, Bayes factors, and other statistical diagnostics can inform the actuary about tradeoffs between different choices of model. 
+
 ## Paving the way forward for Actuaries
 
-Bayesian approaches to statistical problems are rapidly changing the professional statistical field. To the extent that the actuarial profession incorporates statistical procedures we should consider adopting the same practices. The benefits of this are a better understanding of the distribution of risks, results that are more interpretable and explainable, and techniques that can applied to a wider range of problems.
+Bayesian approaches to statistical problems are rapidly changing the professional statistical field. To the extent that the actuarial profession incorporates statistical procedures we should consider adopting the same practices. The benefits of this are a better understanding of the distribution of risks, results that are more interpretable and explainable, and techniques that can applied to a wider range of problems. The combination of these things would serve to enhance actuarial best practices related to understanding and communicating about risk.
 
 For actuaries interested in learning more, there are number of available resources to be found. Textbooks recommended by the author are:
 
@@ -108,4 +116,4 @@ For actuaries interested in learning more, there are number of available resourc
 
 Additionally, the author has published a few examples of actuarial analysis on JuliaActuary.org
 
-[^1]: Note that the approach discussed here is much more encompassing than the Buhlman-Straub Bayesian approach described in the Actuarial literature.
+[^1]: Note that the approach discussed here is much more encompassing than the Bühlmann-Straub Bayesian approach described in the Actuarial literature.
