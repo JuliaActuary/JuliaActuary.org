@@ -114,6 +114,6 @@ For actuaries interested in learning more, there are number of available resourc
 - Bayes Rules! (Johnson, Ott, Dogucu)
 - Bayesian Data Analysis (Gelman, et. al.)
 
-Additionally, the author has published a few examples of actuarial analysis on JuliaActuary.org
+Additionally, the author has published a few examples of Bayesian analysis in an actuarial context on JuliaActuary.org
 
 [^1]: Note that the approach discussed here is much more encompassing than the Bühlmann-Straub Bayesian approach described in the Actuarial literature.
