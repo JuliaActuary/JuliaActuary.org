@@ -101,7 +101,7 @@ let
 	n = 25
 	colors = ColorSchemes.Johnson
 	ax = Axis(f[1,1],yscale=log10,ylabel="index value",
-		title="$n realizations of 4 correlated equity funds")
+		title="$n realizations of 4 correlated equity funds per AAA ESG")
 	for s in scens[1:n]
 		for i in 1:4
 		lines!(ax,cumprod(exp.(s[i,:])), color=(colors[i],0.3),label="fund $i")
