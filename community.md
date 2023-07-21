@@ -44,7 +44,8 @@ Benchmarks of Actuarial workflows can be found on the [Benchmarks](/benchmarks/)
 
 ### Miscellaneous
 
-- [Interactive exploration](/tutorials/PlutoESG/) of the AAA's Economic Scenario Generator
+- [Interactive exploration](/tutorials/PlutoESG/) of the AAA's Economic Scenario Generator for interest rates
+- [A notebook replicating the AAA's equity scenario generator](/tutorials/AAA_equity/)
 - [A comparison](/tutorials/USTreasury/) of U.S. Treasury CMT rates
 - [Interactive mortality table comparison tool](/tutorials/MortalityTableComparison/) for any `mort.soa.org` table
 - [Interactive cashflow analysis](/tutorials/CashflowAnalysis/)
