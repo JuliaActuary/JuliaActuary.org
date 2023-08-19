@@ -1,0 +1,4 @@
+Sitemap: https://thirsty-davinci-e0b972.netlify.app/previews/PR38/sitemap.xml
+
+User-agent: *
+Disallow:
