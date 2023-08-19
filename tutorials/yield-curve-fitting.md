@@ -5,27 +5,33 @@ Given rates and maturities, we can fit the yield curves with different technique
 Below, we specify that the rates should be interpreted as `Continuous`ly compounded zero rates:
 
 ```julia
-using Yields
+using FinanceModels, FinanceCore
 
 rates = Continuous.([0.01, 0.01, 0.03, 0.05, 0.07, 0.16, 0.35, 0.92, 1.40, 1.74, 2.31, 2.41] ./ 100)
 mats = [1/12, 2/12, 3/12, 6/12, 1, 2, 3, 5, 7, 10, 20, 30]
+
+quotes = ZCBYield.(rates,mats)
 ```
 
-Then fit the rates under four methods:
+Then fit the rates under six methods:
 
 - Nelson-Siegel
 - Nelson-Siegel-Svensson
-- Bootstrapping with splines (the default `Bootstrap` option)
+- Smith-Wilson
 - Bootstrapping with linear splines
+- Bootstrapping with quadratic splines
+- Bootstrapping with cubic splines
 
 ```julia
-ns =  Yields.Zero(NelsonSiegel(),                   rates,mats)
-nss = Yields.Zero(NelsonSiegelSvensson(),           rates,mats)
-b =   Yields.Zero(Bootstrap(),                      rates,mats)
-bl =  Yields.Zero(Bootstrap(Yields.LinearSpline()), rates,mats)
+ns =  fit(Yield.NelsonSiegel(),              quotes)
+nss = fit(Yield.NelsonSiegelSvensson(),      quotes)
+nss = fit(Yield.SmithWilson(ufr=0.05,α=0.1), quotes)
+bl =  fit(Spline.Linear(),                   quotes, Fit.Bootstrap())
+bq =  fit(Spline.Quadratic(),                quotes, Fit.Bootstrap())
+bc =  fit(Spline.Cubic(),                    quotes, Fit.Bootstrap())
 ```
 
-That's it! We've fit the rates using four different techniques. These can now be used in a variety of ways, such as calculating the `present_value`, `duration`, or `convexity` of different cashflows if you imported [ActuaryUtilities.jl](https://github.com/JuliaActuary/ActuaryUtilities.jl)
+That's it! We've used the FinanceModels.jl `fit` method to construct yield curves using four different techniques. These can now be used in a variety of ways, such as calculating the `present_value`, `duration`, or `convexity` of different cashflows if you imported [ActuaryUtilities.jl](https://github.com/JuliaActuary/ActuaryUtilities.jl)
 
 A visualization of the different curves:
 

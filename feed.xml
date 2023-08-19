@@ -23,6 +23,25 @@
 
 <item>
   <title>
+    <![CDATA[  FinanceModels.jl - Evolving the JuliaActuary Ecosystem  ]]>
+  </title>
+  <link> https://JuliaActuary.org/blog/finance_models/index.html </link>
+  <guid> https://JuliaActuary.org/blog/finance_models/index.html </guid>
+  <description>
+    <![CDATA[  FinanceModels.jl - Evolving the JuliaActuary Ecosystem  ]]>
+  </description>  
+    
+  <pubDate>Sat, 19 Aug 2023 00:00:00 +0000</pubDate>  
+  
+  
+  <atom:author>
+    <atom:name>Alec Loudenback</atom:name>
+  </atom:author>
+        
+</item>
+
+<item>
+  <title>
     <![CDATA[  JuliaActuary and Hacktoberfest 2022  ]]>
   </title>
   <link> https://JuliaActuary.org/blog/hacktoberfest2022/index.html </link>
