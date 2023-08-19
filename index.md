@@ -60,14 +60,16 @@ MortalityTable (Insured Lives Mortality):
 
 ```julia-repl
 
-julia> using Yields
+julia> using FinanceModels
 
 julia> maturities = [0.5, 1.0, 1.5, 2.0]
 julia> rates      = [5.0, 5.8, 6.4, 6.8] ./ 100
+julia> quotes     = ZCBYield.(rates,maturities)
 
-julia> rf_curve = Yields.Zero(rates,maturities)
+julia> rf_curve = fit(Spline.Cubic(), quotes, Fit.Bootstrap())
 
-               ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀Yield Curve (Yields.YieldCurve)⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+
+               ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀Yield Curve (FinanceModels.YieldCurve)⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
                ┌────────────────────────────────────────────────────────────┐
            0.4 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ Zero rates
                │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
@@ -141,7 +143,7 @@ julia> convexity(discount_rate, cashflows)
 ```julia
 using LifeContingencies
 using MortalityTables
-using Yields
+using FinanceModels
 
 # load mortality rates from MortalityTables.jl
 vbt2015 = MortalityTables.table("2015 VBT Smoker Distinct Male Non-Smoker ALB")
@@ -151,7 +153,7 @@ life = SingleLife(                       # The life underlying the risk
     mort = vbt2015.select[issue_age],    # -- Mortality rates
 )
 
-yield = Yields.Constant(0.05)            # Using a flat 5% interest rate
+yield = Yield.Constant(0.05)            # Using a flat 5% interest rate
 
 ins = Insurance(life, yield)             # alternate way to construct
 
@@ -197,14 +199,14 @@ These packages are available for use in your project.
 [`ActuaryUtilities.jl`](/packages/#actuaryutilitiesjl)
 - Robust and fast calculations for `internal_rate_of_return`, `duration`, `convexity`, `present_value`, `breakeven`, and more. 
 
-[`Yields.jl`](/packages/#yieldsjl)
-- Simple and composable yield curves and calculations.
+[`FinanceModels.jl`](/packages/#FinanceModelsjl)
+- Composable contracts, models, and functions that allow for modeling of both simple and complex financial instruments. 
 
 [`ExperienceAnalysis.jl`](/packages/#experienceanalysisjl)
 - Meeting your exposure calculation needs.
 
 [`EconomicScenarioGenerators.jl`](/packages/#economicscenariogeneratorsjl)
-- Easy-to-use scenario generation that's Yields.jl compatible.
+- Easy-to-use scenario generation that's FinanceModels.jl compatible.
 
 # JuliaActuary Community
 
@@ -230,6 +232,8 @@ Then check out the [Community](/community) page!
   - Why Julia works so well for actuarial science.
 - [Hacktoberfest 2022](/blog/hacktoberfest2022/)
   - Contribute to open source in this community event.
+- [FinanceModels.jl Announcement](/blog/finance_models/)
+  - Yields.jl has evolved into FinanceModels.jl.
 
 
 ~~~
