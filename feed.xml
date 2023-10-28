@@ -42,6 +42,25 @@
 
 <item>
   <title>
+    <![CDATA[  Modern Bayesian Statistics for Actuaries  ]]>
+  </title>
+  <link> https://JuliaActuary.org/blog/bayesian_intro/index.html </link>
+  <guid> https://JuliaActuary.org/blog/bayesian_intro/index.html </guid>
+  <description>
+    <![CDATA[  Evolving actuarial analysis by going back to the statistical basics  ]]>
+  </description>  
+    
+  <pubDate>Thu, 13 Jul 2023 00:00:00 +0000</pubDate>  
+  
+  
+  <atom:author>
+    <atom:name>Alec Loudenback</atom:name>
+  </atom:author>
+        
+</item>
+
+<item>
+  <title>
     <![CDATA[  JuliaActuary and Hacktoberfest 2022  ]]>
   </title>
   <link> https://JuliaActuary.org/blog/hacktoberfest2022/index.html </link>
@@ -143,25 +162,6 @@
   <guid> https://JuliaActuary.org/blog/julia-actuaries/index.html </guid>
   <description>
     <![CDATA[  Julia is a new programming language that&#39;s ideally suited for most actuarial workflows.  ]]>
-  </description>  
-    
-  <pubDate>Sun, 27 Sep 2020 00:00:00 +0000</pubDate>  
-  
-  
-  <atom:author>
-    <atom:name>Alec Loudenback</atom:name>
-  </atom:author>
-        
-</item>
-
-<item>
-  <title>
-    <![CDATA[  Modern Bayesian Statistics for Actuaries  ]]>
-  </title>
-  <link> https://JuliaActuary.org/blog/bayesian_intro/index.html </link>
-  <guid> https://JuliaActuary.org/blog/bayesian_intro/index.html </guid>
-  <description>
-    <![CDATA[  Evolving actuarial analysis by going back to the statistical basics  ]]>
   </description>  
     
   <pubDate>Sun, 27 Sep 2020 00:00:00 +0000</pubDate>  
