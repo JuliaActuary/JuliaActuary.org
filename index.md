@@ -224,8 +224,8 @@ Then check out the [Community](/community) page!
 
 - [Coding the Future](/blog/coding-for-the-future/)
   - Building the insurance company of tomorrow by being a 10x actuary.
-- [Julia for Actuaries](/blog/julia-actuaries/) 
-  - Why Julia works so well for actuarial science. 
+- [Julia for Actuaries](/blog/julia-actuaries/)
+  - Why Julia works so well for actuarial science.
 - [Getting Started with Julia for Actuaries](/blog/julia-getting-started-actuaries/)
   - Getting started with Julia with a bent towards things actuaries care about.
 - [The Life Modeling Problem: A Comparison of Julia, Rust, Python, and R](/blog/life-modeling-problem/) 
@@ -234,6 +234,8 @@ Then check out the [Community](/community) page!
   - Contribute to open source in this community event.
 - [FinanceModels.jl Announcement](/blog/finance_models/)
   - Yields.jl has evolved into FinanceModels.jl.
+- [odern Bayesian Statistics for Actuaries](/blog/bayesian_intro/)
+  - Evolving actuarial analysis by going back to the statistical basics.
 
 
 ~~~
