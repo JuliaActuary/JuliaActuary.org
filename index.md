@@ -234,7 +234,7 @@ Then check out the [Community](/community) page!
   - Contribute to open source in this community event.
 - [FinanceModels.jl Announcement](/blog/finance_models/)
   - Yields.jl has evolved into FinanceModels.jl.
-- [odern Bayesian Statistics for Actuaries](/blog/bayesian_intro/)
+- [Modern Bayesian Statistics for Actuaries](/blog/bayesian_intro/)
   - Evolving actuarial analysis by going back to the statistical basics.
 
 
