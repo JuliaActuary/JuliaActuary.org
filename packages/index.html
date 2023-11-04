@@ -257,7 +257,7 @@ discount(m_spread + m_rate,<span class=hljs-number >0</span>,<span class=hljs-nu
 <span class=hljs-comment ># compute the present value of a contract (a cashflow of 10 at time 3)</span>
 present_value(m_rate,Cashflow(<span class=hljs-number >10</span>,<span class=hljs-number >3</span>)) <span class=hljs-comment ># 9.15...</span></code></pre>
 <h2 id=overview_of_financemodels ><a href="#overview_of_financemodels" class=header-anchor >Overview of FinanceModels</a></h2>
-<p><img src="/docs/src/assets/relations.png" alt="A conceptual sketch of FinanceModels.jl" /></p>
+<p><img src="/blog/assets/relations.png" alt="A conceptual sketch of FinanceModels.jl" /></p>
 <p>Often we start with observed or assumed values for existing contracts. We want to then use those assumed values to extend the valuation logic to new contracts. For example, we may have a set of bond yields which we then want to discount a series of insurance obligations.</p>
 <p>In the language of FinanceModels, we would have a set of <code>Quote</code>s which are used to fit a <code>Model</code>. That model is then used to <code>discount</code> a new series of cashflows.</p>
 <p>That&#39;s just an example, and we can use the various components in different ways depending on the objective of the analysis.</p>
