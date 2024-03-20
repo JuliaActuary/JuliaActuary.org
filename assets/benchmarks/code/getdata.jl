@@ -8,4 +8,4 @@ benchmarks = CSV.read(file,DataFrame)
 benchmarks.relative_mean = benchmarks.mean ./ minimum(benchmarks.mean)
 header = (["Language", "Algorithm", "Function name", "Median","Mean","Relative Mean"],
                  [ "",       "",    "",      "[nanoseconds]","[nanoseconds]",""]);
-pretty_table(benchmarks;header,formatters = ft_printf("%'.1d"))
+pretty_table(benchmarks;header,formatters = ft_printf("%0.1d"))
