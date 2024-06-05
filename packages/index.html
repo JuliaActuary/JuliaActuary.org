@@ -409,19 +409,29 @@ convert(FinanceModels.Continuous(),r)          # convert monthly rate to continu
 <p>Meeting your exposure calculation needs.</p>
 </blockquote>
 <h3 id=quickstart__4 ><a href="#quickstart__4" class=header-anchor >Quickstart</a></h3>
-<pre><code class="julia hljs"><span class=hljs-keyword >using</span> ExperienceAnalysis
-<span class=hljs-keyword >using</span> Dates
+<pre><code class="julia hljs">df = DataFrame(
+    policy_id = <span class=hljs-number >1</span>:<span class=hljs-number >3</span>,
+    issue_date = [Date(<span class=hljs-number >2020</span>,<span class=hljs-number >5</span>,<span class=hljs-number >10</span>), Date(<span class=hljs-number >2020</span>,<span class=hljs-number >4</span>,<span class=hljs-number >5</span>), Date(<span class=hljs-number >2019</span>, <span class=hljs-number >3</span>, <span class=hljs-number >10</span>)],
+    end_date = [Date(<span class=hljs-number >2022</span>, <span class=hljs-number >6</span>, <span class=hljs-number >10</span>), Date(<span class=hljs-number >2022</span>, <span class=hljs-number >8</span>, <span class=hljs-number >10</span>), Date(<span class=hljs-number >2022</span>,<span class=hljs-number >12</span>,<span class=hljs-number >31</span>)],
+    status = [<span class=hljs-string >&quot;claim&quot;</span>, <span class=hljs-string >&quot;lapse&quot;</span>, <span class=hljs-string >&quot;inforce&quot;</span>]
+)
 
-issue = Date(<span class=hljs-number >2016</span>, <span class=hljs-number >7</span>, <span class=hljs-number >4</span>)
-termination = Date(<span class=hljs-number >2020</span>, <span class=hljs-number >1</span>, <span class=hljs-number >17</span>)
-basis = ExperienceAnalysis.Anniversary(Year(<span class=hljs-number >1</span>))
-exposure(basis, issue, termination)</code></pre>
-<p>This will return an array of tuples with a <code>from</code> and <code>to</code> date:</p>
-<pre><code class="julia hljs"><span class=hljs-number >4</span>-element <span class=hljs-built_in >Array</span>{<span class=hljs-built_in >NamedTuple</span>{(:from, :to),<span class=hljs-built_in >Tuple</span>{Date,Date}},<span class=hljs-number >1</span>}:
- (from = Date(<span class=hljs-string >&quot;2016-07-04&quot;</span>), to = Date(<span class=hljs-string >&quot;2017-07-04&quot;</span>))
- (from = Date(<span class=hljs-string >&quot;2017-07-04&quot;</span>), to = Date(<span class=hljs-string >&quot;2018-07-04&quot;</span>))
- (from = Date(<span class=hljs-string >&quot;2018-07-04&quot;</span>), to = Date(<span class=hljs-string >&quot;2019-07-04&quot;</span>))
- (from = Date(<span class=hljs-string >&quot;2019-07-04&quot;</span>), to = Date(<span class=hljs-string >&quot;2020-01-17&quot;</span>))</code></pre>
+df.policy_year = exposure.(
+    ExperienceAnalysis.Anniversary(Year(<span class=hljs-number >1</span>)),
+    df.issue_date,
+    df.end_date,
+    df.status .== <span class=hljs-string >&quot;claim&quot;</span>; <span class=hljs-comment ># continued exposure</span>
+    study_start = Date(<span class=hljs-number >2020</span>, <span class=hljs-number >1</span>, <span class=hljs-number >1</span>),
+    study_end = Date(<span class=hljs-number >2022</span>, <span class=hljs-number >12</span>, <span class=hljs-number >31</span>)
+)
+
+df = flatten(df, :policy_year)
+
+df.exposure_fraction =
+        map(e -&gt; yearfrac(e.from, e.to + Day(<span class=hljs-number >1</span>), DayCounts.Thirty360()), df.policy_year) 
+<span class=hljs-comment ># + Day(1) above because DayCounts has Date(2020, 1, 1) to Date(2021, 1, 1) as an exposure of 1.0</span>
+<span class=hljs-comment ># here we end the interval at Date(2020, 12, 31), so we need to add a day to get the correct exposure fraction.</span></code></pre>
+<table><tr><th align=right ><strong>policy&#95;id</strong>&lt;br&gt;<code>Int64</code><th align=right ><strong>issue&#95;date</strong>&lt;br&gt;<code>Date</code><th align=right ><strong>end&#95;date</strong>&lt;br&gt;<code>Date</code><th align=right ><strong>status</strong>&lt;br&gt;<code>String</code><th align=right ><strong>policy&#95;year</strong>&lt;br&gt;<code>@NamedTuple&#123;from::Date, to::Date, policy\_timestep::Int64&#125;</code><th align=right ><strong>exposure&#95;fraction</strong>&lt;br&gt;<code>Float64</code><tr><td align=right >1<td align=right >2020-05-10<td align=right >2022-06-10<td align=right >claim<td align=right >&#40;from &#61; Date&#40;&quot;2020-05-10&quot;&#41;, to &#61; Date&#40;&quot;2021-05-09&quot;&#41;, policy&#95;timestep &#61; 1&#41;<td align=right >1.0<tr><td align=right >1<td align=right >2020-05-10<td align=right >2022-06-10<td align=right >claim<td align=right >&#40;from &#61; Date&#40;&quot;2021-05-10&quot;&#41;, to &#61; Date&#40;&quot;2022-05-09&quot;&#41;, policy&#95;timestep &#61; 2&#41;<td align=right >1.0<tr><td align=right >1<td align=right >2020-05-10<td align=right >2022-06-10<td align=right >claim<td align=right >&#40;from &#61; Date&#40;&quot;2022-05-10&quot;&#41;, to &#61; Date&#40;&quot;2023-05-09&quot;&#41;, policy&#95;timestep &#61; 3&#41;<td align=right >1.0<tr><td align=right >2<td align=right >2020-04-05<td align=right >2022-08-10<td align=right >lapse<td align=right >&#40;from &#61; Date&#40;&quot;2020-04-05&quot;&#41;, to &#61; Date&#40;&quot;2021-04-04&quot;&#41;, policy&#95;timestep &#61; 1&#41;<td align=right >1.0<tr><td align=right >2<td align=right >2020-04-05<td align=right >2022-08-10<td align=right >lapse<td align=right >&#40;from &#61; Date&#40;&quot;2021-04-05&quot;&#41;, to &#61; Date&#40;&quot;2022-04-04&quot;&#41;, policy&#95;timestep &#61; 2&#41;<td align=right >1.0<tr><td align=right >2<td align=right >2020-04-05<td align=right >2022-08-10<td align=right >lapse<td align=right >&#40;from &#61; Date&#40;&quot;2022-04-05&quot;&#41;, to &#61; Date&#40;&quot;2022-08-10&quot;&#41;, policy&#95;timestep &#61; 3&#41;<td align=right >0.35<tr><td align=right >3<td align=right >2019-03-10<td align=right >2022-12-31<td align=right >inforce<td align=right >&#40;from &#61; Date&#40;&quot;2020-01-01&quot;&#41;, to &#61; Date&#40;&quot;2020-03-09&quot;&#41;, policy&#95;timestep &#61; 1&#41;<td align=right >0.191667<tr><td align=right >3<td align=right >2019-03-10<td align=right >2022-12-31<td align=right >inforce<td align=right >&#40;from &#61; Date&#40;&quot;2020-03-10&quot;&#41;, to &#61; Date&#40;&quot;2021-03-09&quot;&#41;, policy&#95;timestep &#61; 2&#41;<td align=right >1.0<tr><td align=right >3<td align=right >2019-03-10<td align=right >2022-12-31<td align=right >inforce<td align=right >&#40;from &#61; Date&#40;&quot;2021-03-10&quot;&#41;, to &#61; Date&#40;&quot;2022-03-09&quot;&#41;, policy&#95;timestep &#61; 3&#41;<td align=right >1.0<tr><td align=right >3<td align=right >2019-03-10<td align=right >2022-12-31<td align=right >inforce<td align=right >&#40;from &#61; Date&#40;&quot;2022-03-10&quot;&#41;, to &#61; Date&#40;&quot;2022-12-31&quot;&#41;, policy&#95;timestep &#61; 4&#41;<td align=right >0.808333</table>
 <h3 id=available_exposure_basis ><a href="#available_exposure_basis" class=header-anchor >Available Exposure Basis</a></h3>
 <ul>
 <li><p><code>ExperienceAnalysis.Anniversary&#40;period&#41;</code> will give exposures periods based on the first date</p>
@@ -589,7 +599,7 @@ s = ScenarioGenerator(
   
   
   <div class=copyright >
-    &copy; JuliaActuary Contributors. Last modified: March 20, 2024. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and <a href="https://julialang.org">Julia</a>.
+    &copy; JuliaActuary Contributors. Last modified: June 05, 2024. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and <a href="https://julialang.org">Julia</a>.
   </div>
 </div></div>
     
