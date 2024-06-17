@@ -1,0 +1,229 @@
+---
+header-includes:
+  - |
+    <script src="https://cdn.jsdelivr.net/npm/swiffy-slider@1.6.0/dist/js/swiffy-slider.min.js" crossorigin="anonymous" defer></script>
+  - |
+    <link href="https://cdn.jsdelivr.net/npm/swiffy-slider@1.6.0/dist/css/swiffy-slider.min.css" rel="stylesheet" crossorigin="anonymous">
+
+
+---
+
+::: {.column-page .hero}
+::: {.column-page .hero-fullwidth}
+Practical, extensible, and open-source actuarial modeling and analysis. 
+:::
+
+::: {.grid .column-page .hero-grid}
+
+
+::: {.hero-child}
+### High-Performance Computing
+
+Designed for speed and efficiency, enabling high-performance numerical computing, quantitative analysis, modeling, and simulation.
+:::
+
+::: {.hero-child}
+### Domain-Specific Ecosystem
+
+Extensive ecosystem of libraries and tools catering to technical computing, data science, machine learning, and domain-specific tasks in finance and actuarial science.
+:::
+
+::: {.hero-child}
+### Productivity and Interoperability
+
+Clean, readable syntax, comprehensive documentation, and seamless integration with existing languages and tools enhance productivity and accessibility for a wide range of users.
+:::
+
+:::
+:::
+
+**JuliaActuary** is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.
+
+**Julia** is [an ideal language for Actuaries](/blog/julia-actuaries/) and other financial professionals.
+
+
+It is free, open-source software and you can [join the development on Github](https://github.com/JuliaActuary/).
+
+
+## Code Examples
+
+```{=html}
+<div class="swiffy-slider slider-item-reveal slider-nav-autoplay slider-nav-autopause slider-nav-dark slider-indicators-dark " data-slider-nav-autoplay-interval="7500">
+    <ul class="slider-container">
+        <li>
+        <div class="code-carousel">
+          <div class="top">
+    <span class="code-example-head" >Getting Mortality Tables</span>
+  </div>
+```
+
+```julia-repl
+julia> using MortalityTables
+
+julia> MortalityTables.table("2015 VBT Smoker Distinct Male Non-Smoker ALB")
+MortalityTable (Insured Lives Mortality):
+   Name:
+       2015 VBT Smoker Distinct Male Non-Smoker ALB
+   Fields:
+       (:select, :ultimate, :metadata)
+   Provider:
+       American Academy of Actuaries along with the Society of Actuaries
+   mort.SOA.org ID:
+       3269
+   mort.SOA.org link:
+       https://mort.soa.org/ViewTable.aspx?&TableIdentity=3269
+   Description:
+       2015 Valuation Basic Table (VBT) Smoker Distinct Table...
+```
+
+```{=html}
+       </div>
+        </li>
+        <li>
+        <div class="code-carousel">
+          <div class="top">
+        <span class="code-example-head" >Working with Yield Curves</span>
+  </div>
+
+```
+
+```julia-repl
+
+julia> using FinanceModels
+
+julia> maturities = [0.5, 1.0, 1.5, 2.0]
+julia> rates      = [5.0, 5.8, 6.4, 6.8] ./ 100
+julia> quotes     = ZCBYield.(rates,maturities)
+
+julia> rf_curve = fit(Spline.Cubic(), quotes, Fit.Bootstrap())
+
+
+               ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀Yield Curve (FinanceModels.YieldCurve)⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+               ┌────────────────────────────────────────────────────────────┐
+           0.4 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ Zero rates
+               │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+               │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+               │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⡠⠤⠒⠋│
+               │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⠤⠖⠊⠉⠁⠀⠀⠀⠀│
+               │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⡤⠔⠒⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+               │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⡠⠤⠒⠊⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+   Periodic(1) │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⡠⠤⠖⠊⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+               │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⡠⠤⠖⠊⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+               │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⡠⠤⠒⠊⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+               │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⡤⠤⠒⠋⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+               │⠀⠀⠀⠀⠀⠀⠀⣀⡠⠤⠖⠒⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+               │⠀⢀⡠⠤⠒⠋⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+               │⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+             0 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+               └────────────────────────────────────────────────────────────┘
+               ⠀0⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀time⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀30⠀
+```
+
+```{=html}
+
+
+        </div></li>
+                <li>
+        <div class="code-carousel">
+                <div class="code-carousel">
+          <div class="top">
+        <span class="code-example-head" >Financial Maths</span>
+  </div>
+```
+
+```julia-repl
+
+julia> using ActuaryUtilities
+
+julia> cashflows = [5, 5, 105]
+julia> discount_rate = 0.03
+
+julia> present_value(discount_rate, cashflows)           
+105.65
+
+julia> duration(Macaulay(), discount_rate, cashflows)    
+2.86
+
+julia> duration(discount_rate, cashflows)                
+2.78
+
+julia> convexity(discount_rate, cashflows)               
+10.62
+```
+
+```{=html}
+
+
+        </div></li>
+                <li>
+        <div class="code-carousel">
+                <div class="code-carousel">
+          <div class="top">
+        <span class="code-example-head" >Life Contingencies</span>
+  </div>
+```
+
+```julia
+using LifeContingencies
+using MortalityTables
+using FinanceModels
+
+# load mortality rates from MortalityTables.jl
+vbt2015 = MortalityTables.table("2015 VBT Smoker Distinct Male Non-Smoker ALB")
+
+issue_age = 30
+life = SingleLife(                       # The life underlying the risk
+    mort = vbt2015.select[issue_age],    # -- Mortality rates
+)
+
+yield = Yield.Constant(0.05)            # Using a flat 5% interest rate
+
+ins = Insurance(life, yield)             # alternate way to construct
+
+# Summary Scalars
+present_value(ins)                       # The actuarial present value
+premium_net(lc)                          # Net whole life premium 
+V(lc,5)                                  # Net premium reserve for whole life insurance at time 5
+```
+
+```{=html}
+
+
+        </div></li>
+
+    </ul>
+
+    <button type="button" class="slider-nav"></button>
+    <button type="button" class="slider-nav slider-nav-next"></button>
+
+    <div class="slider-indicators">
+        <button class="active"></button>
+        <button></button>
+        <button></button>
+        <button></button>
+    </div>
+</div>
+    
+```
+
+## Packages
+
+These packages are available for use in your project. See more on the [Packages page](/packages.qmd).
+
+[`MortalityTables.jl`](/packages/#mortalitytablesjl)
+  - Easily work with standard [mort.SOA.org](https://mort.soa.org/) tables and parametric models with common survival calculations.
+
+[`LifeContingencies.jl`](/packages/#lifecontingenciesjl)
+- Insurance, annuity, premium, and reserve maths.
+
+[`ActuaryUtilities.jl`](/packages/#actuaryutilitiesjl)
+- Robust and fast calculations for `internal_rate_of_return`, `duration`, `convexity`, `present_value`, `breakeven`, and more. 
+
+[`FinanceModels.jl`](/packages/#FinanceModelsjl)
+- Composable contracts, models, and functions that allow for modeling of both simple and complex financial instruments. 
+
+[`ExperienceAnalysis.jl`](/packages/#experienceanalysisjl)
+- Meeting your exposure calculation needs.
+
+[`EconomicScenarioGenerators.jl`](/packages/#economicscenariogeneratorsjl)
+- Easy-to-use scenario generation that's FinanceModels.jl compatible.

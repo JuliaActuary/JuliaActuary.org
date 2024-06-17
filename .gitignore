@@ -5,3 +5,5 @@ franklin.pub
 node_modules/
 _rss/
 Manifest.toml
+
+/.quarto/

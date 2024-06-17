@@ -1,0 +1,231 @@
+---
+title: "Nested Projection Mechanics"
+categories: [modeling,benchmark, actuaryutilities, tutorial]
+---
+```{julia}
+#| echo: false
+#| output: false
+using Pkg
+Pkg.activate(".")
+Pkg.instantiate()
+```
+
+
+A simple example of how one could define a nested projection system. Includes the following examples:
+- Outer loop policy projections only
+- Outer + Inner loop policy projections with padded cashflows determining reserves and capital
+- Outer + Inner loop with a stochastic interest rate for the reserves
+
+In this notebook, we define a term life policy, implement the mechanics for "outer" projected values, as well as "inner" projections so that we can determine a projection-based reserve. This is done with both a deterministic and stochastic "inner" loop.
+
+
+```{julia}
+using ActuaryUtilities
+using DataFrames
+using Setfield
+```
+
+## Policy Data & Methods
+
+We will use a simple Term policy as an example for the mechanics. We don't need to, but to illustrate that we could easily implement different product types, we first define an `abstract type` for `Policy`s, and then the specific `Term` implementation.
+
+The type annotations aren't strictly necessary, but knowing the types in advance helps Julia specialize the code for it.
+
+```{julia}
+abstract type Policy end
+
+struct Term <: Policy
+    inforce::Float64 # count of inforce
+    term::Int        # length of benefit period (in months)
+    premium::Float64
+    face::Float64
+end
+```
+
+
+For consistency across different calculated amounts, we will keep the function signature consistent, even if not all of the arguments are used:
+
+```
+(policy,assumptions,time) -> result
+```
+
+```{julia}
+
+premiums(pol::Term, assumptions, time) = pol.inforce * pol.premium / 12
+
+qx(pol::Term, assumptions, time) = assumptions.q / 12
+
+deaths(pol::Term, assumptions, time) = pol.inforce * qx(pol, assumptions, time)
+
+claims(pol::Term, assumptions, time) = deaths(pol, assumptions, time) * pol.face
+```
+
+## Projection Assumptions
+
+We define some global assumptions that get passed around. It's good practice (and performant) to pass variables into functions instead of just referring to global variable values.
+
+```{julia}
+assumptions = (
+    q=0.012,
+    int_reserve=0.02,
+    capital_factor=0.1, # rate * reserves
+)
+```
+
+### Inner-loop assumption
+
+In this example, we're assuming just a PADed mortality rate for the inner loop. We take the assumption set and use `Setfield.@set` to return a new immutable named tuple with just that value modified:
+
+```{julia}
+innerloop_assumption(outer_assump) = @set outer_assump.q *= 1.2
+```
+
+## Projection Logic
+
+The architecture takes inspiration from web server architecture where data is passed through multiple processing steps before being returned. The logic is contained within a function called `project`, which:
+
+1. Project a single timestep and create a tuple of values: `(policy, assumptions, result)`
+2. Apply the function `additional_processing` which takes as an argument `(policy, assumptions, result)`.
+3. `additional_processing` can then define an "inner" loop, which could just be to apply the `project` with a modified set of assumptions. In this way, one or more "inner" loops can be defined.
+4. The final `additional_processing` function should return whatever you want to return as a result.
+
+By default, the `additional_processing` will simply return the last argument, `result` and therefore will not have any inner loops.
+
+
+```{julia}
+"""
+	project(policy,assumptions;start_time=1,additional_processing=res)
+
+The kwarg `additional_processing` defines an intermediate processing step where one can take the current model state and perform additional work, including nested projections. If left out of the arguments, the default for `additional_processing` is `res`, where `res` is (pol,assumptions, result)->result (ie will just return the model point's results with no additional work being done).
+
+"""
+function project(
+    pol::Term,
+    assumptions;
+    start_time=1,
+    additional_processing=(pol, assumptions, result) -> result
+)
+
+    # alias the assumptions to A for brevity
+    A = assumptions
+
+
+    # iterate over the policy from the start time to the end of the policy's term
+    map(start_time:pol.term) do t
+        # calculate components of the projection
+        timestep = t
+        premium = premiums(pol, A, t)
+        q = qx(pol, A, t)
+        death = deaths(pol, A, t)
+        claim = claims(pol, A, t)
+        net_cf = premium - claim
+        inforce = pol.inforce - death
+        pol = @set pol.inforce = inforce
+
+        # return a vector of name tuples with the results
+        result = (;
+            timestep,
+            premium,
+            death,
+            claim,
+            net_cf,
+            inforce,
+            q,
+        )
+
+        # apply additional processing function 
+        additional_processing(pol, A, result)
+    end
+end
+```
+
+```{julia}
+# Function signature: (policy, assumptions, result) -> updated result
+function run_inner(policy, assumptions, result)
+    additional_results = if result.timestep + 1 <= policy.term
+        A = innerloop_assumption(assumptions)
+        p = project(policy, A; start_time=result.timestep + 1)
+
+        # calculate the reserves as the present value of the 
+        # cashflows within the inner loop projections
+        # discounted at the reserve interest rate
+        reserves = -pv(A.int_reserve, [modelpoint.net_cf for modelpoint in p])
+        capital = reserves * A.capital_factor
+        (; reserves, capital)
+    else
+        reserves = 0.0
+        capital = 0.0
+        (; reserves, capital)
+
+    end
+
+    return merge(result, additional_results)
+
+end
+```
+
+And a stochastic version:
+
+```{julia}
+# Function signature: (policy, assumptions, result) -> updated result
+function run_inner_stochastic(policy, assumptions, result)
+    additional_results = if result.timestep + 1 <= policy.term
+        A = innerloop_assumption(assumptions)
+        p = project(policy, A; start_time=result.timestep + 1)
+
+        # simple stochastic interest rate 
+        n = 100
+
+        reserves = let
+            i = A.int_reserve
+            f = pv(i + 0.005 * randn(), [modelpoint.net_cf for modelpoint in p])
+
+            -sum(f for _ in 1:n) / n
+
+        end
+        capital = reserves * A.capital_factor
+        (; reserves, capital)
+    else
+        reserves = 0.0
+        capital = 0.0
+        (; reserves, capital)
+    end
+    return merge(result, additional_results)
+
+end
+```
+
+## Projections
+
+First, define a sample policy:
+
+```{julia}
+p = Term(1.0, 120, 1300.0, 100_000.0)
+```
+
+A projection without any additional processing:
+
+```{julia}
+project(p, assumptions) |> DataFrame
+```
+
+And an example which uses a PADed inner loop to determine the resserves and capital:
+
+```{julia}
+project(p, assumptions; additional_processing=run_inner) |> DataFrame
+```
+
+And a stochastic example:
+
+```{julia}
+project(p, assumptions; additional_processing=run_inner_stochastic) |> DataFrame
+```
+
+## Endnotes
+
+### Further Work
+
+This example is simple, but could be greatly optimized to reduce intermediate variable allocations, refine the timing of cashflows, add additional decrements, handle different types of `Policy`s, abstract some of the projection mechanics into an `Iterable` object, etc.
+
+### Disclaimer
+Created as a proof of concept and not indended to be interpreted as a meaningful projection.

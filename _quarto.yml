@@ -1,0 +1,48 @@
+project:
+  type: website
+
+
+website:
+  title: "JuliaActuary"
+  favicon: /assets/favicon.ico
+  site-url: "https://JuliaActuary.org"
+  navbar:
+    logo: /assets/logos/android-chrome-512x512.png
+    href: index.qmd
+    logo-alt: JuliaActuary Logo
+    right:
+      - packages.qmd
+      - learn.qmd
+      - examples.qmd
+      - benchmarks.qmd
+      - community.qmd
+      - blog.qmd
+      - icon: github
+        href: https://github.com/JuliaActuary
+      - icon: rss
+        href: all-posts.xml
+
+
+format:
+  html:
+    engine: julia
+    theme: cosmo
+    css: styles.css
+    monofont: JuliaMono
+    mainfont: Inter
+    highlight: false
+    highlight-style: "none"
+    description: "JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows."
+    header-includes:
+      - |
+        <link rel="stylesheet" href="/assets/highlight/styles/github.min.css">
+      - |
+        <script src="/assets/highlight/highlight.min.js"></script>
+        <script src="/assets/highlight/languages/julia.min.js"></script>
+        <script src="/assets/highlight/languages/julia-repl.min.js"></script>
+        <script src="/assets/highlight/languages/python.min.js"></script>
+        <script src="/assets/highlight/languages/r.min.js"></script>
+        <script>hljs.highlightAll();</script>
+        <script data-goatcounter="https://juliaactuary.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+

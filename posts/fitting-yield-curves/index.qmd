@@ -1,0 +1,101 @@
+---
+title: "Fitting Rate Data to Yield Curves"
+categories: [market, yieldcurves,financemodels,tutorial]
+---
+
+```{julia}
+#| echo: false
+#| output: false
+using Pkg
+Pkg.activate(".")
+Pkg.instantiate()
+```
+
+Given rates and maturities, we can fit the yield curves with different techniques.
+
+Below, we specify that the rates should be interpreted as `Continuous`ly compounded zero rates:
+
+```{julia}
+using FinanceModels
+using Plots
+```
+
+```{julia}
+rates = Continuous.([0.01, 0.01, 0.03, 0.05, 0.07, 0.16, 0.35, 0.92, 1.40, 1.74, 2.31, 2.41] ./ 100)
+mats = [1 / 12, 2 / 12, 3 / 12, 6 / 12, 1, 2, 3, 5, 7, 10, 20, 30]
+```
+
+The above rates and associated maturities represent prices of zero coupon bonds, which we use as the financial instrument that we will fit the curve to:
+
+```{julia}
+quotes = ZCBYield.(rates, mats)
+```
+
+Fitting is then calling `fit` along with the desired curve construction technique. Here are several variants:
+
+```{julia}
+ns = fit(Yield.NelsonSiegel(), quotes);
+nss = fit(Yield.NelsonSiegelSvensson(), quotes);
+sw = fit(Yield.SmithWilson(ufr=0.05, α=0.1), quotes);
+bl = fit(Spline.Linear(), quotes, Fit.Bootstrap());
+bq = fit(Spline.Quadratic(), quotes, Fit.Bootstrap());
+bc = fit(Spline.Cubic(), quotes, Fit.Bootstrap());
+```
+
+That's it! We've fit the rates using six different techniques. These can now be used in a variety of ways, such as calculating the `present_value`, `duration`, or `convexity` of different cashflows if you imported [ActuaryUtilities.jl](https://github.com/JuliaActuary/ActuaryUtilities.jl)"
+
+## Visualizing the results
+
+```{julia}
+"""
+A helper function to plot the given curve onto the given plot figure
+"""
+function curveplot!(plot_fig, curve; label="", alpha=alpha)
+    maturities = 0.25:0.25:40
+    f(x) = rate(zero(curve, x))
+
+    plot!(plot_fig, maturities, f, label=label, line=3, alpha=alpha)
+end
+
+""" 
+a function to plot the curves, given different alpha transparency for each of the lines (used when creating animiation)
+"""
+function p(alpha=[1, 1, 1, 1, 1, 1])
+    theme(:wong2)
+    p = plot(legend=:topleft, xlabel="Tenor", ylabel="Continuous yield", grid=false)
+    scatter!(
+        mats,
+        rate.(Continuous().(rates)),
+        label="Given zero rates"
+    )
+
+    curveplot!(p, bc, label="Bootstrap (Cubic)", alpha=alpha[1])
+    curveplot!(p, bq, label="Bootstrap (Quadratic)", alpha=alpha[2])
+    curveplot!(p, bl, label="Bootstrap (Linear)", alpha=alpha[3])
+    curveplot!(p, ns, label="NelsonSiegel", alpha=alpha[4])
+    curveplot!(p, nss, label="NelsonSiegelSvensson", alpha=alpha[5])
+    curveplot!(p, sw, label="SmithWilson", alpha=alpha[6])
+    lens!([0, 3.5], [0.0, 0.0045], inset=(1, bbox(0.5, 0.5, 0.4, 0.4)))
+
+
+end
+p()
+```
+
+And an animated version:
+
+```{julia}
+#| output: false
+anim = let
+    a = [1, 0.25, 0.25, 0.25, 0.25, 0.25]
+    anim = @animate for i in 1:6
+        a = circshift(a, 1) # shift the transparency
+        p(a)
+    end
+    anim
+end
+
+gif(anim, "anim_fps2.gif", fps=2)
+```
+
+![](anim_fps2.gif)

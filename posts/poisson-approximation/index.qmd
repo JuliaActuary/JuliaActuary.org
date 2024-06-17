@@ -1,0 +1,185 @@
+---
+title: "Poisson approximation to Binomial"
+categories: [modeling,statistics,experience-analysis]
+---
+
+This notebook explores using the Poissson approximation to the Binomial. This can be useful for a number of reasons:
+
+1. The Binomial probability mass formula becomes more unwieldy for large ``N`` faster than it does for the Poisson.
+2. In actuarial, and other contexts, ``N`` can be a non-integer value (think partial period exposures) and rounding up or down could materially distort the posterior estimate if ``N`` is small.
+
+We will look at the approximation across a range of parameters ``q`` (the probabilty a binomial event occurs) and ``N`` (the number of chances for the event to occur, or "exposures"). 
+
+Under certain conditions, the Poisson distribution can approximate the Binomial, where the average number of events, ``λ=N*q``.
+
+What are those conditions? [According to Wikipedia](https://en.wikipedia.org/wiki/Binomial_distribution#Poisson_approximation): 
+
+> According to two rules of thumb, this approximation is good if n ≥ 20 and p ≤ 0.05, or if n ≥ 100 and np ≤ 10.
+
+It's not really that simple, and arguably a bit restrictive as this analysis will show.
+
+## Approach
+
+We will use Julia and Turing.jl to simulate the posterior distribution. Our prior for the parameter \$q\$ will be \${Uniform} = Beta(1,1)\$.
+
+We will sample from the posterior using the No-U-Turn (NUTS) sampler, and aggregate the results of the chains over $(trials) trials of simulated outcomes for the given \$q\$ and \$N\$.
+
+This is overkill for a toy problem where we could just model the parameters themselves, but it demonstrates using Bayesian MCMC techniques in a simple, exploratory fashion.
+
+We begin by importing the relevant packages:
+
+
+```{julia}
+using Turing
+using CairoMakie
+using StatsBase
+using MCMCChains
+using DataFrames
+using ThreadsX
+using Logging
+using Markdown
+```
+"""
+
+## Define the Models
+
+```{julia}
+@model function poisson(N,n_events) 
+	q ~ Beta(1,1)
+	
+	n_events ~ Poisson(q*N)
+end
+
+@model function binom(N,n_events) 
+	q ~ Beta(1,1)
+	
+	n_events ~ Binomial(N,q)
+end
+```
+
+## Simulation Parameters
+
+```{julia}
+trials = 30
+
+# true probabilities
+qs = [0.05,0.25,0.5,0.75,0.95]
+
+# number of observations
+Ns = [10,25,50,100,250,500,1000,5000]
+
+# combine q and N into joint model points
+model_points =  [(;q,N) for q in qs, N in Ns]
+```
+
+
+
+## Sample from the Posterior
+
+
+This is a collection of samples (chains) from Markov chains that are sampled in proportion to the posterior density. If this is new to you, I highly recommend the book *Statistical Rethinking*:
+
+```{julia}
+Logging.disable_logging(Logging.Warn); #Disable warning logs to improve sampling time
+
+bpchains = map(model_points) do mp
+	
+    ThreadsX.map(1:trials) do i
+        claims = sum(rand() < mp.q for _ in 1:mp.N)
+        bc = sample(binom(mp.N,claims), NUTS(), 500)
+        pc = sample(poisson(mp.N,claims), NUTS(), 500)
+
+        (;bc,pc)
+    end
+end
+```
+
+## Results
+
+The results indicate that the Poisson is a good fit when \$q\$ is small, where "small" depends on N, but in general it seems to provide a good fit in less restrictive cases than the "rule of thumb" quoted below. E.g. go ahead and use the Poisson approximation when you've got enough expsoures even if \$q\$ is well above \$0.10\$. The Poisson approximation also isn't terrible when \$N\$ is as low as 10 as long as \$q\$ is very small (e.g.  \$<0.05\$ ).
+
+The fit remains poor when \$q >> 0.5\$ and when \$N\$ is small.
+
+### Visualization
+
+This visualization shows the aggregated posterior distribution across all of the trials and model points. The darker shaded band indicates the middle 50% of the posterior:
+
+```{julia}
+function plot_band_under!(ax,plot,y,low,high,label="")
+    function points(plot)
+        pts = plot.plots[2].converted[1][]
+        [p[1] for p in pts], [p[2] for p in pts]
+    end    
+    xs′, ys′ = points(plot)
+
+    filt = findall(x-> (x ≥ low) && (x ≤ high),xs′)
+    typeof(xs′[filt]), typeof(fill(y,length(filt))), typeof(ys′[filt])
+    b = band!(
+        ax,
+        Float64.(xs′[filt]), 
+        Float64.(fill(y * 1.0, length(filt))), 
+        Float64.(ys′[filt]),
+        color=(plot.color.val, 0.9),transparency=true,shading = false) # 0.25 alpha
+    translate!(b,0,0,5)
+end
+
+
+let
+    f = Figure(resolution=(1280,960))
+    a = Any # outer variable to set as axis for to grab legend
+    
+    for (i,N) in enumerate(reverse(Ns))
+        ax = Axis(f[i+1,1:10],
+        xticks=qs,
+        ylabel="N=$N"
+        )
+        a = ax
+        xlims!(0,1)
+        model_idx = findall(x->x.N == N,model_points)
+
+        for n in model_idx
+            c = bpchains[n]
+            q = model_points[n].q
+            y = model_points[n].N
+            bpoints = vcat([x.bc["q"][:] for x in c]...)
+            ppoints = vcat([x.pc["q"][:] for x in c]...)
+            bqtls = quantile(bpoints,[.25,.75])
+            pqtls = quantile(ppoints,[.25,.75])
+            j = density!(
+				bpoints,
+				# linewidth=10,
+				strokewidth = 1, 
+				strokecolor = (:grey30,0.6),
+				label="Binomial",
+            	color=(:red,.25),
+            )
+            plot_band_under!(ax,j,0,bqtls[1],bqtls[2],"Binomial")
+        
+
+            j = density!(
+				ppoints, 
+				color=(:blue,.25),
+				# linewidth=10,
+				strokewidth = 1, 
+				strokecolor = (:grey30,0.6),
+				label="Poisson",
+			)
+            plot_band_under!(ax,j,0,pqtls[1],pqtls[2],"Poisson")
+
+            hideydecorations!(ax,label=false)
+        end
+
+        scatter!(
+            qs,
+            zeros(length(qs)),
+            marker = :vline,
+            markersize=20,
+            color=:grey30,
+            label="actual value"
+            )
+    end
+
+    Legend(f[1,5],a,unique=true,orientation=:horizontal)
+    f
+end
+```

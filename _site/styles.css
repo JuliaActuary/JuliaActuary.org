@@ -1,0 +1,162 @@
+/* css styles */
+/* Regular style */
+@font-face {
+    font-family: 'JuliaMono';
+    src: url('assets/webfonts/JuliaMono-Regular.woff2');
+}
+
+/* Regular Italic style */
+@font-face {
+    font-family: 'JuliaMono';
+    font-style: italic;
+    src: url('assets/webfonts/JuliaMono-RegularItalic.woff2');
+}
+
+/* Bold style */
+@font-face {
+    font-family: 'JuliaMono';
+    font-weight: bold;
+    src: url('assets/webfonts/JuliaMono-Bold.woff2');
+}
+
+/* Bold Italic style */
+@font-face {
+    font-family: 'JuliaMono';
+    font-style: italic;
+    font-weight: bold;
+    src: url('assets/webfonts/JuliaMono-BoldItalic.woff2');
+}
+
+/* Light style */
+@font-face {
+    font-family: 'JuliaMono';
+    font-weight: 300;
+    src: url('assets/webfonts/JuliaMono-Light.woff2');
+}
+
+/* Light Italic style */
+@font-face {
+    font-family: 'JuliaMono';
+    font-style: italic;
+    font-weight: 300;
+    src: url('assets/webfonts/JuliaMono-LightItalic.woff2');
+}
+
+/* Medium style */
+@font-face {
+    font-family: 'JuliaMono';
+    font-weight: 500;
+    src: url('assets/webfonts/JuliaMono-Medium.woff2');
+}
+
+/* Medium Italic style */
+@font-face {
+    font-family: 'JuliaMono';
+    font-style: italic;
+    font-weight: 500;
+    src: url('assets/webfonts/JuliaMono-MediumItalic.woff2');
+}
+
+/* SemiBold style */
+@font-face {
+    font-family: 'JuliaMono';
+    font-weight: 600;
+    src: url('assets/webfonts/JuliaMono-SemiBold.woff2');
+}
+
+/* SemiBold Italic style */
+@font-face {
+    font-family: 'JuliaMono';
+    font-style: italic;
+    font-weight: 600;
+    src: url('assets/webfonts/JuliaMono-SemiBoldItalic.woff2');
+}
+
+@font-face {
+    font-family: 'Literata';
+    /*a name to be used later*/
+    src: url('assets/webfonts/Literata.woff2');
+    /*URL to font*/
+}
+
+@font-face {
+    font-family: 'Inter';
+    /*a name to be used later*/
+    src: url('assets/webfonts/Inter-Variable.ttf');
+    /*URL to font*/
+}
+
+pre {
+    background-color: rgb(246, 248, 250);
+    border-radius: 8px;
+}
+
+
+.hero {
+    width: 100%;
+    /* height: 100vh; */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-size: 300% 300%;
+    background-image: linear-gradient(-45deg, #CB3C33, #9558B2 100%);
+    -webkit-animation: AnimateBG 40s ease infinite;
+    animation: AnimateBG 40s ease infinite;
+    color: azure;
+    padding: 10px 10px 20px 20px;
+    flex-wrap: wrap;
+}
+
+.hero-fullwidth {
+    width: 100%;
+    text-align: center;
+    font-size: x-large;
+    font-weight: 600;
+}
+
+.hero-grid {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-items: flex-start;
+    font-weight: 400;
+}
+
+.hero-child {
+    flex: 1;
+}
+
+@-webkit-keyframes AnimateBG {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+@keyframes AnimateBG {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+
+.swiffy-slider .top {
+    background-color: gainsboro;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+}

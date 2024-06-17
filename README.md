@@ -4,24 +4,11 @@ This repository contains the Franklin.jl-based website. It is generated via Gith
 
 ## Contributing
 
-Contributions are very welcome! It's very easy to contribute, especially via the notebook method below.
+Contributions are very welcome! This site is a basic Quarto website. New content can be added by creating a pull request with a new page in the `posts` folder. A blog post is distinguished from the other examples content by the simple virtue of having the `blog` category field in the topmatter of the `.qmd` file.
 
-After creating a Pull Request with your changes, a preview website will be built and an automatic comment will be made pointing to the URL.
+## Publishing
 
-### Contributing via a Pluto Notebook
-
-#### Static Notebooks
-
-The easiest way to contribute is to simply create a Pluto notebook and put it in the `/tutorials/` folder. Note that notebooks created in this way are expected to be primarily static, as the website doesn't run a live Julia server.
-
-#### Dynamic Notebooks
-
-Dynamic, interactiven notebooks should be added to the [JuliaActuary/Learn](https://github.com/JuliaActuary/Learn) repository and then follow the pattern of the tutorials that point users to use the notebook interactively ([example](https://github.com/JuliaActuary/JuliaActuary.org/blob/master/tutorials/USTreasury.md)).
-
-### Contributing a Blog Post
-
-Just by using Markdown and Julia you can create a blog post. See [examples in `/blog`](https://github.com/JuliaActuary/JuliaActuary.org/tree/master/blog).
-
+After the repository is edited, a maintainer needs to run `quarto render gh-pages` which will render the site and push to the `gh-pages` branch. The reason for this manual step and not an automated deployment is that many of the examples are too computationally expensive for a free Github Action to run. Therefore, the code needs to be run locally and then pushed to the branch which will automatically be deployed after that.
 
 ### Contributing in other ways
 

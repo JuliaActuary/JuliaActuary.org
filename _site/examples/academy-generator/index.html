@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.43">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>JuliaActuary – Replicating the AAA equtity generator</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<link rel="stylesheet" href="../../assets/highlight/styles/github.min.css">
+<script src="../../assets/highlight/highlight.min.js"></script>
+<script src="../../assets/highlight/languages/julia.min.js"></script>
+<script src="../../assets/highlight/languages/julia-repl.min.js"></script>
+<script src="../../assets/highlight/languages/python.min.js"></script>
+<script src="../../assets/highlight/languages/r.min.js"></script>
+<script>hljs.highlightAll();</script>
+
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed fullcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../assets/logos/android-chrome-512x512.png" alt="JuliaActuary Logo" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">JuliaActuary</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../packages.html"> 
+<span class="menu-text">Packages</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../learn.html"> 
+<span class="menu-text">Learn</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../examples.html"> 
+<span class="menu-text">Examples</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../benchmarks.html"> 
+<span class="menu-text">Benchmarks</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/JuliaActuary"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Replicating the AAA equtity generator</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">modeling</div>
+    <div class="quarto-category">scenario-generator</div>
+  </div>
+  </div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div id="32786141" class="cell" data-execution_count="2">
+<pre class="julia cell-code"><code>using CairoMakie
+using ColorSchemes
+using Distributions
+using LabelledArrays
+using Random</code></pre>
+</div>
+<p>This notebook replicates the model and parameters for the real world equity generator described in this <a href="https://www.actuary.org/sites/default/files/pdf/life/c3supp_march05.pdf">AAA 2005 reference paper</a>.</p>
+<section id="stochastic-log-volatility-model" class="level2">
+<h2 class="anchored" data-anchor-id="stochastic-log-volatility-model">Stochastic Log Volatility Model</h2>
+<p>Note that the <code>@.</code> and other broadcasting (<code>.</code> symbol) allows us to operate on multiple funds at once.</p>
+<div id="6ce2ed89" class="cell" data-execution_count="3">
+<pre class="julia cell-code"><code>function v(v_prior,params,Zₜ) 
+    (;σ_v, σ_m,σ_p,σ⃰,ϕ,τ) = params
+    
+    v_m = log.(σ_m)
+    v_p = log.(σ_p)
+    v⃰ = log.(σ⃰)
+
+    # vol are the odd values in the random array
+    ṽ =  @. min(v_p, (1 - ϕ) * v_prior + ϕ * log(τ) ) + σ_v * Zₜ[[1,3,5,7]]
+    
+    v = @. max(v_m, min(v⃰,ṽ))
+
+    return v
+end
+
+function scenario(params,Z;months=1200)
+    (;σ_v,σ_0, ρ,A,B,C) = params
+
+    n_funds = size(params,2)
+    
+    #initilize/pre-allocate
+    Zₜ = rand(Z)
+    v_t = log.(σ_0)
+    σ_t = zeros(n_funds)
+    μ_t = zeros(n_funds)
+    
+    log_returns = map(1:months) do t
+        Zₜ = rand!(Z,Zₜ)
+        v_t .= v(v_t,params,Zₜ)
+
+        σ_t .= exp.(v_t)
+
+        @. μ_t =  A + B * σ_t + C * (σ_t)^2
+
+        # return are the even values in the random array
+        log_return = @. μ_t / 12 + σ_t / sqrt(12) * Zₜ[[2,4,6,8]]
+    end
+
+    # convert vector of vector to matrix
+    reduce(hcat,log_returns)
+end</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="4">
+<pre><code>scenario (generic function with 1 method)</code></pre>
+</div>
+</div>
+</section>
+<section id="model-parameters" class="level2">
+<h2 class="anchored" data-anchor-id="model-parameters">Model Parameters</h2>
+<div id="99262623" class="cell" data-execution_count="4">
+<pre class="julia cell-code"><code># use a labelled array for easy reference of the parameters 
+params = @LArray [
+    0.12515 0.14506 0.16341 0.20201     # τ
+    0.35229 0.41676 0.3632 0.35277      # ϕ
+    0.32645 0.32634 0.35789 0.34302     # σ_v
+    -0.2488 -0.1572 -0.2756 -0.2843     # ρ
+    0.055 0.055 0.055 0.055             # A
+    0.56 0.466 0.67 0.715               # B
+    -0.9 -0.9 -0.95 -1.0                # C
+    0.1476 0.1688 0.2049 0.2496         # σ_0
+    0.0305 0.0354 0.0403 0.0492         # σ_m
+    0.3 0.3 0.4 0.55                    # σ_p
+    0.7988 0.4519 0.9463 1.1387         # σ⃰
+] ( 
+    # define the regions each label refers to
+    τ = (1,:),
+    ϕ = (2,:),
+    σ_v = (3,:),
+    ρ = (4,:),
+    A = (5,:),
+    B = (6,:),
+    C = (7,:),
+    σ_0 = (8,:),
+    σ_m = (9,:),
+    σ_p = (10,:),
+    σ⃰ = (11,:)
+)</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="5">
+<pre><code>11×4 LArray{Float64, 2, Matrix{Float64}, (τ = (1, Colon()), ϕ = (2, Colon()), σ_v = (3, Colon()), ρ = (4, Colon()), A = (5, Colon()), B = (6, Colon()), C = (7, Colon()), σ_0 = (8, Colon()), σ_m = (9, Colon()), σ_p = (10, Colon()), σ⃰ = (11, Colon()))}:
+   :τ =&gt; 0.12515  …    :τ =&gt; 0.20201
+   :ϕ =&gt; 0.35229       :ϕ =&gt; 0.35277
+ :σ_v =&gt; 0.32645     :σ_v =&gt; 0.34302
+   :ρ =&gt; -0.2488       :ρ =&gt; -0.2843
+   :A =&gt; 0.055         :A =&gt; 0.055
+   :B =&gt; 0.56     …    :B =&gt; 0.715
+   :C =&gt; -0.9          :C =&gt; -1.0
+ :σ_0 =&gt; 0.1476      :σ_0 =&gt; 0.2496
+ :σ_m =&gt; 0.0305      :σ_m =&gt; 0.0492
+ :σ_p =&gt; 0.3         :σ_p =&gt; 0.55
+   :σ⃰ =&gt; 0.7988   …    :σ⃰ =&gt; 1.1387</code></pre>
+</div>
+</div>
+<section id="the-multivariate-normal-and-covariance-matrix" class="level3">
+<h3 class="anchored" data-anchor-id="the-multivariate-normal-and-covariance-matrix">The Multivariate normal and covariance matrix</h3>
+<div id="aa4fac40" class="cell" data-execution_count="5">
+<pre class="julia cell-code"><code># 11 columns because it's got the bond returns in it
+cov_matrix = [
+    1.000   -0.249  0.318   -0.082  0.625   -0.169  0.309   -0.183  0.023   0.075   0.080;
+    -0.249  1.000   -0.046  0.630   -0.123  0.829   -0.136  0.665   -0.120  0.192   0.393;
+    0.318   -0.046  1.000   -0.157  0.259   -0.050  0.236   -0.074  -0.066  0.034   0.044;
+    -0.082  0.630   -0.157  1.000   -0.063  0.515   -0.098  0.558   -0.105  0.130   0.234;
+    0.625   -0.123  0.259   -0.063  1.000   -0.276  0.377   -0.180  0.034   0.028   0.054;
+    -0.169  0.829   -0.050  0.515   -0.276  1.000   -0.142  0.649   -0.106  0.067   0.267;
+    0.309   -0.136  0.236   -0.098  0.377   -0.142  1.000   -0.284  0.026   0.006   0.045;
+    -0.183  0.665   -0.074  0.558   -0.180  0.649   -0.284  1.000   0.034   -0.091  -0.002;
+    0.023   -0.120  -0.066  -0.105  0.034   -0.106  0.026   0.034   1.000   0.047   -0.028;
+    0.075   0.192   0.034   0.130   0.028   0.067   0.006   -0.091  0.047   1.000   0.697;
+    0.080   0.393   0.044   0.234   0.054   0.267   0.045   -0.002  -0.028  0.697   1.000;
+]
+
+    Z = MvNormal(
+        zeros(11), #means for return and volatility
+        cov_matrix # covariance matrix
+        # full covariance matrix in AAA Excel workook on Parameters tab
+    )</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="6">
+<pre><code>FullNormal(
+dim: 11
+μ: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+Σ: [1.0 -0.249 … 0.075 0.08; -0.249 1.0 … 0.192 0.393; … ; 0.075 0.192 … 1.0 0.697; 0.08 0.393 … 0.697 1.0]
+)</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="scenarios-and-validation" class="level2">
+<h2 class="anchored" data-anchor-id="scenarios-and-validation">Scenarios and validation</h2>
+<section id="a-single-scenario" class="level3">
+<h3 class="anchored" data-anchor-id="a-single-scenario">A single scenario</h3>
+<div id="f0e36920" class="cell" data-execution_count="6">
+<pre class="julia cell-code"><code>x = scenario(params,Z;months=1200)</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="7">
+<pre><code>4×1200 Matrix{Float64}:
+ -0.0124354  0.00912116   0.0214326   …  0.0641472  -0.0224623  -0.000456449
+  0.0225229  0.0423898    0.0161604      0.0540821  -0.0368879   0.0440957
+ -0.0655741  0.022554     0.0250733      0.0955047  -0.0303337   0.00775239
+ -0.144574   0.0262148   -0.00133166     0.0932583  -0.144408    0.0400758</code></pre>
+</div>
+</div>
+</section>
+<section id="validation-of-summary-statistics" class="level3">
+<h3 class="anchored" data-anchor-id="validation-of-summary-statistics">Validation of summary statistics</h3>
+<p>The summary statistics expected (per paper Table 8):</p>
+<ul>
+<li><code>μ ≈ [0.0060, 0.0062, 0.0063, 0.0065]</code></li>
+<li><code>σ ≈ [0.0436, 0.0492, 0.0590, 0.0724]</code></li>
+</ul>
+<p>These computed values match very closely:</p>
+<div id="99d90859" class="cell" data-execution_count="7">
+<pre class="julia cell-code"><code># generate 1000 scenarios 
+scens = [scenario(params,Z) for _ in 1:1000];
+
+let
+    # compute summary statistics
+    μ = vec(mean(mean(x,dims=2) for x in scens))
+    σ = vec(mean(std(x,dims=2) for x in scens))
+    (;μ,σ)
+end</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="8">
+<pre><code>(μ = [0.006045006563819091, 0.0062199437086345784, 0.006278168390979234, 0.006531685069702403], σ = [0.043517357354043225, 0.04913425078838221, 0.0590681180411829, 0.07212209999154577])</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="plotting-some-scenarios" class="level2">
+<h2 class="anchored" data-anchor-id="plotting-some-scenarios">Plotting some scenarios</h2>
+<div id="3ea386b0" class="cell" data-execution_count="8">
+<pre class="julia cell-code"><code>let 
+    f = Figure()
+    n = 25
+    colors = ColorSchemes.Johnson
+    ax = Axis(f[1,1],yscale=log10,ylabel="index value",
+        title="$n realizations of 4 correlated equity funds per AAA ESG")
+    for s in scens[1:n]
+        for i in 1:4
+        lines!(ax,cumprod(exp.(s[i,:])), color=(colors[i],0.3),label="fund $i")
+        end
+    end
+    axislegend(ax,unique=true,position=:lt)
+    f
+end</code></pre>
+<div class="cell-output cell-output-stderr">
+<pre><code>┌ Warning: Found `resolution` in the theme when creating a `Scene`. The `resolution` keyword for `Scene`s and `Figure`s has been deprecated. Use `Figure(; size = ...` or `Scene(; size = ...)` instead, which better reflects that this is a unitless size and not a pixel resolution. The key could also come from `set_theme!` calls or related theming functions.
+└ @ Makie ~/.julia/packages/Makie/We6MY/src/scenes.jl:227</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="9">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-9-output-2.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="see-also" class="level2">
+<h2 class="anchored" data-anchor-id="see-also">See also</h2>
+<p><a href="../../examples/academy-generator-rates/">Interactive AAA Economic Scenario Generator</a></p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
