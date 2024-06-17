@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.43">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>JuliaActuary – Using MortaltiyTables.jl with DataFrames</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+<link rel="stylesheet" href="../../assets/highlight/styles/github.min.css">
+<script src="../../assets/highlight/highlight.min.js"></script>
+<script src="../../assets/highlight/languages/julia.min.js"></script>
+<script src="../../assets/highlight/languages/julia-repl.min.js"></script>
+<script src="../../assets/highlight/languages/python.min.js"></script>
+<script src="../../assets/highlight/languages/r.min.js"></script>
+<script>hljs.highlightAll();</script>
+
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed fullcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../assets/logos/android-chrome-512x512.png" alt="JuliaActuary Logo" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">JuliaActuary</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../packages.html"> 
+<span class="menu-text">Packages</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../learn.html"> 
+<span class="menu-text">Learn</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../examples.html"> 
+<span class="menu-text">Examples</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../benchmarks.html"> 
+<span class="menu-text">Benchmarks</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/JuliaActuary"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Using MortaltiyTables.jl with DataFrames</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">mortalitytables</div>
+    <div class="quarto-category">dataframes</div>
+    <div class="quarto-category">tutorial</div>
+  </div>
+  </div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="using-mortaltiytables.jl-with-dataframes" class="level1">
+<h1>Using MortaltiyTables.jl with DataFrames</h1>
+<section id="mortalitytables.jl-standard-representation" class="level2">
+<h2 class="anchored" data-anchor-id="mortalitytables.jl-standard-representation">MortalityTables.jl standard representation</h2>
+<p>MortalityTables.jl stores the rates in a very efficient manner as a collection of vectors indexed by attained age.</p>
+<div id="1e8e36ce" class="cell" data-execution_count="2">
+<pre id="annotated-cell-1" class="julia cell-code code-annotation-code"><code>using MortalityTables
+
+name = "2001 VBT Residual Standard Select and Ultimate - Male Nonsmoker, ANB"
+vbt = MortalityTables.table(name)</code></pre>
+<div class="cell-annotation">
+<dl>
+<dt data-target-cell="annotated-cell-1" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-1" data-code-lines="3" data-code-annotation="1">Or any other mort.soa.org table</span>
+</dd>
+</dl>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="13">
+<pre><code>MortalityTable (Insured Lives Mortality):
+   Name:
+       2001 VBT Residual Standard Select and Ultimate - Male Nonsmoker, ANB
+   Fields: 
+       (:select, :ultimate, :metadata)
+   Provider:
+       Society of Actuaries
+   mort.SOA.org ID:
+       1118
+   mort.SOA.org link:
+       https://mort.soa.org/ViewTable.aspx?&amp;TableIdentity=1118
+   Description:
+       2001 Valuation Basic Table (VBT) Residual Standard Select and Ultimate Table -  Male Nonsmoker. Basis: Age Nearest Birthday. Minimum Select Age: 0. Maximum Select Age: 99. Minimum Ultimate Age: 25. Maximum Ultimate Age: 120</code></pre>
+</div>
+</div>
+<p>First, we include the package, and then we’ll pick a table, where all of the <code>mort.soa.org</code> tables are mirrored into your MortalityTables.jl installation.</p>
+<p>To see how the data is represented, we can look at the the select data for a 55 year old and see the attained age and mortality rates:</p>
+<div id="45fadbe2" class="cell" data-execution_count="3">
+<pre class="julia cell-code"><code>vbt.select[55]</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="14">
+<pre><code>66-element OffsetArray(::Vector{Float64}, 55:120) with eltype Float64 with indices 55:120:
+ 0.00139
+ 0.00218
+ 0.00288
+ 0.00344
+ 0.00403
+ 0.00485
+ 0.00599
+ 0.00736
+ 0.00879
+ 0.01059
+ 0.01211
+ 0.014
+ 0.01584
+ ⋮
+ 0.53905
+ 0.57031
+ 0.60339
+ 0.63838
+ 0.67541
+ 0.71458
+ 0.75603
+ 0.79988
+ 0.84627
+ 0.89536
+ 0.94729
+ 1.0</code></pre>
+</div>
+</div>
+<p>This is very efficient and convienent for modeling, but a lot of times you want the data matched up with policy data in a DataFrame.</p>
+</section>
+<section id="getting-data-into-a-dataframe" class="level2">
+<h2 class="anchored" data-anchor-id="getting-data-into-a-dataframe">Getting data into a dataframe</h2>
+<section id="generate-sample-data" class="level3">
+<h3 class="anchored" data-anchor-id="generate-sample-data">Generate sample data</h3>
+<div id="6ae90227" class="cell" data-execution_count="4">
+<pre class="julia cell-code"><code>using DataFrames
+
+sample_size = 10_000
+
+sample_data = let
+    # generate fake data
+    df = DataFrame(
+        "sex" =&gt; rand(["Male","Female"],sample_size),
+        "smoke" =&gt; rand(["Smoker","Nonsmoker"],sample_size),
+        "issue_age" =&gt; rand(25:65,sample_size),
+        )
+    
+    # a random offset of issue age is the current attained age
+    df.attained_age = df.issue_age .+ rand(1:10,sample_size)
+    df
+end</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="15">
+<div><div style="float: left;"><span>10000×4 DataFrame</span></div><div style="float: right;"><span style="font-style: italic;">9975 rows omitted</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
+<table class="data-frame caption-top table table-sm table-striped small" data-quarto-postprocess="true">
+<thead>
+<tr class="header">
+<th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">sex</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">smoke</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">issue_age</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">attained_age</th>
+</tr>
+<tr class="odd subheader headerLastRow">
+<th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String">String</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String">String</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">1</td>
+<td style="text-align: left;">Male</td>
+<td style="text-align: left;">Nonsmoker</td>
+<td style="text-align: right;">48</td>
+<td style="text-align: right;">55</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">2</td>
+<td style="text-align: left;">Female</td>
+<td style="text-align: left;">Nonsmoker</td>
+<td style="text-align: right;">51</td>
+<td style="text-align: right;">57</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">3</td>
+<td style="text-align: left;">Female</td>
+<td style="text-align: left;">Smoker</td>
+<td style="text-align: right;">58</td>
+<td style="text-align: right;">68</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">4</td>
+<td style="text-align: left;">Female</td>
+<td style="text-align: left;">Nonsmoker</td>
+<td style="text-align: right;">57</td>
+<td style="text-align: right;">64</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">5</td>
+<td style="text-align: left;">Female</td>
+<td style="text-align: left;">Nonsmoker</td>
+<td style="text-align: right;">45</td>
+<td style="text-align: right;">55</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">6</td>
+<td style="text-align: left;">Female</td>
+<td style="text-align: left;">Smoker</td>
+<td style="text-align: right;">44</td>
+<td style="text-align: right;">45</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">7</td>
+<td style="text-align: left;">Male</td>
+<td style="text-align: left;">Nonsmoker</td>
+<td style="text-align: right;">54</td>
+<td style="text-align: right;">62</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">8</td>
+<td style="text-align: left;">Male</td>
+<td style="text-align: left;">Smoker</td>
+<td style="text-align: right;">43</td>
+<td style="text-align: right;">53</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">9</td>
+<td style="text-align: left;">Female</td>
+<td style="text-align: left;">Nonsmoker</td>
+<td style="text-align: right;">56</td>
+<td style="text-align: right;">63</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">10</td>
+<td style="text-align: left;">Female</td>
+<td style="text-align: left;">Nonsmoker</td>
+<td style="text-align: right;">49</td>
+<td style="text-align: right;">59</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">11</td>
+<td style="text-align: left;">Male</td>
+<td style="text-align: left;">Smoker</td>
+<td style="text-align: right;">46</td>
+<td style="text-align: right;">55</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">12</td>
+<td style="text-align: left;">Female</td>
+<td style="text-align: left;">Nonsmoker</td>
+<td style="text-align: right;">31</td>
+<td style="text-align: right;">38</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">13</td>
+<td style="text-align: left;">Male</td>
+<td style="text-align: left;">Smoker</td>
+<td style="text-align: right;">30</td>
+<td style="text-align: right;">37</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">⋮</td>
+<td style="text-align: right;">⋮</td>
+<td style="text-align: right;">⋮</td>
+<td style="text-align: right;">⋮</td>
+<td style="text-align: right;">⋮</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">9989</td>
+<td style="text-align: left;">Female</td>
+<td style="text-align: left;">Nonsmoker</td>
+<td style="text-align: right;">52</td>
+<td style="text-align: right;">56</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">9990</td>
+<td style="text-align: left;">Female</td>
+<td style="text-align: left;">Nonsmoker</td>
+<td style="text-align: right;">60</td>
+<td style="text-align: right;">70</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">9991</td>
+<td style="text-align: left;">Female</td>
+<td style="text-align: left;">Nonsmoker</td>
+<td style="text-align: right;">62</td>
+<td style="text-align: right;">71</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">9992</td>
+<td style="text-align: left;">Female</td>
+<td style="text-align: left;">Nonsmoker</td>
+<td style="text-align: right;">61</td>
+<td style="text-align: right;">68</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">9993</td>
+<td style="text-align: left;">Male</td>
+<td style="text-align: left;">Smoker</td>
+<td style="text-align: right;">57</td>
+<td style="text-align: right;">67</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">9994</td>
+<td style="text-align: left;">Male</td>
+<td style="text-align: left;">Smoker</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">67</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">9995</td>
+<td style="text-align: left;">Male</td>
+<td style="text-align: left;">Smoker</td>
+<td style="text-align: right;">43</td>
+<td style="text-align: right;">48</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">9996</td>
+<td style="text-align: left;">Male</td>
+<td style="text-align: left;">Smoker</td>
+<td style="text-align: right;">62</td>
+<td style="text-align: right;">69</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">9997</td>
+<td style="text-align: left;">Female</td>
+<td style="text-align: left;">Nonsmoker</td>
+<td style="text-align: right;">58</td>
+<td style="text-align: right;">64</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">9998</td>
+<td style="text-align: left;">Male</td>
+<td style="text-align: left;">Nonsmoker</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">68</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">9999</td>
+<td style="text-align: left;">Male</td>
+<td style="text-align: left;">Nonsmoker</td>
+<td style="text-align: right;">44</td>
+<td style="text-align: right;">51</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">10000</td>
+<td style="text-align: left;">Female</td>
+<td style="text-align: left;">Smoker</td>
+<td style="text-align: right;">39</td>
+<td style="text-align: right;">44</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+<section id="define-the-table-set-you-want-to-use" class="level3">
+<h3 class="anchored" data-anchor-id="define-the-table-set-you-want-to-use">Define the table set you want to use</h3>
+<p>There are a lot of different possible combinations of parameters that you might want to use, such as rates that vary by sex, risk class, table set (VBT/CSO/etc), smoking status, relative risk, ALB/ANB, etc.</p>
+<p>It’s easy to define the parameters applicable to your assumption set. Here, we’ll use a dictionary to define the relationship:</p>
+<div id="e9c234ae" class="cell" data-execution_count="5">
+<pre class="julia cell-code"><code>rate_map = Dict(
+    "Male" =&gt; Dict(
+        "Smoker" =&gt; MortalityTables.table("2001 VBT Residual Standard Select and Ultimate - Male Smoker, ANB"),
+        "Nonsmoker" =&gt; MortalityTables.table("2001 VBT Residual Standard Select and Ultimate - Male Nonsmoker, ANB"),
+        ),
+    
+    "Female" =&gt; Dict(
+        "Smoker" =&gt; MortalityTables.table("2001 VBT Residual Standard Select and Ultimate - Female Smoker, ANB"),
+        "Nonsmoker" =&gt; MortalityTables.table("2001 VBT Residual Standard Select and Ultimate - Female Nonsmoker, ANB"),
+        )
+    );</code></pre>
+</div>
+<p>And then we’ll define a function to look up the relevant rate. Note how the function matches the levels we defined for the assumption set dictionary above.</p>
+<div id="553d2a10" class="cell" data-execution_count="6">
+<pre class="julia cell-code"><code>function rate_lookup(assumption_map,sex,smoke,issue_age,attained_age)
+    # pick the relevant table
+    table = assumption_map[sex][smoke]
+    
+    # check if the select rate exists, otherwise look to the ulitmate table
+    if issue_age in eachindex(table.select)
+        table.select[issue_age][attained_age]
+    else
+        table.ultimate[attained_age]
+    end
+end</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="17">
+<pre><code>rate_lookup (generic function with 1 method)</code></pre>
+</div>
+</div>
+</section>
+<section id="lining-up-with-dataframe" class="level3">
+<h3 class="anchored" data-anchor-id="lining-up-with-dataframe">Lining up with dataframe</h3>
+<p>By mapping each row’s data to the lookup function, we get a vector of rates for our data:</p>
+<div id="064916cd" class="cell" data-execution_count="7">
+<pre class="julia cell-code"><code>rates = map(eachrow(sample_data)) do row
+    rate_lookup(rate_map, row.sex, row.smoke, row.issue_age, row.attained_age)
+end</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="18">
+<pre><code>10000-element Vector{Float64}:
+ 0.00392
+ 0.00344
+ 0.01999
+ 0.00589
+ 0.00371
+ 0.00143
+ 0.00778
+ 0.008
+ 0.00544
+ 0.00527
+ 0.00942
+ 0.00064
+ 0.00179
+ ⋮
+ 0.00265
+ 0.01249
+ 0.01294
+ 0.0084
+ 0.02811
+ 0.01922
+ 0.00396
+ 0.02681
+ 0.00546
+ 0.01115
+ 0.00273
+ 0.00182</code></pre>
+</div>
+</div>
+<p>And finally, we can just add this to the dataframe:</p>
+<div id="b1d90178" class="cell" data-execution_count="8">
+<pre class="julia cell-code"><code>sample_data.expectation = rates
+
+sample_data</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="19">
+<div><div style="float: left;"><span>10000×5 DataFrame</span></div><div style="float: right;"><span style="font-style: italic;">9975 rows omitted</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
+<table class="data-frame caption-top table table-sm table-striped small" data-quarto-postprocess="true">
+<thead>
+<tr class="header">
+<th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">sex</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">smoke</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">issue_age</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">attained_age</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">expectation</th>
+</tr>
+<tr class="odd subheader headerLastRow">
+<th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String">String</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String">String</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">1</td>
+<td style="text-align: left;">Male</td>
+<td style="text-align: left;">Nonsmoker</td>
+<td style="text-align: right;">48</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">0.00392</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">2</td>
+<td style="text-align: left;">Female</td>
+<td style="text-align: left;">Nonsmoker</td>
+<td style="text-align: right;">51</td>
+<td style="text-align: right;">57</td>
+<td style="text-align: right;">0.00344</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">3</td>
+<td style="text-align: left;">Female</td>
+<td style="text-align: left;">Smoker</td>
+<td style="text-align: right;">58</td>
+<td style="text-align: right;">68</td>
+<td style="text-align: right;">0.01999</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">4</td>
+<td style="text-align: left;">Female</td>
+<td style="text-align: left;">Nonsmoker</td>
+<td style="text-align: right;">57</td>
+<td style="text-align: right;">64</td>
+<td style="text-align: right;">0.00589</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">5</td>
+<td style="text-align: left;">Female</td>
+<td style="text-align: left;">Nonsmoker</td>
+<td style="text-align: right;">45</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">0.00371</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">6</td>
+<td style="text-align: left;">Female</td>
+<td style="text-align: left;">Smoker</td>
+<td style="text-align: right;">44</td>
+<td style="text-align: right;">45</td>
+<td style="text-align: right;">0.00143</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">7</td>
+<td style="text-align: left;">Male</td>
+<td style="text-align: left;">Nonsmoker</td>
+<td style="text-align: right;">54</td>
+<td style="text-align: right;">62</td>
+<td style="text-align: right;">0.00778</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">8</td>
+<td style="text-align: left;">Male</td>
+<td style="text-align: left;">Smoker</td>
+<td style="text-align: right;">43</td>
+<td style="text-align: right;">53</td>
+<td style="text-align: right;">0.008</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">9</td>
+<td style="text-align: left;">Female</td>
+<td style="text-align: left;">Nonsmoker</td>
+<td style="text-align: right;">56</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">0.00544</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">10</td>
+<td style="text-align: left;">Female</td>
+<td style="text-align: left;">Nonsmoker</td>
+<td style="text-align: right;">49</td>
+<td style="text-align: right;">59</td>
+<td style="text-align: right;">0.00527</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">11</td>
+<td style="text-align: left;">Male</td>
+<td style="text-align: left;">Smoker</td>
+<td style="text-align: right;">46</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">0.00942</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">12</td>
+<td style="text-align: left;">Female</td>
+<td style="text-align: left;">Nonsmoker</td>
+<td style="text-align: right;">31</td>
+<td style="text-align: right;">38</td>
+<td style="text-align: right;">0.00064</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">13</td>
+<td style="text-align: left;">Male</td>
+<td style="text-align: left;">Smoker</td>
+<td style="text-align: right;">30</td>
+<td style="text-align: right;">37</td>
+<td style="text-align: right;">0.00179</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">⋮</td>
+<td style="text-align: right;">⋮</td>
+<td style="text-align: right;">⋮</td>
+<td style="text-align: right;">⋮</td>
+<td style="text-align: right;">⋮</td>
+<td style="text-align: right;">⋮</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">9989</td>
+<td style="text-align: left;">Female</td>
+<td style="text-align: left;">Nonsmoker</td>
+<td style="text-align: right;">52</td>
+<td style="text-align: right;">56</td>
+<td style="text-align: right;">0.00265</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">9990</td>
+<td style="text-align: left;">Female</td>
+<td style="text-align: left;">Nonsmoker</td>
+<td style="text-align: right;">60</td>
+<td style="text-align: right;">70</td>
+<td style="text-align: right;">0.01249</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">9991</td>
+<td style="text-align: left;">Female</td>
+<td style="text-align: left;">Nonsmoker</td>
+<td style="text-align: right;">62</td>
+<td style="text-align: right;">71</td>
+<td style="text-align: right;">0.01294</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">9992</td>
+<td style="text-align: left;">Female</td>
+<td style="text-align: left;">Nonsmoker</td>
+<td style="text-align: right;">61</td>
+<td style="text-align: right;">68</td>
+<td style="text-align: right;">0.0084</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">9993</td>
+<td style="text-align: left;">Male</td>
+<td style="text-align: left;">Smoker</td>
+<td style="text-align: right;">57</td>
+<td style="text-align: right;">67</td>
+<td style="text-align: right;">0.02811</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">9994</td>
+<td style="text-align: left;">Male</td>
+<td style="text-align: left;">Smoker</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">67</td>
+<td style="text-align: right;">0.01922</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">9995</td>
+<td style="text-align: left;">Male</td>
+<td style="text-align: left;">Smoker</td>
+<td style="text-align: right;">43</td>
+<td style="text-align: right;">48</td>
+<td style="text-align: right;">0.00396</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">9996</td>
+<td style="text-align: left;">Male</td>
+<td style="text-align: left;">Smoker</td>
+<td style="text-align: right;">62</td>
+<td style="text-align: right;">69</td>
+<td style="text-align: right;">0.02681</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">9997</td>
+<td style="text-align: left;">Female</td>
+<td style="text-align: left;">Nonsmoker</td>
+<td style="text-align: right;">58</td>
+<td style="text-align: right;">64</td>
+<td style="text-align: right;">0.00546</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">9998</td>
+<td style="text-align: left;">Male</td>
+<td style="text-align: left;">Nonsmoker</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">68</td>
+<td style="text-align: right;">0.01115</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">9999</td>
+<td style="text-align: left;">Male</td>
+<td style="text-align: left;">Nonsmoker</td>
+<td style="text-align: right;">44</td>
+<td style="text-align: right;">51</td>
+<td style="text-align: right;">0.00273</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">10000</td>
+<td style="text-align: left;">Female</td>
+<td style="text-align: left;">Smoker</td>
+<td style="text-align: right;">39</td>
+<td style="text-align: right;">44</td>
+<td style="text-align: right;">0.00182</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+
+</section>
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

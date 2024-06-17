@@ -1,7 +1,0 @@
-
-[MathJax]
-git-tree-sha1 = "da02522100e5961a71834a06aa2c43f6618a364f"
-
-    [[MathJax.download]]
-    sha256 = "4206b9645a97f431018d0b6c4021c98607d49ba4dc129f4f2ecce675e2fcba11"
-    url = "https://github.com/mathjax/MathJax/archive/refs/tags/3.2.2.tar.gz"

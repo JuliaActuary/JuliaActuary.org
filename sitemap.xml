@@ -1,178 +1,119 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-
-<url>
-    <loc>https://JuliaActuary.org/blog/coding-for-the-future/index.html</loc>
-    <lastmod>2024-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-</url>
-<url>
-    <loc>https://JuliaActuary.org/tutorials/credibility_claims/index.html</loc>
-    <lastmod>2024-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-</url>
-<url>
-    <loc>https://JuliaActuary.org/tutorials/exposure_calculation/index.html</loc>
-    <lastmod>2024-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-</url>
-<url>
-    <loc>https://JuliaActuary.org/blog/finance_models/index.html</loc>
-    <lastmod>2024-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-</url>
-<url>
-    <loc>https://JuliaActuary.org/blog/julia-actuaries/index.html</loc>
-    <lastmod>2024-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-</url>
-<url>
-    <loc>https://JuliaActuary.org/tutorials/retention/index.html</loc>
-    <lastmod>2024-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-</url>
-<url>
-    <loc>https://JuliaActuary.org/tutorials/yield-curve-fitting/index.html</loc>
-    <lastmod>2024-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-</url>
-<url>
-    <loc>https://JuliaActuary.org/community/index.html</loc>
-    <lastmod>2024-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-</url>
-<url>
-    <loc>https://JuliaActuary.org/tutorials/PolicyDiffEq/index.html</loc>
-    <lastmod>2024-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-</url>
-<url>
-    <loc>https://JuliaActuary.org/index.html</loc>
-    <lastmod>2024-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-</url>
-<url>
-    <loc>https://JuliaActuary.org/tutorials/AAA_equity/index.html</loc>
-    <lastmod>2024-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-</url>
-<url>
-    <loc>https://JuliaActuary.org/tutorials/SurvivalFitting/index.html</loc>
-    <lastmod>2024-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-</url>
-<url>
-    <loc>https://JuliaActuary.org/tutorials/nested_stochastic/index.html</loc>
-    <lastmod>2024-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-</url>
-<url>
-    <loc>https://JuliaActuary.org/tutorials/loss_functions/index.html</loc>
-    <lastmod>2024-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-</url>
-<url>
-    <loc>https://JuliaActuary.org/blog/life-modeling-problem/index.html</loc>
-    <lastmod>2024-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-</url>
-<url>
-    <loc>https://JuliaActuary.org/tutorials/MortalityTableComparison/index.html</loc>
-    <lastmod>2024-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-</url>
-<url>
-    <loc>https://JuliaActuary.org/benchmarks/index.html</loc>
-    <lastmod>2024-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-</url>
-<url>
-    <loc>https://JuliaActuary.org/tutorials/MortalityTablesDataFrame/index.html</loc>
-    <lastmod>2024-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-</url>
-<url>
-    <loc>https://JuliaActuary.org/tutorials/PlutoESG/index.html</loc>
-    <lastmod>2024-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-</url>
-<url>
-    <loc>https://JuliaActuary.org/blog/julia-getting-started-actuaries/index.html</loc>
-    <lastmod>2024-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-</url>
-<url>
-    <loc>https://JuliaActuary.org/tutorials/USTreasury/index.html</loc>
-    <lastmod>2024-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-</url>
-<url>
-    <loc>https://JuliaActuary.org/blog/hacktoberfest2022/index.html</loc>
-    <lastmod>2024-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-</url>
-<url>
-    <loc>https://JuliaActuary.org/terms/index.html</loc>
-    <lastmod>2024-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-</url>
-<url>
-    <loc>https://JuliaActuary.org/tutorials/CashflowAnalysis/index.html</loc>
-    <lastmod>2024-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-</url>
-<url>
-    <loc>https://JuliaActuary.org/blog/bayesian_intro/index.html</loc>
-    <lastmod>2024-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-</url>
-<url>
-    <loc>https://JuliaActuary.org/packages/index.html</loc>
-    <lastmod>2024-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-</url>
-<url>
-    <loc>https://JuliaActuary.org/tutorials/Bayesian/index.html</loc>
-    <lastmod>2024-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-</url>
-<url>
-    <loc>https://JuliaActuary.org/tutorials/PoissonBinomial/index.html</loc>
-    <lastmod>2024-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-</url>
-<url>
-    <loc>https://JuliaActuary.org/tutorials/StochasticMortality/index.html</loc>
-    <lastmod>2024-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-</url>
+  <url>
+    <loc>https://JuliaActuary.github.io/JuliaActuary.org/blog.html</loc>
+    <lastmod>2024-06-17T02:57:05.379Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.github.io/JuliaActuary.org/packages.html</loc>
+    <lastmod>2024-06-17T02:46:38.178Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.github.io/JuliaActuary.org/benchmarks.html</loc>
+    <lastmod>2024-06-15T13:32:36.848Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.github.io/JuliaActuary.org/posts/academy-generator/index.html</loc>
+    <lastmod>2024-06-16T14:45:08.569Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.github.io/JuliaActuary.org/posts/coding-the-future/index.html</loc>
+    <lastmod>2024-06-17T02:54:10.385Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.github.io/JuliaActuary.org/posts/getting-started-for-actuaries/index.html</loc>
+    <lastmod>2024-06-17T02:54:32.086Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.github.io/JuliaActuary.org/posts/fitting-survival-data/index.html</loc>
+    <lastmod>2024-06-15T16:08:37.185Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.github.io/JuliaActuary.org/posts/fitting-yield-curves/index.html</loc>
+    <lastmod>2024-06-16T03:16:08.017Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.github.io/JuliaActuary.org/posts/poisson-approximation/index.html</loc>
+    <lastmod>2024-06-16T21:17:53.237Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.github.io/JuliaActuary.org/posts/julia-for-actuaries/index.html</loc>
+    <lastmod>2024-06-17T02:54:42.670Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.github.io/JuliaActuary.org/posts/bayesian-intro/index.html</loc>
+    <lastmod>2024-06-17T02:54:18.391Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.github.io/JuliaActuary.org/posts/life-modeling-problem/index.html</loc>
+    <lastmod>2024-06-17T02:54:48.784Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.github.io/JuliaActuary.org/posts/policy-diffeq/index.html</loc>
+    <lastmod>2024-06-17T01:50:58.498Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.github.io/JuliaActuary.org/posts/finance-models-announcement/index.html</loc>
+    <lastmod>2024-06-17T02:54:26.033Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.github.io/JuliaActuary.org/community.html</loc>
+    <lastmod>2024-06-17T02:59:26.307Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.github.io/JuliaActuary.org/examples.html</loc>
+    <lastmod>2024-06-17T02:57:30.830Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.github.io/JuliaActuary.org/posts/cashflow-interactive/index.html</loc>
+    <lastmod>2024-06-16T15:00:44.501Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.github.io/JuliaActuary.org/posts/treasury-interactive/index.html</loc>
+    <lastmod>2024-06-16T13:52:06.076Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.github.io/JuliaActuary.org/posts/bayesian-claims-demo/index.html</loc>
+    <lastmod>2024-06-16T02:18:48.900Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.github.io/JuliaActuary.org/posts/nested-policy-projections/index.html</loc>
+    <lastmod>2024-06-16T03:16:59.653Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.github.io/JuliaActuary.org/posts/mortalitytables-and-dataframes/index.html</loc>
+    <lastmod>2024-06-15T15:41:27.430Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.github.io/JuliaActuary.org/posts/bayes-vs-limited-fluctuation/index.html</loc>
+    <lastmod>2024-06-16T21:41:41.288Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.github.io/JuliaActuary.org/posts/hacktoberfest/index.html</loc>
+    <lastmod>2024-06-17T02:54:36.846Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.github.io/JuliaActuary.org/posts/academy-generator-rates/index.html</loc>
+    <lastmod>2024-06-16T15:00:16.040Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.github.io/JuliaActuary.org/posts/stochastic-mortality/index.html</loc>
+    <lastmod>2024-06-15T16:35:16.344Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.github.io/JuliaActuary.org/posts/exposures-example/index.html</loc>
+    <lastmod>2024-06-16T01:50:06.671Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.github.io/JuliaActuary.org/posts/mortality-comparison/index.html</loc>
+    <lastmod>2024-06-16T21:18:09.490Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.github.io/JuliaActuary.org/index.html</loc>
+    <lastmod>2024-06-17T02:46:11.253Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.github.io/JuliaActuary.org/learn.html</loc>
+    <lastmod>2024-06-17T02:48:31.135Z</lastmod>
+  </url>
 </urlset>

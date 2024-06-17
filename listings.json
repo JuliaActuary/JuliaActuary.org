@@ -1,0 +1,34 @@
+[
+  {
+    "listing": "/blog.html",
+    "items": [
+      "/posts/finance-models-announcement/index.html",
+      "/posts/getting-started-for-actuaries/index.html",
+      "/posts/hacktoberfest/index.html",
+      "/posts/bayesian-intro/index.html",
+      "/posts/life-modeling-problem/index.html",
+      "/posts/julia-for-actuaries/index.html",
+      "/posts/coding-the-future/index.html"
+    ]
+  },
+  {
+    "listing": "/examples.html",
+    "items": [
+      "/posts/cashflow-interactive/index.html",
+      "/posts/policy-diffeq/index.html",
+      "/posts/treasury-interactive/index.html",
+      "/posts/bayesian-claims-demo/index.html",
+      "/posts/nested-policy-projections/index.html",
+      "/posts/mortalitytables-and-dataframes/index.html",
+      "/posts/poisson-approximation/index.html",
+      "/posts/bayes-vs-limited-fluctuation/index.html",
+      "/posts/fitting-yield-curves/index.html",
+      "/posts/fitting-survival-data/index.html",
+      "/posts/academy-generator-rates/index.html",
+      "/posts/stochastic-mortality/index.html",
+      "/posts/exposures-example/index.html",
+      "/posts/academy-generator/index.html",
+      "/posts/mortality-comparison/index.html"
+    ]
+  }
+]

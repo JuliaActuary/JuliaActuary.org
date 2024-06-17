@@ -1,1 +1,0 @@
-"/home/runner/work/JuliaActuary.org/JuliaActuary.org/__site/assets/benchmarks/code/output/lmp_benchmarks.svg"
