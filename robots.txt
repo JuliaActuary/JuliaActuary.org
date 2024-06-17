@@ -1,1 +1,1 @@
-Sitemap: https://JuliaActuary.github.io/JuliaActuary.org/sitemap.xml
+Sitemap: https://JuliaActuary.org/sitemap.xml
