@@ -122,6 +122,12 @@ pre {
     font-weight: 400;
 }
 
+@media (max-width: 800px) {
+    .hero-grid {
+        flex-direction: column;
+    }
+}
+
 .hero-child {
     flex: 1;
 }

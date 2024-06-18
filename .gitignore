@@ -7,3 +7,5 @@ _rss/
 Manifest.toml
 
 /.quarto/
+_freeze/
+_site/
