@@ -1,6 +1,7 @@
 ---
 title: "Fixed Effects Model Example"
 categories: [modeling,statistics,experience-analysis]
+engine: julia
 ---
 
 These examples and description is based very heavily on this [bonus lecture from Richard McElreath](https://youtu.be/iwVqiiXYeC4&t=3304)
