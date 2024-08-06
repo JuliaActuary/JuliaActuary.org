@@ -9,7 +9,7 @@
 <link>https://JuliaActuary.org/blog.html</link>
 <atom:link href="https://JuliaActuary.org/blog.xml" rel="self" type="application/rss+xml"/>
 <description>JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.</description>
-<generator>quarto-1.5.43</generator>
+<generator>quarto-1.5.55</generator>
 <lastBuildDate>Sat, 19 Aug 2023 05:00:00 GMT</lastBuildDate>
 <item>
   <title>FinanceModels.jl - Evolving the JuliaActuary Ecosystem</title>
