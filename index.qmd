@@ -173,7 +173,7 @@ vbt2015 = MortalityTables.table("2015 VBT Smoker Distinct Male Non-Smoker ALB")
 
 issue_age = 30
 life = SingleLife(                       # The life underlying the risk
-    mort = vbt2015.select[issue_age],    # -- Mortality rates
+    mortality = vbt2015.select[issue_age],    # -- Mortality rates
 )
 
 yield = Yield.Constant(0.05)            # Using a flat 5% interest rate
