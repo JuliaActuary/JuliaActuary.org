@@ -9,7 +9,7 @@
 <link>https://JuliaActuary.org/blog.html</link>
 <atom:link href="https://JuliaActuary.org/blog.xml" rel="self" type="application/rss+xml"/>
 <description>JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.</description>
-<generator>quarto-1.5.55</generator>
+<generator>quarto-1.6.37</generator>
 <lastBuildDate>Sat, 19 Aug 2023 05:00:00 GMT</lastBuildDate>
 <item>
   <title>FinanceModels.jl - Evolving the JuliaActuary Ecosystem</title>
@@ -882,7 +882,7 @@ Table&nbsp;1: Benchmarks for the Life Modeling Problem in nanoseconds (lower tim
 <th style="text-align: left;" data-quarto-table-cell-role="th">mean</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th">relative_mean</th>
 </tr>
-<tr class="odd subheader headerLastRow">
+<tr class="subheader headerLastRow even">
 <th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
 <th style="text-align: left;" data-quarto-table-cell-role="th" title="String15">String15</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th" title="String15">String15</th>
@@ -1084,7 +1084,7 @@ Table&nbsp;2: Benchmarks for the Life Modeling Problem in nanoseconds (lower tim
 <th style="text-align: left;" data-quarto-table-cell-role="th">mean</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th">relative_mean</th>
 </tr>
-<tr class="odd subheader headerLastRow">
+<tr class="subheader headerLastRow even">
 <th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
 <th style="text-align: left;" data-quarto-table-cell-role="th" title="String15">String15</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th" title="String15">String15</th>
