@@ -1,6 +1,6 @@
 ---
 title: "Bayesian vs Limited Fluctuation Experience Analysis"
-categories: [modeling,statistics,experience-analysis]
+categories: [modeling,statistics,experience-analysis,bayesian]
 ---
 
 Alternate title: Why actuaries should cease to care about the number 1082.

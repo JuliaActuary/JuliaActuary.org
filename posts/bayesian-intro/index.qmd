@@ -2,7 +2,7 @@
 title: "Getting Started with Julia for Actuaries"
 author: "Alec Loudenback and Dimitar Vanguelov"
 date: "2021-10-24"
-categories: [industry,blog,statistics]
+categories: [industry,blog,statistics,bayesian]
 ---
 
 
