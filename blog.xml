@@ -9,8 +9,8 @@
 <link>https://JuliaActuary.org/blog.html</link>
 <atom:link href="https://JuliaActuary.org/blog.xml" rel="self" type="application/rss+xml"/>
 <description>JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.</description>
-<generator>quarto-1.6.37</generator>
-<lastBuildDate>Sat, 19 Aug 2023 05:00:00 GMT</lastBuildDate>
+<generator>quarto-1.6.39</generator>
+<lastBuildDate>Sat, 19 Aug 2023 06:00:00 GMT</lastBuildDate>
 <item>
   <title>FinanceModels.jl - Evolving the JuliaActuary Ecosystem</title>
   <dc:creator>Alec Loudenback</dc:creator>
@@ -362,7 +362,7 @@ end</code></pre>
   <category>code</category>
   <category>blog</category>
   <guid>https://JuliaActuary.org/posts/finance-models-announcement/</guid>
-  <pubDate>Sat, 19 Aug 2023 05:00:00 GMT</pubDate>
+  <pubDate>Sat, 19 Aug 2023 06:00:00 GMT</pubDate>
 </item>
 <item>
   <title>Modern Bayesian Statistics for Actuaries</title>
@@ -482,7 +482,7 @@ end</code></pre>
   <category>statistics</category>
   <category>blog</category>
   <guid>https://JuliaActuary.org/posts/getting-started-for-actuaries/</guid>
-  <pubDate>Thu, 13 Jul 2023 05:00:00 GMT</pubDate>
+  <pubDate>Thu, 13 Jul 2023 06:00:00 GMT</pubDate>
 </item>
 <item>
   <title>JuliaActuary and Hacktoberfest 2022</title>
@@ -524,7 +524,7 @@ end</code></pre>
   <category>contributing</category>
   <category>blog</category>
   <guid>https://JuliaActuary.org/posts/hacktoberfest/</guid>
-  <pubDate>Sat, 24 Sep 2022 05:00:00 GMT</pubDate>
+  <pubDate>Sat, 24 Sep 2022 06:00:00 GMT</pubDate>
   <media:content url="https://JuliaActuary.org/posts/hacktoberfest/hacktoberfest2022.webp" medium="image" type="image/webp"/>
 </item>
 <item>
@@ -751,8 +751,9 @@ BenchmarkTools.Trial: 10000 samples with 994 evaluations.
   <category>industry</category>
   <category>blog</category>
   <category>statistics</category>
+  <category>bayesian</category>
   <guid>https://JuliaActuary.org/posts/bayesian-intro/</guid>
-  <pubDate>Sun, 24 Oct 2021 05:00:00 GMT</pubDate>
+  <pubDate>Sun, 24 Oct 2021 06:00:00 GMT</pubDate>
 </item>
 <item>
   <title>The Life Modeling Problem: A Comparison of Julia, Rust, Python, and R</title>
@@ -1641,7 +1642,7 @@ Platform Info:
   <category>code</category>
   <category>blog</category>
   <guid>https://JuliaActuary.org/posts/life-modeling-problem/</guid>
-  <pubDate>Sun, 16 May 2021 05:00:00 GMT</pubDate>
+  <pubDate>Sun, 16 May 2021 06:00:00 GMT</pubDate>
 </item>
 <item>
   <title>Julia for Actuaries</title>
@@ -1951,7 +1952,7 @@ size=100)</code></pre></td>
   <category>python</category>
   <category>blog</category>
   <guid>https://JuliaActuary.org/posts/julia-for-actuaries/</guid>
-  <pubDate>Thu, 09 Jul 2020 05:00:00 GMT</pubDate>
+  <pubDate>Thu, 09 Jul 2020 06:00:00 GMT</pubDate>
 </item>
 <item>
   <title>Coding the Future</title>
@@ -2062,7 +2063,7 @@ size=100)</code></pre></td>
   <category>industry</category>
   <category>blog</category>
   <guid>https://JuliaActuary.org/posts/coding-the-future/</guid>
-  <pubDate>Thu, 09 Jul 2020 05:00:00 GMT</pubDate>
+  <pubDate>Thu, 09 Jul 2020 06:00:00 GMT</pubDate>
 </item>
 </channel>
 </rss>
