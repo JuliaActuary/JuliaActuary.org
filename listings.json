@@ -3,9 +3,9 @@
     "listing": "/blog.html",
     "items": [
       "/posts/finance-models-announcement/index.html",
-      "/posts/getting-started-for-actuaries/index.html",
-      "/posts/hacktoberfest/index.html",
       "/posts/bayesian-intro/index.html",
+      "/posts/hacktoberfest/index.html",
+      "/posts/getting-started-for-actuaries/index.html",
       "/posts/life-modeling-problem/index.html",
       "/posts/julia-for-actuaries/index.html",
       "/posts/coding-the-future/index.html"
@@ -28,6 +28,7 @@
       "/posts/stochastic-mortality/index.html",
       "/posts/exposures-example/index.html",
       "/posts/academy-generator/index.html",
+      "/posts/autodiff_ALM/index.html",
       "/posts/mortality-comparison/index.html"
     ]
   },
@@ -48,11 +49,12 @@
       "/posts/stochastic-mortality/index.html",
       "/posts/exposures-example/index.html",
       "/posts/academy-generator/index.html",
+      "/posts/autodiff_ALM/index.html",
       "/posts/mortality-comparison/index.html",
       "/posts/finance-models-announcement/index.html",
-      "/posts/getting-started-for-actuaries/index.html",
-      "/posts/hacktoberfest/index.html",
       "/posts/bayesian-intro/index.html",
+      "/posts/hacktoberfest/index.html",
+      "/posts/getting-started-for-actuaries/index.html",
       "/posts/life-modeling-problem/index.html",
       "/posts/julia-for-actuaries/index.html",
       "/posts/coding-the-future/index.html"
