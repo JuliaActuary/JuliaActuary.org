@@ -1,117 +1,252 @@
+
 ---
-title: "Modern Bayesian Statistics for Actuaries"
-author: "Alec Loudenback"
-date: "2023-07-13"
-categories: [code, statistics,blog]
+title: "Getting Started with Julia for Actuaries"
+author: "Alec Loudenback and Dimitar Vanguelov"
+date: "2021-10-24"
+categories: [industry,blog,statistics,bayesian]
 ---
 
-One of the first probabilistic theorems everyone learns is Bayes' Theorem, but that theorem is conspicuously absent from most applications and practice. The reason for this is that outside of trivial introductory examples ("you tested positive for a disease...") is that Bayes' Theorem becomes intractably complicated to calculate the posterior distribution. Modern advances in computing power, algorithms, and open-source libraries have made it possible to start applying the most powerful theorem to much more complex problems.
 
-The advantage of this is that actuaries can now apply these techniques to problems in a principled and flexible way to understand uncertainty better than we have before by explicitly looking at the posterior distribution of the parameters in our model. This would serve to enhance risk management via moving away from singular estimates of model parameters to a culture of considering the parameter distribution of modeled risk.
+The previously published article titled [Julia for Actuaries](/blog/julia-actuaries) gave a longer introduction to why Julia works so well in actuarial workflows. In summary: Julia's attributes are "evident in its pragmatic, productivity-focused design choices, pleasant syntax, rich ecosystem, thriving communities, and its ability to be both very general purpose and power cutting edge computing".
 
-## What is Modern Bayesian Statistics?
+This is the second in the following trilogy of articles:
 
-A Bayesian statistical model has four main components to focus on:
+1. Why Julia works so well for actuaries
+2. Basic tooling and general packages of interest
+3. Actuarial-specific packages
 
-1. **Prior** encoding assumptions about the random variables related to the problem at hand, before conditioning on the data.
-2. A **Model** that defines how the random variables give rise to the observed outcome.
-3. **Data** that we use to update our prior assumptions.
-4. **Posterior** distributions of our random variables, conditioned on the observed data and our model
+## Reminder of "Why Julia?"
 
-Having defined the first two components and collected our data, the workflow involves computationally sampling the posterior distribution, often using a technique called Markov Chain Monte-Carlo (MCMC). The result is a series of values that are sampled statistically from the posterior distribution.
+In the [2021 Stack Overflow Survey](https://insights.stackoverflow.com/survey/2021?_ga=2.236209345.190202062.1628102352-126161871.1625855113#technology-most-loved-dreaded-and-wanted), Julia was the 5th most loved language. This was ahead of other languages commonly used in actuarial contexts, such as Python (6th), R (28th), C++ (25th), Matlab (36th), or VBA (37th).
 
-## Advantages of the Bayesian Approach
+There are three main reasons to consider using Julia:
 
-The main advantages of this approach over traditional actuarial techniques are:
+1) **The language itself offers expressiveness, pleasant syntax, and less boilerplate than many alternatives.** Multiple dispatch is a programming paradigm that is an evolution of object-oriented approaches that's more amenable to a wide range of programming styles, including functional and vectorized approaches. It affords Julia code a high level of composability and is what makes the Julia ecosystem so powerful.
 
-1. **Focus on distributions rather than point estimates of the posterior's mean or mode.** We are often interested in the distribution of the parameters and a focus on a single parameter estimate will understate the risk distribution.
-2. **Model flexibility.** A Bayesian model can be as simple as an ordinary linear regression, but as complex as modeling a full insurance mechanics.
-3. **Simpler mental model.** Fundamentally, Bayes' theorem could be distilled down to an approach where you count the ways that things could occur and update the probabilities accordingly.
-4. **Explicit Assumptions.**: Enumerating the random variables in your model and explicitly parameterizing prior assumptions avoids ambiguity of the assumptions inside the statistical model.
+2) **High performant Julia code, instead of needing libraries written in C/Cython/etc.** For lots of problems, especially "toy" problems as you learn a language, the speed of Matlab/Python/R is fast enough. However, in real usage, particularly actuarial problems, you might find that when you need the performance, it's too late[^1]
 
-## Challenges with the Bayesian Approach
+3) **The language, tooling, and ecosystem is very modern, mature, and powerful.** A built-in package manager, packages that work together without needing to know about each other, differentiable programming, meta-programming (macros), first-class GPU/parallel support, and wide range of packages relevant to actuarial workloads.
 
-With the Bayesian approach, there are a handful of things that are challenging. Many of the listed items are not unique to the Bayesian approach, but there are different facets of the issues that arise.
+More detail of why Julia works so well in actuarial contexts was discussed in the prior article, [Julia for Actuaries](/blog/julia-actuaries). The rest of this article is going to focus on getting oriented to using Julia, and the next article in the series will introduce actuarial packages available.
 
-1. **Model Construction**. One must be thoughtful about the model and how variables interact. However, with the flexibility of modeling, you can apply (actuarial) science to makes better models! 
-2. **Model Diagnostics**. Instead of R^2 values, there are unique diagnostics that one must monitor to ensure that the posterior sampling worked as intended.
-3. **Model Complexity and Size of Data**. The sampling algorithms are computationally intensive - as the amount of data grows and model complexity grows, the runtime demands cluster computing.
-4. **Model Representation**. The statistical derivation of the posterior can only reflect the complexity of the world as defined by your model. A Bayesian model won't automatically infer all possible real-world relationships and constraints.
+## The language itself
 
-## Why Now?
+Julia is a high level language, with syntax that should feel familiar to someone coming from R, Python, or Matlab. This article is too short for a true introduction to the language. Fortunately, there's a ton of great references online, such as:
 
-There are both philosophical and practical reasons why Bayesian analysis is rapidly changing the statistical landscape.
+- [Matlab-Python-Julia Cheatsheet](https://cheatsheets.quantecon.org/)
+- [Learn Julia in Y minutes](https://learnxinyminutes.com/docs/julia/)
+- [Julia Official Documentation](https://docs.julialang.org/en/v1/manual/getting-started/)
 
-*Philosophically*, one of the main reasons why Bayesian thinking is appealing is its ability to provide a straightforward interpretation of statistical conclusions.
+Julia code is compiled on-the-fly, generating efficient code for the specific data that you are currently working with. This is kind of an in-between of a fully interpreted language (like pure Python or R) and a complied language like C++ which must compile everything in advance.
 
-For example, when estimating an unknown quantity, a Bayesian probability interval can be directly understood as having a high probability of containing that quantity. In contrast, a frequentist confidence interval is typically interpreted only in the context of a series of similar inferences that could be made in repeated practice. In recent years, there has been a growing emphasis on interval estimation rather than hypothesis testing in applied statistics. This shift has strengthened the Bayesian perspective since it is likely that many users of standard confidence intervals intuitively interpret them in a manner consistent with Bayesian thinking.
+Born of a desire to have the niceties of high level languages with the performance of low level compiled code, there are many built-in data structures and functions related to numerical computing like that used in finance, insurance, and statistics.
 
-Another meaningful way to understand the contrast between Bayesian and frequentist approaches is through the lens of decision theory, specifically how each view treats the concept of randomness. This perspective pertains to whether you regard the data being random or the parameters being random.
+If you just want a quick introduction for beginners, [Julia For Data Science](https://www.juliafordatascience.com/) is a great resource with easy, digestible tutorials. If you want a ground-up introduction, the e-book [Think Julia](https://benlauwens.github.io/ThinkJulia.jl/latest/book.html) starts simple and builds up. If you prefer to learn-by-example: the interactive, free, online course [Introduction to Computational Thinking](https://computationalthinking.mit.edu/Spring21/) by MIT will have you working on everything from data science to climate modeling.
 
-Frequentist statistics treats parameters as fixed and unknown, and the data as random — this is reflective of the view that data you collect is but one realization of an infinitely repeatable random process. Consequently, frequentist procedures, like hypothesis testing or confidence intervals, are generally based on the idea of long-run frequency or repeatable sampling.
+Lastly, [JuliaAcademy.com](https://juliaacademy.com/) has a number of free courses that introduce the language via data science, machine learning, or "for nervous beginners."
 
-Conversely, Bayesian statistics turns this on its head by treating the data as fixed — after all, once you've collected your data, it's no longer random but a fixed observed quantity. Parameters, which are unknown, are treated as random variables. The Bayesian approach then allows us to use probability to quantify our uncertainty about these parameters.
+### Spotlight on Features
 
-The Bayesian approach tends to align more closely with our intuitive way of reasoning about problems. Often, you are given specific data and you want to understand what that particular set of data tells you about the world. You're likely less interested in what might happen if you had infinite data, but rather in drawing the best conclusions you can from the data you do have.
+A full introduction to the language is beyond the scope of this article. There are two features we'd like to highlight here, which exemplify powerful features not available in other languages. These might sound a little technical at first, but as Paul Graham describes in his essay, [Beating the Average](http://www.paulgraham.com/avg.html), it is hard to see what you might be missing until you get experience with it.
 
-*Practically*, recent advances in computational power, algorithm development, and open-source libraries have enabled practitioners to adapt the Bayesian workflow.
+#### Multiple Dispatch
 
-Deriving the posterior distribution is analytically intractable so computational methods must be used. Advances in raw computing power only in the 1990's made non-trivial Bayesian analysis possible, and recent advances in algorithms have made the computations more efficient. For example, one of the most popular algorithms, NUTS, was only published in the 2010's. 
+Multiple dispatch is the term for deciding which function to call based on the combination of arguments. Taking an example pointed out by data scientist Brian Groenke[^3] of a simple ordinary least squares implementation:
 
-Many problems require the use of compute clusters to manage runtime, but if there is any place to invest in understanding posterior probability distributions, it's insurance companies trying to manage risk!
+```julia
+ols(x,y) = inv(x'x)x'y
 
-Moreover, the availability of open-source libraries, such as Turing.jl, PyMC3, and Stan provide access to the core routines in an accessible interface.
+# alternatively, one can write this using matrix division:
+ols(x,y) = x \ y
+```
 
-## Subjectivity of the Priors?
+"This very naive implementation already works for any appropriately sized `x` and `y`, including the multivariate case where `x` is a matrix or multiple-target case where `y` is a matrix. Furthermore, if `x` and `y` have special types [e.g diagonal or sparse matrices], we get the potentially optimized implementations [of the different combinations] for free."
 
-There are two ways one might react to subjectivity in a Bayesian context: It's a feature that should be embraced or it’s a flaw that should be avoided.
+In a language without multiple dispatch, the alternative would be to:
 
-### Subjectivity as a Feature
+- define `ols` for every combination of types you might encounter
+- attach a method to a class with every combination of second argument type
 
-**A Bayesian approach to defining a statistical model is an approach that allows for explicitly incorporating actuarial judgment.** Encoding assumptions into a Bayesian model forces the actuary to be explicit about otherwise fuzzy predilections. The explicit assumption is also more amenable to productive debate about its merits and biases than an implicit judgmental override.
+The statistician Josh Day wrote [an entire blog post](https://medium.com/@josh_40272/why-i-use-julia-8eb47216880e) about how multiple dispatch boosts one's productivity, allows for less code, and more time spent on solving the actual problem at hand.
 
-### Subjectivity as a Flaw
+#### Meta-programming and Macros
 
-Subjectivity is inherent in all useful statistical methods. Subjectivity in traditional approaches include how the data was collected, which hypothesis to test, what significant levels to use, and assumptions about the data-generating processes. 
+Meta-programming is the essentially the ability to program the language itself, and macros are one of the tools that provide this ability. In the Paul Graham essay mentioned above, macros are an example of the competitive advantage conferred by a more powerful language.
 
-In fact, the "objective" approach to null hypothesis testing is so prone to abuse and misinterpretation that in 2016, the American Statistical Association issued a statement intended to steer statistical analysis into a "post p<0.05 era." That "p<0.05" approach is embedded in most traditional approaches to actuarial credibility[^1] and therefore should be similarly reconsidered.
+For example, when you see `@benchmark present_value(0.05, [10, 10, 10])` in Julia, the `@benchmark` is a macro (starts with `@`). It modifies the written code to wrap `present_value` in setup, timing, and summary code before returning the result of `present_value`. There is an example of this later in the article.
 
-### Maximum Entropy Distributions
+Most other languages don't have macros, and it means that it's hard to 'hook into' code in a safe way. For example, benchmarking can involve a lot of boilerplate code just to setup, time, and summarize the results (such as the `timeit` library in Python)[^4].
 
-Further, when assigning a prior assumption to a random variable, there are mathematically most conservative choices to pull from. These are called Maximum Entropy Distributions (MED) and it can be shown that for certain minimal constraints these are the information-theoretic least informative choices. Least informative means that the prior will have the least influence on the resulting posterior distribution. 
+Note that *using* macros is quite prevalent when coding in Julia, however *writing* macros is [more advanced usage](https://www.youtube.com/watch?v=mSgXWpvQEHE) and beyond the scope of a "getting-started" guide.
 
-For example, if all you know is that the mean of a random process is positive, then the Exponential Distribution is your MED. If you know that a mean and variance must exist for the process, then the Normal distribution is your MED. If you know nothing at all, you can use a Uniform distribution for the possible values.
+## Installation and Tooling
 
-## Bayesian Versus Machine Learning
+### Installation
 
-Machine learning (ML) is *fully compatible* with Bayesian analysis - one can derive posterior distributions for the ML parameters like any other statistical model and the combination of approaches may be fruitful in practice.
+Julia is open source and can be downloaded from [JuliaLang.org](https://JuliaLang.org) and is available for all major operating systems. After you download and install, then you have Julia installed and can access the **REPL**, or Read-Eval-Print-Loop, which can run complete programs or [function as powerful day-to-day calculator](https://krasjet.com/rnd.wlk/julia/). However, many people find it more comfortable to work in a text editor or **IDE** (Integrated Development Environment).
 
-However, to the extent that actuaries have leaned on ML approaches due to the shortcomings of traditional actuarial approaches, Bayesian modeling may provide an attractive alternative without resorting to notoriously finicky and difficult-to-explain ML models. The Bayesian framework provides an explainable model and offers several analytic extensions beyond the scope of this introductory article:
+If you are looking for managed installations with a curated set of packages for use within an organization, there are ways to self-host package repositories and otherwise administratively manage packages. [Julia Computing](https://juliacomputing.com/) offers managed support with enterprise solutions, including push-button cloud compute capabilities.
 
-- Causal Modeling: Identifying not just correlated relationships, but causal ones, in contexts where a traditional experiment is unavailable.
-- Bayes Action: Optimizing a parameter for, e.g., a CTE95 level instead of a parameter mean.
-- Information Criterion: Principled techniques to compare model fit and complexity.
-- Missing data: Mechanisms to handle the different kinds of missing data.
-- Model averaging: Posteriors can be combined from different models to synthesize different approaches.
+### Package Management
 
-## Implications for Risk Management
+Julia comes with `Pkg`, a built-in package manger. With it, you can install packages, pin certain versions, recreate environments with the same set of dependencies, and upgrade/remove/develop packages easily. It's one of the things that *just works* and makes Julia stand out versus alternative languages that don't have a de-facto way of managing or installing packages.
 
-Like Bayes' Formula itself, another aspect of actuarial literature that is taught but often glossed over in practice is the difference between process risk (volatility), parameter risk, and model formulation risk. Often when performing analysis that relies on stochastic result, in practice only process/volatility risk is assessed.
+Package installation is accomplished interactively in the REPL or executing commands.
 
-Bayesian statistics provides the tools to help actuaries address parameter risk and model formulation. The posterior distribution of parameters derived is consistent with the observed data and modeled relationships. This posterior distribution of parameters can then be run as an additional dimension to the risk analysis.
+- In the REPL, you can change to the Package Management Mode by hitting `]` and, e.g., `add DataFrames CSV` to install the two packages. Hit `[backspace]` to exit that mode in the REPL.
+- The same operation without changing REPL modes would be: `using Pkg; Pkg.add(["DataFrames", "CSV"])`
 
-Additionally, best practices include skepticism of the model construction itself, and testing different formulation of the modeled relationships and variable combinations to identify models which are best fit for purpose. Tools such as Information Criterion, posterior predictive checks, Bayes factors, and other statistical diagnostics can inform the actuary about tradeoffs between different choices of model.
+Related to packages, are **environments** which are a self-contained workspaces for your code. This lets you install only packages that are relevant to the current work. It also lets you 'remember' the exact set of packages and versions that you used. In fact, you can share the environment with others, and it will be able to recreate the same environment as when you ran the code. This is accomplished via a `Project.toml` file, which tracks the direct dependencies you've added, along with details about your project like its version number. The `Manifest.toml` tracks the entire dependency tree.
 
-## Paving the Way Forward for Actuaries
+Reproducibility via the environment tools above is a really key aspect that will ensure Julia code is consistent across time and users, which is important for financial controls.
 
-Bayesian approaches to statistical problems are rapidly changing the professional statistical field. To the extent that the actuarial profession incorporates statistical procedures we should consider adopting the same practices. The benefits of this are a better understanding of the distribution of risks, results that are more interpretable and explainable, and techniques that can be applied to a wider range of problems. The combination of these things would serve to enhance actuarial best practices related to understanding and communicating about risk.
+### Editors
 
-For actuaries interested in learning more, there are number of available resources to be found. Textbooks recommended by the author are:
+Because Julia is very extensible and amenable to analysis of its own code, you can typically find plugins for whatever tool you prefer to write code in. A few examples:
 
-- Statistical Rethinking (McElreath)
-- Bayes Rules! (Johnson, Ott, Dogucu)
-- Bayesian Data Analysis (Gelman, et. al.)
+#### Visual Studio Code
 
-Additionally, the author has published a few examples of Bayesian analysis in an actuarial context on JuliaActuary.org.
+Visual Studio Code is a free editor from Microsoft. There's a full-featured [Julia plugin](https://www.julia-vscode.org/) available, which will help with auto-completion, warnings, and other code hints that you might find in a dedicated editor (e.g. PyCharm or RStudio). Like those tools, you can view plots, search documentation, show datasets, debug, and manage version control.
 
-[^1]: Note that the approach discussed here is much more encompassing than the Bühlmann-Straub Bayesian approach described in the actuarial literature.
+#### Notebooks
+
+Notebooks are typically more interactive environments than text editors - you can write code in cells and see the results side-by-side.
+
+The most popular notebook tool is Jupyter ("Julia, Python, R"). It is widely used and fits in well with exploratory data analysis or other interactive workflows. It can be installed by adding the [`IJulia.jl`](https://github.com/JuliaLang/IJulia.jl) package.
+
+[`Pluto.jl`](https://plutojl.org/) is a newer tool, which adds reactivity and interactivity. It is also more amenable to version control than Jupyter notebooks because notebooks are saved as plain Julia scripts. Pluto is unique to Julia because of the language's ability to introspect and analyze dependencies in its own code. Pluto also has built-in package/environment management, meaning that Pluto notebooks contains all the code needed to reproduce results (as long as Julia and Pluto are installed).
+
+## A Whirlwind Tour of General-Purpose Packages
+
+The Julia ecosystem favors composability and interoperability, enabled by multiple dispatch. In other words, because it's easy to automatically specialize functionality based on the type of data being used, there's much less need to bundle a lot of features within a single package.
+
+As you'll see, Julia packages tend to be less vertically integrated because it's easier to pass data around. Counterexamples of this in Python and R:
+
+- Numpy-compatible packages that are designed to work with a subset of numerically fast libraries in Python
+- special functions in Pandas to read CSV, JSON, database connections, etc.
+- The Tidyverse in R has a tightly coupled set of packages that works well together but has limitations with some other R packages
+
+Julia is not perfect in this regard, but it's neat to see how frequently things *just work*. It's not magic, but because of Julia features outside the scope of this article it's easy for package developers (and you!) to do this.
+
+Julia also has language-level support for documentation, so packages can follow a consistent style of help-text and have the docs be auto-generated into web pages available locally or online.
+
+The following highlighted packages were chosen for their relevance to typical actuarial work, with a bias towards those used regularly by the authors. This is a small sampling of the over 6000 registered Julia Packages[^2]
+
+### Data
+
+Julia offers a rich data ecosystem with a multitude of available packages. Perhaps at the center of the data ecosystem are [`CSV.jl`](https://github.com/JuliaData/CSV.jl) and [`DataFrames.jl`](https://dataframes.juliadata.org/stable/). `CSV.jl` is for reading and writing files text files (namely CSVs) and offers top-class read and write performance. `DataFrames.jl` is a mature package for working with dataframes, comparable to Pandas or dplyr.
+
+Other notable packages include [`ODBC.jl`](https://github.com/JuliaDatabases/ODBC.jl), which lets you connect to any database (given you have the right drivers installed), and [`Arrow.jl`](https://github.com/JuliaData/Arrow.jl) which implements the [Apache Arrow](https://arrow.apache.org/) standard in Julia.
+
+Worth mentioning also is `Dates`, a built-in package making date manipulation straightforward and robust.
+
+Check out [JuliaData](https://github.com/JuliaData) org for more packages and information.
+
+### Plotting
+
+[`Plots.jl`](http://docs.juliaplots.org/latest/) is a meta-package providing an interface to consistently work with several plotting [backends](https://docs.juliaplots.org/latest/backends/), depending if you are trying to emphasize interactivity on the web or print-quality output. You can very easily add animations or change almost any feature of a plot.
+
+[`StatsPlots.jl`](https://github.com/JuliaPlots/StatsPlots.jl) extends `Plots.jl` with a focus on data visualization and compatibility with dataframes.
+
+[`Makie.jl`](http://makie.juliaplots.org/dev/) supports GPU-accelerated plotting and can create very rich, [beautiful visualizations](https://lazarusa.github.io/BeautifulMakie/), but it's main downside is that it has not yet been optimized to minimize the time-to-first-plot.
+
+### Statistics
+
+Julia has first-class support for `missing` values, which follows the rules of [three-valued logic](https://en.wikipedia.org/wiki/Three-valued_logic) so other packages don't need to do anything special to incorporate missing values.
+
+[`StatsBase.jl`](https://github.com/JuliaStats/StatsBase.jl) and [`Distributions.jl`](https://github.com/JuliaStats/Distributions.jl) are essentials for a range of statistics functions and probability distributions respectively.
+
+Others include:
+
+- [`Turing.jl`](https://turing.ml/stable/), a probabilistic programming (Bayesian statistics) library, which is outstanding in its combination of clear model syntax with performance.
+- [`GLM.jl`](https://github.com/JuliaStats/GLM.jl) for any type of linear modeling (mimicking R's `glm` functionality).
+- [`LsqFit.jl`](https://github.com/JuliaNLSolvers/LsqFit.jl) for fitting data to non-linear models.
+- [`MultivariateStats.jl`](https://github.com/JuliaStats/MultivariateStats.jl) for multivariate statistics, such as PCA.
+
+You can find more packages and learn about them [here](https://juliastats.org/).
+
+
+### Machine Learning
+
+[`Flux`](https://fluxml.ai/), [`Gen`](https://www.gen.dev/), [`Knet`](https://github.com/denizyuret/Knet.jl), and [`MLJ`](https://alan-turing-institute.github.io/MLJ.jl/v0.12/) are all very popular machine learning libraries. There are also packages for PyTorch, Tensorflow, and SciKitML available. One advantage for users is that the Julia packages are written in Julia, so it can be easier to adapt or see what's going on in the entire stack. In contrast to this design, PyTorch and Tensorflow are built primarily with C++.
+
+Another advantage is that the Julia libraries can use automatic differentiation to optimize on a wider range of data and functions than those built into libraries in other languages.
+
+### Differentiable Programming
+
+Sensitivity testing is very common in actuarial workflows: essentially, it's understanding the change in one variable in relation to another. In other words, the derivative!
+
+Julia has unique capabilities where almost across the entire language and ecosystem, you can take the derivative of entire functions or scripts. For example, the following is real Julia code to automatically calculate the sensitivity of the ending account value with respect to the inputs:
+
+```julia-repl
+julia> using Zygote
+
+julia> function policy_av(pol)
+	COIs = [0.00319, 0.00345, 0.0038, 0.00419, 0.0047, 0.00532]
+	av = 0.0
+	for (i,coi) in enumerate(COIs)
+		av += av * pol.credit_rate
+		av += pol.annual_premium
+		av -= pol.face * coi
+	end
+	return av                # return the final account value
+end
+
+julia> pol = (annual_premium = 1000, face = 100_000, credit_rate = 0.05);
+
+julia> policy_av(pol)        # the ending account value
+4048.08
+
+julia> policy_av'(pol)       # the derivative of the account value with respect to the inputs
+(annual_premium = 6.802, face = -0.0275, credit_rate = 10972.52)
+```
+When executing the code above, Julia isn't just adding a small amount and calculating the finite difference. Differentiation is applied to entire programs through extensive use of basic derivatives and the chain rule. **Automatic differentiation**, has uses in optimization, machine learning, sensitivity testing, and risk analysis. You can read more about Julia's autodiff ecosystem [here](https://juliadiff.org/).
+
+### Utilities
+
+There are also a lot of quality-of-life packages, like [`Revise.jl`](https://timholy.github.io/Revise.jl/stable/) which lets you edit code on the fly without needing to re-run entire scripts.
+
+[`BenchmarkTools.jl`](https://github.com/JuliaCI/BenchmarkTools.jl) makes it incredibly easy to benchmark your code - simply add `@benchmark` in front of what you want to test, and you will be presented with detailed statistics. For example:
+
+```julia
+julia> using ActuaryUtilities, BenchmarkTools
+
+julia> @benchmark present_value(0.05,[10,10,10])
+
+BenchmarkTools.Trial: 10000 samples with 994 evaluations.
+ Range (min … max):  33.492 ns … 829.015 ns  ┊ GC (min … max): 0.00% … 95.40%
+ Time  (median):     34.708 ns               ┊ GC (median):    0.00%
+ Time  (mean ± σ):   36.599 ns ±  33.686 ns  ┊ GC (mean ± σ):  4.40% ±  4.55%
+
+  ▁▃▆▆▆██▇▄▃▂         ▁                                        ▂
+  █████████████▆▆▇█▇████▇██▇█▇█▇▇▆▆▅▅▅▅▅▄▅▄▄▅▅▅▅▄▄▁▅▄▄▅▄▄▅▅▆▅▆ █
+  33.5 ns       Histogram: log(frequency) by time      45.6 ns <
+
+ Memory estimate: 112 bytes, allocs estimate: 1.
+
+```
+
+`Test` is a built-in package for performing testsets, while [`Documenter.jl`](https://github.com/JuliaDocs/Documenter.jl) will build high-quality documentation based on your inline documentation.
+
+[`ClipData.jl`](https://github.com/pdeffebach/ClipData.jl) lets you copy and paste from spreadsheets to Julia sessions.
+
+### Other packages
+
+Julia is a general-purpose language, so you will find packages for web development, graphics, game development, audio production, and much more. You can explore packages (and their dependencies) at https://juliahub.com/.
+
+### Actuarial packages
+
+Saving the best for last, the next article in the series will dive deeper into actuarial packages, such as those published by [JuliaActuary](https://JuliaActuary.org) for easy mortality table manipulation, common actuarial functions, financial math, and experience analysis.
+
+## Getting Help
+
+Aside from the usual StackOverflow, there is a [community page](https://julialang.org/community/) with links to the Discourse forum, Slack, and Zulip. The latter two have a dedicated `#actuary` channel.
+
+## Summary
+
+This article introduced Julia, getting setup with running and editing, and pointed toward a number of general-purpose features and packages useful to actuaries. The next article in the series will focus on the range of actuarial-specific packages available.
+
+[^1]: https://ocw.mit.edu/courses/mathematics/18-335j-introduction-to-numerical-methods-spring-2019/week-1/Julia-intro.pdf
+[^2]: As of July 2021.
+[^3]: https://discourse.julialang.org/t/claim-false-julia-isnt-multiple-dispatch-but-overloading/42370/114
+[^4]: Perhaps benchmarking isn't the best example because of the 'magic' `%timeit` keyword in Jupyter. However, the [documentation](https://ipython.readthedocs.io/en/stable/interactive/magics.html) for IPython itself reveals the limitations: "To Jupyter users: Magics are specific to and provided by the IPython kernel. Whether Magics are available on a kernel is a decision that is made by the kernel developer on a per-kernel basis. To work properly, Magics must use a syntax element which is not valid in the underlying language."

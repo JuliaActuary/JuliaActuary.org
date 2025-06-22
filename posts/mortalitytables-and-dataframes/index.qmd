@@ -2,6 +2,7 @@
 title: "Using MortaltiyTables.jl with DataFrames"
 categories: [mortalitytables, dataframes,tutorial]
 ---
+
 ```{julia}
 #| echo: false
 #| output: false
@@ -22,7 +23,8 @@ using MortalityTables
 name = "2001 VBT Residual Standard Select and Ultimate - Male Nonsmoker, ANB" # <1>
 vbt = MortalityTables.table(name)
 ```
-1. Or any other mort.soa.org table
+
+1.  Or any other mort.soa.org table
 
 First, we include the package, and then we'll pick a table, where all of the `mort.soa.org` tables are mirrored into your MortalityTables.jl installation.
 
@@ -32,11 +34,12 @@ To see how the data is represented, we can look at the the select data for a 55 
 vbt.select[55]
 ```
 
-This is very efficient and convienent for modeling, but a lot of times you want the data matched up with policy data in a DataFrame.
+This is very efficient and convenient for modeling, but a lot of times you want the data matched up with policy data in a DataFrame.
 
 ## Getting data into a dataframe
 
 ### Generate sample data
+
 ```{julia}
 using DataFrames
 
@@ -58,11 +61,9 @@ end
 
 ### Define the table set you want to use
 
-
 There are a lot of different possible combinations of parameters that you might want to use, such as rates that vary by sex, risk class, table set (VBT/CSO/etc), smoking status, relative risk, ALB/ANB, etc.
 
 It's easy to define the parameters applicable to your assumption set. Here, we'll use a dictionary to define the relationship:
-
 
 ```{julia}
 rate_map = Dict(
@@ -76,7 +77,7 @@ rate_map = Dict(
 		"Nonsmoker" => MortalityTables.table("2001 VBT Residual Standard Select and Ultimate - Female Nonsmoker, ANB"),
 		)
 	);
-```	
+```
 
 And then we'll define a function to look up the relevant rate. Note how the function matches the levels we defined for the assumption set dictionary above.
 
@@ -85,7 +86,7 @@ function rate_lookup(assumption_map,sex,smoke,issue_age,attained_age)
 	# pick the relevant table
 	table = assumption_map[sex][smoke]
 	
-	# check if the select rate exists, otherwise look to the ulitmate table
+	# check if the select rate exists, otherwise look to the ultimate table
 	if issue_age in eachindex(table.select)
 		table.select[issue_age][attained_age]
 	else
@@ -93,7 +94,6 @@ function rate_lookup(assumption_map,sex,smoke,issue_age,attained_age)
 	end
 end
 ```
-	
 
 ### Lining up with dataframe
 

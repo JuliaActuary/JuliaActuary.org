@@ -1,6 +1,6 @@
 project:
   type: website
-
+engines: ['julia']
 
 website:
   title: "JuliaActuary"
