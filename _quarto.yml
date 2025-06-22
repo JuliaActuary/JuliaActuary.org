@@ -1,6 +1,8 @@
 project:
   type: website
 engines: ['julia']
+julia:
+    env: ["JULIA_NUM_THREADS=auto"]
 
 website:
   title: "JuliaActuary"

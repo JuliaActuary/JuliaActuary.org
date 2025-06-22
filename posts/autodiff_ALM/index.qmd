@@ -23,6 +23,7 @@ using Transducers              # data aggregation
 using JuMP, HiGHS              # portfolio optimization
 using LinearAlgebra            # math
 using BenchmarkTools           # benchmarking
+using OhMyThreads              # multi-threading
 ```
 
 ## Interest Rate Curve Setup
@@ -129,7 +130,10 @@ begin
 
         c = curve(rates, times)
 
-        mapreduce(b -> value(c, b), +, portfolio)
+        # threaded map-reduce for more speed
+        OhMyThreads.tmapreduce(+, 1:length(portfolio); ntasks=Threads.nthreads()) do i
+                value(c,portfolio[i])
+        end
     end
 
 end
