@@ -122,6 +122,7 @@ begin
 
         end
     end
+
     function surrender_rate(rate_diff)
         1 / (1 + exp(3 - rate_diff * 60))
     end
@@ -134,6 +135,7 @@ begin
         OhMyThreads.tmapreduce(+, 1:length(portfolio); ntasks=Threads.nthreads()) do i
                 value(c,portfolio[i])
         end
+        # mapreduce(l -> value(c,l),+,portfolio)
     end
 
 end
@@ -170,7 +172,7 @@ end
 ::: {.callout-note collapse="true"}
 ## Consolidating Cashflows
 
-Later on we will generate vectors of vectors of cashflows without any guarantee that the timepoints will line up, making aggregating cashflows by timepoitns a non-obvious task. There are many ways to accomplish this, but [I like Transducers](https://juliaactuary.github.io/FinanceModels.jl/dev/faq/#Why-does-the-package-rely-on-using-Transducers?). 
+Later on we will generate vectors of vectors of cashflows without any guarantee that the timepoints will line up, making aggregating cashflows by timepoints a non-obvious task. There are many ways to accomplish this, but [I like Transducers](https://juliaactuary.github.io/FinanceModels.jl/dev/faq/#Why-does-the-package-rely-on-using-Transducers?). 
 
 Transducers are unfamiliar to many people, and don't let the presence deter you from the main points of this post. The details aren't central to the point of this blog post so just skip over if confusing.
 
@@ -215,13 +217,13 @@ let
     f = Figure(size = (900, 600))
     ax = Axis(f[1, 1], 
         xlabel = "Time (Years)",
-        ylabel = "Cashflow Amount",
-        title = "Liability Cashflows: Base vs +50bp Rate Shock",
+        ylabel = "Cashflow Amount (cumulative)",
+        title = "Cumulative Liability Cashflows: Base vs +50bp Rate Shock",
     )
 
-    scatter!(ax, ks, vs, label = "Base Scenario")
+    lines!(ax, ks, cumsum(vs), label = "Base Scenario")
 
-    scatter!(ax, ks2, vs2, label = "+50bp Rate Shock")
+    lines!(ax, ks2, cumsum(vs2), label = "+50bp Rate Shock")
 
     axislegend(ax, position = :rb)
 
@@ -409,8 +411,8 @@ end
 
 # Define gradient constraints
 constraints = Dict(
-    :krd => Dict(:lower => -0.5e6, :upper => 0.5e6),
-    :duration => Dict(:lower => -0.05e6, :upper => 0.15e6)
+    :krd => Dict(:lower => -0.35e6, :upper => 0.35e6),
+    :duration => Dict(:lower => -0.05e6, :upper => 0.05e6)
 )
 
 # Optimize
@@ -423,7 +425,21 @@ result = optimize_portfolio(asset_universe, vgh_assets, liabilities, vgh_liab, c
 The optimization produces asset weights that hedge the liability portfolio. We can visualize both the resulting cashflow patterns and the key rate duration matching:
 
 ```{julia}
+
 let
+    d = consolidate([p(c) for p in liabilities])
+    ks = collect(keys(d)) |> sort!
+    vs = -cumsum([d[k] for k in ks])
+
+    f = Figure(size = (900, 600))
+    ax = Axis(f[1, 1], 
+        xlabel = "Time (Years)",
+        ylabel = "Cashflow Amount (cumulative)",
+        title = "Cumulative Asset vs Liability Cashflows",
+    )
+
+    lines!(ax, ks, vs, label = "Liabilities")
+
 
     asset_cfs = map(1:length(asset_universe)) do i
         cfs =
@@ -431,24 +447,22 @@ let
     end
 
     d = consolidate(asset_cfs)
-    ks = collect(keys(d)) |> sort!
-    vs = [d[k] for k in ks]
-    scatter(ks, vs,
-        axis = (
-            title="Asset Cashflows",
-            xlabel="Time (years)",
-            ylabel="Cashflow Amount"
-        )
-    )
+    ks2 = collect(keys(d)) |> sort!
+    vs2 = cumsum([d[k] for k in ks2])
+    lines!(ax, ks2, vs2, label = "Assets")
 
-end
+    axislegend(ax, position = :rb)
+
+    f
+end    
+
+
 
 ```
 
 
 
 ```{julia}
-
 let
     asset_krds = sum(getindex.(vgh_assets,2) .* result.weights)
     liab_krds = -vgh_liab[2]
@@ -501,4 +515,150 @@ versioninfo()
 
 :::
 
+However, there's still some performance left on the table! the `(d::DeferredAnnuity)(curve)` function defined above is not type stable. In the appendix to this post, we'll cover a way to improve the performance even more.
+
+## Conclusion
+
 The Julia ecosystem supports this workflow through packages like `DifferentiationInterface` for autodiff, `JuMP` for optimization, and `FinanceCore` for financial mathematics. This combination enables sophisticated ALM implementations that are both mathematically precise and computationally efficient.
+
+
+## Appendix: Even more performance (Advanced)
+
+Julia is fastest when all functions are type stable (i.e. the return type can be inferred at compile time). Looking back at the function defined above, the issue is that the `av` function is defined outside of the scope used within the `map` block. This means that the compiler can't be sure that `av` won't be modified while being used within the `map`. Therefore, `av` get's 'boxed' and held as an `Any` type. This type uncertainty propagates to the value returned from the `(d::DeferredAnnuity)(curve)` function:
+
+```julia
+function (d::DeferredAnnuity)(curve)
+    av = 1. 
+    map(1//12:1//12:d.tenor) do t
+        mkt_rate = -log(curve(d.tenor) / curve(t)) / (d.tenor - t)
+        av *= exp(d.rate / 12)
+        rate_diff = mkt_rate - d.rate
+        sr = t == d.tenor ? 1.0 : surrender_rate(rate_diff) / 12
+        av_surr = av * sr
+        av -= av_surr
+        Cashflow(-av_surr, t)
+    end
+end
+
+```
+
+An alterative would be to write a `for` loop and initialize an array to hold the cashflows. The challenge with that is to concretely define the output type of the resulting array. Particularly when combine with AD, the types within the program are no longer basic floats and integers, as we have dual numbers and more complex types running through our functions. 
+
+
+To maintain most of the simplicity, an alternative approach[^zulip] is to use small, immutable containers from [MicroCollections.jl](https://juliahub.com/ui/Packages/General/MicroCollections) and combine them with [BangBang.jl](https://juliahub.com/ui/Packages/General/BangBang). Then, instead of using `map` we will write a regular loop. The macro `@unroll` is defined to unroll the first `N` iterations of the loop. This means that the macro transforms the source code to explicitly write out the first two loops. An example of this might be as follows where two iterations of the loop are unrolled.
+
+```julia
+function basic_loop()
+    out = []
+    for i ∈ 1:10
+        push!(out,i)
+    end
+    out
+end
+
+function partially_unrolled_loop()
+    out = []
+    push!(out,1)
+    push!(out,2) # two steps unrolled
+    for i ∈ 3:10
+        push!(out,i)
+    end
+    out
+end
+```
+
+
+Here's the macro that does this (expand to see the full definition):
+
+::: {.callout-note collapse="true"}
+## `@unroll` macro
+
+```{julia}
+"""
+    @unroll N for_loop
+
+Unroll the first `N` iterations of a for loop, with remaining iterations handled by a regular loop.
+
+This macro takes a for loop and explicitly expands the first `N` iterations, which can improve 
+performance and type stability, particularly when building collections where the first few 
+iterations determine the container's type.
+
+# Arguments
+- `N::Int`: Number of loop iterations to unroll (must be a compile-time constant)
+- `for_loop`: A standard for loop expression
+
+# How it works
+The macro transforms:
+```julia
+@unroll 2 for i in 1:n
+    # body
+end
+"""
+macro unroll(N::Int, loop)
+    Base.isexpr(loop, :for) || error("only works on for loops")
+    Base.isexpr(loop.args[1], :(=)) || error("This loop pattern isn't supported")
+    val, itr = esc.(loop.args[1].args)
+    body = esc(loop.args[2])
+    @gensym loopend
+    label = :(@label $loopend)
+    goto = :(@goto $loopend)
+    out = Expr(:block, :(itr = $itr), :(next = iterate(itr)))
+    unrolled = map(1:N) do _
+        quote
+            isnothing(next) && @goto loopend
+            $val, state = next
+            $body
+            next = iterate(itr, state)
+        end
+    end
+    append!(out.args, unrolled)
+    remainder = quote
+        while !isnothing(next)
+            $val, state = next
+            $body
+            next = iterate(itr, state)
+        end
+        @label loopend
+    end
+    push!(out.args, remainder)
+    out
+end
+```
+:::
+
+
+Then, we re-write and redefine `(d::DeferredAnnuity)(curve)` to utilize this technique. 
+
+```{julia}
+using BangBang, MicroCollections
+
+function (d::DeferredAnnuity)(curve)
+        times = 1//12:1//12:d.tenor
+        out = UndefVector{Union{}}(length(times)) # 1
+        av = 1.0
+        @unroll 2 for (i,t) ∈ enumerate(times) # 2
+            mkt_rate = -log(curve(d.tenor) / curve(t)) / (d.tenor - t)
+            av *= exp(d.rate / 12)
+            rate_diff = mkt_rate - d.rate
+            sr = t == d.tenor ? 1.0 : surrender_rate(rate_diff) / 12
+            av_surr = av * sr
+            av -= av_surr
+            cf = Cashflow(-av_surr, t)
+            out = setindex!!(out, cf, i) # 3
+        end
+        out
+    end;
+```
+
+1. We tell the `out` vector how many elements to expect
+2. We unroll two iterations of the loop so that the compiler can use the calculated result to determine the type of the output container.
+3. We use `setindex!!` from BangBang to efficiently update the output vector and it's type.
+
+
+Using this technique, we can see that we achieve a significant speedup (less than half the runtime) from the earlier version due to improving the type stability of the code:
+
+```{julia}
+@btime value_gradient_and_hessian(z -> annuities(z, liabilities), AutoForwardDiff(), zeros)
+```
+
+[^zulip]: With thanks to the helpful persons on the [Julia Zulip](https://julialang.zulipchat.com/#narrow/channel/274208-helpdesk-.28published.29/topic/map.20pattern.20and.20avoiding.20closures/with/525441431), in particular Mason Protter for this approach. 
