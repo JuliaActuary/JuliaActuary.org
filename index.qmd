@@ -217,10 +217,10 @@ These packages are available for use in your project. See more on the [Packages 
 - Insurance, annuity, premium, and reserve maths.
 
 [`ActuaryUtilities.jl`](/packages/#actuaryutilitiesjl)
-- Robust and fast calculations for `internal_rate_of_return`, `duration`, `convexity`, `present_value`, `breakeven`, and more. 
+- Robust and fast calculations for `internal_rate_of_return`, `duration`, `convexity`, `present_value`, `breakeven`, and AD-based key rate `sensitivities`.
 
 [`FinanceModels.jl`](/packages/#FinanceModelsjl)
-- Composable contracts, models, and functions that allow for modeling of both simple and complex financial instruments. 
+- Composable contracts, models, and functions for financial instruments — including stochastic short-rate models and Monte Carlo simulation.
 
 [`ExperienceAnalysis.jl`](/packages/#experienceanalysisjl)
 - Meeting your exposure calculation needs.
