@@ -194,6 +194,15 @@ convexity(discount_rate, cfs, times)               #  10.62
 - `breakeven` to calculate the breakeven time for a set of cashflows
 - `accum_offset` to calculate accumulations like survivorship from a mortality vector
 
+#### Key Rate Sensitivities via Automatic Differentiation
+
+Compute exact key rate durations, DV01s, and convexities using ForwardDiff through `ZeroRateCurve` from FinanceModels.jl — machine-precision sensitivities in a single pass, no bump-and-reprice required.
+
+- `sensitivities`: bundled value, key rate durations, and convexity matrix in a single AD pass
+- Two-curve decomposition: separate `IR01` (risk-free) and `CS01` (credit spread) sensitivities
+- Do-block syntax for rate-dependent instruments (callable bonds, floaters)
+- Hull-White stochastic model: key rate sensitivities of Monte Carlo expected values
+
 #### Options Pricing
 
 - `eurocall` and `europut` for Black-Scholes option prices
@@ -376,6 +385,7 @@ Existing `struct`s:
 - `Composite` (combine two other contracts, e.g. into a swap)
 - `EuroCall`
 - `CommonEquity`
+- `Option.Cap`, `Option.Floor`, `Option.Swaption` (interest rate derivatives)
 
 Commonly, we deal with conventions that imply a contract and an observed price. For example, we may talk about a treasury yield of `0.03`. This is a description that implies a `Quote`ed price for an underling fixed bond. In FinanceModels, we could use `CMTYield(rate,tenor)` which would create a `Quote(price,Bond.Fixed(...))`. In this way, we can conveniently create a number of `Quote`s which can be used to fit models. Such convenience methods include:
 
@@ -417,6 +427,19 @@ The models can be used to compute various rates of interest:
 - `forward(curve,from,to)` gives the zero rate between the two given times
 - `par(curve,time;frequency=2)` gives the coupon-paying par equivalent rate for the given time.
 
+#### `ZeroRateCurve` — Direct Construction
+
+Construct a zero-rate curve directly from rates and tenors without fitting:
+
+- Multiple interpolation options (MonotoneConvex default, Linear, PCHIP, Cubic, Akima)
+- ForwardDiff-compatible for AD-based sensitivities (key rate durations, DV01, convexity)
+
+#### Stochastic Short-Rate Models
+
+- `ShortRate.Vasicek`, `ShortRate.CoxIngersollRoss`, `ShortRate.HullWhite`
+- `simulate()` for Monte Carlo rate path generation
+- `pv_mc()` for expected present values under stochastic rates
+- Closed-form pricing for caps, floors, swaptions (Gaussian models)
 
 Other models include:
 
