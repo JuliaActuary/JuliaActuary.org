@@ -283,8 +283,8 @@ let
         mapreduce(cf -> c(cf.time) * cf.amount,+,cfs)
     end
 
-    @show gradient(dynamic,AutoForwardDiff(),zeros) |> sum
-    @show gradient(static,AutoForwardDiff(),zeros) |> sum
+    @show DifferentiationInterface.gradient(dynamic,AutoForwardDiff(),zeros) |> sum
+    @show DifferentiationInterface.gradient(static,AutoForwardDiff(),zeros) |> sum
 end
 ```
 
