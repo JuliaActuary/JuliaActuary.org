@@ -6,63 +6,27 @@ on:
   pull_request:
     branches:
       - master
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
-      with:
-        persist-credentials: false
-    - name: Fix URLs for PR preview deployment (pull request previews)
-      if: github.event_name == 'pull_request'
-      run: |
-        echo "PREVIEW_FRANKLIN_WEBSITE_URL=https://thirsty-davinci-e0b972.netlify.app/previews/PR${{ github.event.number }}/" >> $GITHUB_ENV
-        echo "PREVIEW_FRANKLIN_PREPATH=previews/PR${{ github.event.number }}" >> $GITHUB_ENV
-    # NOTE: Python is necessary for the pre-rendering (minification) step
-    - name: Install python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.8'
-    # NOTE: Here you can install dependencies such as matplotlib if you use
-    # packages such as PyPlot.
-    # - run: pip install matplotlib
-    - name: Install Julia
-      uses: julia-actions/setup-julia@v1
-      with:
-        version: '1.8'
-    - name: Build notebooks
-      run: julia --project -e 'using Pkg; Pkg.activate("."); Pkg.instantiate(); using JuliaActuarySite; build_notebooks()'
-      env:
-        JULIA_NUM_THREADS: '2'
-        DISABLE_CACHE: '${{ github.event.inputs.disableCache }}'
-        REPO: '${{ github.repository }}'
-    # NOTE
-    #   The steps below ensure that NodeJS and Franklin are loaded then it
-    #   installs highlight.js which is needed for the prerendering step
-    #   (code highlighting + katex prerendering).
-    #   Then the environment is activated and instantiated to install all
-    #   Julia packages which may be required to successfully build your site.
-    #   The last line should be `optimize()` though you may want to give it
-    #   specific arguments, see the documentation or ?optimize in the REPL.
-    - run: julia -e '
-            using Pkg; Pkg.add(["NodeJS", "Franklin"]);
-            using NodeJS; run(`$(npm_cmd()) install highlight.js`);
-            using Franklin;
-            Pkg.activate("."); Pkg.instantiate();
-            optimize()'
+      uses: actions/checkout@v4
+
     - name: Deploy (preview)
-      if: github.event_name == 'pull_request' && github.repository == github.event.pull_request.head.repo.full_name # if this build is a PR build and the PR is NOT from a fork
-      uses: JamesIves/github-pages-deploy-action@releases/v3
+      if: github.event_name == 'pull_request' && github.repository == github.event.pull_request.head.repo.full_name
+      uses: JamesIves/github-pages-deploy-action@v4
       with:
-        BRANCH: gh-preview # The branch where the PRs previews are stored
-        FOLDER: __site
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        TARGET_FOLDER: "previews/PR${{ github.event.number }}" # The website preview is going to be stored in a subfolder
+        branch: gh-preview
+        folder: _site
+        token: ${{ secrets.GITHUB_TOKEN }}
+        target-folder: "previews/PR${{ github.event.number }}"
+
     - name: Deploy (main)
       if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-      uses: JamesIves/github-pages-deploy-action@releases/v3
+      uses: JamesIves/github-pages-deploy-action@v4
       with:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        BRANCH: gh-pages # Replace here the branch where your website is deployed
-        FOLDER: __site
+        token: ${{ secrets.GITHUB_TOKEN }}
+        branch: gh-pages
+        folder: _site
