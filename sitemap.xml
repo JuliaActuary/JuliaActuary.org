@@ -1,116 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://JuliaActuary.org/blog.html</loc>
-    <lastmod>2025-06-14T19:05:26.432Z</lastmod>
-  </url>
-  <url>
     <loc>https://JuliaActuary.org/packages.html</loc>
-    <lastmod>2025-06-14T19:05:26.433Z</lastmod>
+    <lastmod>2026-02-16T05:52:13.232Z</lastmod>
   </url>
   <url>
     <loc>https://JuliaActuary.org/index.html</loc>
-    <lastmod>2025-06-14T19:05:26.433Z</lastmod>
+    <lastmod>2026-02-14T15:58:59.140Z</lastmod>
   </url>
   <url>
-    <loc>https://JuliaActuary.org/posts/mortality-comparison/index.html</loc>
-    <lastmod>2025-06-14T19:05:26.448Z</lastmod>
-  </url>
-  <url>
-    <loc>https://JuliaActuary.org/posts/academy-generator/index.html</loc>
-    <lastmod>2025-06-14T19:05:26.436Z</lastmod>
-  </url>
-  <url>
-    <loc>https://JuliaActuary.org/posts/coding-the-future/index.html</loc>
-    <lastmod>2025-06-14T19:05:26.445Z</lastmod>
-  </url>
-  <url>
-    <loc>https://JuliaActuary.org/posts/getting-started-for-actuaries/index.html</loc>
-    <lastmod>2025-06-21T05:37:37.683Z</lastmod>
-  </url>
-  <url>
-    <loc>https://JuliaActuary.org/posts/fitting-survival-data/index.html</loc>
-    <lastmod>2025-06-14T19:05:26.445Z</lastmod>
-  </url>
-  <url>
-    <loc>https://JuliaActuary.org/posts/fitting-yield-curves/index.html</loc>
-    <lastmod>2025-06-14T19:05:26.446Z</lastmod>
-  </url>
-  <url>
-    <loc>https://JuliaActuary.org/posts/poisson-approximation/index.html</loc>
-    <lastmod>2025-06-21T05:32:25.624Z</lastmod>
-  </url>
-  <url>
-    <loc>https://JuliaActuary.org/posts/julia-for-actuaries/index.html</loc>
-    <lastmod>2025-06-14T19:05:26.446Z</lastmod>
-  </url>
-  <url>
-    <loc>https://JuliaActuary.org/posts/bayesian-intro/index.html</loc>
-    <lastmod>2025-06-21T05:37:35.417Z</lastmod>
-  </url>
-  <url>
-    <loc>https://JuliaActuary.org/posts/life-modeling-problem/index.html</loc>
-    <lastmod>2025-06-14T19:05:26.446Z</lastmod>
-  </url>
-  <url>
-    <loc>https://JuliaActuary.org/posts/policy-diffeq/index.html</loc>
-    <lastmod>2025-06-21T04:37:24.502Z</lastmod>
-  </url>
-  <url>
-    <loc>https://JuliaActuary.org/posts/finance-models-announcement/index.html</loc>
-    <lastmod>2025-06-14T19:05:26.445Z</lastmod>
-  </url>
-  <url>
-    <loc>https://JuliaActuary.org/community.html</loc>
+    <loc>https://JuliaActuary.org/blog.html</loc>
     <lastmod>2025-06-14T19:05:26.432Z</lastmod>
-  </url>
-  <url>
-    <loc>https://JuliaActuary.org/examples.html</loc>
-    <lastmod>2025-06-14T19:05:26.432Z</lastmod>
-  </url>
-  <url>
-    <loc>https://JuliaActuary.org/posts/cashflow-interactive/index.html</loc>
-    <lastmod>2025-06-14T19:05:26.444Z</lastmod>
-  </url>
-  <url>
-    <loc>https://JuliaActuary.org/posts/treasury-interactive/index.html</loc>
-    <lastmod>2025-06-14T19:05:26.449Z</lastmod>
-  </url>
-  <url>
-    <loc>https://JuliaActuary.org/posts/bayesian-claims-demo/index.html</loc>
-    <lastmod>2025-06-21T05:11:13.321Z</lastmod>
-  </url>
-  <url>
-    <loc>https://JuliaActuary.org/posts/nested-policy-projections/index.html</loc>
-    <lastmod>2025-06-14T19:05:26.449Z</lastmod>
-  </url>
-  <url>
-    <loc>https://JuliaActuary.org/posts/mortalitytables-and-dataframes/index.html</loc>
-    <lastmod>2025-06-21T05:31:10.069Z</lastmod>
-  </url>
-  <url>
-    <loc>https://JuliaActuary.org/posts/bayes-vs-limited-fluctuation/index.html</loc>
-    <lastmod>2025-06-21T05:39:38.568Z</lastmod>
-  </url>
-  <url>
-    <loc>https://JuliaActuary.org/posts/hacktoberfest/index.html</loc>
-    <lastmod>2025-06-14T19:05:26.446Z</lastmod>
-  </url>
-  <url>
-    <loc>https://JuliaActuary.org/posts/academy-generator-rates/index.html</loc>
-    <lastmod>2025-06-14T19:05:26.436Z</lastmod>
-  </url>
-  <url>
-    <loc>https://JuliaActuary.org/posts/stochastic-mortality/index.html</loc>
-    <lastmod>2025-06-14T19:05:26.449Z</lastmod>
-  </url>
-  <url>
-    <loc>https://JuliaActuary.org/posts/exposures-example/index.html</loc>
-    <lastmod>2025-06-14T19:05:26.445Z</lastmod>
-  </url>
-  <url>
-    <loc>https://JuliaActuary.org/posts/autodiff_ALM/index.html</loc>
-    <lastmod>2025-07-12T14:01:38.004Z</lastmod>
   </url>
   <url>
     <loc>https://JuliaActuary.org/benchmarks.html</loc>
@@ -122,6 +22,6 @@
   </url>
   <url>
     <loc>https://JuliaActuary.org/learn.html</loc>
-    <lastmod>2025-06-14T19:05:26.433Z</lastmod>
+    <lastmod>2026-02-16T05:52:03.578Z</lastmod>
   </url>
 </urlset>

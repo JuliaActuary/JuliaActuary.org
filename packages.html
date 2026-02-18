@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.7.31">
+<meta name="generator" content="quarto-1.9.16">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -34,14 +34,15 @@ ul.task-list li input[type="checkbox"] {
 <link href=".//assets/favicon.ico" rel="icon">
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-1d2c5e5804be587e91f7c3c65a0ea76f.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-a0731b9a3a5d496010872d775e5d9bc3.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-ab054af3ef433f36b68c22367af52b67.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-a9c66334b43f472998d4f0687f28726e.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -90,7 +91,8 @@ ul.task-list li input[type="checkbox"] {
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
     <a href="./index.html" class="navbar-brand navbar-brand-logo">
-    <img src="./assets/logos/android-chrome-512x512.png" alt="JuliaActuary Logo" class="navbar-logo">
+    <img src="./assets/logos/android-chrome-512x512.png" alt="JuliaActuary Logo" class="navbar-logo light-content">
+    <img src="./assets/logos/android-chrome-512x512.png" alt="JuliaActuary Logo" class="navbar-logo dark-content">
     </a>
     <a class="navbar-brand" href="./index.html">
     <span class="navbar-title">JuliaActuary</span>
@@ -102,6 +104,10 @@ ul.task-list li input[type="checkbox"] {
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="https://docs.juliaactuary.org"> 
+<span class="menu-text">Docs</span></a>
+  </li>  
   <li class="nav-item">
     <a class="nav-link active" href="./packages.html" aria-current="page"> 
 <span class="menu-text">Packages</span></a>
@@ -221,7 +227,7 @@ ul.task-list li input[type="checkbox"] {
 
 
 <p>These packages are available for use in your project. Scroll down for more information and links to the associated repository for each one.</p>
-<table class="package-table caption-top table" data-quarto-postprocess="true">
+<table class="package-table caption-top table">
 <colgroup>
 <col style="width: 50%">
 <col style="width: 50%">
@@ -346,6 +352,7 @@ julia&gt; decrement(vbt2001.ultimate,30,40) # the decrement between ages 30 and 
 m[20]                 # the mortality rate at age 20
 decrement(m,20,25)    # the five year cumulative mortality rate
 survival(m,20,25) # the five year survival rate</code></pre>
+<p><a href="https://docs.juliaactuary.org/MortalityTables/stable/">MortalityTables documentation 🡭</a></p>
 <p><a href="https://github.com/JuliaActuary/MortalityTables.jl">MortalityTables package on Github 🡭</a></p>
 </section>
 </section>
@@ -383,6 +390,16 @@ convexity(discount_rate, cfs, times)               #  10.62</code></pre>
 <li><code>accum_offset</code> to calculate accumulations like survivorship from a mortality vector</li>
 </ul>
 </section>
+<section id="key-rate-sensitivities-via-automatic-differentiation" class="level4">
+<h4 class="anchored" data-anchor-id="key-rate-sensitivities-via-automatic-differentiation">Key Rate Sensitivities via Automatic Differentiation</h4>
+<p>Compute exact key rate durations, DV01s, and convexities using ForwardDiff through <code>ZeroRateCurve</code> from FinanceModels.jl — machine-precision sensitivities in a single pass, no bump-and-reprice required.</p>
+<ul>
+<li><code>sensitivities</code>: bundled value, key rate durations, and convexity matrix in a single AD pass</li>
+<li>Two-curve decomposition: separate <code>IR01</code> (risk-free) and <code>CS01</code> (credit spread) sensitivities</li>
+<li>Do-block syntax for rate-dependent instruments (callable bonds, floaters)</li>
+<li>Hull-White stochastic model: key rate sensitivities of Monte Carlo expected values</li>
+</ul>
+</section>
 <section id="options-pricing" class="level4">
 <h4 class="anchored" data-anchor-id="options-pricing">Options Pricing</h4>
 <ul>
@@ -407,6 +424,7 @@ convexity(discount_rate, cfs, times)               #  10.62</code></pre>
 <li>Calculate the duration given an issue date and date (a.k.a. policy duration)</li>
 </ul></li>
 </ul>
+<p><a href="https://docs.juliaactuary.org/ActuaryUtilities/stable/">ActuaryUtilities documentation 🡭</a></p>
 <p><a href="https://github.com/JuliaActuary/ActuaryUtilities.jl">ActuaryUtilities package on GitHub 🡭</a></p>
 </section>
 </section>
@@ -496,6 +514,7 @@ SingleLife(vbt2001.select[50],issue_age = 60)  # select at 50, but now 60
 SingleLife(vbt2001.select,issue_age = 50)      # use issue_age to pick the right select vector
 SingleLife(mortality=vbt2001.select,issue_age = 50) # mort can also be a keyword
 </code></pre>
+<p><a href="https://docs.juliaactuary.org/LifeContingencies/stable/">LifeContingencies documentation 🡭</a></p>
 <p><a href="https://github.com/JuliaActuary/LifeContingencies.jl">LifeContingencies package on GitHub 🡭</a></p>
 </section>
 </section>
@@ -560,6 +579,7 @@ present_value(m_rate,Cashflow(10,3)) # 9.15...</code></pre>
 <li><code>Composite</code> (combine two other contracts, e.g.&nbsp;into a swap)</li>
 <li><code>EuroCall</code></li>
 <li><code>CommonEquity</code></li>
+<li><code>Option.Cap</code>, <code>Option.Floor</code>, <code>Option.Swaption</code> (interest rate derivatives)</li>
 </ul>
 <p>Commonly, we deal with conventions that imply a contract and an observed price. For example, we may talk about a treasury yield of <code>0.03</code>. This is a description that implies a <code>Quote</code>ed price for an underling fixed bond. In FinanceModels, we could use <code>CMTYield(rate,tenor)</code> which would create a <code>Quote(price,Bond.Fixed(...))</code>. In this way, we can conveniently create a number of <code>Quote</code>s which can be used to fit models. Such convenience methods include:</p>
 <ul>
@@ -597,6 +617,23 @@ present_value(m_rate,Cashflow(10,3)) # 9.15...</code></pre>
 <li><code>zero(curve,time)</code> or <code>zero(curve,time,Frequency)</code> gives the zero-coupon spot rate for the given time.</li>
 <li><code>forward(curve,from,to)</code> gives the zero rate between the two given times</li>
 <li><code>par(curve,time;frequency=2)</code> gives the coupon-paying par equivalent rate for the given time.</li>
+</ul>
+</section>
+<section id="zeroratecurve-direct-construction" class="level4">
+<h4 class="anchored" data-anchor-id="zeroratecurve-direct-construction"><code>ZeroRateCurve</code> — Direct Construction</h4>
+<p>Construct a zero-rate curve directly from rates and tenors without fitting:</p>
+<ul>
+<li>Multiple interpolation options (MonotoneConvex default, Linear, PCHIP, Cubic, Akima)</li>
+<li>ForwardDiff-compatible for AD-based sensitivities (key rate durations, DV01, convexity)</li>
+</ul>
+</section>
+<section id="stochastic-short-rate-models" class="level4">
+<h4 class="anchored" data-anchor-id="stochastic-short-rate-models">Stochastic Short-Rate Models</h4>
+<ul>
+<li><code>ShortRate.Vasicek</code>, <code>ShortRate.CoxIngersollRoss</code>, <code>ShortRate.HullWhite</code></li>
+<li><code>simulate()</code> for Monte Carlo rate path generation</li>
+<li><code>pv_mc()</code> for expected present values under stochastic rates</li>
+<li>Closed-form pricing for caps, floors, swaptions (Gaussian models)</li>
 </ul>
 <p>Other models include:</p>
 <ul>
@@ -677,6 +714,7 @@ convert(FinanceModels.Continuous(),r)          # convert monthly rate to continu
 <section id="arithmetic" class="level4">
 <h4 class="anchored" data-anchor-id="arithmetic">Arithmetic</h4>
 <p>Adding, substracting, multiplying, dividing, and comparing rates is supported.</p>
+<p><a href="https://docs.juliaactuary.org/FinanceModels/stable/">FinanceModels documentation 🡭</a></p>
 <p><a href="https://github.com/JuliaActuary/FinanceModels.jl">FinanceModels package on GitHub 🡭</a></p>
 <!-- =============================
      ExperienceAnalysis
@@ -828,6 +866,7 @@ df.exposure_fraction =
 <ul>
 <li><code>continue_exposures</code> indicates whether the exposure should be extended through the full exposure period rather than terminate at the <code>to</code> date.</li>
 </ul>
+<p><a href="https://docs.juliaactuary.org/ExperienceAnalysis/stable/">ExperienceAnalysis documentation 🡭</a></p>
 <p><a href="https://github.com/JuliaActuary/ExperienceAnalysis.jl">ExperienceAnalysis package on GitHub 🡭</a></p>
 <!-- =============================
      ExperienceAnalysis
@@ -895,6 +934,7 @@ end</code></pre>
             0 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│           
               └────────────────────────────────────────────────────────────┘           
               ⠀0⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀time⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀30⠀           </code></pre>
+<p><a href="https://docs.juliaactuary.org/EconomicScenarioGenerators/stable/">EconomicScenarioGenerators documentation 🡭</a></p>
 <p><a href="https://github.com/JuliaActuary/EconomicScenarioGenerators.jl">EconomicScenarioGenerators package on GitHub 🡭</a></p>
 
 
@@ -954,13 +994,14 @@ end</code></pre>
       e.clearSelection();
     }
     const getTextToCopy = function(trigger) {
-        const codeEl = trigger.previousElementSibling.cloneNode(true);
-        for (const childEl of codeEl.children) {
-          if (isCodeAnnotation(childEl)) {
-            childEl.remove();
-          }
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
         }
-        return codeEl.innerText;
+      }
+      return codeEl.innerText;
     }
     const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
       text: getTextToCopy

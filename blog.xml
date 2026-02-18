@@ -9,7 +9,7 @@
 <link>https://JuliaActuary.org/blog.html</link>
 <atom:link href="https://JuliaActuary.org/blog.xml" rel="self" type="application/rss+xml"/>
 <description>JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.</description>
-<generator>quarto-1.7.31</generator>
+<generator>quarto-1.9.16</generator>
 <lastBuildDate>Sat, 19 Aug 2023 06:00:00 GMT</lastBuildDate>
 <item>
   <title>FinanceModels.jl - Evolving the JuliaActuary Ecosystem</title>
@@ -872,7 +872,7 @@ Table&nbsp;1: Benchmarks for the Life Modeling Problem in nanoseconds (lower tim
 <div aria-describedby="tbl-life-modeling-benchmark-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div><div style="float: left;"><span>18×6 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
-<table class="data-frame do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-postprocess="true">
+<table class="data-frame do-not-create-environment cell caption-top table table-sm table-striped small">
 <thead>
 <tr class="header">
 <th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
@@ -1074,7 +1074,7 @@ Table&nbsp;2: Benchmarks for the Life Modeling Problem in nanoseconds (lower tim
 <div aria-describedby="tbl-life-modeling-benchmark-blog-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div><div style="float: left;"><span>18×6 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
-<table class="data-frame do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-postprocess="true">
+<table class="data-frame do-not-create-environment cell caption-top table table-sm table-striped small">
 <thead>
 <tr class="header">
 <th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>

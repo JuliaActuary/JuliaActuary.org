@@ -12,27 +12,6 @@
     ]
   },
   {
-    "listing": "/examples.html",
-    "items": [
-      "/posts/cashflow-interactive/index.html",
-      "/posts/policy-diffeq/index.html",
-      "/posts/treasury-interactive/index.html",
-      "/posts/bayesian-claims-demo/index.html",
-      "/posts/nested-policy-projections/index.html",
-      "/posts/mortalitytables-and-dataframes/index.html",
-      "/posts/poisson-approximation/index.html",
-      "/posts/bayes-vs-limited-fluctuation/index.html",
-      "/posts/fitting-yield-curves/index.html",
-      "/posts/fitting-survival-data/index.html",
-      "/posts/academy-generator-rates/index.html",
-      "/posts/stochastic-mortality/index.html",
-      "/posts/exposures-example/index.html",
-      "/posts/academy-generator/index.html",
-      "/posts/autodiff_ALM/index.html",
-      "/posts/mortality-comparison/index.html"
-    ]
-  },
-  {
     "listing": "/all-posts.html",
     "items": [
       "/posts/cashflow-interactive/index.html",
