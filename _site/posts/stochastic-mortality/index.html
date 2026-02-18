@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.16">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.">
+
+<title>Stochastic claims projections demo – JuliaActuary</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../..//assets/favicon.ico" rel="icon">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-a0731b9a3a5d496010872d775e5d9bc3.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-a9c66334b43f472998d4f0687f28726e.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+<link rel="stylesheet" href="../../assets/highlight/styles/github.min.css">
+<script src="../../assets/highlight/highlight.min.js"></script>
+<script src="../../assets/highlight/languages/julia.min.js"></script>
+<script src="../../assets/highlight/languages/julia-repl.min.js"></script>
+<script src="../../assets/highlight/languages/python.min.js"></script>
+<script src="../../assets/highlight/languages/r.min.js"></script>
+<script>hljs.highlightAll();</script>
+<script data-goatcounter="https://juliaactuary.goatcounter.com/count" async="" src="//gc.zgo.at/count.js"></script>
+
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed fullcontent quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../assets/logos/android-chrome-512x512.png" alt="JuliaActuary Logo" class="navbar-logo light-content">
+    <img src="../../assets/logos/android-chrome-512x512.png" alt="JuliaActuary Logo" class="navbar-logo dark-content">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">JuliaActuary</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../packages.html"> 
+<span class="menu-text">Packages</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../learn.html"> 
+<span class="menu-text">Learn</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../examples.html"> 
+<span class="menu-text">Examples</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../benchmarks.html"> 
+<span class="menu-text">Benchmarks</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../community.html"> 
+<span class="menu-text">Community</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/JuliaActuary"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="../../all-posts.xml"> <i class="bi bi-rss" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Stochastic claims projections demo</h1>
+                  <div>
+        <div class="description">
+          JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">modeling</div>
+                <div class="quarto-category">benchmark</div>
+                <div class="quarto-category">tutorial</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<div id="4" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>using CSV, DataFrames
+using MortalityTables, ActuaryUtilities
+using Dates
+using ThreadsX
+using BenchmarkTools
+using CairoMakie
+using Random</code></pre>
+</div>
+<p>Define a datatype. Not strictly necessary, but will make extending the program with more functions easier.</p>
+<p>Type annotations are optional, but providing them is able to coerce the values to be all plain bits (i.e.&nbsp;simple, non-referenced values like arrays are) when the type is constructed. This makes the whole data be stored in the stack and is an example of data-oriented design. It’s much slower without the type annotations (~0.5 million policies per second, ~50x slower).</p>
+<div id="6" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>@enum Sex Female = 1 Male = 2
+@enum Risk Standard = 1 Preferred = 2
+
+struct Policy
+    id::Int
+    sex::Sex
+    benefit_base::Float64
+    COLA::Float64
+    mode::Int
+    issue_date::Date
+    issue_age::Int
+    risk::Risk
+end</code></pre>
+</div>
+<p>Load the data:</p>
+<div id="8" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>sample_csv_data =
+    IOBuffer(
+        raw"id,sex,benefit_base,COLA,mode,issue_date,issue_age,risk
+         1,M,100000.0,0.03,12,1999-12-05,30,Std
+         2,F,200000.0,0.03,12,1999-12-05,30,Pref"
+    )
+
+policies = let
+
+    # read CSV directly into a dataframe
+    # df = CSV.read("sample_inforce.csv",DataFrame) # use local string for notebook
+    df = CSV.read(sample_csv_data, DataFrame)
+
+    # map over each row and construct an array of Policy objects
+    map(eachrow(df)) do row
+        Policy(
+            row.id,
+            row.sex == "M" ? Male : Female,
+            row.benefit_base,
+            row.COLA,
+            row.mode,
+            row.issue_date,
+            row.issue_age,
+            row.risk == "Std" ? Standard : Preferred,
+        )
+    end
+
+
+end</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>2-element Vector{Policy}:
+ Policy(1, Male, 100000.0, 0.03, 12, Date("1999-12-05"), 30, Standard)
+ Policy(2, Female, 200000.0, 0.03, 12, Date("1999-12-05"), 30, Preferred)</code></pre>
+</div>
+</div>
+<p>Define what mortality gets used:</p>
+<div id="10" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>mort = Dict(
+    Male =&gt; MortalityTables.table(988).ultimate,
+    Female =&gt; MortalityTables.table(992).ultimate,
+)
+
+function mortality(pol::Policy, params)
+    return params.mortality[pol.sex]
+end</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>mortality (generic function with 1 method)</code></pre>
+</div>
+</div>
+<p>This defines the core logic of the policy projection and will write the results to the given <code>out</code> container (here, a named tuple of arrays).</p>
+<p>This is using a threaded approach where it could be operating on any of the computer’s available threads, thus acheiving thread-based parallelism (as opposed to multi-processor (multi-machine) or GPU-based computation which requires formulating the problem a bit differently (array/matrix based). For the scale of computation here, I think I’d apply this model of parallelism.</p>
+<div id="12" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>function pol_project!(out, policy, params)
+    # some starting values for the given policy
+    dur = duration(policy.issue_date, params.val_date)
+    start_age = policy.issue_age + dur - 1
+    COLA_factor = (1 + policy.COLA)
+    cur_benefit = policy.benefit_base * COLA_factor^(dur - 1)
+
+    # get the right mortality vector
+    qs = mortality(policy, params)
+
+    # grab the current thread's id to write to results container without conflicting with other threads
+    tid = Threads.threadid()
+
+    ω = lastindex(qs)
+
+    # inbounds turns off bounds-checking, which makes hot loops faster but first write loop without it to ensure you don't create an error (will crash if you have the error without bounds checking)
+    @inbounds for t in 1:min(params.proj_length, ω - start_age)
+
+        q = qs[start_age+t] # get current mortality
+
+        if (rand() &lt; q)
+            return # if dead then just return and don't increment the results anymore
+        else
+            # pay benefit, add a life to the output count, and increment the benefit for next year
+            out.benefits[t, tid] += cur_benefit
+            out.lives[t, tid] += 1
+            cur_benefit *= COLA_factor
+        end
+    end
+end</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>pol_project! (generic function with 1 method)</code></pre>
+</div>
+</div>
+<p>Parameters for our projection:</p>
+<div id="14" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>params = (
+    val_date=Date(2021, 12, 31),
+    proj_length=100,
+    mortality=mort,
+)</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>(val_date = Date("2021-12-31"), proj_length = 100, mortality = Dict{Sex, OffsetArrays.OffsetVector{Float64, Vector{Float64}}}(Male =&gt; [0.022571, 0.022571, 0.022571, 0.022571, 0.022571, 0.022571, 0.022571, 0.022571, 0.022571, 0.022571  …  0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4], Female =&gt; [0.00745, 0.00745, 0.00745, 0.00745, 0.00745, 0.00745, 0.00745, 0.00745, 0.00745, 0.00745  …  0.376246, 0.386015, 0.393507, 0.398308, 0.4, 0.4, 0.4, 0.4, 0.4, 1.0]))</code></pre>
+</div>
+</div>
+<p>Check the number of threads we’re using:</p>
+<div id="16" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>Threads.nthreads()</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>1</code></pre>
+</div>
+</div>
+<div id="18" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>function project(policies, params)
+    threads = Threads.nthreads()
+    benefits = zeros(params.proj_length, threads)
+    lives = zeros(Int, params.proj_length, threads)
+    out = (; benefits, lives)
+    ThreadsX.foreach(policies) do pol
+        pol_project!(out, pol, params)
+    end
+    map(x -&gt; vec(reduce(+, x, dims=2)), out)
+end</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>project (generic function with 1 method)</code></pre>
+</div>
+</div>
+<p>Example of single projection:</p>
+<div id="20" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>project(repeat(policies, 100_000), params)</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>(benefits = [5.628266348011793e10, 5.673883596707583e10, 5.712497014134891e10, 5.749095439249457e10, 5.774726003023396e10, 5.793810326133258e10, 5.805158891646363e10, 5.810347911612621e10, 5.810405176164248e10, 5.801961458178435e10  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [195193, 190421, 185536, 180703, 175668, 170542, 165338, 160106, 154899, 149612  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])</code></pre>
+</div>
+</div>
+<section id="benchmarking" class="level2">
+<h2 class="anchored" data-anchor-id="benchmarking">Benchmarking</h2>
+<p>Using a Macbook Air M3 laptop, about 45 million policies able to be stochastically projected per second:</p>
+<div id="22" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>policies_to_benchmark = 45_000_000
+# adjust the `repeat` depending on how many policies are already in the array
+# to match the target number for the benchmark
+n = policies_to_benchmark ÷ length(policies)
+
+@benchmark project(p, r) setup = (p = repeat($policies, $n); r = $params)</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="ansi-escaped-output">
+<pre>BenchmarkTools.Trial: 2 samples with 1 evaluation per sample.
+ Range <span class="ansi-bright-black-fg">(</span><span class="ansi-cyan-fg ansi-bold">min</span> … <span class="ansi-magenta-fg">max</span><span class="ansi-bright-black-fg">):  </span><span class="ansi-cyan-fg ansi-bold">3.217 s</span> … <span class="ansi-magenta-fg">   3.218 s</span>  <span class="ansi-bright-black-fg">┊</span> GC <span class="ansi-bright-black-fg">(</span>min … max<span class="ansi-bright-black-fg">): </span>0.00% … 0.00%
+ Time  <span class="ansi-bright-black-fg">(</span><span class="ansi-blue-fg ansi-bold">median</span><span class="ansi-bright-black-fg">):     </span><span class="ansi-blue-fg ansi-bold">3.218 s               </span><span class="ansi-bright-black-fg">┊</span> GC <span class="ansi-bright-black-fg">(</span>median<span class="ansi-bright-black-fg">):    </span>0.00%
+ Time  <span class="ansi-bright-black-fg">(</span><span class="ansi-green-fg ansi-bold">mean</span> ± <span class="ansi-green-fg">σ</span><span class="ansi-bright-black-fg">):   </span><span class="ansi-green-fg ansi-bold">3.218 s</span> ± <span class="ansi-green-fg">502.754 μs</span>  <span class="ansi-bright-black-fg">┊</span> GC <span class="ansi-bright-black-fg">(</span>mean ± σ<span class="ansi-bright-black-fg">):  </span>0.00% ± 0.00%
+
+  <span class="ansi-blue-fg">█</span>                            <span class="ansi-green-fg"> </span>                           █  
+  <span class="ansi-blue-fg">█</span>▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁<span class="ansi-green-fg">▁</span>▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁█ ▁
+  3.22 s<span class="ansi-bright-black-fg">         Histogram: frequency by time</span>         3.22 s <span class="ansi-bold">&lt;</span>
+
+ Memory estimate<span class="ansi-bright-black-fg">: </span><span class="ansi-yellow-fg">9.09 KiB</span>, allocs estimate<span class="ansi-bright-black-fg">: </span><span class="ansi-yellow-fg">68</span>.</pre>
+</div>
+</div>
+</div>
+</section>
+<section id="stochastic-ensemble" class="level2">
+<h2 class="anchored" data-anchor-id="stochastic-ensemble">Stochastic Ensemble</h2>
+<p>Loop through and calculate the reults <code>n</code> times (this is only running the two policies in the sample data” <code>n</code> times).</p>
+<div id="24" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>function stochastic_proj(policies, params, n)
+
+    ThreadsX.map(1:n) do i
+        project(policies, params)
+    end
+end
+
+stoch = stochastic_proj(policies, params, 1000)</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>1000-element Vector{@NamedTuple{benefits::Vector{Float64}, lives::Vector{Int64}}}:
+ (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 628133.3788962648, 646977.3802631528, 666386.7016710474, 686378.3027211789, 706969.6518028142, 728178.7413568987, 750024.1035976056  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 2, 2, 2, 2, 2, 2, 2  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+ (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 628133.3788962648, 646977.3802631528, 666386.7016710474, 686378.3027211789, 706969.6518028142, 728178.7413568987, 500016.0690650704  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 2, 2, 2, 2, 2, 2, 1  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+ (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 628133.3788962648, 646977.3802631528, 666386.7016710474, 686378.3027211789, 706969.6518028142, 728178.7413568987, 250008.0345325352  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 2, 2, 2, 2, 2, 2, 1  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+ (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 628133.3788962648, 646977.3802631528, 666386.7016710474, 686378.3027211789, 471313.1012018761, 485452.49423793243, 500016.0690650704  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 2, 2, 2, 2, 1, 1, 1  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+ (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 628133.3788962648, 431318.2535087685, 444257.8011140316, 457585.53514745255, 471313.1012018761, 485452.49423793243, 500016.0690650704  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 2, 1, 1, 1, 1, 1, 1  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+ (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 209377.7929654216, 215659.12675438426, 222128.9005570158, 228792.76757372628, 235656.55060093806, 242726.24711896622, 250008.0345325352  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 1, 1, 1, 1, 1, 1, 1  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+ (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 628133.3788962648, 646977.3802631528, 666386.7016710474, 686378.3027211789, 706969.6518028142, 728178.7413568987, 750024.1035976056  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 2, 2, 2, 2, 2, 2, 2  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+ (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 628133.3788962648, 646977.3802631528, 666386.7016710474, 686378.3027211789, 706969.6518028142, 728178.7413568987, 750024.1035976056  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 2, 2, 2, 2, 2, 2, 2  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+ (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 628133.3788962648, 646977.3802631528, 666386.7016710474, 686378.3027211789, 706969.6518028142, 728178.7413568987, 250008.0345325352  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 2, 2, 2, 2, 2, 2, 1  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+ (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 418755.5859308432, 431318.2535087685, 444257.8011140316, 457585.53514745255, 471313.1012018761, 485452.49423793243, 500016.0690650704  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 1, 1, 1, 1, 1, 1, 1  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+ ⋮
+ (benefits = [574831.0226582347, 394717.3022253211, 406558.82129208074, 418755.5859308432, 431318.2535087685, 0.0, 0.0, 0.0, 0.0, 0.0  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 1, 1, 1, 1, 0, 0, 0, 0, 0  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+ (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 418755.5859308432, 431318.2535087685, 444257.8011140316, 457585.53514745255, 471313.1012018761, 485452.49423793243, 500016.0690650704  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 1, 1, 1, 1, 1, 1, 1  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+ (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 628133.3788962648, 646977.3802631528, 666386.7016710474, 686378.3027211789, 706969.6518028142, 728178.7413568987, 750024.1035976056  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 2, 2, 2, 2, 2, 2, 2  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+ (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 628133.3788962648, 646977.3802631528, 666386.7016710474, 686378.3027211789, 706969.6518028142, 485452.49423793243, 500016.0690650704  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 2, 2, 2, 2, 2, 1, 1  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+ (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 628133.3788962648, 646977.3802631528, 666386.7016710474, 686378.3027211789, 706969.6518028142, 728178.7413568987, 750024.1035976056  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 2, 2, 2, 2, 2, 2, 2  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+ (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 628133.3788962648, 646977.3802631528, 666386.7016710474, 686378.3027211789, 706969.6518028142, 728178.7413568987, 750024.1035976056  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 2, 2, 2, 2, 2, 2, 2  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+ (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 628133.3788962648, 646977.3802631528, 666386.7016710474, 686378.3027211789, 706969.6518028142, 485452.49423793243, 500016.0690650704  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 2, 2, 2, 2, 2, 1, 1  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+ (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 209377.7929654216, 215659.12675438426, 222128.9005570158, 228792.76757372628, 235656.55060093806, 242726.24711896622, 250008.0345325352  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 1, 1, 1, 1, 1, 1, 1  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+ (benefits = [191610.34088607822, 197358.65111266056, 203279.41064604037, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [1, 1, 1, 0, 0, 0, 0, 0, 0, 0  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])</code></pre>
+</div>
+</div>
+<div id="26" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>v = [pv(0.03, s.benefits) for s in stoch]
+hist(v,
+    bins=15;
+    axis=(xlabel="Present Value", ylabel="# scenarios")
+)</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<img width="672" height="480" style="object-fit: contain; height: auto;" src="data:image/png;base64, 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JZeQ0rp1a95//30kSZJUewWqWAiBrl27ctNNN9G9e3fWrl3LcccdR2FhIU888QTdunVDkiRJtVegGsydO5fRo0ezZcsWrrjiCnJzcxk8eDBr167lzjvvRJIkSbVXoBocffTRfPnllxQVFZGZmUnKbbfdxkEHHUQikUCSJEm1V6CabNmyhQcffJAPPviAjIwMevbsSYcOHZAkSVLtFqgGy5YtY8iQIXTo0IGePXuydetWHnjgAWbPns3LL79MIpFAkiRJtVOgGlx44YVceumlTJ8+nQpFRUUMGDCAW2+9lcsuuwxJkiTVToEqVlZWxltvvcWSJUuoLJFIcNppp/HSSy8hSZKk2itQxeLxOE2bNuXtt98mNzeXyt5++21atGiBJEmSaq9ANfjFL37Bz3/+cy699FJ69uxJcXExixcv5r777uN///d/kSRJUu0VqAb/9V//RZMmTbjjjjuYOXMmiUSCnj178vzzz9O9e3ckSZJUewWqQSwW45xzzuGcc85BkiRJqixQRf785z9z1VVX8eKLL/Lf//3ffPLJJ3yTESNGMGLECCRJklQ7BapIVlYWbdu2JRaLkZubS3l5Od+kQYMGSJIkqfYKVJGBAwcycOBAUvr06cNhhx1GVlYW0r/rq12lbMwvoqYoKy9HkiR9f4EqlkwmGT58OH/4wx848cQTkf5dKz/O57LFa6kpmjeoiyRJ+v4CVSwWi3HTTTcxZ84c+vbtS/PmzZEkSZIqBKrBM888w1tvvUXLli1p0qQJ6enpVJgyZQpTpkxBkiRJtVOgGpx//vmMHz+eb9KxY0ckSZJUewWqwY9//GO+yerVq/n000/p2LEjkiRJqp0C1WDbtm3cfPPNbNq0icpefvllRo4cyYABA5AkSVLtFKgG48eP57333uPII4/k4Ycf5rzzzuPtt9+mpKSESy65BEmSJNVegSpWXl7Oc889x4oVK+jZsyerV6/ml7/8JR06dOC4445j2bJlnHDCCUiSJKl2ClSxsrIySktLadKkCSndunVj7dq1dOjQgREjRvD4449zwgknIEmSpNopUMVCCBx66KFce+21XHPNNXTv3p3HH3+c448/no8//pji4mIkSZJUewWqwW233capp55K//79OfPMM+nRowctWrRgy5Yt/PnPf0aSJEm1V6AaHH300Xz22Wfs2bOHtLQ01qxZw/PPP0+XLl3o1asXkiRJqr0C1aSsrIzCwkJS6tWrx/HHH0/Krl27yMjIQJIkSbVToBo88MADnHvuuRQWFrK3GTNmcOWVVyJJkqTaKVANpkyZwplnnsnkyZOpV68elWVlZSFJkqTaK1DFysrK2LlzJzNnziQnJwdJkiSpskAVi8fjDB48mFWrVjFo0CAkSZKkygLV4Oyzz2bixImcdNJJHHLIIcTjcSr06tWLXr16IUmSpNopUA0WLFhAs2bNeOWVV3jllVeobMKECfTq1QtJkiTVToFq8OCDDyJJkiR9k0A1Wb9+Pb///e/55JNPuPrqq3nnnXfo168fOTk5SJIkqfYKVIMXX3yRkSNH0q9fP15//XWmTp3KH//4R84//3xWrFhBs2bNkCRJUu0UqAbnnXceM2fO5IILLuCII44g5Z577mHYsGHcdtttzJo1C0mSJNVOgSpWVlbGe++9xymnnEJlIQSOP/54XnjhBSRJklR7BapYPB6nXbt2rFy5kqFDh1LZG2+8QV5eHpIkSaq9AtVg2rRpjB07ll/96lfk5+fz7LPP8tvf/paFCxeyatUqJEmSVHsFqsGZZ55JkyZNuOWWW9i5cydz586ld+/evPzyy3Tq1AlJkiTVXoFqMmzYMIYOHUoIgZSCggIaNGiAJEmSardANVi/fj2nn3467du35/7776e0tJRGjRpx+umnc+eddxJCQJIkSbVToBqceeaZNGjQgGnTppESQuC5557jrLPO4u677+a8885DkiRJtVOgipWVlbF8+XLefvttOnfuTIWjjz6as88+m7/+9a+cd955SJIkqXYKVLF4PE7jxo356quv2NvWrVtp1KgRkiRJqr0C1eCcc87hlFNOYcaMGfTs2ZOSkhL+53/+h9tuu43nn38eSZIk1V6BajBjxgyys7OZNWsWGzduJB6P061bNx599FGOPPJIJEmSVHsFqkEsFmPy5MlMnjyZkpISQgjE43EkSZKkQDUoLCxk7ty5nHLKKeTl5XH22WfzwgsvcMIJJ3DTTTcRQkCSJEm1U6AanHbaaSxfvpxRo0bx2GOP8dhjjzFr1ixuvPFGunfvzoQJE5AkSVLtFKhi5eXlLF68mFdeeYWOHTty1VVXMXbsWC644AIKCgp48cUXmTBhApIkSaqdAlWsvLyc8vJy6tevT1lZGUuXLuX2228nJRaLUVJSgiRJkmqvQBWLxWIMGDCAc889l/bt27Nz504GDx7MK6+8wr333sv48eORJElS7RWoBr///e+ZNGkSa9asYf78+SQSCa6++mq6dOnCL3/5SyRJklR7BapB69ateeSRR6jsySefRJIkSQpIkiRJEQpIkiRJEQpIkiRJEQpUg3feeYe6devSsWNHJEmSpMoCVeSjjz5i6dKl9OjRg4ULF3LQQQcxadIkPv30U8444wyWLl2KJEmSFKgipaWlPP3001x33XVs2LCBVq1asWLFClq2bMmGDRvYuHEjeXl5SJIkqXYLVJGOHTvy6KOPkvLrX/+abdu20b17d1asWMFnn31Gt27diMfjjB49mrvuugtJkiTVToEq8vbbb3PHHXfQo0cPPvroI3r37s15553Hcccdx6pVq3jrrbf46KOP2LRpE5IkSaq9AlWkadOmtGjRgmeffZaXXnqJBQsWcOedd9K+fXu2b9/OE088QY8ePTjqqKOQJElS7RWoIrm5uUybNo2UX//612RkZDBw4ED+9re/sXz5cm688UbeeustevbsyQsvvIAkSZJqp0A1+MlPfkJmZiZHHnkkLVq0YP78+bz00kukbN26FUmSJNVegWowZMgQKrRp04ZXXnmFCk2aNEGSJEm1V6CaxWIx6tevjyRJkpQSkCRJkiIUkCRJkiIUkCSplvuqeA8/mbuMmuK6Ew7lx+0aIf1QBSRJquXKgV2lSWqKsvJypB+ygCRJkhShwAGovLyc66+/nvLyciqbOHEijRo1IuWNN95gwYIFFBYWMmzYMAYPHowkSZL2v8AB6PPPP+eyyy7j6KOPprJTTz2VRo0a8eqrrzJw4EBOOeUUGjduzPDhw7nzzjsZN24ckiRJ2r8CB6B169bRtGlTXnzxRb7JNddcwymnnMK8efNIadWqFTNnzmTcuHFIkiRp/wocgNavX0/nzp357LPP2LBhAwcffDC5ubmklJeXs2TJEh577DEqjBo1iosuuoj33nuPzp07I0mSpP0ncAD64IMPePfdd+natSuNGjXi448/5sILL+Smm25i+/btlJSU0KZNGyq0bNmSEAKbNm2ic+fOVLZhwwY2bNhAZfn5+dSvX59du3ZR1UpKSojFYsRiMfTtdu/eTTKZpKYoKysjmUxSE5SVlZFMJqkpkskkyWSS6pBMJkkmk+yrsmSSZDJJTZFMJkkmk9QEybIk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e+jUqRP9+/enss2bNzNv3jw+/PBDjjjiCM4880zq1KlDMpnk3HPPpcKiRYtYt24drVq1QorShg0bmDdvHp999hmdO3fmnHPOoXHjxvwzb7zxBgsWLKCwsJBhw4YxePBg/h0XX3wx06ZNo1GjRlT21FNP8fTTT5OTk8O4cePo0qULKU888QRPPPEEKe+++y69e/fmd7/7HdL3FVAkbr/9di6//HLOP/98Nm7cyFFHHcWyZcvo2rUr0g9BeXk5119/PUuWLOG7nHrqqbzxxhuMHTuWJ598kj/+8Y+sWLGCevXqsa+L6TNcAAARZklEQVQ+/vhjpk2bxg033ED//v2psGPHDvr3789BBx1E//79ueqqq1ixYgV33303sViMe++9l5QXX3yRwsJCWrVqhRSl999/n8MOO4xhw4bRp08fnn76aebOncuaNWvIzc1lb6+++ioDBw7klFNOoXHjxgwfPpw777yTcePG8a/4y1/+wpw5c5g8eTKNGjWiwu23387ll1/O+eefz8aNGznqqKNYtmwZXbt2ZcSIEYwYMYKUY445hl/84hdIVSGgardnzx5mzpzJbbfdxrhx40gZMWIEc+bMYd68eUgHultuuYXrr7+ezz//nA4dOvBt3nzzTf70pz+xYcMG8vLyuOSSSzj44IP505/+xLhx4/guBQUFDBw4kDfeeIM9e/awt/vuu49YLMaSJUtIS0vj5JNPpmfPnlxxxRW0adOGCjfddBNTp05FitqcOXPo378/CxcuJGXy5Mkcdthh3H777cycOZO9XXPNNZxyyinMmzePlFatWjFz5kzGjRvHvnjppZeYOHEif//739nbnj17mDlzJrfddhvjxo0jZcSIEcyZM4d58+ZRYfXq1aSlpfGjH/0IqSoEVO1WrlzJtm3bGD58OBVGjRrFxRdfjPRDMGrUKI4++mieeOIJ7r//fr7NU089RZ8+fcjLyyMlkUgwdOhQFi9ezLhx4/gumZmZ3H333aQMHTqUvS1evJhhw4aRlpZGSvfu3enQoQNLlizhnHPOIWXdunVs3ryZH//4x0hRCyFw6qmnUiEej5OXl8emTZvYW3l5OUuWLOGxxx6jwqhRo7jooot477336Ny5M9+le/fuLFiwgM8//5zjjz+eylauXMm2bdsYPnw4FUaNGsXFF19MZbNnz2bSpElIVSWgardp0yZycnLI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mEBlDz/8MKNGjSItLQ1JqgkCkqT/p3379nTr1o3333+flNmzZzNkyBAeffRRtm/fzpw5c0gmk9x666385S9/IWXs2LGMHTuWCosWLeLBBx/kq6++ol+/flx++eU0bNiQlPz8fK655hpee+01mjVrxuTJk+nXrx8pTzzxBMlkkhACf/jDHygqKuLss89mxIgRvPnmm9x99918+eWXXHDBBdx0002kp6dT2fjx4zn++OP54osvaN68OSmbN29m2bJlzJw5kwoPPfQQDz74IPn5+bRv356LL76Y7t27s7eHHnqIEAIjR46kwmWXXcZZZ51Fp06dSHnyySd54IEH2LJlCwMGDOCyyy4jPT0dSfo2AUnS//Pee+/x5ptvMmLECFIefvhhHn30UbKyshg3bhwpp59+OmvWrOHSSy8lPz+fSZMmkUwmGT9+PH/+85857bTTmDVrFk2bNuXaa69ly5Yt3HPPPezatYt+/frRtWtXzj33XF5//XWOO+44XnrpJbp27cry5ct55plnOPjggznjjDNYvHgxY8aMYe3atWRnZ9OhQwdef/11+vTpQywWY2+DBw+madOmLFq0iAsvvJCUxx57jObNm/PTn/6UlCVLljB+/HiuuOIKOnTowMKFCxk0aBBffPEFsViMyl544QUyMjIYOXIkFebNm8eQIUPo1KkTv//977n00ku54ooraNq0KTfccAMbN27k97//PZL0bQKSVIs9/vjj/P3vfydly5YtvP766/Tq1YuJEydSoWnTpjz++OOkvPvuuyxatIgNGzbQqlUrUvLy8hg3bhynnnoqL730Ev369ePSSy8l5dBDD+Xtt98m5Z577iEjI4M//elPxGIxxowZQ0lJCb/61a94+umnSdm+fTsPPPAAaWlpHHfccTz66KOsXbuWYcOG8R//8R/85S9/4YwzzuCbxONxfv7zn7NgwQIuvPBCUh5++GFOOeUUYrEYKSUlJcyePZtf/vKXpPz4xz+mbdu2fPHFF7Rs2ZJ9VV5ezrRp07jjjjsYPXo0KYMGDSIvL49zzjmHww8/HEn6ZwKSVIu1a9eOE044gZRYLMZVV13F4MGDSUtLo8IxxxxDhVWrVpGVlcXcuXOpUFhYyM6dO/n0008ZMmQIc+fOZcCAAZx88skce+yxnHXWWaSsWrWKeDzO5ZdfToUNGzawdu1aKvTt25e0tDRSQgg0atSIZDLJvho7diw333wzH374IQ0aNOCvf/0r11xzDRWGDx/O5s2beeSRR1i3bh2LFy8mJZlM8q/49NNP+fLLL/nb3/7GqlWrqJCZmcnatWs5/PDDkaR/JiBJtViPHj244IIL+DaZmZlUKC4uJpFI0Lp1ayqbO3cuDRo0YNCgQbzzzjv88Y9/5NFHH2XKlCn8/Oc/54EHHqC4uJicnBxat25NhdatW3PSSSdRISMjg++jT58+HHLIISxcuJBmzZqRl5dH3759qfDII48wceJEBg8eTM+ePZkyZQovv/wy+2rPnj2kFBcXk5KXl0dGRgYVZs6cSe/evZGkbxOQJO2zzp07U1BQwJlnnkkikSDl/fff5+mnnyYnJ4cHH3yQVq1aMX36dKZPn86yZcvo378/V199NZ07d2bz5s1ccMEFVFi6dCkFBQVUpbFjx7JgwQJat27Nz3/+cyq76qqrmDp1KlOnTiXlgw8+4J+pU6cOO3fupMInn3xCQUEBKe3atSM9PZ0jjjiCn/zkJ6QUFxczd+5cmjVrhiR9m4AkaZ/99Kc/pWPHjowfP57p06ezdetWpkyZQt++fUl5/fXXmTVrFr/97W9p1qwZDz30EI0aNaJ58+acffbZ3HDDDcyaNYvRo0fz1ltvMWHCBG6//Xb2RXp6Olu2bOHVV1+lT58+xGIxvsm4ceOYPn067777LjfeeCOVZWRksHr1ajZu3MjatWu59tprSXnttddo3bo1lbVu3Zo5c+Ywbtw4WrduzeTJk6lfvz4paWlp/OIXv+Dcc8/ltttuo379+txwww2sWbOGiy++GEn6NgFJqqV69OhBu3bt+Da9evWiRYsWVKhTpw5Llixh8uTJDB06lBACI0eO5OqrryZlxowZbNmyhdNOO43du3dz2GGHsWTJEtLT02nZsiV//etf+dWvfsWtt95Kbm4uN9xwA+PGjSOlffv21K9fn8oOP/xwmjRpQsqAAQM4+uijOeecc1i+fDn16tXjm7Rt25azzjqLoqIiDj30UCr73e9+x/nnn0/v3r350Y9+xFVXXcWzzz7L1VdfzfDhw+nTpw+5ubmkXHjhhaxZs4ZRo0bRtm1bZsyYQW5uLtnZ2aRcd911JBIJJk6cyFdffUX//v155plniMfjSNK3CUhSLTV79my+y+23387emjVrxoMPPsg3adCgAffffz//TO/evXn++ef5JhMnTmRv999/PxUSiQSPPvoo++Luu+/mm/Tq1YsVK1ZQWf/+/Zk1axYp8+bNo0L9+vV5+OGHqezEE0+kQlpaGr/5zW/4zW9+gyT9KwKSJElShAKSJElShAKSJElShAKSJElShAKSJElShAKSJElShAKSJElShAKSJElShAKSJElShAKSJElShAKSJElShAKSJElShAKSJElShAKSJElShAKSJElShAKSJElShAKSJElShP4viXkoaKXZTe4AAAAASUVORK5CYII=">
+</div>
+</div>
+</section>
+<section id="further-optimization" class="level2">
+<h2 class="anchored" data-anchor-id="further-optimization">Further Optimization</h2>
+<p>In no particular order:</p>
+<ul>
+<li>the RNG could be made faster: https://bkamins.github.io/julialang/2020/11/20/rand.html</li>
+<li>Could make the stochastic set distributed, but at the current speed the overhead of distributed computing is probably more time than it would save. Same thing with GPU projections</li>
+<li>…</li>
+</ul>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/JuliaActuary\.org");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

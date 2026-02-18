@@ -1,8 +1,6 @@
 project:
   type: website
 engines: ['julia']
-execute:
-  freeze: true
 julia:
     env: ["JULIA_NUM_THREADS=auto"]
 
