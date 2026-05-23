@@ -1,0 +1,419 @@
+---
+title: "One Abstraction for Yields, Mortality, Lapse, and Defaults"
+author: "Alec Loudenback"
+date: "2026-05-04"
+categories: [code, blog]
+---
+
+Actuaries already think about the same algebra under four different names. The discount factor on a yield curve is a multiplicative scaling we apply to a future cashflow. So is the survival probability on a mortality table. So is persistency on a lapse curve. So is no-default probability on a credit spread. When we price a contingent annuity we write something like
+
+$$
+EPV = \sum_t c_t \cdot v(0,t) \cdot \,_tp_x \cdot \,_tp_x^{(\ell)}
+$$
+
+— and the only reason `v`, `p`, and `p^(ℓ)` look different in the code is that each lives in a different package with its own API. Math says they're the same shape; the codebase didn't.
+
+A coordinated four-package release across the JuliaActuary ecosystem fixes that. **`AbstractDeflator`** in `FinanceCore.jl 2.6.0` is the unifying abstract type, with one required primitive (`factor(p, from, to)`) and one composition operator (`compose(...)`). `FinanceModels.jl 5.4.0` brings every yield curve under it. `MortalityTables.jl 2.7.0` does the same for parametric mortality and adds a `MortalityVector` wrapper for table-based mortality. `ActuaryUtilities.jl 5.6.0` picks up the new compat. The result: `pv(compose(yield_curve, mortality_table, lapse, default_force), cashflows)` is one expression, and the same `compose` and `pv` calls work whether the components are constant forces, fitted yield curves, parametric mortality models, or `q_x` tables.
+
+This post walks through the abstraction and shows it working across the ecosystem: a real term-structure yield curve composed with mortality for a contingent annuity, defaultable bond pricing with ELGD-of-market-value, sensitivity analysis by component swap, and the joint-life and last-survivor patterns that drop out of the abstraction or extend it cleanly.
+
+## The abstraction
+
+`AbstractDeflator` is a supertype for processes that act as a multiplicative factor over time. Every concrete subtype implements one method:
+
+```julia
+factor(p::AbstractDeflator, from, to)
+```
+
+That's the multiplicative factor over `[from, to]`. The interpretation depends on the subtype:
+
+- For yield curves and constant-force `Rate`s, `factor` is the **discount factor**.
+- For mortality, lapse, and default processes, `factor` is the **survival probability**.
+- For asset accumulation paths and equity scenarios, `factor` is the **accumulation factor** `S(to)/S(from)`.
+
+There's also an optional method:
+
+```julia
+intensity(p::AbstractDeflator, t)
+```
+
+— the instantaneous force at time `t`, defined as `-d/dt log(factor(p, 0, t))` where the derivative exists. Continuous-time subtypes implement this; discrete tables (annual `q_x`, rating-transition matrices) deliberately don't, and asking for `intensity` on them raises a `MethodError`. The type system surfaces the continuity assumption.
+
+Once a subtype provides `factor`, it gets `discount`, `accumulation`, `forward`, and the actuarial-overload `Base.zero` (spot rate) for free:
+
+```julia
+discount(p, from, to)     # = factor(p, from, to)
+accumulation(p, from, to) # = inv(factor(p, from, to))
+forward(p, from, to)      # = Continuous(-log(factor(p, from, to)) / (to - from))
+zero(p, t)                # = Continuous(-log(factor(p, t)) / t)  -- spot rate
+```
+
+The `Base.zero(p, t)` form is an actuarial overload: in the FinanceCore convention, this returns the **continuously-compounded zero rate** (the constant continuous force that, applied uniformly over `[0, t]`, would produce the same `factor`). It's not the additive-identity meaning of `zero(x)` — the two-argument form disambiguates by signature.
+
+## Composition: `compose`
+
+The point of having one abstract type is being able to combine instances. `compose(args...)` builds a `CompositeDeflator` whose `factor` is the product of the components' factors:
+
+```julia-repl
+julia> using FinanceCore
+
+julia> i = Continuous(0.03);    # 3% interest force
+
+julia> μ = Continuous(0.012);   # 1.2% mortality force
+
+julia> deflator = compose(i, μ)
+compose(Continuous(0.03), Continuous(0.012))
+
+julia> discount(deflator, 5)
+0.8105842459701871
+
+julia> exp(-(0.03 + 0.012) * 5)
+0.8105842459701871
+```
+
+The composite's `intensity` is the sum of component intensities (chain rule on `log(factor) = Σ log(factor_i)`):
+
+```julia-repl
+julia> intensity(deflator, 1.0)
+0.041999999999999996
+```
+
+And it composes with the existing `pv` machinery on `Cashflow` vectors:
+
+```julia-repl
+julia> pv(deflator, [Cashflow(1.0, 5.0)])
+0.8105842459701871
+```
+
+That's the EPV of $1 paid in 5 years contingent on survival, using a single deterministic 1.2% mortality force.
+
+`compose` flattens nested composites, so left-associated and right-associated builds produce the same shape. Three-decrement composites read naturally:
+
+```julia-repl
+julia> i   = Continuous(0.05);
+
+julia> μ   = Continuous(0.01);   # mortality
+
+julia> λ_l = Continuous(0.07);   # lapse
+
+julia> λ_d = Continuous(0.001);  # default
+
+julia> d = compose(i, μ, λ_l, λ_d);
+
+julia> intensity(d, 0)           # sum of forces
+0.131
+```
+
+Composition assumes the components are **independent**. The structural product is the right shape for the 95% case in actuarial work (interest is independent of mortality is independent of lapse is independent of default, in the textbook formulation). When that assumption breaks — joint mortalities under a copula, common-shock defaults, correlated yield-and-default scenarios — you write a bespoke `AbstractDeflator` subtype whose `factor` is *not* a product of marginals. We'll see this pattern below.
+
+## Use case 1: Term-structure yield curve × mortality table
+
+The headline workflow now spans four packages. Take a real-ish US Treasury–style yield curve, fit a cubic spline to it, and compose with a mortality vector aligned to the valuation age via `at_age`:
+
+```julia-repl
+julia> using FinanceCore, FinanceModels, MortalityTables
+
+julia> # Fitted yield curve, multiple maturities
+julia> mats  = [0.5, 1.0, 2.0, 3.0, 5.0, 7.0, 10.0, 20.0, 30.0];
+
+julia> rates = [0.045, 0.046, 0.043, 0.041, 0.040, 0.041, 0.042, 0.046, 0.048];
+
+julia> yc = fit(Spline.Cubic(), CMTYield.(rates, mats), Fit.Bootstrap());
+
+julia> yc isa AbstractDeflator     # FinanceModels yields are deflators now
+true
+
+julia> # Mortality vector indexed by attained age
+julia> qs = UltimateMortality([min(0.0001 * 1.097^age, 1.0) for age in 0:119])
+MortalityVector(<120 rates, ages 0:119>)
+
+julia> qs isa AbstractDeflator     # MortalityTables 3.0 returns a MortalityVector
+true
+
+julia> # Align to a 65-year-old's valuation date
+julia> mort = at_age(qs, 65)
+at_age(MortalityVector(<120 rates, ages 0:119>), 65)
+
+julia> # Compose: yield × mortality on a years-from-valuation axis
+julia> deflator = compose(yc, mort);
+
+julia> # 20-year temporary life annuity-immediate, $50,000/year
+julia> cashflows = [Cashflow(50_000.0, t) for t in 1:20];
+
+julia> pv(deflator, cashflows)        # contingent EPV
+374443.96...
+
+julia> pv(yc, cashflows)              # annuity-certain (no mortality)
+654791.10...
+```
+
+The mortality contingency cuts the value of a 65-year-old's 20-year annuity-immediate from $654,791 to $374,444 — about a 43% reduction reflecting the cumulative survival probabilities through age 85 against this synthetic table.
+
+The `at_age` wrapper is the key axis-alignment step. The yield curve uses a **years-from-valuation** axis (`t = 0` is today). The raw mortality vector uses an **absolute-age** axis (index 65 is `q_65`). Composing them directly would silently mix axes — the yield's `factor(yc, 5)` would be the spot 5y discount, but the mortality's `factor(qs, 5)` would be "survival from age 0 to age 5." `at_age(qs, 65)` shifts the mortality's origin so that `factor(mort, t)` means "5-year survival from age 65" — same axis as the yield. This is the **forward-vs-spot footgun** the abstraction's documentation warns about; `at_age` is the canonical fix and works for both `MortalityVector` and `ParametricMortality` (Makeham, Gompertz, etc.).
+
+## Use case 2: Defaultable bond pricing with ELGD
+
+Reduced-form credit modeling under the recovery-of-market-value convention (Duffie-Singleton 1999) prices a defaultable bond as
+
+$$
+\bar{P}(0,T) = E\left[\exp\left(-\int_0^T \big(r(s) + \mathrm{ELGD}\cdot\lambda(s)\big)\,ds\right)\right]
+$$
+
+where ELGD = 1 − R is the loss given default. This is the dominant modern convention in CDS-implied modeling and Solvency II spread risk. The recipe in code is one line — the existing `Rate * Real` operator already scales the underlying force:
+
+```julia-repl
+julia> # Same fitted yield curve as above
+julia> bond_cfs = [Cashflow(t == 5.0 ? 102.0 : 2.0, t) for t in 0.5:0.5:5.0];
+
+julia> # 4% annual coupon, semi-annual, par = 100
+
+julia> λ_marginal = Continuous(0.012);          # 120bp marginal default hazard
+
+julia> ELGD       = 0.60;                        # 60% loss given default
+
+julia> λ_loss_adj = λ_marginal * ELGD;           # Continuous(0.0072) — Rate * Real
+
+julia> pv(yc, bond_cfs)                          # risk-free price
+100.0015...
+
+julia> pv(compose(yc, λ_marginal), bond_cfs)     # zero-recovery defaultable
+94.6585...
+
+julia> pv(compose(yc, λ_loss_adj), bond_cfs)     # 40% recovery (ELGD = 60%)
+96.7586...
+```
+
+The implied credit spread maps cleanly onto the loss-adjusted hazard:
+
+```julia-repl
+julia> rate(forward(compose(yc, λ_marginal), 0, 5)) - rate(forward(yc, 0, 5))
+0.012   # 120bp = 100% LGD × 120bp hazard
+
+julia> rate(forward(compose(yc, λ_loss_adj), 0, 5)) - rate(forward(yc, 0, 5))
+0.0072  # 72bp = 60% LGD × 120bp hazard
+```
+
+The pattern generalizes. Time-varying ELGD or stochastic ELGD correlated with the default intensity (Frye 2000) doesn't fit `Continuous(ELGD * λ)` directly — but it fits as a custom `AbstractDeflator` subtype that defines its own `factor` integrating `(1-R(t)) · λ(t)` over the interval. The framework provides the slot; the credit modeler provides the math.
+
+## Use case 3: Analytical sensitivities via ForwardDiff
+
+A common actuarial workflow is "what's the reserve sensitive to?" The traditional finite-difference approach computes the reserve at the base assumption, computes it again at a shocked assumption, and takes the ratio. That works, but it commits to a specific shock magnitude up front and accumulates floating-point error from the differencing.
+
+The deflator abstraction is **autodiff-friendly by construction**. `factor`, `compose`, and `pv` are all type-generic — `Continuous(μ::ForwardDiff.Dual)` produces a dual-typed `Rate`, the `compose` machinery preserves it through the product, and `pv` carries it all the way to the scalar. So one `ForwardDiff.derivative` call gives you the analytical sensitivity:
+
+```julia-repl
+julia> using ForwardDiff
+
+julia> yield     = Continuous(0.03);
+
+julia> cashflows = [Cashflow(100.0, t) for t in 1.0:10.0];
+
+julia> # PV as a function of the mortality force μ
+julia> pv_of_μ(μ) = pv(compose(yield, Continuous(μ)), cashflows);
+
+julia> base_pv = pv_of_μ(0.012)
+799.5276...
+
+julia> # Analytical d(PV)/dμ — exact, no shock magnitude required
+julia> dpv_dμ = ForwardDiff.derivative(pv_of_μ, 0.012)
+-4121.1845...
+
+julia> # Mortality semi-elasticity: -d(log PV) / dμ
+julia> -dpv_dμ / base_pv
+5.1545...
+
+julia> # Convert to the "10% relative mortality shock" framing if you want it:
+julia> # Δμ = 0.10 × 0.012 = 0.0012, so linear-approx impact is dPV/dμ × Δμ
+julia> dpv_dμ * 0.0012 / base_pv
+-0.00619...
+```
+
+The ForwardDiff path produces `dPV/dμ = −4,121.18` exactly. Translated to the original "10% shock" framing via the linear approximation, that's a −0.62% change in PV — within rounding of the −0.62% you'd get from the finite-difference computation, but without committing to a shock magnitude. You compute the sensitivity once and apply it to whatever shock size your stress framework uses.
+
+The same pipeline gives you the sensitivity to **each element of the composed deflator** in one AD pass. Pair each component of `compose(...)` with its own parameter and call `ForwardDiff.gradient`:
+
+```julia-repl
+julia> # 4-decrement deflator: interest × mortality × lapse × default,
+julia> # one parameter per element of the composite
+julia> function pv_of_components(i, μ, λ_l, λ_d)
+           deflator = compose(Continuous(i),
+                              Continuous(μ),
+                              Continuous(λ_l),
+                              Continuous(λ_d))
+           pv(deflator, cashflows)
+       end;
+
+julia> θ_base = [0.03, 0.012, 0.07, 0.001];   # i, μ, λ_l, λ_d
+
+julia> base_pv = pv_of_components(θ_base...)
+565.8746...
+
+julia> ∇pv = ForwardDiff.gradient(θ -> pv_of_components(θ...), θ_base)
+4-element Vector{Float64}:
+ -2595.7788...   # ∂PV/∂i   (interest force)
+ -2595.7788...   # ∂PV/∂μ   (mortality force)
+ -2595.7788...   # ∂PV/∂λ_l (lapse force)
+ -2595.7788...   # ∂PV/∂λ_d (default force)
+```
+
+The four sensitivities are **equal in magnitude**. That's not a coincidence — it's a structural feature of the independence-product. Under `compose`, each constant force enters the deflator the same way (`factor = exp(-Σf · t)`), so `∂PV/∂f_k = -Σ t·cᵗ·exp(-Σf·t)` independently of which force `f_k` you differentiate. The risk decomposition tells you: "under this composition, a 1 bp shift in mortality moves the reserve by the same amount as a 1 bp shift in lapse, default, or interest." Once you see it as a property of the composition algebra (not as a numerical coincidence), it's the right answer.
+
+Term-structure components break the symmetry because their factor isn't a single exponential. Swap the constant interest force for a fitted yield curve — the same `compose` and the same `ForwardDiff.gradient` keep working, and the yield's contribution now reflects curve shape:
+
+```julia-repl
+julia> yc = fit(Spline.Cubic(), CMTYield.(rates, mats), Fit.Bootstrap());
+
+julia> function pv_with_curve(μ, λ_l, λ_d)
+           deflator = compose(yc, Continuous(μ), Continuous(λ_l), Continuous(λ_d))
+           pv(deflator, cashflows)
+       end;
+
+julia> ∇ = ForwardDiff.gradient(θ -> pv_with_curve(θ...), [0.012, 0.07, 0.001])
+3-element Vector{Float64}:
+ -2427.2897...   # ∂PV/∂μ — symmetric across constant-force components
+ -2427.2897...   # ∂PV/∂λ_l
+ -2427.2897...   # ∂PV/∂λ_d
+```
+
+The decrement sensitivities are still mutually equal (constant forces composing symmetrically), but their magnitudes shift to reflect the yield curve's shape. To get the *yield curve's* per-tenor sensitivities — the analog of mortality/lapse/default per-component — use FinanceModels's `ZeroRateCurve` and ActuaryUtilities's `KeyRates()`/`sensitivities`, which already use ForwardDiff to differentiate against each tenor of the curve. Combining the two gives you a full risk decomposition (yield key rates × decrement forces) in a single AD sweep over the composed deflator.
+
+Mortality, lapse, and credit sensitivities now live in the same toolkit as interest-rate sensitivities instead of requiring separate finite-difference plumbing per assumption.
+
+## Use case 4: Joint-life and last-survivor
+
+A joint-and-survivor annuity pays while at least one of two lives is alive. A joint-life insurance pays on the first death. These two statuses sit on opposite sides of the inclusion-exclusion identity, and they show off two facets of the abstraction.
+
+**Joint-life status (both alive).** Survival of the joint-life status under independence is `S_xy(t) = S_x(t) · S_y(t)`. That's literally what `compose` does:
+
+```julia-repl
+julia> # Two constant-force lives (toy example; the structure extends to
+julia> # any AbstractDeflator-based mortality)
+julia> life_x = Continuous(0.012);   # 65-year-old, μ = 0.012
+
+julia> life_y = Continuous(0.020);   # 70-year-old, μ = 0.020
+
+julia> i      = Continuous(0.03);    # 3% interest
+
+julia> # 10-year temporary joint-life annuity-due:
+julia> # pays 1 at t=0, 1, ..., 9 while BOTH alive
+julia> ä_xy_10 = pv(compose(i, life_x, life_y),
+                    [Cashflow(1.0, t) for t in 0.0:9.0])
+7.6859...
+```
+
+`compose(i, life_x, life_y)` is the joint-life deflator. No special-casing — the abstraction's product structure *is* the independence assumption that joint-life pricing already uses.
+
+**Last-survivor status (at least one alive).** Survival of the last-survivor status is `1 - F_xy(t) = S_x(t) + S_y(t) - S_x(t)·S_y(t)` under independence. That's *not* a product of marginals, so `compose` won't help. We define a custom subtype:
+
+```julia
+struct LastSurvivor{A, B} <: AbstractDeflator
+    a::A
+    b::B
+end
+
+function FinanceCore.factor(ls::LastSurvivor, from, to)
+    Sa = factor(ls.a, from, to)
+    Sb = factor(ls.b, from, to)
+    Sa + Sb - Sa * Sb     # P[at least one survives]
+end
+# pv goes through single-arg factor (factor(deflator, t)), so origin-invariant
+# subtypes need to define it. For LastSurvivor with constant-force lives,
+# "from time 0 to time t" is well-defined, so we delegate to the two-arg form:
+FinanceCore.factor(ls::LastSurvivor, t) = factor(ls, zero(t), t)
+
+# No `intensity` method — last-survivor force is non-trivial; let
+# the subtype's user define it if needed.
+```
+
+The `LastSurvivor` is itself an `AbstractDeflator`, so it composes with the yield curve exactly like any other deflator:
+
+```julia-repl
+julia> last_surv = LastSurvivor(life_x, life_y);
+
+julia> # 10-year last-survivor annuity-due:
+julia> ä_overline_xy_10 = pv(compose(i, last_surv),
+                             [Cashflow(1.0, t) for t in 0.0:9.0])
+8.7201...
+```
+
+The `compose(i, last_surv)` says "discount the last-survivor cashflow at the yield curve" — which is the right composition because the *last-survivor* status is jointly correlated, but its dependence on the *yield* is still independent. The type system makes the dependence structure visible.
+
+This is the general pattern for correlated decrements: **define a custom subtype whose `factor` encodes the correlation**, then compose that subtype with anything else (yield, second-order decrements) under the standard independence assumption. Copulas, common-shock models, and joint analytical survival functions all fit this shape.
+
+## Use case 5: Parametric mortality models
+
+`MortalityTables.jl` parametric models (Makeham, Gompertz, Thiele, Heligman-Pollard, etc.) all subtype `AbstractMortality <: AbstractDeflator` directly. Their `factor` semantic matches the existing `survival(m, age)` convention — survival from age 0 to a given age:
+
+```julia-repl
+julia> using MortalityTables, FinanceCore
+
+julia> mort = Makeham(a = 2.5e-5, b = 0.10, c = 1e-4);
+
+julia> intensity(mort, 65)              # = hazard(mort, 65)
+0.01672...
+
+julia> factor(mort, 65, 70)             # 5-year survival from age 65
+0.8973...
+
+julia> factor(mort, 65)                 # survival from age 0 to age 65
+0.8415...
+```
+
+To compose with a yield curve on a years-from-valuation axis, shift the parametric model's age origin to the valuation age — the same `at_age` helper used for `MortalityVector`:
+
+```julia-repl
+julia> mort_at_65 = at_age(mort, 65)
+at_age(Makeham{Float64, Float64, Float64}(2.5e-5, 0.1, 0.0001), 65.0)
+
+julia> factor(mort_at_65, 5)            # 5-year survival from age 65
+0.8973...
+
+julia> intensity(mort_at_65, 0)         # force at the valuation age
+0.0167...
+
+julia> deflator = compose(yc, mort_at_65);
+
+julia> pv(deflator, cashflows)
+```
+
+`at_age` works on any `AbstractMortality` — parametric, vector-based, or any future subtype — so the same idiom drops a Makeham model, a select-ultimate table, or a custom Heligman-Pollard fit into the same composition workflow.
+
+## What's *not* in this abstraction
+
+Just as important as what fits is what doesn't. The abstraction covers **linear cashflow valuation under a deflator**: `pv(deflator, cashflows) = Σ cᵢ · factor(deflator, tᵢ)`. It does *not* cover:
+
+- **Option pricing and contingent claims**. A European call's price isn't `factor × cashflow` — it's `E[max(S(T) - K, 0)] · D(0,T)` with the expectation taken over the *whole distribution* of `S(T)`. Volatility matters; the deflator framework can't see it. Option pricing lives in parallel `present_value(model, contract)` machinery (already in FinanceModels.jl); it's orthogonal — a model can subtype `AbstractDeflator` for forward/discount calculations *and* implement `present_value(_, ::Option)` for option pricing.
+- **Path-dependent payoffs**, American exercise, lookbacks, basket payoffs that aren't simple functions of marginal factors.
+- **LDTI net premium ratio computation** and other accounting-methodology-specific reserve mechanics. The deflator is an input to those calculations, not a replacement for them.
+
+What this means in practice: a Variable Annuity GMxB liability has *both* a deflator side (`yield × mortality × lapse` for the actuarial scaffolding) *and* an option side (the guarantee payoff). The combined pricing flows through both abstractions; neither subsumes the other.
+
+## The four PRs
+
+This release is a coordinated four-PR rollout:
+
+- **`FinanceCore.jl 2.6.0`** — [PR #39](https://github.com/JuliaActuary/FinanceCore.jl/pull/39). Introduces `AbstractDeflator`, the required `factor` and optional `intensity` primitives, the `compose` constructor with two backends (tuple and vector), and the derived `discount` / `accumulation` / `forward` / `Base.zero` plumbing. `Rate <: AbstractDeflator` is the first concrete subtype.
+- **`FinanceModels.jl 5.4.0`** — [PR #255](https://github.com/JuliaActuary/FinanceModels.jl/pull/255). `AbstractYieldModel <: AbstractDeflator`. Two-line `factor` plumbing routes through each yield model's existing `discount`. Every concrete yield curve — `Constant`, `Spline`, `MonotoneConvex`, `SmithWilson`, `NelsonSiegelSvensson`, `CairnsPritchard`, `ZeroRateCurve`, plus the stochastic short-rate models `Vasicek`, `CIR`, and `HullWhite` — composes through `compose(...)`.
+- **`MortalityTables.jl 3.0.0`** — [PR #134](https://github.com/JuliaActuary/MortalityTables.jl/pull/134). A small deflator-aware hierarchy: `AbstractMortality <: AbstractDeflator` with three subtypes — `MortalityVector` (the new return type from `UltimateMortality(...)` and `SelectMortality[issue_age]`, replacing `OffsetArray` while preserving the `AbstractArray` interface by delegation), `ParametricMortality` (Makeham, Gompertz, Heligman-Pollard, Thiele, etc.), and `ShiftedMortality` (constructed via `at_age(model, age)` — the idiomatic axis-alignment helper). Major version bump for the breaking type-tree change.
+- **`ActuaryUtilities.jl 5.6.0`** — [PR #133](https://github.com/JuliaActuary/ActuaryUtilities.jl/pull/133). Compat bumps; existing yield-specific machinery (`duration`, `convexity`, `KeyRateDuration`, `sensitivities`) stays unchanged. The `pv` re-export accepts composed deflators directly.
+
+Each PR is non-breaking by itself. Adding `<: AbstractDeflator` is purely additive from upstream; the supertype change moves yield models out from under FinanceModels's internal `AbstractModel`, which only affected one dispatch site (handled in the same PR).
+
+## Eight precedents this commits to
+
+If you're building on top of this abstraction, here's what's locked once the four PRs ship:
+
+1. `Rate <: AbstractDeflator` is permanent.
+2. `factor(p, from, to)` signature is locked: positional, no kwargs.
+3. `intensity` is optional with no fallback **ever** — adding numerical-differentiation later would break code that relies on `MethodError` as a discrete-vs-continuous guard.
+4. `compose` is the public composition primitive. `*` is *not* overloaded for deflator pairs (FinanceModels already overloads `+` for yield-spread addition and `*` for after-tax scaling; introducing a third meaning would have muddied two established algebras).
+5. `(from, to)` is the canonical time form; single-argument `factor(p, t)` is at subtype discretion (only origin-invariant or pre-aligned subtypes should define it).
+6. Independence is the composite default; correlated joints live in bespoke subtypes.
+7. Discrete-time deflators are first-class without traits — subtypes police their own time-argument validity at runtime.
+8. The name `AbstractDeflator` is locked; renaming is breaking.
+
+## Conclusion
+
+The deflator abstraction is small — one abstract type, one required method, one optional method, one composition operator. The pay-off is conceptual unity: the same `compose` and `pv` calls work across yield, mortality, lapse, default, and (with custom subtypes) joint statuses, copulas, and stochastic scenarios. Code that used to live in four parallel APIs converges on one.
+
+If you're thinking about how this fits a specific actuarial problem you're working on — variable annuity guarantees, defaultable insurance asset modeling, multi-life valuation, ESG-driven projections, anything else — the four PRs above are open for review and the abstraction is small enough to skim end-to-end in fifteen minutes. Feedback welcome.

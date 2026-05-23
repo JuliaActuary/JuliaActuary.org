@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.16">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Alec Loudenback">
+<meta name="dcterms.date" content="2026-05-04">
+<meta name="description" content="JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.">
+
+<title>One Abstraction for Yields, Mortality, Lapse, and Defaults – JuliaActuary</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../..//assets/favicon.ico" rel="icon">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-a0731b9a3a5d496010872d775e5d9bc3.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-a9c66334b43f472998d4f0687f28726e.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<link rel="stylesheet" href="../../assets/highlight/styles/github.min.css">
+<script src="../../assets/highlight/highlight.min.js"></script>
+<script src="../../assets/highlight/languages/julia.min.js"></script>
+<script src="../../assets/highlight/languages/julia-repl.min.js"></script>
+<script src="../../assets/highlight/languages/python.min.js"></script>
+<script src="../../assets/highlight/languages/r.min.js"></script>
+<script>hljs.highlightAll();</script>
+<script data-goatcounter="https://juliaactuary.goatcounter.com/count" async="" src="//gc.zgo.at/count.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed fullcontent quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../assets/logos/android-chrome-512x512.png" alt="JuliaActuary Logo" class="navbar-logo light-content">
+    <img src="../../assets/logos/android-chrome-512x512.png" alt="JuliaActuary Logo" class="navbar-logo dark-content">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">JuliaActuary</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../packages.html"> 
+<span class="menu-text">Packages</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../learn.html"> 
+<span class="menu-text">Learn</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../examples.html"> 
+<span class="menu-text">Examples</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../benchmarks.html"> 
+<span class="menu-text">Benchmarks</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../community.html"> 
+<span class="menu-text">Community</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/JuliaActuary"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="../../all-posts.xml"> <i class="bi bi-rss" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">One Abstraction for Yields, Mortality, Lapse, and Defaults</h1>
+                  <div>
+        <div class="description">
+          JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">code</div>
+                <div class="quarto-category">blog</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Alec Loudenback </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">May 4, 2026</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<p>Actuaries already think about the same algebra under four different names. The discount factor on a yield curve is a multiplicative scaling we apply to a future cashflow. So is the survival probability on a mortality table. So is persistency on a lapse curve. So is no-default probability on a credit spread. When we price a contingent annuity we write something like</p>
+<p><span class="math display">\[
+EPV = \sum_t c_t \cdot v(0,t) \cdot \,_tp_x \cdot \,_tp_x^{(\ell)}
+\]</span></p>
+<p>— and the only reason <code>v</code>, <code>p</code>, and <code>p^(ℓ)</code> look different in the code is that each lives in a different package with its own API. Math says they’re the same shape; the codebase didn’t.</p>
+<p>A coordinated four-package release across the JuliaActuary ecosystem fixes that. <strong><code>AbstractDeflator</code></strong> in <code>FinanceCore.jl 2.6.0</code> is the unifying abstract type, with one required primitive (<code>factor(p, from, to)</code>) and one composition operator (<code>compose(...)</code>). <code>FinanceModels.jl 5.4.0</code> brings every yield curve under it. <code>MortalityTables.jl 2.7.0</code> does the same for parametric mortality and adds a <code>MortalityVector</code> wrapper for table-based mortality. <code>ActuaryUtilities.jl 5.6.0</code> picks up the new compat. The result: <code>pv(compose(yield_curve, mortality_table, lapse, default_force), cashflows)</code> is one expression, and the same <code>compose</code> and <code>pv</code> calls work whether the components are constant forces, fitted yield curves, parametric mortality models, or <code>q_x</code> tables.</p>
+<p>This post walks through the abstraction and shows it working across the ecosystem: a real term-structure yield curve composed with mortality for a contingent annuity, defaultable bond pricing with ELGD-of-market-value, sensitivity analysis by component swap, and the joint-life and last-survivor patterns that drop out of the abstraction or extend it cleanly.</p>
+<section id="the-abstraction" class="level2">
+<h2 class="anchored" data-anchor-id="the-abstraction">The abstraction</h2>
+<p><code>AbstractDeflator</code> is a supertype for processes that act as a multiplicative factor over time. Every concrete subtype implements one method:</p>
+<pre class="julia"><code>factor(p::AbstractDeflator, from, to)</code></pre>
+<p>That’s the multiplicative factor over <code>[from, to]</code>. The interpretation depends on the subtype:</p>
+<ul>
+<li>For yield curves and constant-force <code>Rate</code>s, <code>factor</code> is the <strong>discount factor</strong>.</li>
+<li>For mortality, lapse, and default processes, <code>factor</code> is the <strong>survival probability</strong>.</li>
+<li>For asset accumulation paths and equity scenarios, <code>factor</code> is the <strong>accumulation factor</strong> <code>S(to)/S(from)</code>.</li>
+</ul>
+<p>There’s also an optional method:</p>
+<pre class="julia"><code>intensity(p::AbstractDeflator, t)</code></pre>
+<p>— the instantaneous force at time <code>t</code>, defined as <code>-d/dt log(factor(p, 0, t))</code> where the derivative exists. Continuous-time subtypes implement this; discrete tables (annual <code>q_x</code>, rating-transition matrices) deliberately don’t, and asking for <code>intensity</code> on them raises a <code>MethodError</code>. The type system surfaces the continuity assumption.</p>
+<p>Once a subtype provides <code>factor</code>, it gets <code>discount</code>, <code>accumulation</code>, <code>forward</code>, and the actuarial-overload <code>Base.zero</code> (spot rate) for free:</p>
+<pre class="julia"><code>discount(p, from, to)     # = factor(p, from, to)
+accumulation(p, from, to) # = inv(factor(p, from, to))
+forward(p, from, to)      # = Continuous(-log(factor(p, from, to)) / (to - from))
+zero(p, t)                # = Continuous(-log(factor(p, t)) / t)  -- spot rate</code></pre>
+<p>The <code>Base.zero(p, t)</code> form is an actuarial overload: in the FinanceCore convention, this returns the <strong>continuously-compounded zero rate</strong> (the constant continuous force that, applied uniformly over <code>[0, t]</code>, would produce the same <code>factor</code>). It’s not the additive-identity meaning of <code>zero(x)</code> — the two-argument form disambiguates by signature.</p>
+</section>
+<section id="composition-compose" class="level2">
+<h2 class="anchored" data-anchor-id="composition-compose">Composition: <code>compose</code></h2>
+<p>The point of having one abstract type is being able to combine instances. <code>compose(args...)</code> builds a <code>CompositeDeflator</code> whose <code>factor</code> is the product of the components’ factors:</p>
+<pre class="julia-repl"><code>julia&gt; using FinanceCore
+
+julia&gt; i = Continuous(0.03);    # 3% interest force
+
+julia&gt; μ = Continuous(0.012);   # 1.2% mortality force
+
+julia&gt; deflator = compose(i, μ)
+compose(Continuous(0.03), Continuous(0.012))
+
+julia&gt; discount(deflator, 5)
+0.8105842459701871
+
+julia&gt; exp(-(0.03 + 0.012) * 5)
+0.8105842459701871</code></pre>
+<p>The composite’s <code>intensity</code> is the sum of component intensities (chain rule on <code>log(factor) = Σ log(factor_i)</code>):</p>
+<pre class="julia-repl"><code>julia&gt; intensity(deflator, 1.0)
+0.041999999999999996</code></pre>
+<p>And it composes with the existing <code>pv</code> machinery on <code>Cashflow</code> vectors:</p>
+<pre class="julia-repl"><code>julia&gt; pv(deflator, [Cashflow(1.0, 5.0)])
+0.8105842459701871</code></pre>
+<p>That’s the EPV of $1 paid in 5 years contingent on survival, using a single deterministic 1.2% mortality force.</p>
+<p><code>compose</code> flattens nested composites, so left-associated and right-associated builds produce the same shape. Three-decrement composites read naturally:</p>
+<pre class="julia-repl"><code>julia&gt; i   = Continuous(0.05);
+
+julia&gt; μ   = Continuous(0.01);   # mortality
+
+julia&gt; λ_l = Continuous(0.07);   # lapse
+
+julia&gt; λ_d = Continuous(0.001);  # default
+
+julia&gt; d = compose(i, μ, λ_l, λ_d);
+
+julia&gt; intensity(d, 0)           # sum of forces
+0.131</code></pre>
+<p>Composition assumes the components are <strong>independent</strong>. The structural product is the right shape for the 95% case in actuarial work (interest is independent of mortality is independent of lapse is independent of default, in the textbook formulation). When that assumption breaks — joint mortalities under a copula, common-shock defaults, correlated yield-and-default scenarios — you write a bespoke <code>AbstractDeflator</code> subtype whose <code>factor</code> is <em>not</em> a product of marginals. We’ll see this pattern below.</p>
+</section>
+<section id="use-case-1-term-structure-yield-curve-mortality-table" class="level2">
+<h2 class="anchored" data-anchor-id="use-case-1-term-structure-yield-curve-mortality-table">Use case 1: Term-structure yield curve × mortality table</h2>
+<p>The headline workflow now spans four packages. Take a real-ish US Treasury–style yield curve, fit a cubic spline to it, and compose with a mortality vector aligned to the valuation age via <code>at_age</code>:</p>
+<pre class="julia-repl"><code>julia&gt; using FinanceCore, FinanceModels, MortalityTables
+
+julia&gt; # Fitted yield curve, multiple maturities
+julia&gt; mats  = [0.5, 1.0, 2.0, 3.0, 5.0, 7.0, 10.0, 20.0, 30.0];
+
+julia&gt; rates = [0.045, 0.046, 0.043, 0.041, 0.040, 0.041, 0.042, 0.046, 0.048];
+
+julia&gt; yc = fit(Spline.Cubic(), CMTYield.(rates, mats), Fit.Bootstrap());
+
+julia&gt; yc isa AbstractDeflator     # FinanceModels yields are deflators now
+true
+
+julia&gt; # Mortality vector indexed by attained age
+julia&gt; qs = UltimateMortality([min(0.0001 * 1.097^age, 1.0) for age in 0:119])
+MortalityVector(&lt;120 rates, ages 0:119&gt;)
+
+julia&gt; qs isa AbstractDeflator     # MortalityTables 3.0 returns a MortalityVector
+true
+
+julia&gt; # Align to a 65-year-old's valuation date
+julia&gt; mort = at_age(qs, 65)
+at_age(MortalityVector(&lt;120 rates, ages 0:119&gt;), 65)
+
+julia&gt; # Compose: yield × mortality on a years-from-valuation axis
+julia&gt; deflator = compose(yc, mort);
+
+julia&gt; # 20-year temporary life annuity-immediate, $50,000/year
+julia&gt; cashflows = [Cashflow(50_000.0, t) for t in 1:20];
+
+julia&gt; pv(deflator, cashflows)        # contingent EPV
+374443.96...
+
+julia&gt; pv(yc, cashflows)              # annuity-certain (no mortality)
+654791.10...</code></pre>
+<p>The mortality contingency cuts the value of a 65-year-old’s 20-year annuity-immediate from $654,791 to $374,444 — about a 43% reduction reflecting the cumulative survival probabilities through age 85 against this synthetic table.</p>
+<p>The <code>at_age</code> wrapper is the key axis-alignment step. The yield curve uses a <strong>years-from-valuation</strong> axis (<code>t = 0</code> is today). The raw mortality vector uses an <strong>absolute-age</strong> axis (index 65 is <code>q_65</code>). Composing them directly would silently mix axes — the yield’s <code>factor(yc, 5)</code> would be the spot 5y discount, but the mortality’s <code>factor(qs, 5)</code> would be “survival from age 0 to age 5.” <code>at_age(qs, 65)</code> shifts the mortality’s origin so that <code>factor(mort, t)</code> means “5-year survival from age 65” — same axis as the yield. This is the <strong>forward-vs-spot footgun</strong> the abstraction’s documentation warns about; <code>at_age</code> is the canonical fix and works for both <code>MortalityVector</code> and <code>ParametricMortality</code> (Makeham, Gompertz, etc.).</p>
+</section>
+<section id="use-case-2-defaultable-bond-pricing-with-elgd" class="level2">
+<h2 class="anchored" data-anchor-id="use-case-2-defaultable-bond-pricing-with-elgd">Use case 2: Defaultable bond pricing with ELGD</h2>
+<p>Reduced-form credit modeling under the recovery-of-market-value convention (Duffie-Singleton 1999) prices a defaultable bond as</p>
+<p><span class="math display">\[
+\bar{P}(0,T) = E\left[\exp\left(-\int_0^T \big(r(s) + \mathrm{ELGD}\cdot\lambda(s)\big)\,ds\right)\right]
+\]</span></p>
+<p>where ELGD = 1 − R is the loss given default. This is the dominant modern convention in CDS-implied modeling and Solvency II spread risk. The recipe in code is one line — the existing <code>Rate * Real</code> operator already scales the underlying force:</p>
+<pre class="julia-repl"><code>julia&gt; # Same fitted yield curve as above
+julia&gt; bond_cfs = [Cashflow(t == 5.0 ? 102.0 : 2.0, t) for t in 0.5:0.5:5.0];
+
+julia&gt; # 4% annual coupon, semi-annual, par = 100
+
+julia&gt; λ_marginal = Continuous(0.012);          # 120bp marginal default hazard
+
+julia&gt; ELGD       = 0.60;                        # 60% loss given default
+
+julia&gt; λ_loss_adj = λ_marginal * ELGD;           # Continuous(0.0072) — Rate * Real
+
+julia&gt; pv(yc, bond_cfs)                          # risk-free price
+100.0015...
+
+julia&gt; pv(compose(yc, λ_marginal), bond_cfs)     # zero-recovery defaultable
+94.6585...
+
+julia&gt; pv(compose(yc, λ_loss_adj), bond_cfs)     # 40% recovery (ELGD = 60%)
+96.7586...</code></pre>
+<p>The implied credit spread maps cleanly onto the loss-adjusted hazard:</p>
+<pre class="julia-repl"><code>julia&gt; rate(forward(compose(yc, λ_marginal), 0, 5)) - rate(forward(yc, 0, 5))
+0.012   # 120bp = 100% LGD × 120bp hazard
+
+julia&gt; rate(forward(compose(yc, λ_loss_adj), 0, 5)) - rate(forward(yc, 0, 5))
+0.0072  # 72bp = 60% LGD × 120bp hazard</code></pre>
+<p>The pattern generalizes. Time-varying ELGD or stochastic ELGD correlated with the default intensity (Frye 2000) doesn’t fit <code>Continuous(ELGD * λ)</code> directly — but it fits as a custom <code>AbstractDeflator</code> subtype that defines its own <code>factor</code> integrating <code>(1-R(t)) · λ(t)</code> over the interval. The framework provides the slot; the credit modeler provides the math.</p>
+</section>
+<section id="use-case-3-analytical-sensitivities-via-forwarddiff" class="level2">
+<h2 class="anchored" data-anchor-id="use-case-3-analytical-sensitivities-via-forwarddiff">Use case 3: Analytical sensitivities via ForwardDiff</h2>
+<p>A common actuarial workflow is “what’s the reserve sensitive to?” The traditional finite-difference approach computes the reserve at the base assumption, computes it again at a shocked assumption, and takes the ratio. That works, but it commits to a specific shock magnitude up front and accumulates floating-point error from the differencing.</p>
+<p>The deflator abstraction is <strong>autodiff-friendly by construction</strong>. <code>factor</code>, <code>compose</code>, and <code>pv</code> are all type-generic — <code>Continuous(μ::ForwardDiff.Dual)</code> produces a dual-typed <code>Rate</code>, the <code>compose</code> machinery preserves it through the product, and <code>pv</code> carries it all the way to the scalar. So one <code>ForwardDiff.derivative</code> call gives you the analytical sensitivity:</p>
+<pre class="julia-repl"><code>julia&gt; using ForwardDiff
+
+julia&gt; yield     = Continuous(0.03);
+
+julia&gt; cashflows = [Cashflow(100.0, t) for t in 1.0:10.0];
+
+julia&gt; # PV as a function of the mortality force μ
+julia&gt; pv_of_μ(μ) = pv(compose(yield, Continuous(μ)), cashflows);
+
+julia&gt; base_pv = pv_of_μ(0.012)
+799.5276...
+
+julia&gt; # Analytical d(PV)/dμ — exact, no shock magnitude required
+julia&gt; dpv_dμ = ForwardDiff.derivative(pv_of_μ, 0.012)
+-4121.1845...
+
+julia&gt; # Mortality semi-elasticity: -d(log PV) / dμ
+julia&gt; -dpv_dμ / base_pv
+5.1545...
+
+julia&gt; # Convert to the "10% relative mortality shock" framing if you want it:
+julia&gt; # Δμ = 0.10 × 0.012 = 0.0012, so linear-approx impact is dPV/dμ × Δμ
+julia&gt; dpv_dμ * 0.0012 / base_pv
+-0.00619...</code></pre>
+<p>The ForwardDiff path produces <code>dPV/dμ = −4,121.18</code> exactly. Translated to the original “10% shock” framing via the linear approximation, that’s a −0.62% change in PV — within rounding of the −0.62% you’d get from the finite-difference computation, but without committing to a shock magnitude. You compute the sensitivity once and apply it to whatever shock size your stress framework uses.</p>
+<p>The same pipeline gives you the sensitivity to <strong>each element of the composed deflator</strong> in one AD pass. Pair each component of <code>compose(...)</code> with its own parameter and call <code>ForwardDiff.gradient</code>:</p>
+<pre class="julia-repl"><code>julia&gt; # 4-decrement deflator: interest × mortality × lapse × default,
+julia&gt; # one parameter per element of the composite
+julia&gt; function pv_of_components(i, μ, λ_l, λ_d)
+           deflator = compose(Continuous(i),
+                              Continuous(μ),
+                              Continuous(λ_l),
+                              Continuous(λ_d))
+           pv(deflator, cashflows)
+       end;
+
+julia&gt; θ_base = [0.03, 0.012, 0.07, 0.001];   # i, μ, λ_l, λ_d
+
+julia&gt; base_pv = pv_of_components(θ_base...)
+565.8746...
+
+julia&gt; ∇pv = ForwardDiff.gradient(θ -&gt; pv_of_components(θ...), θ_base)
+4-element Vector{Float64}:
+ -2595.7788...   # ∂PV/∂i   (interest force)
+ -2595.7788...   # ∂PV/∂μ   (mortality force)
+ -2595.7788...   # ∂PV/∂λ_l (lapse force)
+ -2595.7788...   # ∂PV/∂λ_d (default force)</code></pre>
+<p>The four sensitivities are <strong>equal in magnitude</strong>. That’s not a coincidence — it’s a structural feature of the independence-product. Under <code>compose</code>, each constant force enters the deflator the same way (<code>factor = exp(-Σf · t)</code>), so <code>∂PV/∂f_k = -Σ t·cᵗ·exp(-Σf·t)</code> independently of which force <code>f_k</code> you differentiate. The risk decomposition tells you: “under this composition, a 1 bp shift in mortality moves the reserve by the same amount as a 1 bp shift in lapse, default, or interest.” Once you see it as a property of the composition algebra (not as a numerical coincidence), it’s the right answer.</p>
+<p>Term-structure components break the symmetry because their factor isn’t a single exponential. Swap the constant interest force for a fitted yield curve — the same <code>compose</code> and the same <code>ForwardDiff.gradient</code> keep working, and the yield’s contribution now reflects curve shape:</p>
+<pre class="julia-repl"><code>julia&gt; yc = fit(Spline.Cubic(), CMTYield.(rates, mats), Fit.Bootstrap());
+
+julia&gt; function pv_with_curve(μ, λ_l, λ_d)
+           deflator = compose(yc, Continuous(μ), Continuous(λ_l), Continuous(λ_d))
+           pv(deflator, cashflows)
+       end;
+
+julia&gt; ∇ = ForwardDiff.gradient(θ -&gt; pv_with_curve(θ...), [0.012, 0.07, 0.001])
+3-element Vector{Float64}:
+ -2427.2897...   # ∂PV/∂μ — symmetric across constant-force components
+ -2427.2897...   # ∂PV/∂λ_l
+ -2427.2897...   # ∂PV/∂λ_d</code></pre>
+<p>The decrement sensitivities are still mutually equal (constant forces composing symmetrically), but their magnitudes shift to reflect the yield curve’s shape. To get the <em>yield curve’s</em> per-tenor sensitivities — the analog of mortality/lapse/default per-component — use FinanceModels’s <code>ZeroRateCurve</code> and ActuaryUtilities’s <code>KeyRates()</code>/<code>sensitivities</code>, which already use ForwardDiff to differentiate against each tenor of the curve. Combining the two gives you a full risk decomposition (yield key rates × decrement forces) in a single AD sweep over the composed deflator.</p>
+<p>Mortality, lapse, and credit sensitivities now live in the same toolkit as interest-rate sensitivities instead of requiring separate finite-difference plumbing per assumption.</p>
+</section>
+<section id="use-case-4-joint-life-and-last-survivor" class="level2">
+<h2 class="anchored" data-anchor-id="use-case-4-joint-life-and-last-survivor">Use case 4: Joint-life and last-survivor</h2>
+<p>A joint-and-survivor annuity pays while at least one of two lives is alive. A joint-life insurance pays on the first death. These two statuses sit on opposite sides of the inclusion-exclusion identity, and they show off two facets of the abstraction.</p>
+<p><strong>Joint-life status (both alive).</strong> Survival of the joint-life status under independence is <code>S_xy(t) = S_x(t) · S_y(t)</code>. That’s literally what <code>compose</code> does:</p>
+<pre class="julia-repl"><code>julia&gt; # Two constant-force lives (toy example; the structure extends to
+julia&gt; # any AbstractDeflator-based mortality)
+julia&gt; life_x = Continuous(0.012);   # 65-year-old, μ = 0.012
+
+julia&gt; life_y = Continuous(0.020);   # 70-year-old, μ = 0.020
+
+julia&gt; i      = Continuous(0.03);    # 3% interest
+
+julia&gt; # 10-year temporary joint-life annuity-due:
+julia&gt; # pays 1 at t=0, 1, ..., 9 while BOTH alive
+julia&gt; ä_xy_10 = pv(compose(i, life_x, life_y),
+                    [Cashflow(1.0, t) for t in 0.0:9.0])
+7.6859...</code></pre>
+<p><code>compose(i, life_x, life_y)</code> is the joint-life deflator. No special-casing — the abstraction’s product structure <em>is</em> the independence assumption that joint-life pricing already uses.</p>
+<p><strong>Last-survivor status (at least one alive).</strong> Survival of the last-survivor status is <code>1 - F_xy(t) = S_x(t) + S_y(t) - S_x(t)·S_y(t)</code> under independence. That’s <em>not</em> a product of marginals, so <code>compose</code> won’t help. We define a custom subtype:</p>
+<pre class="julia"><code>struct LastSurvivor{A, B} &lt;: AbstractDeflator
+    a::A
+    b::B
+end
+
+function FinanceCore.factor(ls::LastSurvivor, from, to)
+    Sa = factor(ls.a, from, to)
+    Sb = factor(ls.b, from, to)
+    Sa + Sb - Sa * Sb     # P[at least one survives]
+end
+# pv goes through single-arg factor (factor(deflator, t)), so origin-invariant
+# subtypes need to define it. For LastSurvivor with constant-force lives,
+# "from time 0 to time t" is well-defined, so we delegate to the two-arg form:
+FinanceCore.factor(ls::LastSurvivor, t) = factor(ls, zero(t), t)
+
+# No `intensity` method — last-survivor force is non-trivial; let
+# the subtype's user define it if needed.</code></pre>
+<p>The <code>LastSurvivor</code> is itself an <code>AbstractDeflator</code>, so it composes with the yield curve exactly like any other deflator:</p>
+<pre class="julia-repl"><code>julia&gt; last_surv = LastSurvivor(life_x, life_y);
+
+julia&gt; # 10-year last-survivor annuity-due:
+julia&gt; ä_overline_xy_10 = pv(compose(i, last_surv),
+                             [Cashflow(1.0, t) for t in 0.0:9.0])
+8.7201...</code></pre>
+<p>The <code>compose(i, last_surv)</code> says “discount the last-survivor cashflow at the yield curve” — which is the right composition because the <em>last-survivor</em> status is jointly correlated, but its dependence on the <em>yield</em> is still independent. The type system makes the dependence structure visible.</p>
+<p>This is the general pattern for correlated decrements: <strong>define a custom subtype whose <code>factor</code> encodes the correlation</strong>, then compose that subtype with anything else (yield, second-order decrements) under the standard independence assumption. Copulas, common-shock models, and joint analytical survival functions all fit this shape.</p>
+</section>
+<section id="use-case-5-parametric-mortality-models" class="level2">
+<h2 class="anchored" data-anchor-id="use-case-5-parametric-mortality-models">Use case 5: Parametric mortality models</h2>
+<p><code>MortalityTables.jl</code> parametric models (Makeham, Gompertz, Thiele, Heligman-Pollard, etc.) all subtype <code>AbstractMortality &lt;: AbstractDeflator</code> directly. Their <code>factor</code> semantic matches the existing <code>survival(m, age)</code> convention — survival from age 0 to a given age:</p>
+<pre class="julia-repl"><code>julia&gt; using MortalityTables, FinanceCore
+
+julia&gt; mort = Makeham(a = 2.5e-5, b = 0.10, c = 1e-4);
+
+julia&gt; intensity(mort, 65)              # = hazard(mort, 65)
+0.01672...
+
+julia&gt; factor(mort, 65, 70)             # 5-year survival from age 65
+0.8973...
+
+julia&gt; factor(mort, 65)                 # survival from age 0 to age 65
+0.8415...</code></pre>
+<p>To compose with a yield curve on a years-from-valuation axis, shift the parametric model’s age origin to the valuation age — the same <code>at_age</code> helper used for <code>MortalityVector</code>:</p>
+<pre class="julia-repl"><code>julia&gt; mort_at_65 = at_age(mort, 65)
+at_age(Makeham{Float64, Float64, Float64}(2.5e-5, 0.1, 0.0001), 65.0)
+
+julia&gt; factor(mort_at_65, 5)            # 5-year survival from age 65
+0.8973...
+
+julia&gt; intensity(mort_at_65, 0)         # force at the valuation age
+0.0167...
+
+julia&gt; deflator = compose(yc, mort_at_65);
+
+julia&gt; pv(deflator, cashflows)</code></pre>
+<p><code>at_age</code> works on any <code>AbstractMortality</code> — parametric, vector-based, or any future subtype — so the same idiom drops a Makeham model, a select-ultimate table, or a custom Heligman-Pollard fit into the same composition workflow.</p>
+</section>
+<section id="whats-not-in-this-abstraction" class="level2">
+<h2 class="anchored" data-anchor-id="whats-not-in-this-abstraction">What’s <em>not</em> in this abstraction</h2>
+<p>Just as important as what fits is what doesn’t. The abstraction covers <strong>linear cashflow valuation under a deflator</strong>: <code>pv(deflator, cashflows) = Σ cᵢ · factor(deflator, tᵢ)</code>. It does <em>not</em> cover:</p>
+<ul>
+<li><strong>Option pricing and contingent claims</strong>. A European call’s price isn’t <code>factor × cashflow</code> — it’s <code>E[max(S(T) - K, 0)] · D(0,T)</code> with the expectation taken over the <em>whole distribution</em> of <code>S(T)</code>. Volatility matters; the deflator framework can’t see it. Option pricing lives in parallel <code>present_value(model, contract)</code> machinery (already in FinanceModels.jl); it’s orthogonal — a model can subtype <code>AbstractDeflator</code> for forward/discount calculations <em>and</em> implement <code>present_value(_, ::Option)</code> for option pricing.</li>
+<li><strong>Path-dependent payoffs</strong>, American exercise, lookbacks, basket payoffs that aren’t simple functions of marginal factors.</li>
+<li><strong>LDTI net premium ratio computation</strong> and other accounting-methodology-specific reserve mechanics. The deflator is an input to those calculations, not a replacement for them.</li>
+</ul>
+<p>What this means in practice: a Variable Annuity GMxB liability has <em>both</em> a deflator side (<code>yield × mortality × lapse</code> for the actuarial scaffolding) <em>and</em> an option side (the guarantee payoff). The combined pricing flows through both abstractions; neither subsumes the other.</p>
+</section>
+<section id="the-four-prs" class="level2">
+<h2 class="anchored" data-anchor-id="the-four-prs">The four PRs</h2>
+<p>This release is a coordinated four-PR rollout:</p>
+<ul>
+<li><strong><code>FinanceCore.jl 2.6.0</code></strong> — <a href="https://github.com/JuliaActuary/FinanceCore.jl/pull/39">PR #39</a>. Introduces <code>AbstractDeflator</code>, the required <code>factor</code> and optional <code>intensity</code> primitives, the <code>compose</code> constructor with two backends (tuple and vector), and the derived <code>discount</code> / <code>accumulation</code> / <code>forward</code> / <code>Base.zero</code> plumbing. <code>Rate &lt;: AbstractDeflator</code> is the first concrete subtype.</li>
+<li><strong><code>FinanceModels.jl 5.4.0</code></strong> — <a href="https://github.com/JuliaActuary/FinanceModels.jl/pull/255">PR #255</a>. <code>AbstractYieldModel &lt;: AbstractDeflator</code>. Two-line <code>factor</code> plumbing routes through each yield model’s existing <code>discount</code>. Every concrete yield curve — <code>Constant</code>, <code>Spline</code>, <code>MonotoneConvex</code>, <code>SmithWilson</code>, <code>NelsonSiegelSvensson</code>, <code>CairnsPritchard</code>, <code>ZeroRateCurve</code>, plus the stochastic short-rate models <code>Vasicek</code>, <code>CIR</code>, and <code>HullWhite</code> — composes through <code>compose(...)</code>.</li>
+<li><strong><code>MortalityTables.jl 3.0.0</code></strong> — <a href="https://github.com/JuliaActuary/MortalityTables.jl/pull/134">PR #134</a>. A small deflator-aware hierarchy: <code>AbstractMortality &lt;: AbstractDeflator</code> with three subtypes — <code>MortalityVector</code> (the new return type from <code>UltimateMortality(...)</code> and <code>SelectMortality[issue_age]</code>, replacing <code>OffsetArray</code> while preserving the <code>AbstractArray</code> interface by delegation), <code>ParametricMortality</code> (Makeham, Gompertz, Heligman-Pollard, Thiele, etc.), and <code>ShiftedMortality</code> (constructed via <code>at_age(model, age)</code> — the idiomatic axis-alignment helper). Major version bump for the breaking type-tree change.</li>
+<li><strong><code>ActuaryUtilities.jl 5.6.0</code></strong> — <a href="https://github.com/JuliaActuary/ActuaryUtilities.jl/pull/133">PR #133</a>. Compat bumps; existing yield-specific machinery (<code>duration</code>, <code>convexity</code>, <code>KeyRateDuration</code>, <code>sensitivities</code>) stays unchanged. The <code>pv</code> re-export accepts composed deflators directly.</li>
+</ul>
+<p>Each PR is non-breaking by itself. Adding <code>&lt;: AbstractDeflator</code> is purely additive from upstream; the supertype change moves yield models out from under FinanceModels’s internal <code>AbstractModel</code>, which only affected one dispatch site (handled in the same PR).</p>
+</section>
+<section id="eight-precedents-this-commits-to" class="level2">
+<h2 class="anchored" data-anchor-id="eight-precedents-this-commits-to">Eight precedents this commits to</h2>
+<p>If you’re building on top of this abstraction, here’s what’s locked once the four PRs ship:</p>
+<ol type="1">
+<li><code>Rate &lt;: AbstractDeflator</code> is permanent.</li>
+<li><code>factor(p, from, to)</code> signature is locked: positional, no kwargs.</li>
+<li><code>intensity</code> is optional with no fallback <strong>ever</strong> — adding numerical-differentiation later would break code that relies on <code>MethodError</code> as a discrete-vs-continuous guard.</li>
+<li><code>compose</code> is the public composition primitive. <code>*</code> is <em>not</em> overloaded for deflator pairs (FinanceModels already overloads <code>+</code> for yield-spread addition and <code>*</code> for after-tax scaling; introducing a third meaning would have muddied two established algebras).</li>
+<li><code>(from, to)</code> is the canonical time form; single-argument <code>factor(p, t)</code> is at subtype discretion (only origin-invariant or pre-aligned subtypes should define it).</li>
+<li>Independence is the composite default; correlated joints live in bespoke subtypes.</li>
+<li>Discrete-time deflators are first-class without traits — subtypes police their own time-argument validity at runtime.</li>
+<li>The name <code>AbstractDeflator</code> is locked; renaming is breaking.</li>
+</ol>
+</section>
+<section id="conclusion" class="level2">
+<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
+<p>The deflator abstraction is small — one abstract type, one required method, one optional method, one composition operator. The pay-off is conceptual unity: the same <code>compose</code> and <code>pv</code> calls work across yield, mortality, lapse, default, and (with custom subtypes) joint statuses, copulas, and stochastic scenarios. Code that used to live in four parallel APIs converges on one.</p>
+<p>If you’re thinking about how this fits a specific actuarial problem you’re working on — variable annuity guarantees, defaultable insurance asset modeling, multi-life valuation, ESG-driven projections, anything else — the four PRs above are open for review and the abstraction is small enough to skim end-to-end in fifteen minutes. Feedback welcome.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/JuliaActuary\.org");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
