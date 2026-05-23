@@ -1,0 +1,7 @@
+[deps]
+ActuaryUtilities = "bdd23359-8b1c-4f88-b89b-d11982a786f4"
+BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
+FinanceCore = "b9b1ffdd-6612-4b69-8227-7663be06e089"
+FinanceModels = "77f2ae65-bdde-421f-ae9d-22f1af19dd76"
+ForwardDiff = "f6369f11-7733-5829-9624-2563aa707210"
+Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
