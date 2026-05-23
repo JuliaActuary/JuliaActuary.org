@@ -1,0 +1,1351 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.16">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.">
+
+<title>Packages – JuliaActuary</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href=".//assets/favicon.ico" rel="icon">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-a0731b9a3a5d496010872d775e5d9bc3.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-a9c66334b43f472998d4f0687f28726e.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<link rel="stylesheet" href="./assets/highlight/styles/github.min.css">
+<script src="./assets/highlight/highlight.min.js"></script>
+<script src="./assets/highlight/languages/julia.min.js"></script>
+<script src="./assets/highlight/languages/julia-repl.min.js"></script>
+<script src="./assets/highlight/languages/python.min.js"></script>
+<script src="./assets/highlight/languages/r.min.js"></script>
+<script>hljs.highlightAll();</script>
+<script data-goatcounter="https://juliaactuary.goatcounter.com/count" async="" src="//gc.zgo.at/count.js"></script>
+
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="./index.html" class="navbar-brand navbar-brand-logo">
+    <img src="./assets/logos/android-chrome-512x512.png" alt="JuliaActuary Logo" class="navbar-logo light-content">
+    <img src="./assets/logos/android-chrome-512x512.png" alt="JuliaActuary Logo" class="navbar-logo dark-content">
+    </a>
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">JuliaActuary</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="https://docs.juliaactuary.org"> 
+<span class="menu-text">Docs</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="./packages.html" aria-current="page"> 
+<span class="menu-text">Packages</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./learn.html"> 
+<span class="menu-text">Learn</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./examples.html"> 
+<span class="menu-text">Examples</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./benchmarks.html"> 
+<span class="menu-text">Benchmarks</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./community.html"> 
+<span class="menu-text">Community</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./blog.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/JuliaActuary"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="./all-posts.xml"> <i class="bi bi-rss" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#adding-and-using-packages" id="toc-adding-and-using-packages" class="nav-link active" data-scroll-target="#adding-and-using-packages">Adding and Using Packages</a></li>
+  <li><a href="#mortalitytables.jl" id="toc-mortalitytables.jl" class="nav-link" data-scroll-target="#mortalitytables.jl">MortalityTables.jl</a>
+  <ul class="collapse">
+  <li><a href="#features" id="toc-features" class="nav-link" data-scroll-target="#features">Features</a></li>
+  <li><a href="#quickstart" id="toc-quickstart" class="nav-link" data-scroll-target="#quickstart">Quickstart</a></li>
+  <li><a href="#parametric-models" id="toc-parametric-models" class="nav-link" data-scroll-target="#parametric-models">Parametric Models</a></li>
+  </ul></li>
+  <li><a href="#actuaryutilities.jl" id="toc-actuaryutilities.jl" class="nav-link" data-scroll-target="#actuaryutilities.jl">ActuaryUtilities.jl</a>
+  <ul class="collapse">
+  <li><a href="#quickstart-1" id="toc-quickstart-1" class="nav-link" data-scroll-target="#quickstart-1">Quickstart</a></li>
+  <li><a href="#features-1" id="toc-features-1" class="nav-link" data-scroll-target="#features-1">Features</a></li>
+  </ul></li>
+  <li><a href="#lifecontingencies.jl" id="toc-lifecontingencies.jl" class="nav-link" data-scroll-target="#lifecontingencies.jl">LifeContingencies.jl</a>
+  <ul class="collapse">
+  <li><a href="#features-2" id="toc-features-2" class="nav-link" data-scroll-target="#features-2">Features</a></li>
+  <li><a href="#package-overview" id="toc-package-overview" class="nav-link" data-scroll-target="#package-overview">Package Overview</a></li>
+  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
+  </ul></li>
+  <li><a href="#financemodels.jl" id="toc-financemodels.jl" class="nav-link" data-scroll-target="#financemodels.jl">FinanceModels.jl</a>
+  <ul class="collapse">
+  <li><a href="#quickstart-2" id="toc-quickstart-2" class="nav-link" data-scroll-target="#quickstart-2">QuickStart</a></li>
+  <li><a href="#overview-of-financemodels" id="toc-overview-of-financemodels" class="nav-link" data-scroll-target="#overview-of-financemodels">Overview of FinanceModels</a></li>
+  <li><a href="#contracts-and-quotes" id="toc-contracts-and-quotes" class="nav-link" data-scroll-target="#contracts-and-quotes">Contracts and Quotes</a></li>
+  <li><a href="#models" id="toc-models" class="nav-link" data-scroll-target="#models">Models</a></li>
+  <li><a href="#projections" id="toc-projections" class="nav-link" data-scroll-target="#projections">Projections</a></li>
+  <li><a href="#fitting-models" id="toc-fitting-models" class="nav-link" data-scroll-target="#fitting-models">Fitting Models</a></li>
+  <li><a href="#rates" id="toc-rates" class="nav-link" data-scroll-target="#rates">Rates</a></li>
+  </ul></li>
+  <li><a href="#experienceanalysis.jl" id="toc-experienceanalysis.jl" class="nav-link" data-scroll-target="#experienceanalysis.jl">ExperienceAnalysis.jl</a>
+  <ul class="collapse">
+  <li><a href="#quickstart-3" id="toc-quickstart-3" class="nav-link" data-scroll-target="#quickstart-3">Quickstart</a></li>
+  <li><a href="#available-exposure-basis" id="toc-available-exposure-basis" class="nav-link" data-scroll-target="#available-exposure-basis">Available Exposure Basis</a></li>
+  </ul></li>
+  <li><a href="#economicscenariogenerators.jl" id="toc-economicscenariogenerators.jl" class="nav-link" data-scroll-target="#economicscenariogenerators.jl">EconomicScenarioGenerators.jl</a>
+  <ul class="collapse">
+  <li><a href="#models-1" id="toc-models-1" class="nav-link" data-scroll-target="#models-1">Models</a></li>
+  <li><a href="#interest-rate-model-examples" id="toc-interest-rate-model-examples" class="nav-link" data-scroll-target="#interest-rate-model-examples">Interest Rate Model Examples</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Packages</h1>
+</div>
+
+<div>
+  <div class="description">
+    JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>These packages are available for use in your project. Scroll down for more information and links to the associated repository for each one.</p>
+<table class="package-table caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<tbody>
+<tr class="odd">
+<td style="width: 50%"><p><strong><a href="./packages.html#mortalitytables.jl">MortalityTables.jl</a></strong></p>
+<p>Easily work with standard tables and parametric models with common survival calculations.</p></td>
+<td style="vertical-align: top"><p><strong><a href="./packages.html#lifecontingencies.jl">LifeContingencies.jl</a></strong></p>
+<p>Insurance, annuity, premium, and reserve maths.</p></td>
+</tr>
+<tr class="even">
+<td style="vertical-align: top"><p><strong><a href="./packages.html#actuaryutilities.jl">ActuaryUtilities.jl</a></strong></p>
+<p>Robust and fast calculations for <code>internal_rate_of_return</code>, <code>duration</code>, <code>convexity</code>, <code>present_value</code>, <code>breakeven</code>, and more.</p></td>
+<td style="vertical-align: top"><p><strong><a href="./packages.html#experienceanalysis.jl">ExperienceAnalysis.jl</a></strong></p>
+<p>Meeting your exposure calculation needs.</p></td>
+</tr>
+<tr class="odd">
+<td style="vertical-align: top"><p><strong><a href="./packages.html#financemodels.jl">FinanceModels.jl</a></strong></p>
+<p>Composable contracts, models, and functions that allow for modeling of both simple and complex financial instruments.</p></td>
+<td style="vertical-align: top"><p><strong><a href="./packages.html#economicscenariogenerators.jl">EconomicScenarioGenerators.jl</a></strong></p>
+<p>Easy-to-use scenario generation that's FinanceModels.jl compatible.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>For consistency, you can lock any package in its current state and not worry about breaking changes to any code that you write. Julia’s package manager lets you <a href="https://julialang.github.io/Pkg.jl/v1/toml-files/#Manifest.toml-1">exactly recreate a set of code and its dependencies</a>. <a href="https://stackoverflow.com/questions/63485891/how-do-i-ensure-repeatability-of-julia-code-and-assoicated-dependencies">More information</a>.</p>
+</div>
+</div>
+<section id="adding-and-using-packages" class="level2">
+<h2 class="anchored" data-anchor-id="adding-and-using-packages">Adding and Using Packages</h2>
+<p>There are two ways to add packages:</p>
+<ul>
+<li>In the code itself: <code>using Pkg; Pkg.add("MortalityTables")</code></li>
+<li>In the <a href="https://docs.julialang.org/en/v1/stdlib/REPL/index.html">REPL</a>, hit <code>]</code> to enter Pkg mode and type <code>add MortalityTables</code> More info can be found at the <a href="https://julialang.github.io/Pkg.jl/v1/getting-started">Pkg manager documentation</a>.</li>
+</ul>
+<p>To use packages in your code:</p>
+<pre class="julia"><code>using PackageName</code></pre>
+</section>
+<section id="mortalitytables.jl" class="level2">
+<h2 class="anchored" data-anchor-id="mortalitytables.jl">MortalityTables.jl</h2>
+<blockquote class="blockquote">
+<p>Hassle-free mortality and other rate tables.</p>
+</blockquote>
+<section id="features" class="level3">
+<h3 class="anchored" data-anchor-id="features">Features</h3>
+<ul>
+<li>Full set of SOA mort.soa.org tables included</li>
+<li><code>survival</code> and <code>decrement</code> functions to calculate decrements over period of time</li>
+<li>Partial year mortality calculations (Uniform, Constant, Balducci)</li>
+<li>Friendly syntax and flexible usage</li>
+<li>Extensive set of parametric mortality models.</li>
+</ul>
+</section>
+<section id="quickstart" class="level3">
+<h3 class="anchored" data-anchor-id="quickstart">Quickstart</h3>
+<p>Load and see information about a particular table:</p>
+<pre class="julia"><code>julia&gt; vbt2001 = MortalityTables.table("2001 VBT Residual Standard Select and Ultimate - Male Nonsmoker, ANB")
+
+MortalityTable (Insured Lives Mortality):
+   Name:
+       2001 VBT Residual Standard Select and Ultimate - Male Nonsmoker, ANB
+   Fields:
+       (:select, :ultimate, :metadata)
+   Provider:
+       Society of Actuaries
+   mort.SOA.org ID:
+       1118
+   mort.SOA.org link:
+       https://mort.soa.org/ViewTable.aspx?&amp;TableIdentity=1118
+   Description:
+       2001 Valuation Basic Table (VBT) Residual Standard Select and Ultimate Table -  Male Nonsmoker.
+       Basis: Age Nearest Birthday. 
+       Minimum Select Age: 0. 
+       Maximum Select Age: 99. 
+       Minimum Ultimate Age: 25. 
+       Maximum Ultimate Age: 120</code></pre>
+<p>The package revolves around easy-to-access vectors which are indexed by attained age:</p>
+<pre class="julia"><code>julia&gt; vbt2001.select[35]          # vector of rates for issue age 35
+ 0.00036
+ 0.00048
+ ⋮
+ 0.94729
+ 1.0
+ 
+julia&gt; vbt2001.select[35][35]      # issue age 35, attained age 35
+ 0.00036
+ 
+julia&gt; vbt2001.select[35][50:end] # issue age 35, attained age 50 through end of table
+0.00316
+0.00345
+ ⋮
+0.94729
+1.0
+
+julia&gt; vbt2001.ultimate[95]        # ultimate vectors only need to be called with the attained age
+ 0.24298</code></pre>
+<p>Calculate the force of mortality or survival over a range of time:</p>
+<pre class="julia"><code>julia&gt; survival(vbt2001.ultimate,30,40) # the survival between ages 30 and 40
+0.9894404665434904
+
+julia&gt; decrement(vbt2001.ultimate,30,40) # the decrement between ages 30 and 40
+0.010559533456509618</code></pre>
+<p>Non-whole periods of time are supported when you specify the assumption (<code>Constant()</code>, <code>Uniform()</code>, or <code>Balducci()</code>) for fractional periods:</p>
+<pre class="julia"><code>julia&gt; survival(vbt2001.ultimate,30,40.5,Uniform()) # the survival between ages 30 and 40.5
+0.9887676470262408</code></pre>
+</section>
+<section id="parametric-models" class="level3">
+<h3 class="anchored" data-anchor-id="parametric-models">Parametric Models</h3>
+<p>Over 20 different models included. Example with the <code>Gompertz</code> model</p>
+<pre class="julia"><code>m = MortalityTables.Gompertz(a=0.01,b=0.2)
+
+m[20]                 # the mortality rate at age 20
+decrement(m,20,25)    # the five year cumulative mortality rate
+survival(m,20,25) # the five year survival rate</code></pre>
+<p><a href="https://docs.juliaactuary.org/MortalityTables/stable/">MortalityTables documentation 🡭</a></p>
+<p><a href="https://github.com/JuliaActuary/MortalityTables.jl">MortalityTables package on Github 🡭</a></p>
+</section>
+</section>
+<section id="actuaryutilities.jl" class="level2">
+<h2 class="anchored" data-anchor-id="actuaryutilities.jl">ActuaryUtilities.jl</h2>
+<blockquote class="blockquote">
+<p>A collection of common functions/manipulations used in Actuarial Calculations.</p>
+</blockquote>
+<p>A collection of common functions/manipulations used in Actuarial Calculations.</p>
+<section id="quickstart-1" class="level3">
+<h3 class="anchored" data-anchor-id="quickstart-1">Quickstart</h3>
+<pre class="julia"><code>cfs = [5, 5, 105]
+times    = [1, 2, 3]
+
+discount_rate = 0.03
+
+present_value(discount_rate, cfs, times)           # 105.65
+duration(Macaulay(), discount_rate, cfs, times)    #   2.86
+duration(discount_rate, cfs, times)                #   2.78
+convexity(discount_rate, cfs, times)               #  10.62</code></pre>
+</section>
+<section id="features-1" class="level3">
+<h3 class="anchored" data-anchor-id="features-1">Features</h3>
+<section id="financial-maths" class="level4">
+<h4 class="anchored" data-anchor-id="financial-maths">Financial Maths</h4>
+<ul>
+<li><code>duration</code>:
+<ul>
+<li>Calculate the <code>Macaulay</code>, <code>Modified</code>, or <code>DV01</code> durations for a set of cashflows</li>
+</ul></li>
+<li><code>convexity</code> for price sensitivity</li>
+<li>Flexible interest rate options via the <a href="https://github.com/JuliaActuary/FinanceModels.jl"><code>FinanceModels.jl</code></a> package.</li>
+<li><code>internal_rate_of_return</code> or <code>irr</code> to calculate the IRR given cashflows (including at timepoints like Excel’s <code>XIRR</code>)</li>
+<li><code>breakeven</code> to calculate the breakeven time for a set of cashflows</li>
+<li><code>accum_offset</code> to calculate accumulations like survivorship from a mortality vector</li>
+</ul>
+</section>
+<section id="key-rate-sensitivities-via-automatic-differentiation" class="level4">
+<h4 class="anchored" data-anchor-id="key-rate-sensitivities-via-automatic-differentiation">Key Rate Sensitivities via Automatic Differentiation</h4>
+<p>Compute exact key rate durations, DV01s, and convexities using ForwardDiff through <code>ZeroRateCurve</code> from FinanceModels.jl — machine-precision sensitivities in a single pass, no bump-and-reprice required.</p>
+<ul>
+<li><code>sensitivities</code>: bundled value, key rate durations, and convexity matrix in a single AD pass</li>
+<li>Two-curve decomposition: separate <code>IR01</code> (risk-free) and <code>CS01</code> (credit spread) sensitivities</li>
+<li>Do-block syntax for rate-dependent instruments (callable bonds, floaters)</li>
+<li>Hull-White stochastic model: key rate sensitivities of Monte Carlo expected values</li>
+</ul>
+</section>
+<section id="options-pricing" class="level4">
+<h4 class="anchored" data-anchor-id="options-pricing">Options Pricing</h4>
+<ul>
+<li><code>eurocall</code> and <code>europut</code> for Black-Scholes option prices</li>
+</ul>
+</section>
+<section id="risk-measures" class="level4">
+<h4 class="anchored" data-anchor-id="risk-measures">Risk Measures</h4>
+<ul>
+<li>Calculate risk measures for a given vector of risks:
+<ul>
+<li><code>CTE</code> for the Conditional Tail Expectation, or</li>
+<li><code>VaR</code> for the percentile/Value at Risk.</li>
+</ul></li>
+</ul>
+</section>
+<section id="insurance-mechanics" class="level4">
+<h4 class="anchored" data-anchor-id="insurance-mechanics">Insurance mechanics</h4>
+<ul>
+<li><code>duration</code>:
+<ul>
+<li>Calculate the duration given an issue date and date (a.k.a. policy duration)</li>
+</ul></li>
+</ul>
+<p><a href="https://docs.juliaactuary.org/ActuaryUtilities/stable/">ActuaryUtilities documentation 🡭</a></p>
+<p><a href="https://github.com/JuliaActuary/ActuaryUtilities.jl">ActuaryUtilities package on GitHub 🡭</a></p>
+</section>
+</section>
+</section>
+<section id="lifecontingencies.jl" class="level2">
+<h2 class="anchored" data-anchor-id="lifecontingencies.jl">LifeContingencies.jl</h2>
+<blockquote class="blockquote">
+<p>Common life contingent calculations with a convenient interface.</p>
+</blockquote>
+<section id="features-2" class="level3">
+<h3 class="anchored" data-anchor-id="features-2">Features</h3>
+<ul>
+<li>Integration with other JuliaActuary packages such as <a href="https://github.com/JuliaActuary/MortalityTables.jl">MortalityTables.jl</a></li>
+<li>Fast calculations, with some parts utilizing parallel processing power automatically</li>
+<li>Use functions that look more like the math you are used to (e.g.&nbsp;<code>A</code>, <code>ä</code>) with <a href="https://docs.julialang.org/en/v1/manual/unicode-input/index.html">Unicode support</a></li>
+<li>All of the power, speed, convenience, tooling, and ecosystem of Julia</li>
+<li>Flexible and modular modeling approach</li>
+</ul>
+</section>
+<section id="package-overview" class="level3">
+<h3 class="anchored" data-anchor-id="package-overview">Package Overview</h3>
+<ul>
+<li>Leverages <a href="https://github.com/JuliaActuary/MortalityTables.jl">MortalityTables.jl</a> for the mortality calculations</li>
+<li>Contains common insurance calculations such as:
+<ul>
+<li><code>Insurance(life,yield)</code>: Whole life</li>
+<li><code>Insurance(life,yield,n)</code>: Term life for <code>n</code> years</li>
+<li><code>ä(life,yield)</code>: <code>present_value</code> of life-contingent annuity</li>
+<li><code>ä(life,yield,n)</code>: <code>present_value</code> of life-contingent annuity due for <code>n</code> years</li>
+</ul></li>
+<li>Contains various commutation functions such as <code>D(x)</code>,<code>M(x)</code>,<code>C(x)</code>, etc.</li>
+<li><code>SingleLife</code> and <code>JointLife</code> capable</li>
+<li>Interest rate mechanics via <a href="https://github.com/JuliaActuary/FinanceModels.jl"><code>FinanceModels.jl</code></a></li>
+<li>More documentation available by clicking the DOCS badges at the top of this README</li>
+</ul>
+</section>
+<section id="examples" class="level3">
+<h3 class="anchored" data-anchor-id="examples">Examples</h3>
+<section id="basic-functions" class="level4">
+<h4 class="anchored" data-anchor-id="basic-functions">Basic Functions</h4>
+<p>Calculate various items for a 30-year-old male nonsmoker using 2015 VBT base table and a 5% interest rate</p>
+<pre class="julia"><code>
+using LifeContingencies
+using MortalityTables
+using FinanceModels
+import LifeContingencies: V, ä     # pull the shortform notation into scope
+
+# load mortality rates from MortalityTables.jl
+vbt2001 = MortalityTables.table("2001 VBT Residual Standard Select and Ultimate - Male Nonsmoker, ANB")
+
+issue_age = 30
+life = SingleLife(                 # The life underlying the risk
+    mortality = vbt2001.select[issue_age],    # -- Mortality rates
+)
+
+yield = FinanceModels.Yield.Constant(0.05) 
+
+lc = LifeContingency(life, yield)  # LifeContingency joins the risk with interest
+
+
+ins = Insurance(lc)                # Whole Life insurance
+ins = Insurance(life, yield)       # alternate way to construct</code></pre>
+<p>With the above life contingent data, we can calculate vectors of relevant information:</p>
+<pre class="julia"><code>cashflows(ins)                     # A vector of the unit cashflows
+timepoints(ins)                    # The timepoints associated with the cashflows
+survival(ins)                      # The survival vector
+benefit(ins)                       # The unit benefit vector
+probability(ins)                   # The probability of benefit payment</code></pre>
+<p>Some of the above will return lazy results. For example, <code>cashflows(ins)</code> will return a <code>Generator</code> which can be efficiently used in most places you’d use a vector of cashflows (e.g.&nbsp;<code>pv(...)</code> or <code>sum(...)</code>) but has the advantage of being non-allocating (less memory used, faster computations). To get a computed vector instead of the generator, simply call <code>collect(...)</code> on the result: <code>collect(cashflows(ins))</code>.</p>
+<p>Or calculate summary scalars:</p>
+<pre class="julia"><code>present_value(ins)                 # The actuarial present value
+premium_net(lc)                    # Net whole life premium 
+V(lc,5)                            # Net premium reserve for whole life insurance at time 5</code></pre>
+<p>Other types of life contingent benefits:</p>
+<pre class="julia"><code>Insurance(lc,10)                 # 10 year term insurance
+AnnuityImmediate(lc)               # Whole life annuity due
+AnnuityDue(lc)                     # Whole life annuity due
+ä(lc)                              # Shortform notation
+ä(lc, 5)                           # 5 year annuity due
+ä(lc, 5, certain=5,frequency=4)    # 5 year annuity due, with 5 year certain payable 4x per year
+...                                # and more!</code></pre>
+</section>
+<section id="constructing-lives" class="level4">
+<h4 class="anchored" data-anchor-id="constructing-lives">Constructing Lives</h4>
+<pre class="julia"><code>SingleLife(vbt2001.select[50])                 # no keywords, just a mortality vector
+SingleLife(vbt2001.select[50],issue_age = 60)  # select at 50, but now 60
+SingleLife(vbt2001.select,issue_age = 50)      # use issue_age to pick the right select vector
+SingleLife(mortality=vbt2001.select,issue_age = 50) # mort can also be a keyword
+</code></pre>
+<p><a href="https://docs.juliaactuary.org/LifeContingencies/stable/">LifeContingencies documentation 🡭</a></p>
+<p><a href="https://github.com/JuliaActuary/LifeContingencies.jl">LifeContingencies package on GitHub 🡭</a></p>
+</section>
+</section>
+</section>
+<section id="financemodels.jl" class="level2">
+<h2 class="anchored" data-anchor-id="financemodels.jl">FinanceModels.jl</h2>
+<blockquote class="blockquote">
+<p>Flexible and composable yield curves and interest functions.</p>
+</blockquote>
+<p><strong>FinanceModels.jl</strong> provides a set of composable contracts, models, and functions that allow for modeling of both simple and complex financial instruments. The resulting models, such as discount rates or term structures, can then be used across the JuliaActuary ecosystem to perform actuarial and financial analysis.</p>
+<p>Additionally, the models can be used to project contracts through time: most basically as a series of cashflows but more complex output can be defined for contracts.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="./assets/yield-curves.gif" class="img-fluid figure-img"></p>
+<figcaption>Yields Curve Fitting in FinanceModels.jl</figcaption>
+</figure>
+</div>
+<section id="quickstart-2" class="level3">
+<h3 class="anchored" data-anchor-id="quickstart-2">QuickStart</h3>
+<pre class="julia"><code>using FinanceModels
+
+# a set of market-observed prices we wish to calibrate the model to
+# annual effective unless otherwise specified
+q_rate = ZCBYield([0.01,0.02,0.03]);
+q_spread = ZCBYield([0.01,0.01,0.01]);
+
+# bootstrap a linear spline yield model
+model_rate = fit(Spline.Linear(),q_rate,Fit.Bootstrap());⠀           
+model_spread = fit(Spline.Linear(),q_spread,Fit.Bootstrap());
+
+# the zero rate is the combination of the two underlying rates
+zero(m_spread + m_rate,1) # 0.02 annual effective rate 
+
+# the discount is the same as if we added the underlying zero rates
+discount(m_spread + m_rate,0,3) ≈ discount(0.01 + 0.03,3)   # true
+
+# compute the present value of a contract (a cashflow of 10 at time 3)
+present_value(m_rate,Cashflow(10,3)) # 9.15...</code></pre>
+</section>
+<section id="overview-of-financemodels" class="level3">
+<h3 class="anchored" data-anchor-id="overview-of-financemodels">Overview of FinanceModels</h3>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="./assets/relations.png" class="img-fluid figure-img"></p>
+<figcaption>A conceptual sketch of FinanceModels.jl</figcaption>
+</figure>
+</div>
+<p>Often we start with observed or assumed values for existing contracts. We want to then use those assumed values to extend the valuation logic to new contracts. For example, we may have a set of bond yields which we then want to discount a series of insurance obligations.</p>
+<p>In the language of FinanceModels, we would have a set of <code>Quote</code>s which are used to fit a <code>Model</code>. That model is then used to <code>discount</code> a new series of cashflows.</p>
+<p>That’s just an example, and we can use the various components in different ways depending on the objective of the analysis.</p>
+</section>
+<section id="contracts-and-quotes" class="level3">
+<h3 class="anchored" data-anchor-id="contracts-and-quotes">Contracts and Quotes</h3>
+<p>Contracts are a way to represent financial obligations. These can be valued using a model, projected into a future steam of values, or combined with assumed prices as a <code>Quote</code>.</p>
+<p>Included are a number of primitives and convenience methods for contracts:</p>
+<p>Existing <code>struct</code>s:</p>
+<ul>
+<li><code>Cashflow</code></li>
+<li><code>Bond.Fixed</code></li>
+<li><code>Bond.Floating</code></li>
+<li><code>Forward</code> (an obligation with a forward start time)</li>
+<li><code>Composite</code> (combine two other contracts, e.g.&nbsp;into a swap)</li>
+<li><code>EuroCall</code></li>
+<li><code>CommonEquity</code></li>
+<li><code>Option.Cap</code>, <code>Option.Floor</code>, <code>Option.Swaption</code> (interest rate derivatives)</li>
+</ul>
+<p>Commonly, we deal with conventions that imply a contract and an observed price. For example, we may talk about a treasury yield of <code>0.03</code>. This is a description that implies a <code>Quote</code>ed price for an underling fixed bond. In FinanceModels, we could use <code>CMTYield(rate,tenor)</code> which would create a <code>Quote(price,Bond.Fixed(...))</code>. In this way, we can conveniently create a number of <code>Quote</code>s which can be used to fit models. Such convenience methods include:</p>
+<ul>
+<li><code>ZCBYield</code></li>
+<li><code>ZCBPrice</code></li>
+<li><code>CMTYield</code></li>
+<li><code>ParYield</code></li>
+<li><code>ParSwapYield</code></li>
+<li><code>ForwardYield</code></li>
+</ul>
+<p>FinanceModels offers a way to define new contracts as well.</p>
+<section id="cashflows" class="level4">
+<h4 class="anchored" data-anchor-id="cashflows">Cashflows</h4>
+<p>A <code>Cashflow</code>s obligation are themselves a contract, but other contracts can be considered as essentially anything that can be combined with assumptions (a <strong>model</strong>) to derive a collection of cashflows.</p>
+<p>For example, a obligation that pays 1.75 at time 2 could be represented as: <code>Cashflow(1.75,2)</code>.</p>
+</section>
+</section>
+<section id="models" class="level3">
+<h3 class="anchored" data-anchor-id="models">Models</h3>
+<p>Models are objects that can be fit to observed prices and then subsequently used to make valuations of other cashflows/contracts.</p>
+<p>Yield models include:</p>
+<ul>
+<li><code>Yield.Constant</code></li>
+<li>Bootstrapped <code>Spline</code>s</li>
+<li><code>Yield.SmithWilson</code></li>
+<li><code>Yield.NelsonSiegel</code></li>
+<li><code>Yield.NelsonSiegelSvensson</code></li>
+</ul>
+<section id="yield-related-functions" class="level4">
+<h4 class="anchored" data-anchor-id="yield-related-functions">Yield-related functions</h4>
+<p>The models can be used to compute various rates of interest:</p>
+<ul>
+<li><code>discount(curve,from,to)</code> or <code>discount(curve,to)</code> gives the discount factor</li>
+<li><code>accumulation(curve,from,to)</code> or <code>accumulation(curve,to)</code> gives the accumulation factor</li>
+<li><code>zero(curve,time)</code> or <code>zero(curve,time,Frequency)</code> gives the zero-coupon spot rate for the given time.</li>
+<li><code>forward(curve,from,to)</code> gives the zero rate between the two given times</li>
+<li><code>par(curve,time;frequency=2)</code> gives the coupon-paying par equivalent rate for the given time.</li>
+</ul>
+</section>
+<section id="zeroratecurve-direct-construction" class="level4">
+<h4 class="anchored" data-anchor-id="zeroratecurve-direct-construction"><code>ZeroRateCurve</code> — Direct Construction</h4>
+<p>Construct a zero-rate curve directly from rates and tenors without fitting:</p>
+<ul>
+<li>Multiple interpolation options (MonotoneConvex default, Linear, PCHIP, Cubic, Akima)</li>
+<li>ForwardDiff-compatible for AD-based sensitivities (key rate durations, DV01, convexity)</li>
+</ul>
+</section>
+<section id="stochastic-short-rate-models" class="level4">
+<h4 class="anchored" data-anchor-id="stochastic-short-rate-models">Stochastic Short-Rate Models</h4>
+<ul>
+<li><code>ShortRate.Vasicek</code>, <code>ShortRate.CoxIngersollRoss</code>, <code>ShortRate.HullWhite</code></li>
+<li><code>simulate()</code> for Monte Carlo rate path generation</li>
+<li><code>pv_mc()</code> for expected present values under stochastic rates</li>
+<li>Closed-form pricing for caps, floors, swaptions (Gaussian models)</li>
+</ul>
+<p>Other models include:</p>
+<ul>
+<li><code>BlackScholesMerton</code> derivative valuation</li>
+</ul>
+</section>
+</section>
+<section id="projections" class="level3">
+<h3 class="anchored" data-anchor-id="projections">Projections</h3>
+<p>Most basically, we can project a contract into a series of <code>Cashflow</code>s:</p>
+<pre class="julia-repl"><code>julia&gt; b = Bond.Fixed(0.04,Periodic(2),3)
+FinanceModels.Bond.Fixed{Periodic, Float64, Int64}(0.04, Periodic(2), 3)
+
+julia&gt; collect(b)
+6-element Vector{Cashflow{Float64, Float64}}:
+ Cashflow{Float64, Float64}(0.02, 0.5)
+ Cashflow{Float64, Float64}(0.02, 1.0)
+ Cashflow{Float64, Float64}(0.02, 1.5)
+ Cashflow{Float64, Float64}(0.02, 2.0)
+ Cashflow{Float64, Float64}(0.02, 2.5)
+ Cashflow{Float64, Float64}(1.02, 3.0)</code></pre>
+<p>However, <code>Projection</code>s allow one to combine three elements which can be extended to define any desired output (such as amortization schedules, financial statement projections, or account value rollforwards). The three elements are:</p>
+<ul>
+<li>the underlying <strong>contract</strong> of interest</li>
+<li>the <strong>model</strong> which includes assumptions of how the contract will behave</li>
+<li>a <code>ProjectionKind</code> which indicates the kind of output desired (cashflow stream, amortization schedule, etc…)</li>
+</ul>
+</section>
+<section id="fitting-models" class="level3">
+<h3 class="anchored" data-anchor-id="fitting-models">Fitting Models</h3>
+<pre class="plaintext"><code>       Model                                                               Method
+          |                                                                   |
+    |------------|                                                     |---------------|
+fit(Spline.Cubic(), CMTYield.([0.04,0.05,0.055,0.06,0055],[1,2,3,4,5]), Fit.Bootstrap())
+                    |-------------------------------------------------|
+                                              |
+                                              Quotes</code></pre>
+<ul>
+<li><strong>Model</strong> could be <code>Spline.Linear()</code>, <code>Yield.NelsonSiegelSvensson()</code>, <code>Equity.BlackScholesMerton(...)</code>, etc.</li>
+<li><strong>Quote</strong> could be <code>CMTYield</code>s, <code>ParYield</code>s, <code>Option.Eurocall</code>, etc.</li>
+<li><strong>Method</strong> could be <code>Fit.Loss(x-&gt;x^2)</code>, <code>Fit.Loss(x-&gt;abs(x))</code>, <code>Fit.Bootstrap()</code>, etc.</li>
+</ul>
+<p>This unified way to fit models offers a much simpler way to extend functionality to new models or contract types.</p>
+<section id="using-models" class="level4">
+<h4 class="anchored" data-anchor-id="using-models">Using Models</h4>
+<p>After being fit, models can be used to value contracts:</p>
+<pre class="julia"><code>present_value(model,cashflows)</code></pre>
+<p>Additionally, <a href="https://github.com/JuliaActuary/ActuaryUtilities.jl">ActuaryUtilities.jl</a> offers a number of other methods that can be used, such as <code>duration</code>, <code>convexity</code>, <code>price</code> which can be used for analysis with the fitted models.</p>
+</section>
+</section>
+<section id="rates" class="level3">
+<h3 class="anchored" data-anchor-id="rates">Rates</h3>
+<p>Rates are types that wrap scalar values to provide information about how to determine <code>discount</code> and <code>accumulation</code> factors.</p>
+<p>There are two <code>Frequency</code> types:</p>
+<ul>
+<li><code>Periodic(m)</code> for rates that compound <code>m</code> times per period (e.g.&nbsp;<code>m</code> times per year if working with annual rates).</li>
+<li><code>Continuous()</code> for continuously compounding rates.</li>
+</ul>
+<section id="examples-1" class="level4">
+<h4 class="anchored" data-anchor-id="examples-1">Examples</h4>
+<pre class="julia"><code>Continuous(0.05)       # 5% continuously compounded
+Periodic(0.05,2)       # 5% compounded twice per period</code></pre>
+<p>These are both subtypes of the parent <code>Rate</code> type and are instantiated as:</p>
+<pre class="julia"><code>Rate(0.05,Continuous())       # 5% continuously compounded
+Rate(0.05,Periodic(2))        # 5% compounded twice per period</code></pre>
+<p>Rates can also be constructed by specifying the <code>Frequency</code> and then passing a scalar rate:</p>
+<pre class="julia"><code>Periodic(1)(0.05)
+Continuous()(0.05)</code></pre>
+</section>
+<section id="conversion" class="level4">
+<h4 class="anchored" data-anchor-id="conversion">Conversion</h4>
+<p>Convert rates between different types with <code>convert</code>. E.g.:</p>
+<pre class="julia-repl"><code>r = Rate(FinanceModels.Periodic(12),0.01)             # rate that compounds 12 times per rate period (ie monthly)
+
+convert(FinanceModels.Periodic(1),r)                  # convert monthly rate to annual effective
+convert(FinanceModels.Continuous(),r)          # convert monthly rate to continuous</code></pre>
+</section>
+<section id="arithmetic" class="level4">
+<h4 class="anchored" data-anchor-id="arithmetic">Arithmetic</h4>
+<p>Adding, substracting, multiplying, dividing, and comparing rates is supported.</p>
+<p><a href="https://docs.juliaactuary.org/FinanceModels/stable/">FinanceModels documentation 🡭</a></p>
+<p><a href="https://github.com/JuliaActuary/FinanceModels.jl">FinanceModels package on GitHub 🡭</a></p>
+<!-- =============================
+     ExperienceAnalysis
+    ============================== -->
+</section>
+</section>
+</section>
+<section id="experienceanalysis.jl" class="level2">
+<h2 class="anchored" data-anchor-id="experienceanalysis.jl">ExperienceAnalysis.jl</h2>
+<blockquote class="blockquote">
+<p>Meeting your exposure calculation needs.</p>
+</blockquote>
+<section id="quickstart-3" class="level3">
+<h3 class="anchored" data-anchor-id="quickstart-3">Quickstart</h3>
+<pre class="julia"><code>df = DataFrame(
+    policy_id = 1:3,
+    issue_date = [Date(2020,5,10), Date(2020,4,5), Date(2019, 3, 10)],
+    end_date = [Date(2022, 6, 10), Date(2022, 8, 10), Date(2022,12,31)],
+    status = ["claim", "lapse", "inforce"]
+)
+
+df.policy_year = exposure.(
+    ExperienceAnalysis.Anniversary(Year(1)),
+    df.issue_date,
+    df.end_date,
+    df.status .== "claim"; # continued exposure
+    study_start = Date(2020, 1, 1),
+    study_end = Date(2022, 12, 31)
+)
+
+df = flatten(df, :policy_year)
+
+df.exposure_fraction =
+        map(e -&gt; yearfrac(e.from, e.to + Day(1), DayCounts.Thirty360()), df.policy_year) 
+# + Day(1) above because DayCounts has Date(2020, 1, 1) to Date(2021, 1, 1) as an exposure of 1.0
+# here we end the interval at Date(2020, 12, 31), so we need to add a day to get the correct exposure fraction.</code></pre>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 11%">
+<col style="width: 10%">
+<col style="width: 36%">
+<col style="width: 16%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: right;"><strong>policy_id</strong><br><code>Int64</code></th>
+<th style="text-align: right;"><strong>issue_date</strong><br><code>Date</code></th>
+<th style="text-align: right;"><strong>end_date</strong><br><code>Date</code></th>
+<th style="text-align: right;"><strong>status</strong><br><code>String</code></th>
+<th style="text-align: right;"><strong>policy_year</strong><br><code>@NamedTuple{from::Date, to::Date, policy\_timestep::Int64}</code></th>
+<th style="text-align: right;"><strong>exposure_fraction</strong><br><code>Float64</code></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">2020-05-10</td>
+<td style="text-align: right;">2022-06-10</td>
+<td style="text-align: right;">claim</td>
+<td style="text-align: right;">(from = Date(“2020-05-10”), to = Date(“2021-05-09”), policy_timestep = 1)</td>
+<td style="text-align: right;">1.0</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">2020-05-10</td>
+<td style="text-align: right;">2022-06-10</td>
+<td style="text-align: right;">claim</td>
+<td style="text-align: right;">(from = Date(“2021-05-10”), to = Date(“2022-05-09”), policy_timestep = 2)</td>
+<td style="text-align: right;">1.0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">2020-05-10</td>
+<td style="text-align: right;">2022-06-10</td>
+<td style="text-align: right;">claim</td>
+<td style="text-align: right;">(from = Date(“2022-05-10”), to = Date(“2023-05-09”), policy_timestep = 3)</td>
+<td style="text-align: right;">1.0</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2020-04-05</td>
+<td style="text-align: right;">2022-08-10</td>
+<td style="text-align: right;">lapse</td>
+<td style="text-align: right;">(from = Date(“2020-04-05”), to = Date(“2021-04-04”), policy_timestep = 1)</td>
+<td style="text-align: right;">1.0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2020-04-05</td>
+<td style="text-align: right;">2022-08-10</td>
+<td style="text-align: right;">lapse</td>
+<td style="text-align: right;">(from = Date(“2021-04-05”), to = Date(“2022-04-04”), policy_timestep = 2)</td>
+<td style="text-align: right;">1.0</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2020-04-05</td>
+<td style="text-align: right;">2022-08-10</td>
+<td style="text-align: right;">lapse</td>
+<td style="text-align: right;">(from = Date(“2022-04-05”), to = Date(“2022-08-10”), policy_timestep = 3)</td>
+<td style="text-align: right;">0.35</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">2019-03-10</td>
+<td style="text-align: right;">2022-12-31</td>
+<td style="text-align: right;">inforce</td>
+<td style="text-align: right;">(from = Date(“2020-01-01”), to = Date(“2020-03-09”), policy_timestep = 1)</td>
+<td style="text-align: right;">0.191667</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">2019-03-10</td>
+<td style="text-align: right;">2022-12-31</td>
+<td style="text-align: right;">inforce</td>
+<td style="text-align: right;">(from = Date(“2020-03-10”), to = Date(“2021-03-09”), policy_timestep = 2)</td>
+<td style="text-align: right;">1.0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">2019-03-10</td>
+<td style="text-align: right;">2022-12-31</td>
+<td style="text-align: right;">inforce</td>
+<td style="text-align: right;">(from = Date(“2021-03-10”), to = Date(“2022-03-09”), policy_timestep = 3)</td>
+<td style="text-align: right;">1.0</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">2019-03-10</td>
+<td style="text-align: right;">2022-12-31</td>
+<td style="text-align: right;">inforce</td>
+<td style="text-align: right;">(from = Date(“2022-03-10”), to = Date(“2022-12-31”), policy_timestep = 4)</td>
+<td style="text-align: right;">0.808333</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="available-exposure-basis" class="level3">
+<h3 class="anchored" data-anchor-id="available-exposure-basis">Available Exposure Basis</h3>
+<ul>
+<li><code>ExperienceAnalysis.Anniversary(period)</code> will give exposures periods based on the first date</li>
+<li><code>ExperienceAnalysis.Calendar(period)</code> will follow calendar periods (e.g.&nbsp;month or year)</li>
+<li><code>ExperienceAnalysis.AnniversaryCalendar(period,period)</code> will split into the smaller of the calendar or policy period.</li>
+</ul>
+<p>Where <code>period</code> is a <a href="https://docs.julialang.org/en/v1/stdlib/Dates/#Period-Types">Period Type from the Dates standard library</a>.</p>
+<p>Calculate exposures with <code>exposures(basis,from,to,continue_exposure)</code>.</p>
+<ul>
+<li><code>continue_exposures</code> indicates whether the exposure should be extended through the full exposure period rather than terminate at the <code>to</code> date.</li>
+</ul>
+<p><a href="https://docs.juliaactuary.org/ExperienceAnalysis/stable/">ExperienceAnalysis documentation 🡭</a></p>
+<p><a href="https://github.com/JuliaActuary/ExperienceAnalysis.jl">ExperienceAnalysis package on GitHub 🡭</a></p>
+<!-- =============================
+     ExperienceAnalysis
+    ============================== -->
+</section>
+</section>
+<section id="economicscenariogenerators.jl" class="level2">
+<h2 class="anchored" data-anchor-id="economicscenariogenerators.jl">EconomicScenarioGenerators.jl</h2>
+<blockquote class="blockquote">
+<p>Easy-to-use scenario generation that’s FinanceModels.jl compatible.</p>
+</blockquote>
+<section id="models-1" class="level3">
+<h3 class="anchored" data-anchor-id="models-1">Models</h3>
+<section id="interest-rate-models" class="level4">
+<h4 class="anchored" data-anchor-id="interest-rate-models">Interest Rate Models</h4>
+<ul>
+<li><code>Vasicek</code></li>
+<li><code>CoxIngersolRoss</code></li>
+<li><code>HullWhite</code></li>
+</ul>
+</section>
+<section id="equitymodels" class="level4">
+<h4 class="anchored" data-anchor-id="equitymodels">EquityModels</h4>
+<ul>
+<li><code>BlackScholesMerton</code></li>
+</ul>
+</section>
+</section>
+<section id="interest-rate-model-examples" class="level3">
+<h3 class="anchored" data-anchor-id="interest-rate-model-examples">Interest Rate Model Examples</h3>
+<section id="vasicek" class="level4">
+<h4 class="anchored" data-anchor-id="vasicek">Vasicek</h4>
+<pre class="julia"><code>m = Vasicek(0.136,0.0168,0.0119,Continuous(0.01)) # a, b, σ, initial Rate
+s = ScenarioGenerator(
+        1,  # timestep
+        30, # projection horizon
+        m,  # model
+    )</code></pre>
+<p>This can be iterated over, or you can collect all of the rates like:</p>
+<pre class="julia"><code>rates = collect(s)</code></pre>
+<p>or</p>
+<pre class="julia"><code>for r in s
+    # do something with r
+end</code></pre>
+<p>And the package integrates with <a href="https://github.com/JuliaActuary/FinanceModels.jl">FinanceModels.jl</a>:</p>
+<pre class="julia"><code>YieldCurve(s)
+</code></pre>
+<p>will produce a yield curve object:</p>
+<pre class="julia-repl"><code>              ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀Yield Curve (FinanceModels.BootstrapCurve)⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀           
+              ┌────────────────────────────────────────────────────────────┐           
+         0.03 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⠤⠤⠔⠒⠉⠉⠒⠒⠒⠒⠒⠤⣄⣀│ Zero rates
+              │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⠤⠒⠒⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│           
+              │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⠔⠊⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│           
+              │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⠔⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│           
+              │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣀⠀⠀⣀⡤⠖⠊⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│           
+              │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⠤⠖⠋⠁⠀⠀⠉⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│           
+              │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⠔⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│           
+   Continuous │⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⡤⠒⠓⠦⠤⠖⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│           
+              │⠀⠀⠀⠀⠀⠀⠀⢰⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│           
+              │⠀⠀⣀⠖⠢⡀⡰⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│           
+              │⠉⠉⠁⠀⠀⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│           
+              │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│           
+              │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│           
+              │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│           
+            0 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│           
+              └────────────────────────────────────────────────────────────┘           
+              ⠀0⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀time⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀30⠀           </code></pre>
+<p><a href="https://docs.juliaactuary.org/EconomicScenarioGenerators/stable/">EconomicScenarioGenerators documentation 🡭</a></p>
+<p><a href="https://github.com/JuliaActuary/EconomicScenarioGenerators.jl">EconomicScenarioGenerators package on GitHub 🡭</a></p>
+
+
+</section>
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/JuliaActuary\.org");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
