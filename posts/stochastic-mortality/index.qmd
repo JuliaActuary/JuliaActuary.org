@@ -193,7 +193,7 @@ function stochastic_proj(policies, params, n)
     end
 end
 
-stoch = stochastic_proj(policies, params, 1000)
+stoch = stochastic_proj(policies, params, 200)
 ```
 
 ```{julia}
