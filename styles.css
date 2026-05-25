@@ -199,12 +199,17 @@ a:hover, a:focus { color: var(--cf-orange); }
     padding-top: 0.45rem;
     padding-bottom: 0.45rem;
 }
-.navbar .navbar-brand,
 .navbar .nav-link,
 .navbar-text {
     color: var(--cf-paper) !important;
     font-weight: 700;
     font-size: 1rem;
+}
+.navbar .navbar-brand {
+    color: var(--cf-paper) !important;
+    font-weight: 700;
+    font-size: 1.35rem;        /* wordmark — sits above the nav-links */
+    letter-spacing: 0.01em;
 }
 .navbar .nav-link:hover,
 .navbar .nav-link:focus,
@@ -214,6 +219,17 @@ a:hover, a:focus { color: var(--cf-orange); }
 .navbar .nav-link.active,
 .navbar .navbar-brand.active {
     color: var(--cf-amber) !important;
+}
+
+/* Logo: paper-tinted backdrop so the colored mark reads against ink */
+.navbar .navbar-brand img,
+.navbar-logo {
+    background: var(--cf-paper);
+    padding: 4px;
+    border-radius: 6px;
+    box-shadow: 0 0 0 1px var(--cf-amber);
+    height: 36px;
+    width: auto;
 }
 
 /* ---- Quarto title-block banner: matches navbar so they read as one - */
