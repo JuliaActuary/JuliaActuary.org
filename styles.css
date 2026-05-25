@@ -133,7 +133,16 @@ body {
 
 p { margin-bottom: 0.9em; }
 
-main#quarto-document-content { max-width: 72ch; }
+/* Cap reading width on prose blocks only — never on a column-page wrapper.
+   Quarto's column system distinguishes column-body (reading width) from
+   column-page (full bleed); we target text-only elements so figures, hero
+   panels, and full-bleed sections keep their layouts. */
+main#quarto-document-content > p,
+main#quarto-document-content > ul,
+main#quarto-document-content > ol,
+main#quarto-document-content > blockquote {
+    max-width: 72ch;
+}
 
 /* ---- Headings: monospaced like technical-document section markers ----
    JuliaMono stands in for an eventual draftsman face; alternatives that
@@ -282,6 +291,13 @@ tbody tr { border-color: var(--cf-rule); }
     background-color: var(--cf-paper-bright);
     border: 1px solid var(--cf-rule);
     border-radius: 4px;
+    transition: transform 120ms ease, box-shadow 120ms ease, border-color 120ms ease;
+}
+.quarto-listing .listing-item:hover,
+.quarto-grid-item:hover {
+    transform: translateY(-2px);
+    border-color: var(--cf-amber);
+    box-shadow: 0 4px 12px rgba(27, 42, 58, 0.08);
 }
 .quarto-grid-item .listing-title,
 .quarto-grid-item .listing-title a {
@@ -303,6 +319,7 @@ tbody tr { border-color: var(--cf-rule); }
 .hero {
     width: 100%;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     background: var(--cf-ink);
@@ -310,24 +327,28 @@ tbody tr { border-color: var(--cf-rule); }
     font-family: 'JuliaMono', ui-monospace, monospace;
     border-top: 2px solid var(--cf-amber);
     border-bottom: 2px solid var(--cf-red);
-    padding: 28px 24px 28px 24px;
-    flex-wrap: wrap;
+    padding: 36px 32px;
+    gap: 28px;
 }
 
 .hero-fullwidth {
     width: 100%;
+    max-width: 880px;        /* don't stretch the tagline on huge screens */
     text-align: center;
-    font-size: x-large;
-    font-weight: 600;
+    font-size: 1.35rem;
+    font-weight: 500;
     color: var(--cf-paper);
-    letter-spacing: 0.02em;
+    letter-spacing: 0.01em;
+    line-height: 1.45;
 }
 
 .hero-grid {
     display: flex;
-    align-items: center;
-    justify-content: center;
     align-items: flex-start;
+    justify-content: center;
+    gap: 36px;               /* space between the three feature columns */
+    max-width: 1100px;
+    width: 100%;
     font-weight: 400;
 }
 
