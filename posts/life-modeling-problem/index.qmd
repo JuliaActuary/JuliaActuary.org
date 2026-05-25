@@ -10,6 +10,7 @@ categories: [code,blog]
 #| output: false
 using Pkg
 Pkg.activate("env/benchmarks")
+Pkg.resolve()
 Pkg.instantiate()
 ```
 

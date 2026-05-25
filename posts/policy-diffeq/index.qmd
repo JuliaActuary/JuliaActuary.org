@@ -9,6 +9,7 @@ categories: [modeling,diffeq,mortalitytables,actuaryutilities, tutorial]
 #| output: false
 using Pkg
 Pkg.activate(".")
+Pkg.resolve()
 Pkg.instantiate()
 ```
 

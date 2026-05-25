@@ -8,6 +8,7 @@ categories: [market, yieldcurves,financemodels,tutorial]
 #| output: false
 using Pkg
 Pkg.activate(".")
+Pkg.resolve()
 Pkg.instantiate()
 ```
 
