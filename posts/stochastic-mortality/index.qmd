@@ -169,6 +169,10 @@ project(repeat(policies, 100_000), params)
 Using a Macbook Air M3 laptop, about 45 million policies able to be stochastically projected per second:
 
 ```{julia}
+#| eval: false
+# Skipped at render time — allocating 45M policies + running @benchmark
+# OOMs the Quarto worker. The number is preserved for documentation; the
+# block runs interactively when you open the post locally.
 policies_to_benchmark = 45_000_000
 # adjust the `repeat` depending on how many policies are already in the array
 # to match the target number for the benchmark
