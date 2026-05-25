@@ -216,6 +216,17 @@ a:hover, a:focus { color: var(--cf-orange); }
     color: var(--cf-amber) !important;
 }
 
+/* Logo: paper-tinted backdrop so the colored mark reads against ink */
+.navbar .navbar-brand img,
+.navbar-logo {
+    background: var(--cf-paper);
+    padding: 4px;
+    border-radius: 6px;
+    box-shadow: 0 0 0 1px var(--cf-amber);
+    height: 36px;
+    width: auto;
+}
+
 /* ---- Quarto title-block banner: matches navbar so they read as one - */
 .quarto-title-block .quarto-title-banner {
     background: var(--cf-ink);
