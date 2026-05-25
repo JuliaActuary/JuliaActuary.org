@@ -169,7 +169,6 @@ a:hover, a:focus { color: var(--cf-orange); }
 .navbar {
     background-color: var(--cf-ink) !important;
     border-bottom: 2px solid var(--cf-amber);
-    font-family: 'JuliaMono', ui-monospace, monospace;
     padding-top: 0.45rem;
     padding-bottom: 0.45rem;
 }
@@ -177,10 +176,8 @@ a:hover, a:focus { color: var(--cf-orange); }
 .navbar .nav-link,
 .navbar-text {
     color: var(--cf-paper) !important;
-    letter-spacing: 0.04em;
-    font-weight: 500;
-    font-size: 0.95rem;
-    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 1rem;
 }
 .navbar .nav-link:hover,
 .navbar .nav-link:focus,

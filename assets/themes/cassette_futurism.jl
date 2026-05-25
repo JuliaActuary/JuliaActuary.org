@@ -11,9 +11,13 @@ Fonts
 -----
 JuliaMono stands in for a future "draftsman" hand — a single monospace family
 across titles, axes, and legends gives the engineering-document feel.
-=#
 
-using Makie
+Usage
+-----
+This file is `include`d from posts that have already done `using CairoMakie`,
+so `Theme` is in scope. It does not `using Makie` so Makie need not be a
+direct dep — CairoMakie's re-exports are enough.
+=#
 
 const CF_PAPER       = "#F0EDE3"  # fresh technical-paper white, faintly warm
 const CF_PAPER_DEEP  = "#E6E2D5"  # secondary panel fill

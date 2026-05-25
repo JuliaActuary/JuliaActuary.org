@@ -18,6 +18,9 @@ using ThreadsX
 using BenchmarkTools
 using CairoMakie
 using Random
+
+include(joinpath(@__DIR__, "..", "..", "assets", "themes", "cassette_futurism.jl"))
+set_theme!(cassette_futurism_theme())
 ```
 
 Define a datatype. Not strictly necessary, but will make extending the program with more functions easier.

@@ -35,6 +35,9 @@ Logging.disable_logging(Logging.Warn);
 using StatsFuns
 using StatisticalRethinking
 using CairoMakie
+
+include(joinpath(@__DIR__, "..", "..", "assets", "themes", "cassette_futurism.jl"))
+set_theme!(cassette_futurism_theme())
 ```
 
 ## Limited Fluctuation Credibility

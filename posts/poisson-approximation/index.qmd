@@ -45,6 +45,9 @@ using DataFrames
 using ThreadsX
 using Logging
 using Markdown
+
+include(joinpath(@__DIR__, "..", "..", "assets", "themes", "cassette_futurism.jl"))
+set_theme!(cassette_futurism_theme())
 ```
 
 """

@@ -168,7 +168,11 @@ To aid in visualizing results with such vast different orders of magnitude, this
 #| label: fig-life-modeling-benchmark-blog
 using Plots
 using DataFrames
-p = plot(palette=:seaborn_colorblind, rotation=25, yaxis=:log)
+
+include(joinpath(@__DIR__, "..", "..", "assets", "themes", "cassette_futurism_plots.jl"))
+cassette_futurism_plots!()
+
+p = plot(palette=CASSETTE_PALETTE, rotation=25, yaxis=:log)
 # label equivalents to distance to make log scale more relatable
 scatter!(
     fill("\n equivalents (ns → ft)", 7),

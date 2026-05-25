@@ -21,6 +21,9 @@ begin
     using DataFrames
     using Survival
 end
+
+include(joinpath(@__DIR__, "..", "..", "assets", "themes", "cassette_futurism_plots.jl"))
+cassette_futurism_plots!()
 ```
 
 *This tutorial is via [PharmCat on Github](https://gist.github.com/PharmCat/fe1e64a2241aa35d3a3fa925989c3784) (this link has similar code with comments in Russian and English).*

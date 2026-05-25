@@ -18,6 +18,9 @@ Below, we specify that the rates should be interpreted as `Continuous`ly compoun
 ```{julia}
 using FinanceModels
 using Plots
+
+include(joinpath(@__DIR__, "..", "..", "assets", "themes", "cassette_futurism_plots.jl"))
+cassette_futurism_plots!()
 ```
 
 ```{julia}
@@ -61,7 +64,6 @@ end
 a function to plot the curves, given different alpha transparency for each of the lines (used when creating animiation)
 """
 function p(alpha=[1, 1, 1, 1, 1, 1])
-    theme(:wong2)
     p = plot(legend=:topleft, xlabel="Tenor", ylabel="Continuous yield", grid=false)
     scatter!(
         mats,

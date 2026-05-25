@@ -28,6 +28,9 @@ using Plots
 using ColorSchemes # for Turbo colors, which emphasize readability
 using ActuaryUtilities
 using LaTeXStrings
+
+include(joinpath(@__DIR__, "..", "..", "assets", "themes", "cassette_futurism_plots.jl"))
+cassette_futurism_plots!()
 ```
 
 Let's use the 2001 CSO table as the basis for cost of insurance charges:
