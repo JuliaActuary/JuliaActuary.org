@@ -124,7 +124,7 @@
 body {
     background-color: var(--cf-paper);
     color: var(--cf-ink);
-    font-family: "IBM Plex Sans", "Inter", system-ui, -apple-system, "Helvetica Neue", sans-serif;
+    font-family: "Atkinson Hyperlegible", "Inter", system-ui, -apple-system, "Helvetica Neue", sans-serif;
     font-size: 16px;
     line-height: 1.65;
     font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
@@ -155,20 +155,20 @@ h1, h2, h3, h4, h5, h6,
 .h1, .h2, .h3, .h4, .h5, .h6 {
     color: var(--cf-ink);
     font-family: 'JuliaMono', "Space Grotesk", ui-monospace, monospace;
-    font-weight: 700;
-    letter-spacing: 0.005em;
+    font-weight: 600;
+    letter-spacing: 0;
     line-height: 1.25;
 }
-h1, .h1 { font-size: 1.9rem; }
+h1, .h1 { font-size: 1.75rem; }
 h2 {
     border-bottom: 1px solid var(--cf-rule);
     padding-bottom: 0.25em;
     margin-top: 1.6em;
-    font-size: 1.35rem;
+    font-size: 1.25rem;
 }
 h3 {
     color: var(--cf-blue);
-    font-size: 1.1rem;
+    font-size: 1.05rem;
     margin-top: 1.3em;
 }
 
