@@ -130,7 +130,7 @@ function plot_band_under!(ax,plot,y,low,high,label="")
         Float64.(xs′[filt]), 
         Float64.(fill(y * 1.0, length(filt))), 
         Float64.(ys′[filt]),
-        color=(plot.color.val, 0.9),transparency=true,shading = false) # 0.25 alpha
+        color=(plot.color[], 0.9),transparency=true,shading = false) # 0.25 alpha
     translate!(b,0,0,5)
 end
 
