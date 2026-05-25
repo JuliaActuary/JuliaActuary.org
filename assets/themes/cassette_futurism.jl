@@ -15,11 +15,11 @@ across titles, axes, and legends gives the engineering-document feel.
 
 using Makie
 
-const CF_PAPER       = "#F1E7CF"  # warm manila / blueprint paper
-const CF_PAPER_DEEP  = "#E6D9B8"  # secondary panel fill
+const CF_PAPER       = "#F0EDE3"  # fresh technical-paper white, faintly warm
+const CF_PAPER_DEEP  = "#E6E2D5"  # secondary panel fill
 const CF_INK         = "#1B2A3A"  # deep navy "ink"
 const CF_INK_SOFT    = "#3C4A5C"  # muted ink for secondary marks
-const CF_RULE        = "#B6A77E"  # graph-paper rule color
+const CF_RULE        = "#B6AD90"  # graph-paper rule color
 
 # Apollo / NASA-punk accent palette — instrument panel pigments.
 const CF_RED      = "#C8351C"  # warning red / NASA worm

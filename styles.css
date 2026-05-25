@@ -86,24 +86,196 @@
     /*URL to font*/
 }
 
-pre {
-    background-color: rgb(246, 248, 250);
-    border-radius: 8px;
+/* =====================================================================
+   Cassette futurism / NASA-punk site theme.
+   Mirrors assets/themes/cassette_futurism.jl so plots and chrome read
+   as one technical document. Newly-printed paper, deep navy ink,
+   plotter-pen accents, draftsman details.
+   ===================================================================== */
+
+:root {
+    --cf-paper:        #F0EDE3;
+    --cf-paper-deep:   #E6E2D5;
+    --cf-paper-bright: #F7F4EB;
+    --cf-ink:          #1B2A3A;
+    --cf-ink-soft:     #3C4A5C;
+    --cf-rule:         #B6AD90;
+
+    --cf-red:    #C8351C;
+    --cf-orange: #E07A1F;
+    --cf-amber:  #D4A017;
+    --cf-green:  #3F7D4E;
+    --cf-blue:   #1F4E79;
+    --cf-teal:   #3B7C7A;
+    --cf-plum:   #6B3A5C;
+
+    /* Bootstrap / Cosmo overrides */
+    --bs-body-bg:       var(--cf-paper);
+    --bs-body-color:    var(--cf-ink);
+    --bs-primary:       var(--cf-blue);
+    --bs-primary-rgb:   31, 78, 121;
+    --bs-link-color:    var(--cf-red);
+    --bs-link-color-rgb: 200, 53, 28;
+    --bs-link-hover-color: var(--cf-orange);
+    --bs-border-color:  var(--cf-rule);
+    --bs-code-color:    var(--cf-ink);
 }
 
+body {
+    background-color: var(--cf-paper);
+    color: var(--cf-ink);
+}
+
+/* ---- Headings: monospaced like technical-document section markers --- */
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6 {
+    color: var(--cf-ink);
+    font-family: 'JuliaMono', ui-monospace, monospace;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+}
+h2 {
+    border-bottom: 1px solid var(--cf-rule);
+    padding-bottom: 0.25em;
+    margin-top: 1.6em;
+}
+h3 { color: var(--cf-blue); }
+
+/* ---- Links: red plotter pen, amber on hover --------------------------- */
+a {
+    color: var(--cf-red);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+}
+a:hover, a:focus { color: var(--cf-orange); }
+
+/* ---- Navbar: deep ink panel, paper text, amber accent rule ----------- */
+.navbar {
+    background-color: var(--cf-ink) !important;
+    border-bottom: 2px solid var(--cf-amber);
+    font-family: 'JuliaMono', ui-monospace, monospace;
+}
+.navbar .navbar-brand,
+.navbar .nav-link,
+.navbar-text {
+    color: var(--cf-paper) !important;
+    letter-spacing: 0.02em;
+}
+.navbar .nav-link:hover,
+.navbar .nav-link:focus,
+.navbar .navbar-brand:hover {
+    color: var(--cf-amber) !important;
+}
+.navbar .nav-link.active,
+.navbar .navbar-brand.active {
+    color: var(--cf-amber) !important;
+}
+
+/* ---- Quarto title-block banner: matches navbar so they read as one - */
+.quarto-title-block .quarto-title-banner {
+    background: var(--cf-ink);
+    color: var(--cf-paper);
+    border-bottom: 2px solid var(--cf-amber);
+}
+.quarto-title-block .quarto-title-banner h1.title,
+.quarto-title-block .quarto-title-banner .title,
+.quarto-title-block .quarto-title-banner .quarto-categories .quarto-category {
+    color: var(--cf-paper);
+    font-family: 'JuliaMono', ui-monospace, monospace;
+}
+.quarto-title-block .quarto-title-banner .quarto-categories .quarto-category {
+    background: transparent;
+    border: 1px solid var(--cf-amber);
+    color: var(--cf-amber);
+}
+
+/* ---- Code blocks: bright paper card, ruled border -------------------- */
+pre {
+    background-color: var(--cf-paper-bright);
+    border: 1px solid var(--cf-rule);
+    border-radius: 4px;
+    padding: 12px 14px;
+}
+pre code { color: var(--cf-ink); }
+
+code:not(pre code) {
+    background-color: var(--cf-paper-deep);
+    color: var(--cf-ink);
+    padding: 1px 5px;
+    border-radius: 2px;
+    font-family: 'JuliaMono', ui-monospace, monospace;
+}
+
+/* ---- Blockquotes: amber rule, hushed ink ----------------------------- */
+blockquote, .blockquote {
+    border-left: 3px solid var(--cf-amber);
+    color: var(--cf-ink-soft);
+    padding-left: 1em;
+}
+
+hr { border-color: var(--cf-rule); opacity: 0.7; }
+
+/* ---- Tables: technical-doc rules, no zebra --------------------------- */
+table { color: var(--cf-ink); }
+thead { border-bottom: 1.5px solid var(--cf-ink); }
+tbody tr { border-color: var(--cf-rule); }
+
+/* ---- Buttons --------------------------------------------------------- */
+.btn-primary {
+    background-color: var(--cf-blue);
+    border-color: var(--cf-blue);
+    color: var(--cf-paper);
+}
+.btn-primary:hover {
+    background-color: var(--cf-ink);
+    border-color: var(--cf-ink);
+}
+
+/* ---- Sidebar / TOC --------------------------------------------------- */
+#TOC, .sidebar, .quarto-secondary-nav {
+    color: var(--cf-ink);
+}
+#TOC a, .sidebar a, .quarto-secondary-nav a {
+    color: var(--cf-ink-soft);
+}
+#TOC a:hover, .sidebar a:hover { color: var(--cf-red); }
+#TOC .active, .sidebar .active { color: var(--cf-red) !important; }
+
+/* ---- Listing cards (blog / examples pages) --------------------------- */
+.quarto-listing .listing-item,
+.quarto-grid-item {
+    background-color: var(--cf-paper-bright);
+    border: 1px solid var(--cf-rule);
+    border-radius: 4px;
+}
+.quarto-grid-item .listing-title,
+.quarto-grid-item .listing-title a {
+    color: var(--cf-ink);
+    font-family: 'JuliaMono', ui-monospace, monospace;
+}
+.quarto-grid-item .listing-categories .listing-category {
+    background-color: transparent;
+    border: 1px solid var(--cf-blue);
+    color: var(--cf-blue);
+}
+
+/* =====================================================================
+   Hero panel (home page)
+   Deep ink panel with paper text, framed by amber and red accent rules,
+   like the header of an Apollo flight plan. No animation.
+   ===================================================================== */
 
 .hero {
     width: 100%;
-    /* height: 100vh; */
     display: flex;
     align-items: center;
     justify-content: center;
-    background-size: 300% 300%;
-    background-image: linear-gradient(-45deg, #CB3C33, #9558B2 100%);
-    -webkit-animation: AnimateBG 40s ease infinite;
-    animation: AnimateBG 40s ease infinite;
-    color: azure;
-    padding: 10px 10px 20px 20px;
+    background: var(--cf-ink);
+    color: var(--cf-paper);
+    font-family: 'JuliaMono', ui-monospace, monospace;
+    border-top: 2px solid var(--cf-amber);
+    border-bottom: 2px solid var(--cf-red);
+    padding: 28px 24px 28px 24px;
     flex-wrap: wrap;
 }
 
@@ -112,6 +284,8 @@ pre {
     text-align: center;
     font-size: x-large;
     font-weight: 600;
+    color: var(--cf-paper);
+    letter-spacing: 0.02em;
 }
 
 .hero-grid {
@@ -122,47 +296,31 @@ pre {
     font-weight: 400;
 }
 
+.hero h1, .hero h2, .hero h3, .hero h4 {
+    color: var(--cf-amber);
+}
+.hero a { color: var(--cf-amber); }
+.hero a:hover { color: var(--cf-paper); }
+
 @media (max-width: 800px) {
     .hero-grid {
         flex-direction: column;
     }
 }
 
-.hero-child {
-    flex: 1;
-}
+.hero-child { flex: 1; }
 
-@-webkit-keyframes AnimateBG {
-    0% {
-        background-position: 0% 50%;
-    }
-
-    50% {
-        background-position: 100% 50%;
-    }
-
-    100% {
-        background-position: 0% 50%;
-    }
-}
-
-@keyframes AnimateBG {
-    0% {
-        background-position: 0% 50%;
-    }
-
-    50% {
-        background-position: 100% 50%;
-    }
-
-    100% {
-        background-position: 0% 50%;
-    }
-}
-
-
+/* ---- Code carousel (home page) --------------------------------------- */
 .swiffy-slider .top {
-    background-color: gainsboro;
+    background-color: var(--cf-ink);
+    color: var(--cf-paper);
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
+    padding: 4px 10px;
+    border-bottom: 1px solid var(--cf-amber);
+}
+.code-example-head {
+    color: var(--cf-paper);
+    font-family: 'JuliaMono', ui-monospace, monospace;
+    letter-spacing: 0.02em;
 }

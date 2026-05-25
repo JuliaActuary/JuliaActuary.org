@@ -3,7 +3,6 @@ title: "Cassette Futurism: a Makie theme preview"
 author: "Alec Loudenback"
 date: "2026-05-24"
 categories: [design, code]
-draft: true
 ---
 
 A draft Makie theme exploring a *cassette futurism* / *NASA-punk* look for
