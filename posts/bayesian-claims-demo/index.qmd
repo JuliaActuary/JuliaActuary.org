@@ -8,6 +8,7 @@ categories: [mortalitytables, exposures,experience-analysis,dataframes,tutorial,
 #| output: false
 using Pkg
 Pkg.activate(".")
+Pkg.resolve()
 Pkg.instantiate()
 ```
 
@@ -16,10 +17,34 @@ using MortalityTables
 using Turing
 using UUIDs
 using DataFramesMeta
-using MCMCChains, Plots, StatsPlots
+using MCMCChains
+using CairoMakie
 using LinearAlgebra
 using Pipe
 using StatsFuns
+
+include(joinpath(@__DIR__, "..", "..", "assets", "themes", "cassette_futurism.jl"))
+set_theme!(cassette_futurism_theme())
+
+# Small Makie equivalent of StatsPlots' plot(chain): trace + density per
+# parameter, one row per parameter, chains overlaid in palette colors.
+function chainplot(ch::Chains)
+    params = names(ch, :parameters)
+    nchains = size(ch, 3)
+    fig = Figure(size=(900, 160 * length(params)))
+    for (i, p) in enumerate(params)
+        ax_t = Axis(fig[i, 1]; title=string(p), xlabel="iteration")
+        ax_d = Axis(fig[i, 2]; title="density")
+        for c in 1:nchains
+            col = CASSETTE_PALETTE[mod1(c, length(CASSETTE_PALETTE))]
+            v = vec(Array(ch[:, p, c]))
+            lines!(ax_t, v; color=(col, 0.7), linewidth=0.8)
+            density!(ax_d, v; color=(col, 0.0),
+                strokecolor=col, strokewidth=1.5)
+        end
+    end
+    return fig
+end
 ```
 
 ## Generating fake data
@@ -108,9 +133,10 @@ num_chains = 4
 We use a No-U-Turn-Sampler (NUTS) technique to sample multiple chains at once:
 
 ```{julia}
+#| column: page-inset
 chain = sample(m1, NUTS(), 1000)
 
-plot(chain)
+chainplot(chain)
 ```
 
 ### Plotting samples from the posterior
@@ -122,30 +148,28 @@ This is saying that for the observed data, if there really is just a single prob
 ```{julia}
 let
     data_weight = data.exposures ./ sum(data.exposures)
-    data_weight = .√(data_weight ./ maximum(data_weight) .* 20)
+    data_weight = .√(data_weight ./ maximum(data_weight) .* 20) .* 4  # Makie markersize ≈ 4× Plots
 
-    p = scatter(
-        data.att_age,
-        data.fraction,
-        markersize=data_weight,
-        alpha=0.5,
-        label="Experience data point (size indicates relative exposure quantity)",
-        xlabel="age",
-        ylim=(0.0, 0.25),
-        ylabel="mortality rate",
-        title="Parametric Bayseian Mortality"
-    )
+    fig = Figure()
+    ax = Axis(fig[1,1]; xlabel="age", ylabel="mortality rate",
+        title="Parametric Bayesian Mortality")
 
     # show n samples from the posterior plotted on the graph
     n = 300
-    ages = sort!(unique(data.att_age))
-
-    for i in 1:n
+    for _ in 1:n
         p_posterior = sample(chain, 1)[:p][1]
-        hline!([p_posterior], label="", alpha=0.1)
+        hlines!(ax, [p_posterior]; color=(CASSETTE_PALETTE[3], 0.08))
     end
-    p
 
+    scatter!(ax, data.att_age, data.fraction;
+        markersize=data_weight,
+        color=(CASSETTE_PALETTE[1], 0.5),
+        strokewidth=0,
+        label="Experience data point (size = relative exposure)")
+
+    ylims!(ax, 0.0, 0.25)
+    axislegend(ax, position=:rt)
+    fig
 end
 ```
 
@@ -198,7 +222,8 @@ summarize(chain2)
 ```
 
 ```{julia}
-plot(chain2)
+#| column: page-inset
+chainplot(chain2)
 ```
 
 ### Plotting samples from the posterior
@@ -208,35 +233,30 @@ We can see that the sampling of possible posterior parameters fits the data well
 ```{julia}
 let
     data_weight = data.exposures ./ sum(data.exposures)
-    data_weight = .√(data_weight ./ maximum(data_weight) .* 20)
+    data_weight = .√(data_weight ./ maximum(data_weight) .* 20) .* 4
 
-    p = scatter(
-        data.att_age,
-        data.fraction,
-        markersize=data_weight,
-        alpha=0.5,
-        label="Experience data point (size indicates relative exposure quantity)",
-        xlabel="age",
-        ylim=(0.0, 0.25),
-        ylabel="mortality rate",
-        title="Parametric Bayseian Mortality"
-    )
+    fig = Figure()
+    ax = Axis(fig[1,1]; xlabel="age", ylabel="mortality rate",
+        title="Parametric Bayesian Mortality")
 
-
-    # show n samples from the posterior plotted on the graph
     n = 300
     ages = sort!(unique(data.att_age))
-
-    for i in 1:n
+    for _ in 1:n
         s = sample(chain2, 1)
-        a = only(s[:a])
-        b = only(s[:b])
-        k = only(s[:k])
-        c = 0
+        a = only(s[:a]); b = only(s[:b]); k = only(s[:k]); c = 0
         m = MortalityTables.MakehamBeard(; a, b, c, k)
-        plot!(ages, age -> MortalityTables.hazard(m, age), alpha=0.1, label="")
+        lines!(ax, ages, age -> MortalityTables.hazard(m, age);
+            color=(CASSETTE_PALETTE[3], 0.08), linewidth=0.8)
     end
-    p
+
+    scatter!(ax, data.att_age, data.fraction;
+        markersize=data_weight, color=(CASSETTE_PALETTE[1], 0.5),
+        strokewidth=0,
+        label="Experience data point (size = relative exposure)")
+
+    ylims!(ax, 0.0, 0.25)
+    axislegend(ax, position=:rt)
+    fig
 end
 ```
 
@@ -278,45 +298,34 @@ summarize(chain3)
 
 ```{julia}
 let data = data2
-
     data_weight = data.exposures ./ sum(data.exposures)
-    data_weight = .√(data_weight ./ maximum(data_weight) .* 20)
-    color_i = data.risklevel
+    data_weight = .√(data_weight ./ maximum(data_weight) .* 20) .* 4
 
-    p = scatter(
-        data.att_age,
-        data.fraction,
-        markersize=data_weight,
-        alpha=0.5,
-        color=color_i,
-        label="Experience data point (size indicates relative exposure quantity)",
-        xlabel="age",
-        ylim=(0.0, 0.25),
-        ylabel="mortality rate",
-        title="Parametric Bayseian Mortality"
-    )
+    risk_colors = CASSETTE_PALETTE[1:3]
+    point_colors = [risk_colors[r] for r in Int.(data.risklevel)]
 
+    fig = Figure()
+    ax = Axis(fig[1,1]; xlabel="age", ylabel="mortality rate",
+        title="Parametric Bayesian Mortality")
 
-    # show n samples from the posterior plotted on the graph
     n = 100
-
     ages = sort!(unique(data.att_age))
-    for r in 1:3
-        for i in 1:n
-            s = sample(chain3, 1)
-            a = only(s[Symbol("a[$r]")])
-            b = only(s[:b])
-            k = only(s[:k])
-            c = 0
-            m = MortalityTables.MakehamBeard(; a, b, c, k)
-            if i == 1
-                plot!(ages, age -> MortalityTables.hazard(m, age), label="risk level $r", alpha=0.2, color=r)
-            else
-                plot!(ages, age -> MortalityTables.hazard(m, age), label="", alpha=0.2, color=r)
-            end
-        end
+    for r in 1:3, i in 1:n
+        s = sample(chain3, 1)
+        a = only(s[Symbol("a[$r]")])
+        b = only(s[:b]); k = only(s[:k]); c = 0
+        m = MortalityTables.MakehamBeard(; a, b, c, k)
+        lines!(ax, ages, age -> MortalityTables.hazard(m, age);
+            color=(risk_colors[r], 0.12), linewidth=0.8,
+            label = (i == 1 ? "risk level $r" : nothing))
     end
-    p
+
+    scatter!(ax, data.att_age, data.fraction;
+        markersize=data_weight, color=point_colors, strokewidth=0)
+
+    ylims!(ax, 0.0, 0.25)
+    axislegend(ax, position=:rt, unique=true)
+    fig
 end
 ```
 
@@ -364,45 +373,34 @@ risk_factors4 = [mean(chain4[Symbol("a[$f]")]) for f in 1:3]
 
 ```{julia}
 let data = data2
-
     data_weight = data.exposures ./ sum(data.exposures)
-    data_weight = .√(data_weight ./ maximum(data_weight) .* 20)
-    color_i = data.risklevel
+    data_weight = .√(data_weight ./ maximum(data_weight) .* 20) .* 4
 
-    p = scatter(
-        data.att_age,
-        data.fraction,
-        markersize=data_weight,
-        alpha=0.5,
-        color=color_i,
-        label="Experience data point (size indicates relative exposure quantity)",
-        xlabel="age",
-        ylim=(0.0, 0.25),
-        ylabel="mortality rate",
-        title="Parametric Bayseian Mortality"
-    )
+    risk_colors = CASSETTE_PALETTE[1:3]
+    point_colors = [risk_colors[r] for r in Int.(data.risklevel)]
 
+    fig = Figure()
+    ax = Axis(fig[1,1]; xlabel="age", ylabel="mortality rate",
+        title="Parametric Bayesian Mortality")
 
-    # show n samples from the posterior plotted on the graph
     n = 100
-
     ages = sort!(unique(data.att_age))
-    for r in 1:3
-        for i in 1:n
-            s = sample(chain4, 1)
-            a = only(s[Symbol("a[$r]")])
-            b = only(s[:b])
-            k = only(s[:k])
-            c = 0
-            m = MortalityTables.MakehamBeard(; a, b, c, k)
-            if i == 1
-                plot!(ages, age -> MortalityTables.hazard(m, age), label="risk level $r", alpha=0.2, color=r)
-            else
-                plot!(ages, age -> MortalityTables.hazard(m, age), label="", alpha=0.2, color=r)
-            end
-        end
+    for r in 1:3, i in 1:n
+        s = sample(chain4, 1)
+        a = only(s[Symbol("a[$r]")])
+        b = only(s[:b]); k = only(s[:k]); c = 0
+        m = MortalityTables.MakehamBeard(; a, b, c, k)
+        lines!(ax, ages, age -> MortalityTables.hazard(m, age);
+            color=(risk_colors[r], 0.12), linewidth=0.8,
+            label = (i == 1 ? "risk level $r" : nothing))
     end
-    p
+
+    scatter!(ax, data.att_age, data.fraction;
+        markersize=data_weight, color=point_colors, strokewidth=0)
+
+    ylims!(ax, 0.0, 0.25)
+    axislegend(ax, position=:rt, unique=true)
+    fig
 end
 ```
 

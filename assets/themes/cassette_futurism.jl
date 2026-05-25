@@ -19,6 +19,10 @@ so `Theme` is in scope. It does not `using Makie` so Makie need not be a
 direct dep — CairoMakie's re-exports are enough.
 =#
 
+# Emit figures as SVG instead of PNG so they stay crisp at any zoom and on
+# high-DPI displays. Caller must have done `using CairoMakie` first.
+CairoMakie.activate!(type = "svg")
+
 const CF_PAPER       = "#F0EDE3"  # fresh technical-paper white, faintly warm
 const CF_PAPER_DEEP  = "#E6E2D5"  # secondary panel fill
 const CF_INK         = "#1B2A3A"  # deep navy "ink"
