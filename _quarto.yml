@@ -31,11 +31,15 @@ format:
     theme: cosmo
     css: styles.css
     monofont: JuliaMono
-    mainfont: Inter
+    mainfont: "IBM Plex Sans"
     highlight: false
     highlight-style: "none"
     description: "JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows."
     header-includes:
+      - |
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
       - |
         <link rel="stylesheet" href="/assets/highlight/styles/github.min.css">
       - |

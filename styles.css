@@ -124,22 +124,38 @@
 body {
     background-color: var(--cf-paper);
     color: var(--cf-ink);
+    font-family: "IBM Plex Sans", "Inter", system-ui, -apple-system, "Helvetica Neue", sans-serif;
+    font-size: 17px;
+    line-height: 1.55;
 }
 
-/* ---- Headings: monospaced like technical-document section markers --- */
+/* ---- Headings: monospaced like technical-document section markers ----
+   JuliaMono stands in for an eventual draftsman face; alternatives that
+   fit cleanly: Space Grotesk (geometric, modern aerospace), Eurostile /
+   Microgramma (the canonical cassette-futurism face — commercial),
+   Major Mono Display (display-mono, very on-aesthetic), Atkinson
+   Hyperlegible (max readability). Swap on a single line below.
+   --------------------------------------------------------------------- */
 h1, h2, h3, h4, h5, h6,
 .h1, .h2, .h3, .h4, .h5, .h6 {
     color: var(--cf-ink);
-    font-family: 'JuliaMono', ui-monospace, monospace;
-    font-weight: 600;
-    letter-spacing: 0.01em;
+    font-family: 'JuliaMono', "Space Grotesk", ui-monospace, monospace;
+    font-weight: 700;
+    letter-spacing: 0.005em;
+    line-height: 1.25;
 }
+h1, .h1 { font-size: 2.1rem; }
 h2 {
     border-bottom: 1px solid var(--cf-rule);
     padding-bottom: 0.25em;
-    margin-top: 1.6em;
+    margin-top: 1.8em;
+    font-size: 1.5rem;
 }
-h3 { color: var(--cf-blue); }
+h3 {
+    color: var(--cf-blue);
+    font-size: 1.2rem;
+    margin-top: 1.4em;
+}
 
 /* ---- Links: red plotter pen, amber on hover --------------------------- */
 a {
@@ -154,12 +170,17 @@ a:hover, a:focus { color: var(--cf-orange); }
     background-color: var(--cf-ink) !important;
     border-bottom: 2px solid var(--cf-amber);
     font-family: 'JuliaMono', ui-monospace, monospace;
+    padding-top: 0.45rem;
+    padding-bottom: 0.45rem;
 }
 .navbar .navbar-brand,
 .navbar .nav-link,
 .navbar-text {
     color: var(--cf-paper) !important;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.04em;
+    font-weight: 500;
+    font-size: 0.95rem;
+    text-transform: uppercase;
 }
 .navbar .nav-link:hover,
 .navbar .nav-link:focus,
@@ -169,6 +190,17 @@ a:hover, a:focus { color: var(--cf-orange); }
 .navbar .nav-link.active,
 .navbar .navbar-brand.active {
     color: var(--cf-amber) !important;
+}
+
+/* Logo: paper-tinted backdrop so the colored mark reads against ink */
+.navbar .navbar-brand img,
+.navbar-logo {
+    background: var(--cf-paper);
+    padding: 4px;
+    border-radius: 6px;
+    box-shadow: 0 0 0 1px var(--cf-amber);
+    height: 36px;
+    width: auto;
 }
 
 /* ---- Quarto title-block banner: matches navbar so they read as one - */
