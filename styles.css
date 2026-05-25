@@ -126,12 +126,12 @@ body {
     color: var(--cf-ink);
     font-family: "Atkinson Hyperlegible", "Inter", system-ui, -apple-system, "Helvetica Neue", sans-serif;
     font-size: 16px;
-    line-height: 1.65;
+    line-height: 1.6;
     font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
     text-rendering: optimizeLegibility;
 }
 
-p { margin-bottom: 0.9em; }
+p { margin: 0 0 0.5em 0; }   /* Wikipedia-rhythm: tight, lean on line-height */
 
 /* Cap reading width on prose blocks only — never on a column-page wrapper.
    Quarto's column system distinguishes column-body (reading width) from
@@ -144,33 +144,45 @@ main#quarto-document-content > blockquote {
     max-width: 72ch;
 }
 
-/* ---- Headings: monospaced like technical-document section markers ----
-   JuliaMono stands in for an eventual draftsman face; alternatives that
-   fit cleanly: Space Grotesk (geometric, modern aerospace), Eurostile /
-   Microgramma (the canonical cassette-futurism face — commercial),
-   Major Mono Display (display-mono, very on-aesthetic), Atkinson
-   Hyperlegible (max readability). Swap on a single line below.
+/* ---- Headings: Wikipedia-style serif h1/h2 at normal weight, body sans
+   for h3+. Source Serif 4 (Adobe; variable, on Google Fonts) stands in
+   for Wikipedia's Linux Libertine / Source Serif 4 stack.
    --------------------------------------------------------------------- */
 h1, h2, h3, h4, h5, h6,
 .h1, .h2, .h3, .h4, .h5, .h6 {
     color: var(--cf-ink);
-    font-family: 'JuliaMono', "Space Grotesk", ui-monospace, monospace;
-    font-weight: 600;
     letter-spacing: 0;
-    line-height: 1.25;
 }
-h1, .h1 { font-size: 1.75rem; }
-h2 {
+h1, h2, .h1 {
+    font-family: 'Source Serif 4', Georgia, 'Times New Roman', Times, serif;
+    font-weight: 400;
+    line-height: 1.375;
+}
+h1, .h1 {
+    font-size: 1.8rem;
     border-bottom: 1px solid var(--cf-rule);
     padding-bottom: 0.25em;
-    margin-top: 1.6em;
-    font-size: 1.25rem;
+    margin-bottom: 0.6em;
+}
+h2 {
+    font-size: 1.5rem;
+    border-bottom: 1px solid var(--cf-rule);
+    padding-bottom: 0.25em;
+    margin-top: 1.5em;
+    margin-bottom: 0.6em;
+}
+h3, h4, h5, h6 {
+    font-family: "Atkinson Hyperlegible", "Inter", system-ui, sans-serif;
+    font-weight: 700;
+    line-height: 1.4;
 }
 h3 {
-    color: var(--cf-blue);
-    font-size: 1.05rem;
-    margin-top: 1.3em;
+    font-size: 1.2rem;
+    margin-top: 1.4em;
+    margin-bottom: 0.4em;
 }
+h4 { font-size: 1.05rem; margin-top: 1.2em; }
+h5, h6 { font-size: 1rem; margin-top: 1em; }
 
 /* ---- Links: red plotter pen, amber on hover --------------------------- */
 a {
@@ -222,15 +234,19 @@ a:hover, a:focus { color: var(--cf-orange); }
     border-bottom: 2px solid var(--cf-amber);
 }
 .quarto-title-block .quarto-title-banner h1.title,
-.quarto-title-block .quarto-title-banner .title,
-.quarto-title-block .quarto-title-banner .quarto-categories .quarto-category {
+.quarto-title-block .quarto-title-banner .title {
     color: var(--cf-paper);
-    font-family: 'JuliaMono', ui-monospace, monospace;
+    font-family: 'Source Serif 4', Georgia, 'Times New Roman', Times, serif;
+    font-weight: 400;
+    border-bottom: none;     /* banner already has its amber rule */
+    padding-bottom: 0;
+    margin-bottom: 0.3em;
 }
 .quarto-title-block .quarto-title-banner .quarto-categories .quarto-category {
     background: transparent;
     border: 1px solid var(--cf-amber);
     color: var(--cf-amber);
+    font-family: "Atkinson Hyperlegible", sans-serif;
 }
 
 /* ---- Code blocks: bright paper card, ruled border -------------------- */
@@ -302,7 +318,8 @@ tbody tr { border-color: var(--cf-rule); }
 .quarto-grid-item .listing-title,
 .quarto-grid-item .listing-title a {
     color: var(--cf-ink);
-    font-family: 'JuliaMono', ui-monospace, monospace;
+    font-family: 'Source Serif 4', Georgia, 'Times New Roman', Times, serif;
+    font-weight: 400;
 }
 .quarto-grid-item .listing-categories .listing-category {
     background-color: transparent;
