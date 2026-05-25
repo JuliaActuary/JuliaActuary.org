@@ -134,7 +134,7 @@ We use a No-U-Turn-Sampler (NUTS) technique to sample multiple chains at once:
 
 ```{julia}
 #| column: page-inset
-chain = sample(m1, NUTS(), 1000)
+chain = MCMCChains.Chains(sample(m1, NUTS(), 1000))
 
 chainplot(chain)
 ```
@@ -217,7 +217,7 @@ We combine the model with the data and a use use a No-U-Turn-Sampler (NUTS) tech
 
 ```{julia}
 m2 = mortality2(data, data.deaths)
-chain2 = sample(m2, NUTS(), 1000)
+chain2 = MCMCChains.Chains(sample(m2, NUTS(), 1000))
 summarize(chain2)
 ```
 
@@ -292,7 +292,7 @@ Instantiate model with the data, sample, and summarize:
 
 ```{julia}
 m3 = mortality3(data2, data2.deaths)
-chain3 = sample(m3, NUTS(), 1000)
+chain3 = MCMCChains.Chains(sample(m3, NUTS(), 1000))
 summarize(chain3)
 ```
 
@@ -361,7 +361,7 @@ Instantiate model with the data, sample, and summarize:
 
 ```{julia}
 m4 = mortality4(data2, data2.deaths)
-chain4 = sample(m4, NUTS(), 1000)
+chain4 = MCMCChains.Chains(sample(m4, NUTS(), 1000))
 summarize(chain4)
 ```
 

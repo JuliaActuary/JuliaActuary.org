@@ -94,8 +94,8 @@ bpchains = map(model_points) do mp
 	
     ThreadsX.map(1:trials) do i
         claims = sum(rand() < mp.q for _ in 1:mp.N)
-        bc = sample(binom(mp.N,claims), NUTS(), 500)
-        pc = sample(poisson(mp.N,claims), NUTS(), 500)
+        bc = MCMCChains.Chains(sample(binom(mp.N,claims), NUTS(), 500))
+        pc = MCMCChains.Chains(sample(poisson(mp.N,claims), NUTS(), 500))
 
         (;bc,pc)
     end
