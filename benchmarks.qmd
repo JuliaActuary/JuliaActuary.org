@@ -9,6 +9,7 @@ toc: true
 #| output: false
 using Pkg
 Pkg.activate("env/benchmarks")
+Pkg.resolve()
 Pkg.instantiate()
 ```
 
@@ -42,29 +43,54 @@ To aid in visualizing results with such vast different orders of magnitude, this
 ```{julia}
 #| echo: false
 #| label: fig-life-modeling-benchmark
-using Plots
+using CairoMakie
 using DataFrames
-p = plot(palette=:seaborn_colorblind, rotation=25, yaxis=:log)
-# label equivalents to distance to make log scale more relatable
-scatter!(
-    fill("\n equivalents (ns → ft)", 7),
-    [1, 1e1, 1e2, 1e3, .8e4, 0.72e5, 3.3e6],
-    series_annotations=Plots.text.(["1 foot", "basketball hoop", "blue whale", "Eiffel Tower", "avg ocean depth", "marathon distance", "Space Station altitude"], :left, 8, :grey),
-    marker=0,
-    label="",
-    left_margin=20Plots.mm,
-    bottom_margin=20Plots.mm
-)
 
-# plot mean, or median if not available
-for g in groupby(benchmarks, :algorithm)
-    scatter!(p, g.lang,
-        ifelse.(ismissing.(g.mean), g.median, g.mean),
-        label="$(g.algorithm[1])",
-        ylabel="Nanoseconds (log scale)",
-        marker=(:circle, 5, 0.7, stroke(0)))
+include(joinpath(@__DIR__, "assets", "themes", "cassette_futurism.jl"))
+set_theme!(cassette_futurism_theme())
+
+let
+    langs = unique(benchmarks.lang)
+    ruler = "equivalents\n(ns → ft)"
+    all_cats = [ruler; langs]
+    pos = Dict(l => i for (i, l) in pairs(all_cats))
+
+    distances = [
+        (1.0,      "1 foot"),
+        (1e1,      "basketball hoop"),
+        (1e2,      "blue whale"),
+        (1e3,      "Eiffel Tower"),
+        (0.8e4,    "avg ocean depth"),
+        (0.72e5,   "marathon distance"),
+        (3.3e6,    "Space Station altitude"),
+    ]
+
+    fig = Figure(size=(900, 480))
+    ax = Axis(fig[1,1];
+        yscale = log10,
+        ylabel = "Nanoseconds (log scale)",
+        xticks = (1:length(all_cats), all_cats),
+        xticklabelrotation = π/8,
+    )
+
+    for (y, lbl) in distances
+        text!(ax, 1.0, y; text = lbl, align = (:left, :center),
+            color = CF_INK_SOFT, fontsize = 9, offset = (4, 0))
+    end
+
+    for (i, g) in enumerate(groupby(benchmarks, :algorithm))
+        xs = [pos[l] for l in g.lang]
+        ys = [ismissing(m) ? med : m for (m, med) in zip(g.mean, g.median)]
+        scatter!(ax, xs, ys;
+            label = string(g.algorithm[1]),
+            color = (CASSETTE_PALETTE[i], 0.75),
+            markersize = 11,
+            strokewidth = 0,
+        )
+    end
+    axislegend(ax, position = :rt)
+    fig
 end
-p
 ```
 
 ### Discussion
