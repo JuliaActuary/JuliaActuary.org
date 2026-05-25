@@ -68,10 +68,10 @@ function cassette_futurism_theme(; font::String = "JuliaMono")
 
         Axis = (
             backgroundcolor      = CF_PAPER,
-            xgridcolor           = (CF_RULE, 0.45),
-            ygridcolor           = (CF_RULE, 0.45),
-            xminorgridcolor      = (CF_RULE, 0.22),
-            yminorgridcolor      = (CF_RULE, 0.22),
+            xgridcolor           = (CF_RULE, 0.30),
+            ygridcolor           = (CF_RULE, 0.30),
+            xminorgridcolor      = (CF_RULE, 0.12),
+            yminorgridcolor      = (CF_RULE, 0.12),
             xminorgridvisible    = true,
             yminorgridvisible    = true,
             xminorticksvisible   = true,
