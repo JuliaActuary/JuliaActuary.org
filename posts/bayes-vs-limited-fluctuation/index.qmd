@@ -150,7 +150,7 @@ A complete overview of modern Bayesian models is beyond the scope of this notebo
     -   `data.claims ~ product_distribution(Poisson.(data.n .* logistic.(μ_i)))` means "each value in `data.claims` is a random outcome (`~`) distributed accroding to a corresponding Poisson distribution with `\lambda =n \times \text{logistic}(\mu_i)` where `text{logistic}(\mu_i)` is the average claims rate for each group.
 
 ```{julia}
-@model function model_poisson(data)
+@model function model_poisson(data, claims)
     # hyperparameter that informs the prior for each group
     μ ~ Normal(-2, 4)
     σ ~ Exponential(0.25)
@@ -161,7 +161,7 @@ A complete overview of modern Bayesian models is beyond the scope of this notebo
 
     # use the poisson appproximation to the binomial claim outcome with a
     # logisitc link function to keep the probability between 0 and 1
-    data.claims ~ product_distribution(Poisson.(data.n .* logistic.(μ_i)))
+    claims ~ product_distribution(Poisson.(data.n .* logistic.(μ_i)))
 end
 ```
 
@@ -179,7 +179,7 @@ mp = let
             :claims = sum(:claims)
         end
     end
-    model_poisson(condensed)
+    model_poisson(condensed, condensed.claims)
 end
 ```
 

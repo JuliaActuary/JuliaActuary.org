@@ -116,9 +116,11 @@ This visualization shows the aggregated posterior distribution across all of the
 #| column: page
 function plot_band_under!(ax,plot,y,low,high,label="")
     function points(plot)
-        pts = plot.plots[2].converted[1][]
+        # Modern Makie: positions on the Lines child are arg-1's Observable.
+        # (Was plot.plots[2].converted[1][] pre-ComputePipeline.)
+        pts = plot.plots[2][1][]
         [p[1] for p in pts], [p[2] for p in pts]
-    end    
+    end
     xs′, ys′ = points(plot)
 
     filt = findall(x-> (x ≥ low) && (x ≤ high),xs′)
