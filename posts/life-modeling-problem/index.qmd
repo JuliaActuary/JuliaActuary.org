@@ -167,6 +167,7 @@ To aid in visualizing results with such vast different orders of magnitude, this
 ```{julia}
 #| echo: false
 #| label: fig-life-modeling-benchmark-blog
+#| column: page-inset
 using CairoMakie
 using DataFrames
 
@@ -191,7 +192,7 @@ let
         (3.3e6,    "Space Station altitude"),
     ]
 
-    fig = Figure(size=(900, 480))
+    fig = Figure(size=(960, 460))
     ax = Axis(fig[1,1];
         yscale = log10,
         ylabel = "Nanoseconds (log scale)",

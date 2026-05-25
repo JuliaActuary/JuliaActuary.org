@@ -200,8 +200,9 @@ Now let's plot the result. Not surprising, interest has a huge effect on the pol
 One thing that's remarkable is how going from 2000 premium to just ~2200 of premium results in about a $5m difference at 8% interest. The power of compound interest!
 
 ```{julia}
+#| column: page-inset
 let
-    fig = Figure(size=(900, 430))
+    fig = Figure(size=(960, 430))
 
     ax1 = Axis(fig[1,1]; xlabel="credit rate", ylabel=L"Annual Premium (\$)",
         title="AV at age 100 (\$M)")

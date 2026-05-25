@@ -113,6 +113,7 @@ The fit remains poor when \$q \>\> 0.5\$ and when \$N\$ is small.
 This visualization shows the aggregated posterior distribution across all of the trials and model points. The darker shaded band indicates the middle 50% of the posterior:
 
 ```{julia}
+#| column: page
 function plot_band_under!(ax,plot,y,low,high,label="")
     function points(plot)
         pts = plot.plots[2].converted[1][]
@@ -133,7 +134,7 @@ end
 
 
 let
-    f = Figure(resolution=(1280,960))
+    f = Figure(size=(1100, 720))
     a = Any # outer variable to set as axis for to grab legend
     
     for (i,N) in enumerate(reverse(Ns))
