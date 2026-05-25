@@ -193,12 +193,12 @@ Run the chain:
 
 ```{julia}
 
-cp = MCMCChains.Chains(sample(mp, NUTS(), 500)) # this is the line that runs the MCMC sampler
+cp = MCMCChains.Chains(sample(mp, NUTS(), 500; check_model=false)) # this is the line that runs the MCMC sampler
 
 # ╔═╡ 6b5d2186-78ac-48ae-8529-e0dcd51d0b00
 let
     # sample from the priors before learning from any data
-    ch_prior = MCMCChains.Chains(sample(mp, Prior(), 1500))
+    ch_prior = MCMCChains.Chains(sample(mp, Prior(), 1500; check_model=false))
 
     f = Figure()
     ax = Axis(f[1, 1], title="Prior distribution of expected claims rate for a group")

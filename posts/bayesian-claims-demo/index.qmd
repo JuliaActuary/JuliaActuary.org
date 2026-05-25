@@ -201,11 +201,11 @@ This isn't an ideal parameterization (e.g. we aren't including information about
     # use the variables to create a parametric mortality model
     m = MortalityTables.MakehamBeard(; a, b, c, k)
 
-    # loop through the rows of the dataframe to let Turing observe the data 
+    # loop through the rows of the dataframe to let Turing observe the data
     # and how consistent the parameters are with the data
     for i = 1:nrow(data)
         age = data.att_age[i]
-        q = MortalityTables.hazard(m, age)
+        q = clamp(MortalityTables.hazard(m, age), 1e-10, 1 - 1e-10)
         deaths[i] ~ Binomial(data.exposures[i], q)
     end
 end
@@ -282,7 +282,7 @@ This model extends the prior to create a multi-level model. Each risk class (`ri
 
         m = MortalityTables.MakehamBeard(; a=a[risk], b, c, k)
         age = data.att_age[i]
-        q = MortalityTables.hazard(m, age)
+        q = clamp(MortalityTables.hazard(m, age), 1e-10, 1 - 1e-10)
         deaths[i] ~ Binomial(data.exposures[i], q)
     end
 end
