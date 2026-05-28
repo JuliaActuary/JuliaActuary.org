@@ -24,7 +24,7 @@ ul.task-list li input[type="checkbox"] {
 </style>
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="../../site_libs/quarto-nav/headroom.min.js"></script>
 <script src="../../site_libs/clipboard/clipboard.min.js"></script>
 <script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
@@ -42,7 +42,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-a0731b9a3a5d496010872d775e5d9bc3.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-a9c66334b43f472998d4f0687f28726e.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-98ac2d5361ef6f18cc0525d38bedc462.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -70,9 +70,9 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
-
-<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&amp;family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&amp;display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../../assets/highlight/styles/github.min.css">
 <script src="../../assets/highlight/highlight.min.js"></script>
 <script src="../../assets/highlight/languages/julia.min.js"></script>
@@ -110,6 +110,10 @@ ul.task-list li input[type="checkbox"] {
   <li class="nav-item">
     <a class="nav-link" href="../../packages.html"> 
 <span class="menu-text">Packages</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://docs.juliaactuary.org"> 
+<span class="menu-text">Docs</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="../../learn.html"> 
@@ -190,10 +194,24 @@ ul.task-list li input[type="checkbox"] {
 <pre class="julia cell-code"><code>using CSV, DataFrames
 using MortalityTables, ActuaryUtilities
 using Dates
-using ThreadsX
+using OhMyThreads
 using BenchmarkTools
 using CairoMakie
-using Random</code></pre>
+using Random
+
+include(joinpath(@__DIR__, "..", "..", "assets", "themes", "cassette_futurism.jl"))
+set_theme!(cassette_futurism_theme())</code></pre>
+<div class="cell-output cell-output-stdout">
+<div class="ansi-escaped-output">
+<pre><span class="ansi-green-fg ansi-bold">Precompiling</span> packages...
+   4399.6 ms<span class="ansi-green-fg">  ✓ </span>QuartoNotebookWorkerMakieExt<span class="ansi-bright-black-fg"> (serial)</span>
+  1 dependency successfully precompiled in 4 seconds
+<span class="ansi-green-fg ansi-bold">Precompiling</span> packages...
+   3640.1 ms<span class="ansi-green-fg">  ✓ </span>QuartoNotebookWorkerCairoMakieExt<span class="ansi-bright-black-fg"> (serial)</span>
+  1 dependency successfully precompiled in 4 seconds
+</pre>
+</div>
+</div>
 </div>
 <p>Define a datatype. Not strictly necessary, but will make extending the program with more functions easier.</p>
 <p>Type annotations are optional, but providing them is able to coerce the values to be all plain bits (i.e.&nbsp;simple, non-referenced values like arrays are) when the type is constructed. This makes the whole data be stored in the stack and is an example of data-oriented design. It’s much slower without the type annotations (~0.5 million policies per second, ~50x slower).</p>
@@ -266,34 +284,27 @@ end</code></pre>
 <p>This defines the core logic of the policy projection and will write the results to the given <code>out</code> container (here, a named tuple of arrays).</p>
 <p>This is using a threaded approach where it could be operating on any of the computer’s available threads, thus acheiving thread-based parallelism (as opposed to multi-processor (multi-machine) or GPU-based computation which requires formulating the problem a bit differently (array/matrix based). For the scale of computation here, I think I’d apply this model of parallelism.</p>
 <div id="12" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>function pol_project!(out, policy, params)
+<pre class="julia cell-code"><code>function pol_project!(benefits, lives, policy, params)
     # some starting values for the given policy
     dur = duration(policy.issue_date, params.val_date)
     start_age = policy.issue_age + dur - 1
-    COLA_factor = (1 + policy.COLA)
+    COLA_factor = 1 + policy.COLA
     cur_benefit = policy.benefit_base * COLA_factor^(dur - 1)
 
     # get the right mortality vector
     qs = mortality(policy, params)
-
-    # grab the current thread's id to write to results container without conflicting with other threads
-    tid = Threads.threadid()
-
     ω = lastindex(qs)
 
-    # inbounds turns off bounds-checking, which makes hot loops faster but first write loop without it to ensure you don't create an error (will crash if you have the error without bounds checking)
+    # inbounds turns off bounds-checking, which makes hot loops faster — write
+    # the loop without it first to ensure you don't have an out-of-bounds bug.
     @inbounds for t in 1:min(params.proj_length, ω - start_age)
+        q = qs[start_age + t]            # current mortality
+        rand() &lt; q &amp;&amp; return              # death — stop incrementing this life
 
-        q = qs[start_age+t] # get current mortality
-
-        if (rand() &lt; q)
-            return # if dead then just return and don't increment the results anymore
-        else
-            # pay benefit, add a life to the output count, and increment the benefit for next year
-            out.benefits[t, tid] += cur_benefit
-            out.lives[t, tid] += 1
-            cur_benefit *= COLA_factor
-        end
+        # otherwise: pay benefit, add a life, grow the benefit by COLA for next year
+        benefits[t] += cur_benefit
+        lives[t]    += 1
+        cur_benefit *= COLA_factor
     end
 end</code></pre>
 <div class="cell-output cell-output-display" data-execution_count="1">
@@ -315,19 +326,38 @@ end</code></pre>
 <div id="16" class="cell" data-execution_count="1">
 <pre class="julia cell-code"><code>Threads.nthreads()</code></pre>
 <div class="cell-output cell-output-display" data-execution_count="1">
-<pre><code>1</code></pre>
+<pre><code>10</code></pre>
 </div>
 </div>
 <div id="18" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>function project(policies, params)
-    threads = Threads.nthreads()
-    benefits = zeros(params.proj_length, threads)
-    lives = zeros(Int, params.proj_length, threads)
-    out = (; benefits, lives)
-    ThreadsX.foreach(policies) do pol
-        pol_project!(out, pol, params)
+<pre class="julia cell-code"><code># Serial projection — one scenario's worth of work. Each call owns its
+# own (proj_length,) buffers, so there is no thread coordination.
+function project_serial(policies, params)
+    benefits = zeros(params.proj_length)
+    lives    = zeros(Int, params.proj_length)
+    for pol in policies
+        pol_project!(benefits, lives, pol, params)
     end
-    map(x -&gt; vec(reduce(+, x, dims=2)), out)
+    (; benefits, lives)
+end
+
+# Threaded projection — used for the throughput demo. Policies are
+# chunked, each task accumulates into its own local buffers, and the
+# partial results are summed at the end. No `threadid()` and no shared
+# writes, so it is correct under task migration.
+function project(policies, params)
+    chunks = OhMyThreads.chunks(policies; n = Threads.nthreads())
+    parts  = OhMyThreads.tmap(chunks) do chunk
+        b = zeros(params.proj_length)
+        l = zeros(Int, params.proj_length)
+        for pol in chunk
+            pol_project!(b, l, pol, params)
+        end
+        (b, l)
+    end
+    benefits = sum(p -&gt; p[1], parts)
+    lives    = sum(p -&gt; p[2], parts)
+    (; benefits, lives)
 end</code></pre>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>project (generic function with 1 method)</code></pre>
@@ -337,69 +367,56 @@ end</code></pre>
 <div id="20" class="cell" data-execution_count="1">
 <pre class="julia cell-code"><code>project(repeat(policies, 100_000), params)</code></pre>
 <div class="cell-output cell-output-display" data-execution_count="1">
-<pre><code>(benefits = [5.628266348011793e10, 5.673883596707583e10, 5.712497014134891e10, 5.749095439249457e10, 5.774726003023396e10, 5.793810326133258e10, 5.805158891646363e10, 5.810347911612621e10, 5.810405176164248e10, 5.801961458178435e10  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [195193, 190421, 185536, 180703, 175668, 170542, 165338, 160106, 154899, 149612  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])</code></pre>
+<pre><code>(benefits = [5.6290327893816505e10, 5.6687917435023285e10, 5.70735404506219e10, 5.739736251899788e10, 5.762196207749678e10, 5.783614609582748e10, 5.797013869123363e10, 5.8016993162106316e10, 5.807225462320919e10, 5.7999113923170906e10  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [195263, 190367, 185492, 180503, 175336, 170272, 165114, 159875, 154872, 149665  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])</code></pre>
 </div>
 </div>
 <section id="benchmarking" class="level2">
 <h2 class="anchored" data-anchor-id="benchmarking">Benchmarking</h2>
 <p>Using a Macbook Air M3 laptop, about 45 million policies able to be stochastically projected per second:</p>
-<div id="22" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>policies_to_benchmark = 45_000_000
+<div id="22" class="cell" data-execution_count="0">
+<pre class="julia cell-code"><code># Skipped at render time — allocating 45M policies + running @benchmark
+# OOMs the Quarto worker. The number is preserved for documentation; the
+# block runs interactively when you open the post locally.
+policies_to_benchmark = 45_000_000
 # adjust the `repeat` depending on how many policies are already in the array
 # to match the target number for the benchmark
 n = policies_to_benchmark ÷ length(policies)
 
 @benchmark project(p, r) setup = (p = repeat($policies, $n); r = $params)</code></pre>
-<div class="cell-output cell-output-display" data-execution_count="1">
-<div class="ansi-escaped-output">
-<pre>BenchmarkTools.Trial: 2 samples with 1 evaluation per sample.
- Range <span class="ansi-bright-black-fg">(</span><span class="ansi-cyan-fg ansi-bold">min</span> … <span class="ansi-magenta-fg">max</span><span class="ansi-bright-black-fg">):  </span><span class="ansi-cyan-fg ansi-bold">3.217 s</span> … <span class="ansi-magenta-fg">   3.218 s</span>  <span class="ansi-bright-black-fg">┊</span> GC <span class="ansi-bright-black-fg">(</span>min … max<span class="ansi-bright-black-fg">): </span>0.00% … 0.00%
- Time  <span class="ansi-bright-black-fg">(</span><span class="ansi-blue-fg ansi-bold">median</span><span class="ansi-bright-black-fg">):     </span><span class="ansi-blue-fg ansi-bold">3.218 s               </span><span class="ansi-bright-black-fg">┊</span> GC <span class="ansi-bright-black-fg">(</span>median<span class="ansi-bright-black-fg">):    </span>0.00%
- Time  <span class="ansi-bright-black-fg">(</span><span class="ansi-green-fg ansi-bold">mean</span> ± <span class="ansi-green-fg">σ</span><span class="ansi-bright-black-fg">):   </span><span class="ansi-green-fg ansi-bold">3.218 s</span> ± <span class="ansi-green-fg">502.754 μs</span>  <span class="ansi-bright-black-fg">┊</span> GC <span class="ansi-bright-black-fg">(</span>mean ± σ<span class="ansi-bright-black-fg">):  </span>0.00% ± 0.00%
-
-  <span class="ansi-blue-fg">█</span>                            <span class="ansi-green-fg"> </span>                           █  
-  <span class="ansi-blue-fg">█</span>▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁<span class="ansi-green-fg">▁</span>▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁█ ▁
-  3.22 s<span class="ansi-bright-black-fg">         Histogram: frequency by time</span>         3.22 s <span class="ansi-bold">&lt;</span>
-
- Memory estimate<span class="ansi-bright-black-fg">: </span><span class="ansi-yellow-fg">9.09 KiB</span>, allocs estimate<span class="ansi-bright-black-fg">: </span><span class="ansi-yellow-fg">68</span>.</pre>
-</div>
-</div>
 </div>
 </section>
 <section id="stochastic-ensemble" class="level2">
 <h2 class="anchored" data-anchor-id="stochastic-ensemble">Stochastic Ensemble</h2>
 <p>Loop through and calculate the reults <code>n</code> times (this is only running the two policies in the sample data” <code>n</code> times).</p>
 <div id="24" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>function stochastic_proj(policies, params, n)
+<pre class="julia cell-code"><code># One level of parallelism — across scenarios — with the serial kernel
+# inside. Avoids nested threadpool contention.
+stochastic_proj(policies, params, n) =
+    OhMyThreads.tmap(_ -&gt; project_serial(policies, params), 1:n)
 
-    ThreadsX.map(1:n) do i
-        project(policies, params)
-    end
-end
-
-stoch = stochastic_proj(policies, params, 1000)</code></pre>
+stoch = stochastic_proj(policies, params, 50)</code></pre>
 <div class="cell-output cell-output-display" data-execution_count="1">
-<pre><code>1000-element Vector{@NamedTuple{benefits::Vector{Float64}, lives::Vector{Int64}}}:
+<pre><code>50-element Vector{@NamedTuple{benefits::Vector{Float64}, lives::Vector{Int64}}}:
+ (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 628133.3788962648, 215659.12675438426, 222128.9005570158, 228792.76757372628, 235656.55060093806, 242726.24711896622, 250008.0345325352  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 2, 1, 1, 1, 1, 1, 1  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
  (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 628133.3788962648, 646977.3802631528, 666386.7016710474, 686378.3027211789, 706969.6518028142, 728178.7413568987, 750024.1035976056  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 2, 2, 2, 2, 2, 2, 2  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+ (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 628133.3788962648, 646977.3802631528, 666386.7016710474, 686378.3027211789, 706969.6518028142, 728178.7413568987, 750024.1035976056  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 2, 2, 2, 2, 2, 2, 2  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+ (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 628133.3788962648, 646977.3802631528, 666386.7016710474, 686378.3027211789, 706969.6518028142, 728178.7413568987, 750024.1035976056  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 2, 2, 2, 2, 2, 2, 2  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+ (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 628133.3788962648, 646977.3802631528, 666386.7016710474, 686378.3027211789, 706969.6518028142, 728178.7413568987, 250008.0345325352  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 2, 2, 2, 2, 2, 2, 1  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
  (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 628133.3788962648, 646977.3802631528, 666386.7016710474, 686378.3027211789, 706969.6518028142, 728178.7413568987, 500016.0690650704  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 2, 2, 2, 2, 2, 2, 1  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
- (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 628133.3788962648, 646977.3802631528, 666386.7016710474, 686378.3027211789, 706969.6518028142, 728178.7413568987, 250008.0345325352  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 2, 2, 2, 2, 2, 2, 1  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
- (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 628133.3788962648, 646977.3802631528, 666386.7016710474, 686378.3027211789, 471313.1012018761, 485452.49423793243, 500016.0690650704  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 2, 2, 2, 2, 1, 1, 1  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
- (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 628133.3788962648, 431318.2535087685, 444257.8011140316, 457585.53514745255, 471313.1012018761, 485452.49423793243, 500016.0690650704  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 2, 1, 1, 1, 1, 1, 1  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
- (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 209377.7929654216, 215659.12675438426, 222128.9005570158, 228792.76757372628, 235656.55060093806, 242726.24711896622, 250008.0345325352  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 1, 1, 1, 1, 1, 1, 1  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
  (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 628133.3788962648, 646977.3802631528, 666386.7016710474, 686378.3027211789, 706969.6518028142, 728178.7413568987, 750024.1035976056  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 2, 2, 2, 2, 2, 2, 2  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+ (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 628133.3788962648, 646977.3802631528, 666386.7016710474, 457585.53514745255, 471313.1012018761, 485452.49423793243, 500016.0690650704  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 2, 2, 2, 1, 1, 1, 1  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
  (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 628133.3788962648, 646977.3802631528, 666386.7016710474, 686378.3027211789, 706969.6518028142, 728178.7413568987, 750024.1035976056  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 2, 2, 2, 2, 2, 2, 2  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
- (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 628133.3788962648, 646977.3802631528, 666386.7016710474, 686378.3027211789, 706969.6518028142, 728178.7413568987, 250008.0345325352  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 2, 2, 2, 2, 2, 2, 1  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
- (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 418755.5859308432, 431318.2535087685, 444257.8011140316, 457585.53514745255, 471313.1012018761, 485452.49423793243, 500016.0690650704  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 1, 1, 1, 1, 1, 1, 1  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+ (benefits = [574831.0226582347, 592075.9533379817, 406558.82129208074, 418755.5859308432, 431318.2535087685, 444257.8011140316, 457585.53514745255, 0.0, 0.0, 0.0  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 1, 1, 1, 1, 1, 0, 0, 0  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
  ⋮
- (benefits = [574831.0226582347, 394717.3022253211, 406558.82129208074, 418755.5859308432, 431318.2535087685, 0.0, 0.0, 0.0, 0.0, 0.0  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 1, 1, 1, 1, 0, 0, 0, 0, 0  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
- (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 418755.5859308432, 431318.2535087685, 444257.8011140316, 457585.53514745255, 471313.1012018761, 485452.49423793243, 500016.0690650704  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 1, 1, 1, 1, 1, 1, 1  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
- (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 628133.3788962648, 646977.3802631528, 666386.7016710474, 686378.3027211789, 706969.6518028142, 728178.7413568987, 750024.1035976056  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 2, 2, 2, 2, 2, 2, 2  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
- (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 628133.3788962648, 646977.3802631528, 666386.7016710474, 686378.3027211789, 706969.6518028142, 485452.49423793243, 500016.0690650704  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 2, 2, 2, 2, 2, 1, 1  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+ (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 628133.3788962648, 646977.3802631528, 666386.7016710474, 686378.3027211789, 706969.6518028142, 728178.7413568987, 500016.0690650704  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 2, 2, 2, 2, 2, 2, 1  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
  (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 628133.3788962648, 646977.3802631528, 666386.7016710474, 686378.3027211789, 706969.6518028142, 728178.7413568987, 750024.1035976056  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 2, 2, 2, 2, 2, 2, 2  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
  (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 628133.3788962648, 646977.3802631528, 666386.7016710474, 686378.3027211789, 706969.6518028142, 728178.7413568987, 750024.1035976056  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 2, 2, 2, 2, 2, 2, 2  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
- (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 628133.3788962648, 646977.3802631528, 666386.7016710474, 686378.3027211789, 706969.6518028142, 485452.49423793243, 500016.0690650704  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 2, 2, 2, 2, 2, 1, 1  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
- (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 209377.7929654216, 215659.12675438426, 222128.9005570158, 228792.76757372628, 235656.55060093806, 242726.24711896622, 250008.0345325352  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 1, 1, 1, 1, 1, 1, 1  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
- (benefits = [191610.34088607822, 197358.65111266056, 203279.41064604037, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [1, 1, 1, 0, 0, 0, 0, 0, 0, 0  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])</code></pre>
+ (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 628133.3788962648, 646977.3802631528, 666386.7016710474, 686378.3027211789, 706969.6518028142, 728178.7413568987, 750024.1035976056  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 2, 2, 2, 2, 2, 2, 2  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+ (benefits = [383220.68177215644, 394717.3022253211, 406558.82129208074, 418755.5859308432, 431318.2535087685, 444257.8011140316, 457585.53514745255, 471313.1012018761, 485452.49423793243, 500016.0690650704  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+ (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 628133.3788962648, 646977.3802631528, 666386.7016710474, 686378.3027211789, 706969.6518028142, 728178.7413568987, 750024.1035976056  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 2, 2, 2, 2, 2, 2, 2  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+ (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 628133.3788962648, 431318.2535087685, 444257.8011140316, 457585.53514745255, 471313.1012018761, 485452.49423793243, 500016.0690650704  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 2, 1, 1, 1, 1, 1, 1  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+ (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 628133.3788962648, 646977.3802631528, 666386.7016710474, 686378.3027211789, 706969.6518028142, 728178.7413568987, 750024.1035976056  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 2, 2, 2, 2, 2, 2, 2  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+ (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 628133.3788962648, 646977.3802631528, 666386.7016710474, 686378.3027211789, 706969.6518028142, 728178.7413568987, 750024.1035976056  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 2, 2, 2, 2, 2, 2, 2  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])</code></pre>
 </div>
 </div>
 <div id="26" class="cell" data-execution_count="1">
@@ -409,7 +426,11 @@ hist(v,
     axis=(xlabel="Present Value", ylabel="# scenarios")
 )</code></pre>
 <div class="cell-output cell-output-display" data-execution_count="1">
-<img width="672" height="480" style="object-fit: contain; height: auto;" src="data:image/png;base64, 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JZeQ0rp1a95//30kSZJUewWqWAiBrl27ctNNN9G9e3fWrl3LcccdR2FhIU888QTdunVDkiRJtVegGsydO5fRo0ezZcsWrrjiCnJzcxk8eDBr167lzjvvRJIkSbVXoBocffTRfPnllxQVFZGZmUnKbbfdxkEHHUQikUCSJEm1V6CabNmyhQcffJAPPviAjIwMevbsSYcOHZAkSVLtFqgGy5YtY8iQIXTo0IGePXuydetWHnjgAWbPns3LL79MIpFAkiRJtVOgGlx44YVceumlTJ8+nQpFRUUMGDCAW2+9lcsuuwxJkiTVToEqVlZWxltvvcWSJUuoLJFIcNppp/HSSy8hSZKk2itQxeLxOE2bNuXtt98mNzeXyt5++21atGiBJEmSaq9ANfjFL37Bz3/+cy699FJ69uxJcXExixcv5r777uN///d/kSRJUu0VqAb/9V//RZMmTbjjjjuYOXMmiUSCnj178vzzz9O9e3ckSZJUewWqQSwW45xzzuGcc85BkiRJqixQRf785z9z1VVX8eKLL/Lf//3ffPLJJ3yTESNGMGLECCRJklQ7BapIVlYWbdu2JRaLkZubS3l5Od+kQYMGSJIkqfYKVJGBAwcycOBAUvr06cNhhx1GVlYW0r/rq12lbMwvoqYoKy9HkiR9f4EqlkwmGT58OH/4wx848cQTkf5dKz/O57LFa6kpmjeoiyRJ+v4CVSwWi3HTTTcxZ84c+vbtS/PmzZEkSZIqBKrBM888w1tvvUXLli1p0qQJ6enpVJgyZQpTpkxBkiRJtVOgGpx//vmMHz+eb9KxY0ckSZJUewWqwY9//GO+yerVq/n000/p2LEjkiRJqp0C1WDbtm3cfPPNbNq0icpefvllRo4cyYABA5AkSVLtFKgG48eP57333uPII4/k4Ycf5rzzzuPtt9+mpKSESy65BEmSJNVegSpWXl7Oc889x4oVK+jZsyerV6/ml7/8JR06dOC4445j2bJlnHDCCUiSJKl2ClSxsrIySktLadKkCSndunVj7dq1dOjQgREjRvD4449zwgknIEmSpNopUMVCCBx66KFce+21XHPNNXTv3p3HH3+c448/no8//pji4mIkSZJUewWqwW233capp55K//79OfPMM+nRowctWrRgy5Yt/PnPf0aSJEm1V6AaHH300Xz22Wfs2bOHtLQ01qxZw/PPP0+XLl3o1asXkiRJqr0C1aSsrIzCwkJS6tWrx/HHH0/Krl27yMjIQJIkSbVToBo88MADnHvuuRQWFrK3GTNmcOWVVyJJkqTaKVANpkyZwplnnsnkyZOpV68elWVlZSFJkqTaK1DFysrK2LlzJzNnziQnJwdJkiSpskAVi8fjDB48mFWrVjFo0CAkSZKkygLV4Oyzz2bixImcdNJJHHLIIcTjcSr06tWLXr16IUmSpNopUA0WLFhAs2bNeOWVV3jllVeobMKECfTq1QtJkiTVToFq8OCDDyJJkiR9k0A1Wb9+Pb///e/55JNPuPrqq3nnnXfo168fOTk5SJIkqfYKVIMXX3yRkSNH0q9fP15//XWmTp3KH//4R84//3xWrFhBs2bNkCRJUu0UqAbnnXceM2fO5IILLuCII44g5Z577mHYsGHcdtttzJo1C0mSJNVOgSpWVlbGe++9xymnnEJlIQSOP/54XnjhBSRJklR7BapYPB6nXbt2rFy5kqFDh1LZG2+8QV5eHpIkSaq9AtVg2rRpjB07ll/96lfk5+fz7LPP8tvf/paFCxeyatUqJEmSVHsFqsGZZ55JkyZNuOWWW9i5cydz586ld+/evPzyy3Tq1AlJkiTVXoFqMmzYMIYOHUoIgZSCggIaNGiAJEmSardANVi/fj2nn3467du35/7776e0tJRGjRpx+umnc+eddxJCQJIkSbVToBqceeaZNGjQgGnTppESQuC5557jrLPO4u677+a8885DkiRJtVOgipWVlbF8+XLefvttOnfuTIWjjz6as88+m7/+9a+cd955SJIkqXYKVLF4PE7jxo356quv2NvWrVtp1KgRkiRJqr0C1eCcc87hlFNOYcaMGfTs2ZOSkhL+53/+h9tuu43nn38eSZIk1V6BajBjxgyys7OZNWsWGzduJB6P061bNx599FGOPPJIJEmSVHsFqkEsFmPy5MlMnjyZkpISQgjE43EkSZKkQDUoLCxk7ty5nHLKKeTl5XH22WfzwgsvcMIJJ3DTTTcRQkCSJEm1U6AanHbaaSxfvpxRo0bx2GOP8dhjjzFr1ixuvPFGunfvzoQJE5AkSVLtFKhi5eXlLF68mFdeeYWOHTty1VVXMXbsWC644AIKCgp48cUXmTBhApIkSaqdAlWsvLyc8vJy6tevT1lZGUuXLuX2228nJRaLUVJSgiRJkmqvQBWLxWIMGDCAc889l/bt27Nz504GDx7MK6+8wr333sv48eORJElS7RWoBr///e+ZNGkSa9asYf78+SQSCa6++mq6dOnCL3/5SyRJklR7BapB69ateeSRR6jsySefRJIkSQpIkiRJEQpIkiRJEQpIkiRJEQpUg3feeYe6devSsWNHJEmSpMoCVeSjjz5i6dKl9OjRg4ULF3LQQQcxadIkPv30U8444wyWLl2KJEmSFKgipaWlPP3001x33XVs2LCBVq1asWLFClq2bMmGDRvYuHEjeXl5SJIkqXYLVJGOHTvy6KOPkvLrX/+abdu20b17d1asWMFnn31Gt27diMfjjB49mrvuugtJkiTVToEq8vbbb3PHHXfQo0cPPvroI3r37s15553Hcccdx6pVq3jrrbf46KOP2LRpE5IkSaq9AlWkadOmtGjRgmeffZaXXnqJBQsWcOedd9K+fXu2b9/OE088QY8ePTjqqKOQJElS7RWoIrm5uUybNo2UX//612RkZDBw4ED+9re/sXz5cm688UbeeustevbsyQsvvIAkSZJqp0A1+MlPfkJmZiZHHnkkLVq0YP78+bz00kukbN26FUmSJNVegWowZMgQKrRp04ZXXnmFCk2aNEGSJEm1V6CaxWIx6tevjyRJkpQSkCRJkiIUkCRJkiIUkCSplvuqeA8/mbuMmuK6Ew7lx+0aIf1QBSRJquXKgV2lSWqKsvJypB+ygCRJkhShwAGovLyc66+/nvLyciqbOHEijRo1IuWNN95gwYIFFBYWMmzYMAYPHowkSZL2v8AB6PPPP+eyyy7j6KOPprJTTz2VRo0a8eqrrzJw4EBOOeUUGjduzPDhw7nzzjsZN24ckiRJ2r8CB6B169bRtGlTXnzxRb7JNddcwymnnMK8efNIadWqFTNnzmTcuHFIkiRp/wocgNavX0/nzp357LPP2LBhAwcffDC5ubmklJeXs2TJEh577DEqjBo1iosuuoj33nuPzp07I0mSpP0ncAD64IMPePfdd+natSuNGjXi448/5sILL+Smm25i+/btlJSU0KZNGyq0bNmSEAKbNm2ic+fOVLZhwwY2bNhAZfn5+dSvX59du3ZR1UpKSojFYsRiMfTtdu/eTTKZpKYoKysjmUxSE5SVlZFMJqkpkskkyWSS6pBMJkkmk+yrsmSSZDJJTZFMJkkmk9QEybIk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e+jUqRP9+/enss2bNzNv3jw+/PBDjjjiCM4880zq1KlDMpnk3HPPpcKiRYtYt24drVq1QorShg0bmDdvHp999hmdO3fmnHPOoXHjxvwzb7zxBgsWLKCwsJBhw4YxePBg/h0XX3wx06ZNo1GjRlT21FNP8fTTT5OTk8O4cePo0qULKU888QRPPPEEKe+++y69e/fmd7/7HdL3FVAkbr/9di6//HLOP/98Nm7cyFFHHcWyZcvo2rUr0g9BeXk5119/PUuWLOG7nHrqqbzxxhuMHTuWJ598kj/+8Y+sWLGCevXqsa+L6TNcAAARZklEQVQ+/vhjpk2bxg033ED//v2psGPHDvr3789BBx1E//79ueqqq1ixYgV33303sViMe++9l5QXX3yRwsJCWrVqhRSl999/n8MOO4xhw4bRp08fnn76aebOncuaNWvIzc1lb6+++ioDBw7klFNOoXHjxgwfPpw777yTcePG8a/4y1/+wpw5c5g8eTKNGjWiwu23387ll1/O+eefz8aNGznqqKNYtmwZXbt2ZcSIEYwYMYKUY445hl/84hdIVSGgardnzx5mzpzJbbfdxrhx40gZMWIEc+bMYd68eUgHultuuYXrr7+ezz//nA4dOvBt3nzzTf70pz+xYcMG8vLyuOSSSzj44IP505/+xLhx4/guBQUFDBw4kDfeeIM9e/awt/vuu49YLMaSJUtIS0vj5JNPpmfPnlxxxRW0adOGCjfddBNTp05FitqcOXPo378/CxcuJGXy5Mkcdthh3H777cycOZO9XXPNNZxyyinMmzePlFatWjFz5kzGjRvHvnjppZeYOHEif//739nbnj17mDlzJrfddhvjxo0jZcSIEcyZM4d58+ZRYfXq1aSlpfGjH/0IqSoEVO1WrlzJtm3bGD58OBVGjRrFxRdfjPRDMGrUKI4++mieeOIJ7r//fr7NU089RZ8+fcjLyyMlkUgwdOhQFi9ezLhx4/gumZmZ3H333aQMHTqUvS1evJhhw4aRlpZGSvfu3enQoQNLlizhnHPOIWXdunVs3ryZH//4x0hRCyFw6qmnUiEej5OXl8emTZvYW3l5OUuWLOGxxx6jwqhRo7jooot477336Ny5M9+le/fuLFiwgM8//5zjjz+eylauXMm2bdsYPnw4FUaNGsXFF19MZbNnz2bSpElIVSWgardp0yZycnLI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mEBlDz/8MKNGjSItLQ1JqgkCkqT/p3379nTr1o3333+flNmzZzNkyBAeffRRtm/fzpw5c0gmk9x666385S9/IWXs2LGMHTuWCosWLeLBBx/kq6++ol+/flx++eU0bNiQlPz8fK655hpee+01mjVrxuTJk+nXrx8pTzzxBMlkkhACf/jDHygqKuLss89mxIgRvPnmm9x99918+eWXXHDBBdx0002kp6dT2fjx4zn++OP54osvaN68OSmbN29m2bJlzJw5kwoPPfQQDz74IPn5+bRv356LL76Y7t27s7eHHnqIEAIjR46kwmWXXcZZZ51Fp06dSHnyySd54IEH2LJlCwMGDOCyyy4jPT0dSfo2AUnS//Pee+/x5ptvMmLECFIefvhhHn30UbKyshg3bhwpp59+OmvWrOHSSy8lPz+fSZMmkUwmGT9+PH/+85857bTTmDVrFk2bNuXaa69ly5Yt3HPPPezatYt+/frRtWtXzj33XF5//XWOO+44XnrpJbp27cry5ct55plnOPjggznjjDNYvHgxY8aMYe3atWRnZ9OhQwdef/11+vTpQywWY2+DBw+madOmLFq0iAsvvJCUxx57jObNm/PTn/6UlCVLljB+/HiuuOIKOnTowMKFCxk0aBBffPEFsViMyl544QUyMjIYOXIkFebNm8eQIUPo1KkTv//977n00ku54ooraNq0KTfccAMbN27k97//PZL0bQKSVIs9/vjj/P3vfydly5YtvP766/Tq1YuJEydSoWnTpjz++OOkvPvuuyxatIgNGzbQqlUrUvLy8hg3bhynnnoqL730Ev369ePSSy8l5dBDD+Xtt98m5Z577iEjI4M//elPxGIxxowZQ0lJCb/61a94+umnSdm+fTsPPPAAaWlpHHfccTz66KOsXbuWYcOG8R//8R/85S9/4YwzzuCbxONxfv7zn7NgwQIuvPBCUh5++GFOOeUUYrEYKSUlJcyePZtf/vKXpPz4xz+mbdu2fPHFF7Rs2ZJ9VV5ezrRp07jjjjsYPXo0KYMGDSIvL49zzjmHww8/HEn6ZwKSVIu1a9eOE044gZRYLMZVV13F4MGDSUtLo8IxxxxDhVWrVpGVlcXcuXOpUFhYyM6dO/n0008ZMmQIc+fOZcCAAZx88skce+yxnHXWWaSsWrWKeDzO5ZdfToUNGzawdu1aKvTt25e0tDRSQgg0atSIZDLJvho7diw333wzH374IQ0aNOCvf/0r11xzDRWGDx/O5s2beeSRR1i3bh2LFy8mJZlM8q/49NNP+fLLL/nb3/7GqlWrqJCZmcnatWs5/PDDkaR/JiBJtViPHj244IIL+DaZmZlUKC4uJpFI0Lp1ayqbO3cuDRo0YNCgQbzzzjv88Y9/5NFHH2XKlCn8/Oc/54EHHqC4uJicnBxat25NhdatW3PSSSdRISMjg++jT58+HHLIISxcuJBmzZqRl5dH3759qfDII48wceJEBg8eTM+ePZkyZQovv/wy+2rPnj2kFBcXk5KXl0dGRgYVZs6cSe/evZGkbxOQJO2zzp07U1BQwJlnnkkikSDl/fff5+mnnyYnJ4cHH3yQVq1aMX36dKZPn86yZcvo378/V199NZ07d2bz5s1ccMEFVFi6dCkFBQVUpbFjx7JgwQJat27Nz3/+cyq76qqrmDp1KlOnTiXlgw8+4J+pU6cOO3fupMInn3xCQUEBKe3atSM9PZ0jjjiCn/zkJ6QUFxczd+5cmjVrhiR9m4AkaZ/99Kc/pWPHjowfP57p06ezdetWpkyZQt++fUl5/fXXmTVrFr/97W9p1qwZDz30EI0aNaJ58+acffbZ3HDDDcyaNYvRo0fz1ltvMWHCBG6//Xb2RXp6Olu2bOHVV1+lT58+xGIxvsm4ceOYPn067777LjfeeCOVZWRksHr1ajZu3MjatWu59tprSXnttddo3bo1lbVu3Zo5c+Ywbtw4WrduzeTJk6lfvz4paWlp/OIXv+Dcc8/ltttuo379+txwww2sWbOGiy++GEn6NgFJqqV69OhBu3bt+Da9evWiRYsWVKhTpw5Llixh8uTJDB06lBACI0eO5OqrryZlxowZbNmyhdNOO43du3dz2GGHsWTJEtLT02nZsiV//etf+dWvfsWtt95Kbm4uN9xwA+PGjSOlffv21K9fn8oOP/xwmjRpQsqAAQM4+uijOeecc1i+fDn16tXjm7Rt25azzjqLoqIiDj30UCr73e9+x/nnn0/v3r350Y9+xFVXXcWzzz7L1VdfzfDhw+nTpw+5ubmkXHjhhaxZs4ZRo0bRtm1bZsyYQW5uLtnZ2aRcd911JBIJJk6cyFdffUX//v155plniMfjSNK3CUhSLTV79my+y+23387emjVrxoMPPsg3adCgAffffz//TO/evXn++ef5JhMnTmRv999/PxUSiQSPPvoo++Luu+/mm/Tq1YsVK1ZQWf/+/Zk1axYp8+bNo0L9+vV5+OGHqezEE0+kQlpaGr/5zW/4zW9+gyT9KwKSJElShAKSJElShAKSJElShAKSJElShAKSJElShAKSJElShAKSJElShAKSJElShAKSJElShAKSJElShAKSJElShAKSJElShAKSJElShAKSJElShAKSJElShAKSJElShAKSJElShP4viXkoaKXZTe4AAAAASUVORK5CYII=">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-14-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
 </div>
 </div>
 </section>

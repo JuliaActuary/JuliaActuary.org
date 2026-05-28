@@ -2,11 +2,11 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://JuliaActuary.org/packages.html</loc>
-    <lastmod>2026-02-16T05:52:13.232Z</lastmod>
+    <lastmod>2026-02-18T06:34:12.487Z</lastmod>
   </url>
   <url>
     <loc>https://JuliaActuary.org/index.html</loc>
-    <lastmod>2026-02-14T15:58:59.140Z</lastmod>
+    <lastmod>2026-02-18T06:34:12.487Z</lastmod>
   </url>
   <url>
     <loc>https://JuliaActuary.org/blog.html</loc>
@@ -14,7 +14,7 @@
   </url>
   <url>
     <loc>https://JuliaActuary.org/benchmarks.html</loc>
-    <lastmod>2025-06-14T19:05:26.431Z</lastmod>
+    <lastmod>2026-05-28T04:13:50.576Z</lastmod>
   </url>
   <url>
     <loc>https://JuliaActuary.org/all-posts.html</loc>
@@ -22,6 +22,70 @@
   </url>
   <url>
     <loc>https://JuliaActuary.org/learn.html</loc>
-    <lastmod>2026-02-16T05:52:03.578Z</lastmod>
+    <lastmod>2026-02-17T21:35:32.694Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.org/examples.html</loc>
+    <lastmod>2025-06-14T19:05:26.432Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.org/posts/quantlib-comparison/index.html</loc>
+    <lastmod>2026-05-28T04:23:30.171Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.org/posts/cassette-futurism-theme/index.html</loc>
+    <lastmod>2026-05-28T04:01:07.763Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.org/posts/cashflow-interactive/index.html</loc>
+    <lastmod>2025-06-14T19:05:26.444Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.org/posts/nested-policy-projections/index.html</loc>
+    <lastmod>2025-06-14T19:05:26.449Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.org/community.html</loc>
+    <lastmod>2025-06-14T19:05:26.432Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.org/posts/life-modeling-problem/index.html</loc>
+    <lastmod>2026-05-28T04:01:53.744Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.org/posts/academy-generator/index.html</loc>
+    <lastmod>2026-05-28T04:01:14.415Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.org/posts/fitting-survival-data/index.html</loc>
+    <lastmod>2026-05-28T04:01:37.041Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.org/posts/bayes-vs-limited-fluctuation/index.html</loc>
+    <lastmod>2026-05-28T04:01:26.382Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.org/posts/policy-diffeq/index.html</loc>
+    <lastmod>2026-05-28T04:02:06.785Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.org/posts/poisson-approximation/index.html</loc>
+    <lastmod>2026-05-28T04:02:00.277Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.org/posts/fitting-yield-curves/index.html</loc>
+    <lastmod>2026-05-28T04:01:47.711Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.org/posts/stochastic-mortality/index.html</loc>
+    <lastmod>2026-05-28T04:02:12.828Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.org/posts/autodiff_ALM/index.html</loc>
+    <lastmod>2026-05-28T04:01:20.260Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.org/posts/bayesian-claims-demo/index.html</loc>
+    <lastmod>2026-05-28T04:01:31.807Z</lastmod>
   </url>
 </urlset>
