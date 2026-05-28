@@ -11,6 +11,10 @@ using Pkg
 Pkg.activate("env/benchmarks")
 Pkg.resolve()
 Pkg.instantiate()
+
+# Pre-load packages here so the first `using X` in later visible chunks
+# is a no-op — keeps Quarto from rendering precompile messages inline.
+using CSV, DataFrames, PrettyTables, CairoMakie
 ```
 
 ## The Life Modeling Problem
