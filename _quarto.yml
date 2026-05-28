@@ -16,6 +16,8 @@ website:
       - packages.qmd
       - text: Docs
         href: https://docs.juliaactuary.org
+      - text: Book
+        href: https://modernfinancialmodeling.com
       - learn.qmd
       - examples.qmd
       - benchmarks.qmd
