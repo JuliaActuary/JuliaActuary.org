@@ -232,14 +232,14 @@ Interior pillars match to displayed precision; the discrepancy at pillar 1 is an
 
 ## The whole sensitivity bundle in one call
 
-ActuaryUtilities' `sensitivities(zrc, cfs)` returns the value, the per-pillar modified-duration vector, *and* the per-pillar convexity matrix from a single second-order AD pass:
+ActuaryUtilities' `sensitivities(KeyRates(tenors), zrc, cfs)` returns the value, the per-pillar modified-duration vector, *and* the per-pillar convexity matrix from a single second-order AD pass. The `KeyRates(tenors)` marker carries the KRD knot grid — you choose the bucketing rather than inheriting it from the curve's storage tenors:
 
 ```{julia}
 zero_rates = [0.02, 0.025, 0.028, 0.030, 0.032, 0.034]
 tenors = [1.0, 2.0, 3.0, 5.0, 7.0, 10.0]
 zrc = FinanceModels.ZeroRateCurve(zero_rates, tenors)
 
-result = sensitivities(zrc, cfs)
+result = sensitivities(KeyRates(tenors), zrc, cfs)
 
 @printf("price                  = %.6f\n", result.value * par)
 println("durations by pillar    = ", round.(result.durations; digits=6))
@@ -249,7 +249,7 @@ println("durations by pillar    = ", round.(result.durations; digits=6))
     sum(result.convexities))
 ```
 
-Each entry of `result.durations` is the bond's sensitivity at that specific pillar — the same KRD vector from the previous section, recomputed by direct AD through the curve construction instead of by tent bumps. The full convexity *matrix* (6×6 here) gives cross-pillar second-order effects: `result.convexities[i, j]` is `∂²price / ∂z_i ∂z_j`. There is no "sensitivity mode" anywhere in the library; `ZeroRateCurve` and `pv` are ordinary functions that happen to be generic on numeric types, and `sensitivities` bundles the value, gradient, and Hessian.
+Each entry of `result.durations` is the bond's sensitivity at the corresponding knot in `tenors` — the same Ho-1992 triangular-hat decomposition as the previous section, computed analytically in a single forward pass instead of pillar-by-pillar finite differences. The full convexity *matrix* (6×6 here) gives cross-pillar second-order effects: `result.convexities[i, j]` is `∂²price / ∂z_i ∂z_j`. There is no "sensitivity mode" anywhere in the library; `ZeroRateCurve` and `pv` are ordinary functions that happen to be generic on numeric types, and `sensitivities` bundles the value, gradient, and Hessian.
 
 The same Float64 code path runs in `BigFloat` for validation, `ForwardDiff.Dual` for nested AD, `Measurements.Measurement` for uncertainty propagation — any numeric type that implements arithmetic:
 
@@ -277,7 +277,7 @@ end
 ForwardDiff.gradient(price_from_zeros, zero_rates)
 ```
 
-The same `ForwardDiff.Dual` mechanism, the same numbers as `result.durations * (-1) * value * par` (sign and scaling from how `sensitivities` normalizes). Wraps cleanly with `Optimization.jl` for calibration with an exact gradient, `Measurements.Measurement` for error bars, another `ForwardDiff.gradient` for the Hessian.
+The same `ForwardDiff.Dual` mechanism — this time differentiating through whatever spline the curve uses to interpolate between pillars, rather than through the fixed triangular hat that `sensitivities` lays on top via `Yield.TenorShift`. For `Spline.Linear()` the two paths agree exactly; for the default `Spline.MonotoneConvex()` they differ slightly in how the total is *attributed across pillars* (the spline carries some sensitivity past adjacent knots that a hat would not), and `Σ KRD ≈ Modified duration` in both. The point of this callout isn't to reproduce `sensitivities` — it's that any AD-friendly Julia code wraps cleanly with `Optimization.jl` for calibration with an exact gradient, `Measurements.Measurement` for error bars, another `ForwardDiff.gradient` for the Hessian.
 :::
 
 ## When the cashflows respond to rates
@@ -406,7 +406,7 @@ b_conv = @benchmark convexity($yield_flat, $cfs)
 # vector in one AD pass.
 krd_pillars_30 = collect(1.0:1.0:30.0)
 zrc_30 = FinanceModels.ZeroRateCurve(fill(0.03, 30), krd_pillars_30)
-b_krd = @benchmark duration(KeyRates(), $zrc_30, $cfs)
+b_krd = @benchmark duration(KeyRates($krd_pillars_30), $zrc_30, $cfs)
 
 (price=minimum(b_price).time,
     mod_duration=minimum(b_mod).time,
@@ -421,8 +421,8 @@ QuantLib-Python via `timeit`:
 | Bond price — `FinanceCore.pv` / `bond.NPV()`                                             | ~25 ns                | ~235 ns            | ~9×    |
 | Modified duration — `duration(Modified(), …)` / `BondFunctions.duration`                 | ~215 ns (AD)          | ~1.25 μs           | ~6×    |
 | Convexity — `convexity` / `BondFunctions.convexity`                                      | ~255 ns (nested AD)   | ~1.25 μs           | ~5×    |
-| 30-pillar KRD — `duration(KeyRates(), zrc, cfs)` / parallel `FlatForward` bumps          | ~4 μs (single AD pass)| ~385 μs            | ~95×   |
-| 30-pillar KRD — `duration(KeyRates(), zrc, cfs)` / per-pillar `ZeroCurve` bumps          | ~4 μs (single AD pass)| ~1170 μs           | ~290×  |
+| 30-pillar KRD — `duration(KeyRates(tenors), zrc, cfs)` / parallel `FlatForward` bumps          | ~4 μs (single AD pass)| ~385 μs            | ~95×   |
+| 30-pillar KRD — `duration(KeyRates(tenors), zrc, cfs)` / per-pillar `ZeroCurve` bumps          | ~4 μs (single AD pass)| ~1170 μs           | ~290×  |
 
 Two things drive the gap. First, **the Python boundary, not the C++ math**: every QL call dispatched from Python costs ~200–300 ns of object marshaling regardless of what's on the other side. For single-instrument metrics — price, duration, convexity — the actual C++ work is fast enough that the boundary cost dominates, which is why all three rows land in the same 5–9× neighborhood. Duration and convexity both clock in at ~1.25 μs because they're the same shape from Python's perspective: one bond, one `InterestRate`, one C++ function call, one returned scalar.
 
@@ -449,24 +449,24 @@ A `pybind11` rewrite of QuantLib could plausibly halve its per-call cost; `nanob
 **Why does QL still ship SWIG, then?** It pre-dates pybind11 (the QL-SWIG project goes back to the early 2000s), and the same `.i` file generates Python, Ruby, Java, C#, R, and Perl bindings. For a library with QL's reach and longevity, language coverage beat peak per-call speed — a sensible trade in 2003, just one that's become visible now that the C++-side gap has closed on at least one of those target languages.
 :::
 
-Second, **AD bundles all 30 pillar partials into one forward pass**, while QL has to run the bond-pricing engine 60 times (30 pillars × 2 sides). The ~1170 μs figure for the per-pillar `ZeroCurve` approach is dominated by rebuilding the curve object on every call; the cheaper `FlatForward` path still pays the per-pillar repricing cost. The single-call `KeyRates()` is one `ForwardDiff.gradient` over a 30-Dual vector — same algorithmic work, no Python boundary in the loop.
+Second, **AD bundles all 30 pillar partials into one forward pass**, while QL has to run the bond-pricing engine 60 times (30 pillars × 2 sides). The ~1170 μs figure for the per-pillar `ZeroCurve` approach is dominated by rebuilding the curve object on every call; the cheaper `FlatForward` path still pays the per-pillar repricing cost. The single-call `KeyRates(tenors)` is one `ForwardDiff.gradient` over a 30-Dual vector — same algorithmic work, no Python boundary in the loop.
 
 A C++ application calling QL directly would recover most of the per-call overhead, and the gap would shrink for the rows that aren't already algorithm-limited. But that isn't the comparison most Python or R users actually face — they reach for QL through a binding, and the wrapper cost is part of the workflow.
 
 ::: {.callout-note collapse="true"}
-## Per-pillar tent-bump KRDs vs single-pass AD: different perturbation shapes, different numbers
+## Per-pillar tent-bump KRDs vs single-pass AD: same shape, two routes
 
-The two functions answer slightly different questions. The difference is in what "shift the curve at pillar `i`" actually means:
+Both functions decompose the same way — a Ho-1992 triangular hat at each knot, layered on the user's curve via `Yield.TenorShift` — and the KRD definition is independent of how the base curve interpolates between knots. The difference is in how the bumped price is computed:
 
-- **`duration(KeyRateZero(t), …)`** (the section above) applies a Ho-1992 **tent** perturbation — triangular, peaking at `t` and ramping to zero at adjacent pillars — and FD-bumps the price. The tent shape is fixed, regardless of how `zrc` interpolates.
-- **`duration(KeyRates(), zrc, cfs)`** returns the partial derivative `∂P/∂z_i / P` at each pillar. The implicit curve perturbation is whatever the curve's interpolation produces when `zrc.rates[i]` moves — a tent for `Spline.Linear()`, a smooth bump for `Spline.MonotoneConvex()` (FM's default), something cubic for `Spline.Cubic()`.
+- **`duration(KeyRateZero(t), …)`** finite-differences the price across a ±10bp triangular hat centered at `t`, pillar by pillar.
+- **`duration(KeyRates(tenors), zrc, cfs)`** layers the same triangular hat via `TenorShift` and walks the analytic gradient through the discount integral in a single forward pass over `length(tenors)` ForwardDiff Duals.
 
-Same 30-pillar setup, same bond, same flat zeros, three different KRD vectors:
+Same 30-pillar setup, same bond, same flat zeros, same answers across `Spline.Linear()` and the default `Spline.MonotoneConvex()`:
 
 ```{julia}
 zrc_lin = FinanceModels.ZeroRateCurve(fill(0.03, 30), krd_pillars_30, Spline.Linear())
-krds_ad_lin = duration(KeyRates(), zrc_lin, cfs)         # AD through linear spline
-krds_ad_mc = duration(KeyRates(), zrc_30, cfs)          # AD through MonotoneConvex (default)
+krds_ad_lin = duration(KeyRates(krd_pillars_30), zrc_lin, cfs)   # AD, Linear base
+krds_ad_mc  = duration(KeyRates(krd_pillars_30), zrc_30, cfs)    # AD, MonotoneConvex base
 
 function krd_tent_loop(yield, cfs, pillars)
     return [duration(KeyRateZero(t), yield, cfs, eachindex(cfs), pillars) for t in pillars]
@@ -476,34 +476,32 @@ krds_tent = krd_tent_loop(yield_flat, cfs, krd_pillars_30)
 [krd_pillars_30 krds_tent krds_ad_lin krds_ad_mc][1:7, :]
 ```
 
-| pillar | tent-bump  | AD (Linear) | AD (MonotoneConvex) |
-|-------:|-----------:|------------:|--------------------:|
-|   1 y  |  0.04172   |  0.04172    |  0.04300            |
-|   2 y  |  0.07196   |  0.07196    |  0.06856            |
-|   3 y  |  0.10482   |  0.10482    |  0.10495            |
-|   4 y  |  0.13567   |  0.13567    |  0.14796            |
-|   5 y  |  4.23806   |  4.23804    |  4.22148            |
-|   6 y  |  0         |  0          |  0.00627            |
-|  **Σ** | **4.59223**| **4.59222** | **4.59222**         |
+| pillar | tent-bump (FD) | AD (Linear) | AD (MonotoneConvex) |
+|-------:|---------------:|------------:|--------------------:|
+|   1 y  |  0.04172       |  0.04172    |  0.04172            |
+|   2 y  |  0.07196       |  0.07196    |  0.07196            |
+|   3 y  |  0.10482       |  0.10482    |  0.10482            |
+|   4 y  |  0.13567       |  0.13567    |  0.13567            |
+|   5 y  |  4.23806       |  4.23804    |  4.23804            |
+|   6 y  |  0             |  0          |  0                  |
+|  **Σ** | **4.59223**    | **4.59222** | **4.59222**         |
 
 Three things to notice:
 
-1. **Tent-bump and AD-through-Linear agree to FD precision.** That's not a coincidence — perturbing a linearly-interpolated curve's pillar IS a tent. Same calculation, two routes.
+1. **FD tent-bump and AD agree to FD precision.** That's not a coincidence — they're computing the same derivative, one by central difference at ±10bp and one analytically. The ~1.7e-5 discrepancy is the residual finite-difference truncation error, not a different definition of KRD.
 
-2. **AD-through-MonotoneConvex gives different per-pillar numbers.** The MC-shape perturbation reaches further than a tent — its "tail" smooths past the last cashflow date, which is why pillar 6 carries 6bp of duration even though the bond pays nothing after year 5. Inside the cashflow range, the attribution is shifted: less weight at year 5, more at year 4, less at year 2, more at year 1.
+2. **AD-through-Linear and AD-through-MonotoneConvex are bit-identical.** This is the v5.7 KRD convention: the perturbation shape is `TenorShift` triangular-hat, independent of the base curve's interpolation. The base curve still determines the unperturbed discount factors, but the *shape of the shift* doesn't change with the spline. (Earlier versions of the library walked AD through the curve's spline reconstruction, so MonotoneConvex gave a slightly different per-pillar attribution — sub-bp on discount factors, same Σ.)
 
-3. **Σ KRD = Modified duration in all three.** The aggregation invariant doesn't care which perturbation shape you used — the sum recovers the parallel-shift duration regardless. What differs is *how that total is attributed across pillars*.
+3. **Σ KRD = Modified duration in all three.** The aggregation invariant is preserved by construction: the hats tile the timeline (flat-left at the first knot, flat-right at the last), so their sum is exactly a parallel shift.
 
-Pick whichever decomposition your downstream risk system expects: Bloomberg-style tent bumps for portfolios where matching counterparty risk reports matters, AD-through-curve for ALM workflows where the curve's interpolation IS the model.
-
-Timing the tent-bump loop on the same setup:
+Timing the FD tent-bump loop on the same setup:
 
 ```{julia}
 b_krd_tent = @benchmark krd_tent_loop($yield_flat, $cfs, $krd_pillars_30)
 minimum(b_krd_tent).time   # ns
 ```
 
-~26 μs per 30-pillar vector — about 6× slower than the single AD pass under MonotoneConvex, still 15× faster than QL's cheapest per-pillar emulation.
+~26 μs per 30-pillar vector — about 6× slower than the single AD pass, still 15× faster than QL's cheapest per-pillar emulation. The AD path wins the constant factor because it bundles every pillar into one forward sweep of ForwardDiff Duals over the discount integral, instead of re-running the price twice per pillar.
 :::
 
 ::: {.callout-note collapse="true"}
