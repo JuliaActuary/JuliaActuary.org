@@ -171,6 +171,7 @@ To aid in visualizing results with such vast different orders of magnitude, this
 using CairoMakie
 using DataFrames
 
+# Apply the site's custom Makie plot theme (cassette futurism).
 include(joinpath(@__DIR__, "..", "..", "assets", "themes", "cassette_futurism.jl"))
 set_theme!(cassette_futurism_theme())
 

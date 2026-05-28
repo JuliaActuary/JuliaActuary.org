@@ -20,6 +20,7 @@ Below, we specify that the rates should be interpreted as `Continuous`ly compoun
 using FinanceModels
 using CairoMakie
 
+# Apply the site's custom Makie plot theme (cassette futurism).
 include(joinpath(@__DIR__, "..", "..", "assets", "themes", "cassette_futurism.jl"))
 set_theme!(cassette_futurism_theme())
 ```
