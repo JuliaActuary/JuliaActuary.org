@@ -421,7 +421,6 @@ QuantLib-Python via `timeit`:
 | Bond price — `FinanceCore.pv` / `bond.NPV()`                                             | ~25 ns                | ~235 ns            | ~9×    |
 | Modified duration — `duration(Modified(), …)` / `BondFunctions.duration`                 | ~215 ns (AD)          | ~1.25 μs           | ~6×    |
 | Convexity — `convexity` / `BondFunctions.convexity`                                      | ~255 ns (nested AD)   | ~1.25 μs           | ~5×    |
-| 30-pillar KRD — `duration(KeyRates(tenors), zrc, cfs)` / parallel `FlatForward` bumps          | ~4 μs (single AD pass)| ~385 μs            | ~95×   |
 | 30-pillar KRD — `duration(KeyRates(tenors), zrc, cfs)` / per-pillar `ZeroCurve` bumps          | ~4 μs (single AD pass)| ~1170 μs           | ~290×  |
 
 Two things drive the gap. First, **the Python boundary, not the C++ math**: every QL call dispatched from Python costs ~200–300 ns of object marshaling regardless of what's on the other side. For single-instrument metrics — price, duration, convexity — the actual C++ work is fast enough that the boundary cost dominates, which is why all three rows land in the same 5–9× neighborhood. Duration and convexity both clock in at ~1.25 μs because they're the same shape from Python's perspective: one bond, one `InterestRate`, one C++ function call, one returned scalar.
@@ -449,7 +448,7 @@ A `pybind11` rewrite of QuantLib could plausibly halve its per-call cost; `nanob
 **Why does QL still ship SWIG, then?** It pre-dates pybind11 (the QL-SWIG project goes back to the early 2000s), and the same `.i` file generates Python, Ruby, Java, C#, R, and Perl bindings. For a library with QL's reach and longevity, language coverage beat peak per-call speed — a sensible trade in 2003, just one that's become visible now that the C++-side gap has closed on at least one of those target languages.
 :::
 
-Second, **AD bundles all 30 pillar partials into one forward pass**, while QL has to run the bond-pricing engine 60 times (30 pillars × 2 sides). The ~1170 μs figure for the per-pillar `ZeroCurve` approach is dominated by rebuilding the curve object on every call; the cheaper `FlatForward` path still pays the per-pillar repricing cost. The single-call `KeyRates(tenors)` is one `ForwardDiff.gradient` over a 30-Dual vector — same algorithmic work, no Python boundary in the loop.
+Second, **AD bundles all 30 pillar partials into one forward pass**, while QL has to run the bond-pricing engine 60 times (30 pillars × 2 sides). The ~1170 μs figure for the per-pillar `ZeroCurve` approach is dominated by rebuilding the curve object on every call. The single-call `KeyRates(tenors)` is one `ForwardDiff.gradient` over a 30-Dual vector — same algorithmic work, no Python boundary in the loop.
 
 A C++ application calling QL directly would recover most of the per-call overhead, and the gap would shrink for the rows that aren't already algorithm-limited. But that isn't the comparison most Python or R users actually face — they reach for QL through a binding, and the wrapper cost is part of the workflow.
 
@@ -514,23 +513,7 @@ pillar_dates_30 = [settle + ql.Period(y, ql.Years) for y in pillars]
 flat_zeros_30   = [0.03] * len(pillars)
 shift           = 1e-3
 
-# (a) lower-bound: parallel FlatForward bumps repeated per pillar
-def krd_flatforward():
-    out = []
-    for _ in pillars:
-        up = ql.FlatForward(settle, ql.QuoteHandle(ql.SimpleQuote(ytm + shift)),
-                            day_count, ql.Continuous)
-        dn = ql.FlatForward(settle, ql.QuoteHandle(ql.SimpleQuote(ytm - shift)),
-                            day_count, ql.Continuous)
-        bond.setPricingEngine(ql.DiscountingBondEngine(ql.YieldTermStructureHandle(up)))
-        p_up = bond.NPV()
-        bond.setPricingEngine(ql.DiscountingBondEngine(ql.YieldTermStructureHandle(dn)))
-        p_dn = bond.NPV()
-        out.append((p_dn - p_up) / (2 * shift * 100))
-    bond.setPricingEngine(ql.DiscountingBondEngine(ql.YieldTermStructureHandle(flat)))
-    return out
-
-# (b) representative: ZeroCurve bump-and-rebuild, one pillar at a time
+# Per-pillar ZeroCurve bump-and-rebuild
 def krd_zerocurve():
     out = []
     for i in range(len(pillars)):
@@ -548,8 +531,7 @@ def krd_zerocurve():
     bond.setPricingEngine(ql.DiscountingBondEngine(ql.YieldTermStructureHandle(flat)))
     return out
 
-timeit.timeit(krd_flatforward, number=1_000)
-timeit.timeit(krd_zerocurve,   number=1_000)
+timeit.timeit(krd_zerocurve, number=1_000)
 ```
 :::
 
