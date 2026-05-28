@@ -8,6 +8,7 @@ categories: [market, yieldcurves,financemodels,tutorial]
 #| output: false
 using Pkg
 Pkg.activate(".")
+Pkg.resolve()
 Pkg.instantiate()
 ```
 
@@ -17,7 +18,11 @@ Below, we specify that the rates should be interpreted as `Continuous`ly compoun
 
 ```{julia}
 using FinanceModels
-using Plots
+using CairoMakie
+
+# Apply the site's custom Makie plot theme (cassette futurism).
+include(joinpath(@__DIR__, "..", "..", "assets", "themes", "cassette_futurism.jl"))
+set_theme!(cassette_futurism_theme())
 ```
 
 ```{julia}
@@ -47,55 +52,55 @@ That's it! We've fit the rates using six different techniques. These can now be 
 ## Visualizing the results
 
 ```{julia}
-"""
-A helper function to plot the given curve onto the given plot figure
-"""
-function curveplot!(plot_fig, curve; label="", alpha=alpha)
+const CURVES = [
+    (bc,  "Bootstrap (Cubic)"),
+    (bq,  "Bootstrap (Quadratic)"),
+    (bl,  "Bootstrap (Linear)"),
+    (ns,  "NelsonSiegel"),
+    (nss, "NelsonSiegelSvensson"),
+    (sw,  "SmithWilson"),
+]
+
+function curveplot!(ax, curve, color; label="", alpha=1.0)
     maturities = 0.25:0.25:40
     f(x) = rate(zero(curve, x))
-
-    plot!(plot_fig, maturities, f, label=label, line=3, alpha=alpha)
+    lines!(ax, maturities, f.(maturities);
+        label, linewidth=3, color=(color, alpha))
 end
 
-""" 
-a function to plot the curves, given different alpha transparency for each of the lines (used when creating animiation)
-"""
-function p(alpha=[1, 1, 1, 1, 1, 1])
-    theme(:wong2)
-    p = plot(legend=:topleft, xlabel="Tenor", ylabel="Continuous yield", grid=false)
-    scatter!(
-        mats,
-        rate.(Continuous().(rates)),
-        label="Given zero rates"
-    )
-
-    curveplot!(p, bc, label="Bootstrap (Cubic)", alpha=alpha[1])
-    curveplot!(p, bq, label="Bootstrap (Quadratic)", alpha=alpha[2])
-    curveplot!(p, bl, label="Bootstrap (Linear)", alpha=alpha[3])
-    curveplot!(p, ns, label="NelsonSiegel", alpha=alpha[4])
-    curveplot!(p, nss, label="NelsonSiegelSvensson", alpha=alpha[5])
-    curveplot!(p, sw, label="SmithWilson", alpha=alpha[6])
-    lens!([0, 3.5], [0.0, 0.0045], inset=(1, bbox(0.5, 0.5, 0.4, 0.4)))
-
-
+function build_axis!(ax, alpha=ones(length(CURVES)))
+    scatter!(ax, mats, rate.(Continuous().(rates));
+        label="Given zero rates", color=CF_INK, markersize=9)
+    for (i, (c, name)) in enumerate(CURVES)
+        curveplot!(ax, c, CASSETTE_PALETTE[i]; label=name, alpha=alpha[i])
+    end
+    return ax
 end
-p()
+
+let
+    fig = Figure(size=(760, 460))
+    ax = Axis(fig[1,1]; xlabel="Tenor", ylabel="Continuous yield")
+    build_axis!(ax)
+    axislegend(ax, position=:lt)
+    fig
+end
 ```
 
-And an animated version:
+And an animated version that fades each fit in turn:
 
 ```{julia}
 #| output: false
-anim = let
-    a = [1, 0.25, 0.25, 0.25, 0.25, 0.25]
-    anim = @animate for i in 1:6
-        a = circshift(a, 1) # shift the transparency
-        p(a)
+let
+    fig = Figure(size=(760, 460))
+    ax = Axis(fig[1,1]; xlabel="Tenor", ylabel="Continuous yield")
+    a = [1.0, 0.25, 0.25, 0.25, 0.25, 0.25]
+    record(fig, "anim_fps2.gif", 1:6; framerate=2) do _
+        a .= circshift(a, 1)
+        empty!(ax)
+        build_axis!(ax, a)
+        axislegend(ax, position=:lt)
     end
-    anim
 end
-
-gif(anim, "anim_fps2.gif", fps=2)
 ```
 
 ![](anim_fps2.gif)

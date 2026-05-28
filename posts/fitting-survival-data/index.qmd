@@ -7,6 +7,7 @@ categories: [survival, tutorial]
 #| output: false
 using Pkg
 Pkg.activate(".")
+Pkg.resolve()
 Pkg.instantiate()
 ```
 
@@ -15,12 +16,16 @@ Pkg.instantiate()
 begin
     using LsqFit
     using MortalityTables
-    using Plots
+    using CairoMakie
     using Distributions
     using Optim
     using DataFrames
     using Survival
 end
+
+# Apply the site's custom Makie plot theme (cassette futurism).
+include(joinpath(@__DIR__, "..", "..", "assets", "themes", "cassette_futurism.jl"))
+set_theme!(cassette_futurism_theme())
 ```
 
 *This tutorial is via [PharmCat on Github](https://gist.github.com/PharmCat/fe1e64a2241aa35d3a3fa925989c3784) (this link has similar code with comments in Russian and English).*
@@ -40,8 +45,11 @@ end
 Visualizing the data:
 
 ```{julia}
-plt = plot(data.times, data.survival, label="observed survival proportion", xlabel="time")
-
+plt = Figure(); ax = Axis(plt[1,1]; xlabel="time", ylabel="survival",
+    title="Observed survival proportion")
+lines!(ax, data.times, data.survival;
+    label="observed", color=CASSETTE_PALETTE[1], linewidth=2)
+plt
 ```
 
 Define the two-parameter Weibull model:
@@ -62,7 +70,10 @@ And fit the model with [LsqFit.jl](https://github.com/JuliaNLSolvers/LsqFit.jl):
 ```{julia}
 fit1 = curve_fit(model1, data.times, data.survival, [1.0, 1.0])
 
-plot!(plt, data.times, model1(data.times, fit1.param), label="fitted model")
+lines!(ax, data.times, model1(data.times, fit1.param);
+    label="fitted Weibull", color=CASSETTE_PALETTE[2], linewidth=2, linestyle=:dash)
+axislegend(ax, position=:rt)
+plt
 ```
 
 ### Maximum Likelihood estimation
@@ -128,7 +139,10 @@ KaplanMeier comes from [Survival.jl](https://github.com/JuliaStats/Survival.jl).
 #t- time vector;c - censored events vector
 km = fit(Survival.KaplanMeier, t, c)
 
-plt2 = plot(km.events.time, km.survival; labels="Empirical")
+plt2 = Figure(); ax2 = Axis(plt2[1,1]; xlabel="time", ylabel="survival")
+stairs!(ax2, km.events.time, km.survival;
+    label="Empirical (Kaplan–Meier)", color=CASSETTE_PALETTE[1], step=:post, linewidth=2)
+plt2
 ```
 
 ```{julia}
@@ -136,5 +150,8 @@ plt2 = plot(km.events.time, km.survival; labels="Empirical")
 
 mfit = LsqFit.curve_fit(model, km.events.time, km.survival, [2.0, 2.0])
 
-plot!(plt2, km.events.time, model(km.events.time, mfit.param), labels="Theoretical")
+lines!(ax2, km.events.time, model(km.events.time, mfit.param);
+    label="Theoretical Weibull", color=CASSETTE_PALETTE[2], linewidth=2, linestyle=:dash)
+axislegend(ax2, position=:rt)
+plt2
 ```

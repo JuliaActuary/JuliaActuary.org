@@ -16,6 +16,10 @@ using ColorSchemes
 using Distributions
 using LabelledArrays
 using Random
+
+# Apply the site's custom Makie plot theme (cassette futurism).
+include(joinpath(@__DIR__, "..", "..", "assets", "themes", "cassette_futurism.jl"))
+set_theme!(cassette_futurism_theme())
 ```
 
 This notebook replicates the model and parameters for the real world equity generator described in this [AAA 2005 reference paper](https://www.actuary.org/sites/default/files/pdf/life/c3supp_march05.pdf).

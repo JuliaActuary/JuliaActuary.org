@@ -35,6 +35,10 @@ Logging.disable_logging(Logging.Warn);
 using StatsFuns
 using StatisticalRethinking
 using CairoMakie
+
+# Apply the site's custom Makie plot theme (cassette futurism).
+include(joinpath(@__DIR__, "..", "..", "assets", "themes", "cassette_futurism.jl"))
+set_theme!(cassette_futurism_theme())
 ```
 
 ## Limited Fluctuation Credibility
@@ -147,7 +151,7 @@ A complete overview of modern Bayesian models is beyond the scope of this notebo
     -   `data.claims ~ product_distribution(Poisson.(data.n .* logistic.(μ_i)))` means "each value in `data.claims` is a random outcome (`~`) distributed accroding to a corresponding Poisson distribution with `\lambda =n \times \text{logistic}(\mu_i)` where `text{logistic}(\mu_i)` is the average claims rate for each group.
 
 ```{julia}
-@model function model_poisson(data)
+@model function model_poisson(data, claims)
     # hyperparameter that informs the prior for each group
     μ ~ Normal(-2, 4)
     σ ~ Exponential(0.25)
@@ -158,7 +162,7 @@ A complete overview of modern Bayesian models is beyond the scope of this notebo
 
     # use the poisson appproximation to the binomial claim outcome with a
     # logisitc link function to keep the probability between 0 and 1
-    data.claims ~ product_distribution(Poisson.(data.n .* logistic.(μ_i)))
+    claims ~ product_distribution(Poisson.(data.n .* logistic.(μ_i)))
 end
 ```
 
@@ -176,7 +180,7 @@ mp = let
             :claims = sum(:claims)
         end
     end
-    model_poisson(condensed)
+    model_poisson(condensed, condensed.claims)
 end
 ```
 
@@ -190,12 +194,12 @@ Run the chain:
 
 ```{julia}
 
-cp = sample(mp, NUTS(), 500) # this is the line that runs the MCMC sampler
+cp = MCMCChains.Chains(sample(mp, NUTS(), 500; check_model=false)) # this is the line that runs the MCMC sampler
 
 # ╔═╡ 6b5d2186-78ac-48ae-8529-e0dcd51d0b00
 let
     # sample from the priors before learning from any data
-    ch_prior = sample(mp, Prior(), 1500)
+    ch_prior = MCMCChains.Chains(sample(mp, Prior(), 1500; check_model=false))
 
     f = Figure()
     ax = Axis(f[1, 1], title="Prior distribution of expected claims rate for a group")

@@ -14,10 +14,14 @@ Pkg.instantiate()
 using CSV, DataFrames
 using MortalityTables, ActuaryUtilities
 using Dates
-using ThreadsX
+using OhMyThreads
 using BenchmarkTools
 using CairoMakie
 using Random
+
+# Apply the site's custom Makie plot theme (cassette futurism).
+include(joinpath(@__DIR__, "..", "..", "assets", "themes", "cassette_futurism.jl"))
+set_theme!(cassette_futurism_theme())
 ```
 
 Define a datatype. Not strictly necessary, but will make extending the program with more functions easier.
@@ -92,34 +96,27 @@ This defines the core logic of the policy projection and will write the results 
 This is using a threaded approach where it could be operating on any of the computer's available threads, thus acheiving thread-based parallelism (as opposed to multi-processor (multi-machine) or GPU-based computation which requires formulating the problem a bit differently (array/matrix based). For the scale of computation here, I think I'd apply this model of parallelism.
 
 ```{julia}
-function pol_project!(out, policy, params)
+function pol_project!(benefits, lives, policy, params)
     # some starting values for the given policy
     dur = duration(policy.issue_date, params.val_date)
     start_age = policy.issue_age + dur - 1
-    COLA_factor = (1 + policy.COLA)
+    COLA_factor = 1 + policy.COLA
     cur_benefit = policy.benefit_base * COLA_factor^(dur - 1)
 
     # get the right mortality vector
     qs = mortality(policy, params)
-
-    # grab the current thread's id to write to results container without conflicting with other threads
-    tid = Threads.threadid()
-
     ω = lastindex(qs)
 
-    # inbounds turns off bounds-checking, which makes hot loops faster but first write loop without it to ensure you don't create an error (will crash if you have the error without bounds checking)
+    # inbounds turns off bounds-checking, which makes hot loops faster — write
+    # the loop without it first to ensure you don't have an out-of-bounds bug.
     @inbounds for t in 1:min(params.proj_length, ω - start_age)
+        q = qs[start_age + t]            # current mortality
+        rand() < q && return              # death — stop incrementing this life
 
-        q = qs[start_age+t] # get current mortality
-
-        if (rand() < q)
-            return # if dead then just return and don't increment the results anymore
-        else
-            # pay benefit, add a life to the output count, and increment the benefit for next year
-            out.benefits[t, tid] += cur_benefit
-            out.lives[t, tid] += 1
-            cur_benefit *= COLA_factor
-        end
+        # otherwise: pay benefit, add a life, grow the benefit by COLA for next year
+        benefits[t] += cur_benefit
+        lives[t]    += 1
+        cur_benefit *= COLA_factor
     end
 end
 ```
@@ -143,15 +140,34 @@ Threads.nthreads()
 
 
 ```{julia}
-function project(policies, params)
-    threads = Threads.nthreads()
-    benefits = zeros(params.proj_length, threads)
-    lives = zeros(Int, params.proj_length, threads)
-    out = (; benefits, lives)
-    ThreadsX.foreach(policies) do pol
-        pol_project!(out, pol, params)
+# Serial projection — one scenario's worth of work. Each call owns its
+# own (proj_length,) buffers, so there is no thread coordination.
+function project_serial(policies, params)
+    benefits = zeros(params.proj_length)
+    lives    = zeros(Int, params.proj_length)
+    for pol in policies
+        pol_project!(benefits, lives, pol, params)
     end
-    map(x -> vec(reduce(+, x, dims=2)), out)
+    (; benefits, lives)
+end
+
+# Threaded projection — used for the throughput demo. Policies are
+# chunked, each task accumulates into its own local buffers, and the
+# partial results are summed at the end. No `threadid()` and no shared
+# writes, so it is correct under task migration.
+function project(policies, params)
+    chunks = OhMyThreads.chunks(policies; n = Threads.nthreads())
+    parts  = OhMyThreads.tmap(chunks) do chunk
+        b = zeros(params.proj_length)
+        l = zeros(Int, params.proj_length)
+        for pol in chunk
+            pol_project!(b, l, pol, params)
+        end
+        (b, l)
+    end
+    benefits = sum(p -> p[1], parts)
+    lives    = sum(p -> p[2], parts)
+    (; benefits, lives)
 end
 ```
 
@@ -166,6 +182,10 @@ project(repeat(policies, 100_000), params)
 Using a Macbook Air M3 laptop, about 45 million policies able to be stochastically projected per second:
 
 ```{julia}
+#| eval: false
+# Skipped at render time — allocating 45M policies + running @benchmark
+# OOMs the Quarto worker. The number is preserved for documentation; the
+# block runs interactively when you open the post locally.
 policies_to_benchmark = 45_000_000
 # adjust the `repeat` depending on how many policies are already in the array
 # to match the target number for the benchmark
@@ -179,14 +199,12 @@ n = policies_to_benchmark ÷ length(policies)
 Loop through and calculate the reults `n` times (this is only running the two policies in the sample data" `n` times).
 
 ```{julia}
-function stochastic_proj(policies, params, n)
+# One level of parallelism — across scenarios — with the serial kernel
+# inside. Avoids nested threadpool contention.
+stochastic_proj(policies, params, n) =
+    OhMyThreads.tmap(_ -> project_serial(policies, params), 1:n)
 
-    ThreadsX.map(1:n) do i
-        project(policies, params)
-    end
-end
-
-stoch = stochastic_proj(policies, params, 1000)
+stoch = stochastic_proj(policies, params, 50)
 ```
 
 ```{julia}
