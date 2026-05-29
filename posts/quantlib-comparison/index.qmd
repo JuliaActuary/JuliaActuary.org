@@ -421,7 +421,7 @@ QuantLib-Python via `timeit`:
 | Bond price — `FinanceCore.pv` / `bond.NPV()`                                             | ~25 ns                | ~235 ns            | ~9×    |
 | Modified duration — `duration(Modified(), …)` / `BondFunctions.duration`                 | ~215 ns (AD)          | ~1.25 μs           | ~6×    |
 | Convexity — `convexity` / `BondFunctions.convexity`                                      | ~255 ns (nested AD)   | ~1.25 μs           | ~5×    |
-| 30-pillar KRD — `duration(KeyRates(tenors), zrc, cfs)` / per-pillar `ZeroCurve` bumps          | ~4 μs (single AD pass)| ~1170 μs           | ~290×  |
+| 30-pillar KRD — `duration(KeyRates(tenors), zrc, cfs)` / per-pillar `ZeroCurve` bumps          | ~9 μs (single AD pass)| ~1170 μs           | ~130×  |
 
 Two things drive the gap. First, **the Python boundary, not the C++ math**: every QL call dispatched from Python costs ~200–300 ns of object marshaling regardless of what's on the other side. For single-instrument metrics — price, duration, convexity — the actual C++ work is fast enough that the boundary cost dominates, which is why all three rows land in the same 5–9× neighborhood. Duration and convexity both clock in at ~1.25 μs because they're the same shape from Python's perspective: one bond, one `InterestRate`, one C++ function call, one returned scalar.
 
@@ -474,7 +474,7 @@ b_krd_tent = @benchmark krd_tent_loop($yield_flat, $cfs, $krd_pillars_30)
 minimum(b_krd_tent).time   # ns
 ```
 
-~26 μs per 30-pillar vector — about 6× slower than the single AD pass, and still ~15× faster than QL's cheapest per-pillar emulation. The AD path wins the constant factor because it bundles every pillar into one forward sweep of ForwardDiff Duals over the discount integral, instead of re-running the price twice per pillar.
+~22 μs per 30-pillar vector — about 2.5× slower than the single AD pass, and still ~17× faster than QL's cheapest per-pillar emulation. The AD path wins the constant factor because it bundles every pillar into one forward sweep of ForwardDiff Duals over the discount integral, instead of re-running the price twice per pillar.
 :::
 
 ::: {.callout-note collapse="true"}
