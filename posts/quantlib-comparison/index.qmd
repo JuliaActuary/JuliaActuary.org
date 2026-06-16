@@ -245,11 +245,20 @@ result = sensitivities(KeyRates(tenors), zrc, cfs)
 println("durations by pillar    = ", round.(result.durations; digits=6))
 @printf("Σ durations            = %.6f   (≈ total Modified duration)\n",
     sum(result.durations))
-@printf("Σ convexities (matrix) = %.6f   (≈ total convexity)\n",
+@printf("Σ convexities (matrix) = %.6f   (continuous-shock convexity)\n",
     sum(result.convexities))
 ```
 
-Each entry of `result.durations` is the bond's sensitivity at the corresponding knot in `tenors` — the same Ho-1992 triangular-hat decomposition as the previous section, computed analytically in a single forward pass instead of pillar-by-pillar finite differences. The full convexity *matrix* (6×6 here) gives cross-pillar second-order effects: `result.convexities[i, j]` is `∂²price / ∂z_i ∂z_j`. There is no "sensitivity mode" anywhere in the library; `ZeroRateCurve` and `pv` are ordinary functions that happen to be generic on numeric types, and `sensitivities` bundles the value, gradient, and Hessian.
+Each entry of `result.durations` is the bond's sensitivity at the corresponding knot in `tenors` — the same Ho-1992 triangular-hat decomposition as the previous section, computed analytically in a single forward pass instead of pillar-by-pillar finite differences. The full convexity *matrix* (6×6 here) gives cross-pillar second-order effects: `result.convexities[i, j]` is `∂²price / ∂z_i ∂z_j`; summed, that matrix gives the *continuous-shock* convexity, which sits exactly one Modified duration below the Macaulay `convexity()` reported earlier — the compounding-convention split from the convexity section resurfacing, not a discrepancy. There is no "sensitivity mode" anywhere in the library; `ZeroRateCurve` and `pv` are ordinary functions that happen to be generic on numeric types, and `sensitivities` bundles the value, gradient, and Hessian.
+
+Switch the reporting unit without touching the inputs: a `DV01()` marker turns the same call into the per-pillar *dollar value of a basis point*, summing to the position-level DV01:
+
+```{julia}
+dv01s = sensitivities(DV01(), KeyRates(tenors), zrc, cfs).dv01s
+(per_pillar = round.(dv01s .* par; digits=6), total = sum(dv01s) * par)
+```
+
+`IR01()` and `CS01()` split that figure into base-rate and credit-spread sensitivity when you pass a separate discount and spread curve, and `sensitivities(bond, zrc, tenors)` accepts the *contract* directly — returning an `effective_`/`spread_`/`forward_` duration-and-DV01 breakdown without your building `cfs` at all. Each is the same AD pass under a different reporting convention; none of these markers existed when QuantLib's `BondFunctions` interface was designed.
 
 The same Float64 code path runs in `BigFloat` for validation, `ForwardDiff.Dual` for nested AD, `Measurements.Measurement` for uncertainty propagation — any numeric type that implements arithmetic:
 
@@ -277,7 +286,7 @@ end
 ForwardDiff.gradient(price_from_zeros, zero_rates)
 ```
 
-The same `ForwardDiff.Dual` mechanism — this time differentiating through whatever spline the curve uses to interpolate between pillars, rather than through the fixed triangular hat that `sensitivities` lays on top via `Yield.TenorShift`. For `Spline.Linear()` the two paths agree exactly; for the default `Spline.MonotoneConvex()` they differ slightly in how the total is *attributed across pillars* (the spline carries some sensitivity past adjacent knots that a hat would not), and `Σ KRD ≈ Modified duration` in both. The point of this callout isn't to reproduce `sensitivities` — it's that any AD-friendly Julia code wraps cleanly with `Optimization.jl` for calibration with an exact gradient, `Measurements.Measurement` for error bars, another `ForwardDiff.gradient` for the Hessian.
+The same `ForwardDiff.Dual` mechanism — but this gradient runs through whatever spline the curve uses to interpolate between pillars, whereas `sensitivities` lays a fixed triangular hat on top via `Yield.TenorShift`. The two therefore *attribute* the per-pillar total a little differently — modestly for `Spline.Linear()`, more for the default `Spline.MonotoneConvex()`, whose smooth basis spreads sensitivity past adjacent knots that a hat keeps local — while `Σ KRD = Modified duration` in both (a uniform bump of every stored rate is a parallel curve shift no matter how you interpolate). The point of this callout isn't to reproduce `sensitivities` — it's that any AD-friendly Julia code wraps cleanly with `Optimization.jl` for calibration with an exact gradient, `Measurements.Measurement` for error bars, another `ForwardDiff.gradient` for the Hessian.
 :::
 
 ## When the cashflows respond to rates
@@ -364,7 +373,20 @@ hw_pvs = [FinanceCore.present_value(p, cfs_static) for p in paths]
 
 Under a flat calibrating curve and σ = 1% the MC mean sits a few cents above the deterministic, with an MC standard error of comparable size — read: the gap is *consistent with* a small Jensen's-inequality correction from rate volatility, but at this σ the signal isn't large versus the MC noise. A realistic 2026 calibration would put σ in the 80–120bp range, where the correction is comfortably outside the SE. The composition itself is the takeaway: `simulate` produces yield-curve scenarios, `present_value` prices contracts against them, and the existing valuation machinery handles the rest. Closed-form `present_value` is also available under the Gaussian models for ZCB calls and puts, caps, floors, and Jamshidian-decomposed European swaptions.
 
-The asymmetric capability: `simulate` threads `ForwardDiff.Dual` types, so `ForwardDiff.derivative` walks *through* the Monte Carlo PV — model-parameter sensitivities under a stochastic process, no bumping, no separate Greek path. Here's the same setup wrapped in an AD call against Vasicek's initial short rate, returning a stochastic-model duration:
+The payoff of scenarios *being* yield curves shows up when you differentiate. `simulate` threads `ForwardDiff.Dual` types, so the AD walks straight *through* the Monte Carlo PV — no bumping, no separate Greek path. ActuaryUtilities 5.8 ships that as a first-class call: hand `sensitivities` a `KeyRates(tenors)` marker and a short-rate model, and it returns Monte-Carlo key-rate durations (plus a convexity matrix, and a `DV01()` variant) from one AD pass over the scenario set:
+
+```{julia}
+mc_tenors = [1.0, 2.0, 3.0, 5.0, 7.0, 10.0]
+mc_sens = sensitivities(KeyRates(mc_tenors), hw,
+    FinanceCore.amount.(cfs_static), FinanceCore.timepoint.(cfs_static);
+    n_scenarios=5_000, timestep=1 / 12, horizon=10.0, rng=Random.MersenneTwister(42))
+
+(value=mc_sens.value, total_duration=sum(mc_sens.durations))
+```
+
+Summed across pillars the durations recover the model's effective duration — here within MC noise of the deterministic figure — while each individual pillar, a Monte-Carlo average of pathwise derivatives, carries a standard error you'd report alongside it.
+
+Under the hood that's an ordinary `ForwardDiff` pass, and you can write it by hand for any parameter the bundled call doesn't cover. Differentiating the Monte-Carlo PV against Vasicek's initial short rate, for instance, returns a stochastic-model duration:
 
 ```{julia}
 function pv_mc_vasicek_r0(r0)
@@ -383,7 +405,7 @@ dPdr0_vas = ForwardDiff.derivative(pv_mc_vasicek_r0, r0_base)
     stochastic_model_duration=-dPdr0_vas / P_vas)
 ```
 
-Same common-random-numbers seed across the value and the gradient, so the derivative is the pathwise sensitivity rather than a bumped finite difference. The gradient itself carries MC noise (it's the average of per-path derivatives), so for production you'd report it with an SE the same way as the price. The capability extends naturally to gradients w.r.t. other model parameters (mean reversion, vol) and to multi-parameter `gradient` calls; some of those require a small array-typing enhancement on the FM side that's straightforward but not yet shipped.
+Same common-random-numbers seed across the value and the gradient, so the derivative is the pathwise sensitivity rather than a bumped finite difference — and like any MC estimate it carries a standard error you'd report alongside it. Two kinds of stochastic-model sensitivity flow through `ForwardDiff` today: against the calibrating *curve* (the shipped `sensitivities(KeyRates(…), hw, …)` call above) and against an *initial rate* (the scalar derivative here). Differentiating against the SDE *coefficients* — mean reversion `a`, vol `σ` — still trips a `Float64` type-pin inside `simulate`'s path buffers; it's a narrow FM fix, but not yet shipped.
 
 QL fundamentally can't do any of this through Python, because the FFI boundary breaks the AD chain. For MC-based calibration objectives with exact gradients, or pathwise sensitivities under a short-rate model, JA is ahead of QL by capability, not by speed.
 
@@ -419,11 +441,11 @@ QuantLib-Python via `timeit`:
 | Workload — JA call / QL call                                                            | FinanceModels (Julia) | QuantLib (Python)  | factor |
 |------------------------------------------------------------------------------------------|-----------------------|--------------------|--------|
 | Bond price — `FinanceCore.pv` / `bond.NPV()`                                             | ~25 ns                | ~235 ns            | ~9×    |
-| Modified duration — `duration(Modified(), …)` / `BondFunctions.duration`                 | ~215 ns (AD)          | ~1.25 μs           | ~6×    |
-| Convexity — `convexity` / `BondFunctions.convexity`                                      | ~255 ns (nested AD)   | ~1.25 μs           | ~5×    |
-| 30-pillar KRD — `duration(KeyRates(tenors), zrc, cfs)` / per-pillar `ZeroCurve` bumps          | ~4 μs (single AD pass)| ~1170 μs           | ~290×  |
+| Modified duration — `duration(Modified(), …)` / `BondFunctions.duration`                 | ~260 ns (AD)          | ~1.25 μs           | ~5×    |
+| Convexity — `convexity` / `BondFunctions.convexity`                                      | ~300 ns (nested AD)   | ~1.25 μs           | ~4×    |
+| 30-pillar KRD — `duration(KeyRates(tenors), zrc, cfs)` / per-pillar `ZeroCurve` bumps          | ~10 μs (single AD pass)| ~1170 μs          | ~120×  |
 
-Two things drive the gap. First, **the Python boundary, not the C++ math**: every QL call dispatched from Python costs ~200–300 ns of object marshaling regardless of what's on the other side. For single-instrument metrics — price, duration, convexity — the actual C++ work is fast enough that the boundary cost dominates, which is why all three rows land in the same 5–9× neighborhood. Duration and convexity both clock in at ~1.25 μs because they're the same shape from Python's perspective: one bond, one `InterestRate`, one C++ function call, one returned scalar.
+Two things drive the gap. First, **the Python boundary, not the C++ math**: every QL call dispatched from Python costs ~200–300 ns of object marshaling regardless of what's on the other side. For single-instrument metrics — price, duration, convexity — the actual C++ work is fast enough that the boundary cost dominates, which is why all three rows land in the same 4–9× neighborhood. Duration and convexity both clock in at ~1.25 μs because they're the same shape from Python's perspective: one bond, one `InterestRate`, one C++ function call, one returned scalar.
 
 ::: {.callout-note collapse="true"}
 ## Is the ~200–300 ns Python boundary fundamental, or just SWIG?
@@ -474,7 +496,7 @@ b_krd_tent = @benchmark krd_tent_loop($yield_flat, $cfs, $krd_pillars_30)
 minimum(b_krd_tent).time   # ns
 ```
 
-~26 μs per 30-pillar vector — about 6× slower than the single AD pass, and still ~15× faster than QL's cheapest per-pillar emulation. The AD path wins the constant factor because it bundles every pillar into one forward sweep of ForwardDiff Duals over the discount integral, instead of re-running the price twice per pillar.
+~24 μs per 30-pillar vector — about 2.5× slower than the single AD pass, and still ~50× faster than QL's per-pillar `ZeroCurve` emulation. The AD path wins the constant factor because it bundles every pillar into one forward sweep of ForwardDiff Duals over the discount integral, instead of re-running the price twice per pillar.
 :::
 
 ::: {.callout-note collapse="true"}
