@@ -28,9 +28,9 @@ It's not really that simple, and arguably a bit restrictive as this analysis wil
 
 ## Approach
 
-We will use Julia and Turing.jl to simulate the posterior distribution. Our prior for the parameter \$q\$ will be \${Uniform} = Beta(1,1)\$.
+We will use Julia and Turing.jl to simulate the posterior distribution. Our prior for the parameter $q$ will be $\text{Uniform} = \text{Beta}(1,1)$.
 
-We will sample from the posterior using the No-U-Turn (NUTS) sampler, and aggregate the results of the chains over \$(trials) trials of simulated outcomes for the given \$q\$ and \$N\$.
+We will sample from the posterior using the No-U-Turn (NUTS) sampler, and aggregate the results of the chains over repeated trials of simulated outcomes for the given $q$ and $N$.
 
 This is overkill for a toy problem where we could just model the parameters themselves, but it demonstrates using Bayesian MCMC techniques in a simple, exploratory fashion.
 
@@ -50,8 +50,6 @@ using Markdown
 include(joinpath(@__DIR__, "..", "..", "assets", "themes", "cassette_futurism.jl"))
 set_theme!(cassette_futurism_theme())
 ```
-
-"""
 
 ## Define the Models
 
@@ -105,9 +103,11 @@ end
 
 ## Results
 
-The results indicate that the Poisson is a good fit when \$q\$ is small, where "small" depends on N, but in general it seems to provide a good fit in less restrictive cases than the "rule of thumb" quoted below. E.g. go ahead and use the Poisson approximation when you've got enough expsoures even if \$q\$ is well above \$0.10\$. The Poisson approximation also isn't terrible when \$N\$ is as low as 10 as long as \$q\$ is very small (e.g. \$\<0.05\$ ).
+The results indicate that the Poisson is a good fit when $q$ is small, where "small" depends on $N$, but in general it seems to provide a good fit in less restrictive cases than the "rule of thumb" quoted above. E.g. the Poisson approximation can be reasonable when you've got enough exposures even if $q$ is above $0.10$. The Poisson approximation also isn't terrible when $N$ is as low as 10 as long as $q$ is very small (e.g. $<0.05$).
 
-The fit remains poor when \$q \>\> 0.5\$ and when \$N\$ is small.
+The fit remains poor when $q$ is well above $0.5$ and when $N$ is small.
+
+One caveat: increasing $N$ improves the *location* of the Poisson-based posterior but not its relative *width*. Because the Poisson likelihood lacks the $(1-q)$ variance-shrinking term of the Binomial, its posterior standard deviation is inflated by a factor of roughly $1/\sqrt{1-q}$ regardless of $N$ (about +15% at $q=0.25$ and +41% at $q=0.5$), so posterior intervals from the Poisson model are systematically wider at moderate-to-high $q$ even when the point estimate is accurate.
 
 ### Visualization
 

@@ -8,7 +8,7 @@ Scroll down below the sample video to see how to run it.
 ![](demo.gif)
 
 
-The recording above shows a [Pluto.jl](https://github.com/fonsp/Pluto.jl) notebook demonstrating some of the basic cashflow-oriented features in `ActuaryUtilities.jl` and `Yields.jl`.
+The recording above shows a [Pluto.jl](https://github.com/fonsp/Pluto.jl) notebook demonstrating some of the basic cashflow-oriented features in `ActuaryUtilities.jl` and `FinanceModels.jl`.
 
 ## Instructions to Run
 

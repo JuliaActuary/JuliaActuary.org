@@ -13,7 +13,7 @@ Scroll down below the sample video to see how to run it.
  </video>
 ```
 
-The recording above shows a [Pluto.jl](https://github.com/fonsp/Pluto.jl) notebook manipulating the long term mean reversion parameter for the Nelson-Siegel functional interest rate model, based on the American Academy of Actuaries' (AAA) [Economic Scenario Generator](https://www.actuary.org/content/economic-scenario-generators) (ESG).
+The recording above shows a [Pluto.jl](https://github.com/fonsp/Pluto.jl) notebook manipulating the long-rate mean reversion parameter of the stochastic interest rate process (with the full curve interpolated via a Nelson-Siegel functional form), based on the American Academy of Actuaries' (AAA) [Economic Scenario Generator](https://www.actuary.org/content/economic-scenario-generators) (ESG).
 
 ## Instructions to Run
 
@@ -37,4 +37,4 @@ https://raw.githubusercontent.com/JuliaActuary/Learn/master/AAA_ESG.jl
 
 ## See also
 
-[Replicating the AAA equtity generator](/examples/academy-generator/)
+[Replicating the AAA equity generator](/posts/academy-generator/)

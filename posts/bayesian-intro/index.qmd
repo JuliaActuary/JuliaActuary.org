@@ -80,7 +80,7 @@ In fact, the "objective" approach to null hypothesis testing is so prone to abus
 
 Further, when assigning a prior assumption to a random variable, there are mathematically most conservative choices to pull from. These are called Maximum Entropy Distributions (MED) and it can be shown that for certain minimal constraints these are the information-theoretic least informative choices. Least informative means that the prior will have the least influence on the resulting posterior distribution. 
 
-For example, if all you know is that the mean of a random process is positive, then the Exponential Distribution is your MED. If you know that a mean and variance must exist for the process, then the Normal distribution is your MED. If you know nothing at all, you can use a Uniform distribution for the possible values.
+For example, if all you know is that a random process is positive-valued with a given mean, then the Exponential Distribution is your MED. If you know the mean and variance of a process on the real line, then the Normal distribution is your MED. If all you know is that the values fall within a bounded range, the Uniform distribution over that range is your MED.
 
 ## Bayesian Versus Machine Learning
 

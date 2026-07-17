@@ -81,7 +81,9 @@ plt
 Generate 100 sample datapoints:
 
 ```{julia}
-t = rand(Weibull(fit1.param[2], fit1.param[1]), 100)
+# MortalityTables.Weibull(m, σ) has S(x) = exp(-(x/m)^(m/σ)), which in
+# Distributions.jl parameterization is Weibull(shape = m/σ, scale = m)
+t = rand(Weibull(fit1.param[1] / fit1.param[2], fit1.param[1]), 100)
 ```
 
 ### Without Censored Data"

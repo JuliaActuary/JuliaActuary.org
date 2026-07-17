@@ -146,10 +146,12 @@ function run_inner(policy, assumptions, result)
         A = innerloop_assumption(assumptions)
         p = project(policy, A; start_time=result.timestep + 1)
 
-        # calculate the reserves as the present value of the 
+        # calculate the reserves as the present value of the
         # cashflows within the inner loop projections
         # discounted at the reserve interest rate
-        reserves = -pv(A.int_reserve, [modelpoint.net_cf for modelpoint in p])
+        # (an annual rate, converted to match the monthly timesteps)
+        i_monthly = (1 + A.int_reserve)^(1 / 12) - 1
+        reserves = -pv(i_monthly, [modelpoint.net_cf for modelpoint in p])
         capital = reserves * A.capital_factor
         (; reserves, capital)
     else
@@ -177,11 +179,12 @@ function run_inner_stochastic(policy, assumptions, result)
         n = 100
 
         reserves = let
-            i = A.int_reserve
-            f = pv(i + 0.005 * randn(), [modelpoint.net_cf for modelpoint in p])
-
-            -sum(f for _ in 1:n) / n
-
+            cfs = [modelpoint.net_cf for modelpoint in p]
+            -sum(1:n) do _
+                # shock the annual rate each scenario, then convert to monthly
+                i = (1 + A.int_reserve + 0.005 * randn())^(1 / 12) - 1
+                pv(i, cfs)
+            end / n
         end
         capital = reserves * A.capital_factor
         (; reserves, capital)

@@ -69,6 +69,7 @@ function cassette_futurism_theme(; font::String = "JuliaMono")
             patchcolor = CASSETTE_PALETTE,
         ),
         linewidth = 1.6,
+        figure_padding = 18,
 
         Axis = (
             backgroundcolor      = CF_PAPER,
@@ -82,10 +83,10 @@ function cassette_futurism_theme(; font::String = "JuliaMono")
             yminorticksvisible   = true,
             xticksvisible        = true,
             yticksvisible        = true,
-            xtickalign           = 1.0,        # outward — draftsman style
-            ytickalign           = 1.0,
-            xminortickalign      = 1.0,
-            yminortickalign      = 1.0,
+            xtickalign           = 0.0,        # outward — draftsman style (0 = out, 1 = in)
+            ytickalign           = 0.0,
+            xminortickalign      = 0.0,
+            yminortickalign      = 0.0,
             xtickwidth           = 0.9,
             ytickwidth           = 0.9,
             xticksize            = 5,
@@ -139,7 +140,7 @@ function cassette_futurism_theme(; font::String = "JuliaMono")
         Colorbar = (
             spinewidth      = 1.0,
             tickcolor       = CF_INK,
-            tickalign       = 1.0,
+            tickalign       = 0.0,
             ticklabelcolor  = CF_INK,
             ticklabelfont   = font,
             labelcolor      = CF_INK,
@@ -153,10 +154,5 @@ function cassette_futurism_theme(; font::String = "JuliaMono")
         Density  = (strokewidth = 1.6, strokecolor = CF_INK),
         Heatmap  = (colormap = :lajolla,),
         Contour  = (color = CF_INK, linewidth = 1.0),
-
-        Figure = (
-            backgroundcolor = CF_PAPER,
-            figure_padding  = 18,
-        ),
     )
 end

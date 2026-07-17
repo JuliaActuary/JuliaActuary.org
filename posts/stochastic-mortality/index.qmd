@@ -26,7 +26,7 @@ set_theme!(cassette_futurism_theme())
 
 Define a datatype. Not strictly necessary, but will make extending the program with more functions easier.
 
-Type annotations are optional, but providing them is able to coerce the values to be all plain bits (i.e. simple, non-referenced values like arrays are) when the type is constructed. This makes the whole data be stored in the stack and is an example of data-oriented design. It's much slower without the type annotations (~0.5 million policies per second, ~50x slower).
+Type annotations are optional, but providing them is able to coerce the values to be all plain bits (i.e. simple, non-referenced values like arrays are) when the type is constructed. This lets the policies be stored inline and contiguously in the array (no pointer chasing) and is an example of data-oriented design. It's much slower without the type annotations (~0.5 million policies per second, roughly 90x slower than the ~45 million per second benchmarked below).
 
 ```{julia}
 @enum Sex Female = 1 Male = 2
@@ -109,8 +109,8 @@ function pol_project!(benefits, lives, policy, params)
 
     # inbounds turns off bounds-checking, which makes hot loops faster — write
     # the loop without it first to ensure you don't have an out-of-bounds bug.
-    @inbounds for t in 1:min(params.proj_length, ω - start_age)
-        q = qs[start_age + t]            # current mortality
+    @inbounds for t in 1:min(params.proj_length, ω - start_age + 1)
+        q = qs[start_age + t - 1]        # mortality for the current projection year
         rand() < q && return              # death — stop incrementing this life
 
         # otherwise: pay benefit, add a life, grow the benefit by COLA for next year

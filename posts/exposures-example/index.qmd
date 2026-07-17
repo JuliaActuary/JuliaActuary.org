@@ -10,7 +10,7 @@ Pkg.activate(".")
 Pkg.instantiate()
 ```
 
-In this tutorial, we will walk through how to calculate exposures using the [ExperienceAnalysis.jl package](/packages/#lifecontingenciesjl).
+In this tutorial, we will walk through how to calculate exposures using the [ExperienceAnalysis.jl package](/packages.html#experienceanalysis.jl).
 
 In summary, the package will help calculate the exposure periods given parameters about the kind of period and timepoints under consideration. This will return an array of tuples with a `from` and `to` date:
 
@@ -33,9 +33,9 @@ exposure(basis, issue, termination)
 
 Where `period` is a [Period Type from the Dates standard library](https://docs.julialang.org/en/v1/stdlib/Dates/#Period-Types).
 
-Calculate exposures with `exposures(basis,from,to,continue_exposure)`. 
+Calculate exposures with `exposure(basis, from, to, continued_exposure; study_start, study_end)`.
 
-- `continue_exposures` indicates whether the exposure should be extended through the full exposure period rather than terminate at the `to` date.
+- `continued_exposure` indicates whether the exposure should be extended through the full exposure period rather than terminate at the `to` date.
 
 ## Full Example
 
@@ -84,7 +84,8 @@ This can be extended to calculate the decimal fraction of the year under differe
 ```{julia}
 using DayCounts
 
-df.exposure_fraction = map(e -> yearfrac(e.from, e.to, DayCounts.Actual360()), df.exposure)
+# note: the `to` date is inclusive, so we add a day when computing the fraction
+df.exposure_fraction = map(e -> yearfrac(e.from, e.to + Day(1), DayCounts.Thirty360()), df.exposure)
 df[:, [:exposure, :exposure_fraction]]
 ```
 

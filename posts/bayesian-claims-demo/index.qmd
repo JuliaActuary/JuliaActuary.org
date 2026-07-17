@@ -70,10 +70,10 @@ function generate_data_individual(tbl, issue_age=rand(50:55), inforce_years=rand
     # we observe the assigned risklevel, but not risk_factor
     risk_factors = [0.7, 1.0, 1.5]
     rf = risk_factors[risklevel]
-    deaths = rand(inforce_years) .< (tbl.select[issue_age][issue_age.+inforce_years.-1] .* rf)
+    deaths = rand(inforce_years) .< (tbl.select[issue_age][issue_age .+ (1:inforce_years) .- 1] .* rf)
 
     endpoint = if sum(deaths) == 0
-        last(inforce_years)
+        inforce_years
     else
         findfirst(deaths)
     end
@@ -135,7 +135,7 @@ We use a No-U-Turn-Sampler (NUTS) technique to sample multiple chains at once:
 
 ```{julia}
 #| column: page-inset
-chain = MCMCChains.Chains(sample(m1, NUTS(), 1000))
+chain = MCMCChains.Chains(sample(m1, NUTS(), MCMCThreads(), 1000, num_chains))
 
 chainplot(chain)
 ```
@@ -366,8 +366,6 @@ chain4 = MCMCChains.Chains(sample(m4, NUTS(), 1000))
 summarize(chain4)
 ```
 
-PRECIS(DataFrame(chain4))
-
 ```{julia}
 risk_factors4 = [mean(chain4[Symbol("a[$f]")]) for f in 1:3]
 ```
@@ -389,7 +387,7 @@ let data = data2
     for r in 1:3, i in 1:n
         s = sample(chain4, 1)
         a = only(s[Symbol("a[$r]")])
-        b = only(s[:b]); k = only(s[:k]); c = 0
+        b = only(s[:b]); k = only(s[:k]); c = only(s[:c])
         m = MortalityTables.MakehamBeard(; a, b, c, k)
         lines!(ax, ages, age -> MortalityTables.hazard(m, age);
             color=(risk_colors[r], 0.12), linewidth=0.8,
