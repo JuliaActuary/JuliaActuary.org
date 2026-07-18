@@ -50,7 +50,7 @@ In the code below, this translates to:
 
 - `u` is the *state* of the system. We  will track three variables to represent the `state`:
    - `state[1]` is the account value
-   - `state[2]` is the premium paid
+   - `state[2]` is the premium paid at that timestep
    - `state[3]` is the policy duration
 - `p` are the parameters of the system.
 - `t` is the time, which will represent days since policy issuance
@@ -91,7 +91,7 @@ function policy_projection(state, p, t)
         end
 
         # daily events
-        int(av) = av * ((1 + p.int_rate)^(1 / 360) - 1.0)
+        int(av) = av * ((1 + p.int_rate)^(1 / 365) - 1.0)
 
 
 
@@ -127,7 +127,7 @@ params(prem, int) = (
 
 ## Runing the system
 
-This results in the following plot. The tracked output variables u1 and u2 represent the two vars that we tracked above: account value and cumulative premium.
+This results in the following plot of the tracked account value (`state[1]`):
 
 ```{julia}
 begin
@@ -160,7 +160,7 @@ end
 
 An excellent way to understand the behavior of a model is to [move up the ladder of abstraction](http://worrydream.com/LadderOfAbstraction/). Below, we will see what happens to the projection at varying levels of credit rates and annual premiums.
 
-md"The full range of simulated outcomes can take a couple of minutes to run:
+The full range of simulated outcomes can take a couple of minutes to run:
 
 ```{julia}
 begin
@@ -173,7 +173,8 @@ begin
         proj = solve(prob, FunctionMap())
         end_av = proj[end][1]
         if end_av == 0.0
-            lapse_time = findfirst(isequal(0.0), proj[1, 2:end])
+            # +1 because the search starts at the 2nd column of `proj`
+            lapse_time = findfirst(isequal(0.0), proj[1, 2:end]) + 1
         else
             lapse_time = length(proj)
         end

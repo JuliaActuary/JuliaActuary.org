@@ -60,7 +60,8 @@ let
         xlabel = "t / s", ylabel = "amplitude",
     )
     for (i, ζ) in enumerate((0.05, 0.12, 0.22, 0.40))
-        lines!(ax, t, exp.(-ζ .* t) .* cos.(t); label = "ζ = $ζ")
+        # unit natural frequency: x(t) = e^{-ζt}·cos(√(1-ζ²)·t)
+        lines!(ax, t, exp.(-ζ .* t) .* cos.(sqrt(1 - ζ^2) .* t); label = "ζ = $ζ")
     end
     axislegend(ax, position = :rt, framevisible = true)
     fig
@@ -97,10 +98,10 @@ end
 ```{julia}
 let
     cats   = ["LEM", "CSM", "S-IVB", "S-II", "S-IC"]
-    values = [4.7, 6.3, 10.1, 14.8, 22.4]
+    values = [4.3, 11.9, 13.5, 36.0, 130.0]  # approximate dry masses
     fig = Figure(size = (720, 380))
     ax = Axis(fig[1, 1];
-        title = "FIG. 03 — STAGE MASS / 10³ kg",
+        title = "FIG. 03 — STAGE DRY MASS / 10³ kg (APPROX.)",
         xticks = (1:length(cats), cats),
         ylabel = "mass",
     )

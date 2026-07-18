@@ -91,7 +91,7 @@ end function
 
 Maybe more readable to the modern eye than APL, but many actuaries would still recognize what's going on with the first code example.
 
-Why did APL take off for Actuaries and not APL? I think [expressiveness](https://en.wikipedia.org/wiki/Expressive_power_%28computer_science%29) and the ability to have a language inspired by mathematical notation were attractive. It's not pleasant to write a lot of boiler-plate simply to achieve a simple objective. 
+Why did APL take off for Actuaries and not Fortran? I think [expressiveness](https://en.wikipedia.org/wiki/Expressive_power_%28computer_science%29) and the ability to have a language inspired by mathematical notation were attractive. It's not pleasant to write a lot of boiler-plate simply to achieve a simple objective. 
 
 What is boiler-plate? It's writing a lot of code supporting the main idea, but straying from a simple mathematical formulation. For example, in high performance object-oriented languages (C#/C++/Java), the idiomatic code might involve a special class. See, for example this C# code to count substrings:
 
@@ -142,23 +142,10 @@ using PrettyTables
 file = download("https://raw.githubusercontent.com/JuliaActuary/Learn/master/Benchmarks/LifeModelingProblem/benchmarks.csv")
 benchmarks = CSV.read(file, DataFrame)
 
-benchmarks.relative_mean = benchmarks.mean ./ minimum(benchmarks.mean)
-sort(benchmarks, :relative_mean)
-```
-
-To aid in visualizing results with such vast different orders of magnitude, this graph includes a physical length comparison to serve as a reference. The computation time is represented by the distance that light travels in the time for the computation to complete (comparing a nanosecond to one foot length [goes at least back to Admiral Grace Hopper](https://www.youtube.com/watch?v=9eyFDBPk4Yw)).
-
-```{julia}
-#| echo: false
-#| label: tbl-life-modeling-benchmark-blog
-#| tbl-cap: Benchmarks for the Life Modeling Problem in nanoseconds (lower times are better).
-#| 
-using CSV, DataFrames
-using PrettyTables
-file = download("https://raw.githubusercontent.com/JuliaActuary/Learn/master/Benchmarks/LifeModelingProblem/benchmarks.csv")
-benchmarks = CSV.read(file, DataFrame)
-
-benchmarks.relative_mean = benchmarks.mean ./ minimum(benchmarks.mean)
+# some languages' benchmark libraries only report a median;
+# use it where the mean is unavailable (see footnote 3)
+time_ns = coalesce.(benchmarks.mean, benchmarks.median)
+benchmarks.relative_mean = time_ns ./ minimum(time_ns)
 sort(benchmarks, :relative_mean)
 ```
 
@@ -308,7 +295,7 @@ Rust scores well here, coming second only to Julia.
 
 ##### Flexibility
 
-Rust is statically compiled (you write script, have computer run script, see results). It doesn't have a REPL or ability to be used in an interactive way (e.g. notebook environments).
+Rust is statically compiled (you write a program, compile it, and then run it to see results). It doesn't have an official REPL and interactive use (e.g. notebook environments) is uncommon, though third-party tools like [evcxr](https://github.com/evcxr/evcxr) provide a REPL and Jupyter kernel.
 
 ##### Readability
 
@@ -367,7 +354,7 @@ With [NumPy](https://numpy.org/), Python was the second fastest `Vectorized` app
 
 Python wins large points for interactive usage in the REPL, notebooks, and wide variety of environments that support running Python code. However, within the language itself I have to deduct points for the ease of inspecting/evaluating code.
 
-What I mean by that, is that if you look at the code example below, in order to test the code you have to turn it into string and then call the `timeit` function to read and parse the string. In none of the other tested languages was that sort of boiler-plate required.
+What I mean by that, is that if you look at the code example below, the idiomatic standalone `timeit` pattern turns the code into a string which the `timeit` function then reads and parses (`timeit` can also accept a callable, and IPython/Jupyter offer `%timeit`, but the string form is the common standalone-script pattern). In none of the other tested languages was that sort of boiler-plate typical.
 
 Python scores partial points for meta-programming: decorators (`@` syntax) is syntactic sugar for macro-like modifications to functions, but Python metaprogramming is [fundamentally limited](https://softwareengineering.stackexchange.com/a/253377/37060) by the language design.
 
@@ -405,7 +392,7 @@ benchmark = '''npv(q,w,P,S,r)'''
 print(timeit.timeit(stmt=benchmark,setup=setup,number = 1000000))
 ```
 
-To do non standard things like benchmarking (or The benchmarking setup with Python's `timeit` is definitely the most painful, needing to wrap the whole thing in a string. And then only get a single number result, without normalizing for the number of runs is very annoying.
+The benchmarking setup with Python's `timeit` was the most painful of the languages compared here: the common pattern wraps the code in a string, and the result is a single total time that you have to normalize by the number of runs yourself.
 
 #### Julia
 
@@ -452,7 +439,7 @@ function npv1(q,w,P,S,r)
   	return sum(ncf .* d)
 end
 
-@benchmark npv($q,$w,$P,$S,$r)
+@benchmark npv1($q,$w,$P,$S,$r)
 ```
 
 And the `Accumulator` version:
@@ -476,12 +463,6 @@ end
 ## More flexibility, more performance from Julia
 
 I wanted to go a little bit deeper and show how 1) Julia just runs fast even if your not explicitly focused on performance. But for where it *really* matters, you can go even deeper. This is a little advanced, but I think it can be useful to introduce some basics as to why some languages and approaches are going to be fundamentally slower than others.
-
-Notes:
-The accumulator approach
-vectors and allocations
-talk about stack/heap?
-pick a faster approach and explain why it's even faster.
 
 ## Colophon
 
@@ -525,14 +506,14 @@ Python 3.9.4 (default, Apr  4 2021, 17:42:23)
 
 ## Footnotes
 
-[^1] A take on [Andy and Bill's law](https://en.wikipedia.org/wiki/Andy_and_Bill%27s_law)
+[^1]: A take on [Andy and Bill's law](https://en.wikipedia.org/wiki/Andy_and_Bill%27s_law)
 
-[^2] If benchmarking memoization, it's essentially benchmarking how long it takes to perform hashing in a language. While interesting, especially in the context of [incremental computing](https://scattered-thoughts.net/writing/an-opinionated-map-of-incremental-and-streaming-systems), it's not the core issue at hand. Incremental computing libraries exist for all of the modern languages discussed here.
+[^2]: If benchmarking memoization, it's essentially benchmarking how long it takes to perform hashing in a language. While interesting, especially in the context of [incremental computing](https://scattered-thoughts.net/writing/an-opinionated-map-of-incremental-and-streaming-systems), it's not the core issue at hand. Incremental computing libraries exist for all of the modern languages discussed here.
 
-[^3] Note that not all languages have both a mean and median result in their benchmarking libraries. Mean is a better representation for a garbage-collected modern language, because sometimes the computation just takes longer than the median result. Where the mean is not available in the graph below, median is substituted.
+[^3]: Note that not all languages have both a mean and median result in their benchmarking libraries. Mean is a better representation for a garbage-collected modern language, because sometimes the computation just takes longer than the median result. Where the mean is not available in the graph below, median is substituted.
 
-[^4] Don't [prematurely optimize](https://en.wikipedia.org/wiki/Program_optimization#When_to_optimizer). But in the long run avoid, [re-writing your code in a faster language too many times!](https://www.nature.com/articles/d41586-019-02310-3)
+[^4]: Don't [prematurely optimize](https://en.wikipedia.org/wiki/Program_optimization#When_to_optimizer). But in the long run avoid, [re-writing your code in a faster language too many times!](https://www.nature.com/articles/d41586-019-02310-3)
 
-[^5]  I've seen 50+ line, irregular Excel formulas. To Nick: it probably started out as a good idea but it was a beast to understand and modify! At least with code you can look at the code with variable names and syntax highlighting! Comments, if you are lucky!
+[^5]: I've seen 50+ line, irregular Excel formulas. To Nick: it probably started out as a good idea but it was a beast to understand and modify! At least with code you can look at the code with variable names and syntax highlighting! Comments, if you are lucky!
 
-[^6] This is not legal advice, consult a lawyer for more details.
+[^6]: This is not legal advice, consult a lawyer for more details.

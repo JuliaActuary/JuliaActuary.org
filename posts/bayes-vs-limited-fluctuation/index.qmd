@@ -55,7 +55,7 @@ $$
 \text{Credibility-Weighted Rate} = Z × \text{Observed Rate} + (1 – Z) × \text{Prior Rate}
 $$
 
-With probability equal to $LC_p$ that the Observed Rate does not differ from the true rate by more than $LC_r$.
+With probability equal to $LC_p$ that the Observed Rate does not differ from the true rate by more than $LC_r$ *of the true rate* (i.e. a ±5% relative margin, not an absolute one).
 
 ```{julia}
 LC_p = 0.9
@@ -70,9 +70,9 @@ $$
 LC_full_credibility = round(Int, (quantile(Normal(), 1 - (1 - LC_p) / 2) / LC_r)^2)
 ```
 
-Using the inputs above, we have a z-score corresponding to `{julia} LC_p` of `{julia} quantile(Normal(),1-(1-LC_p)/2)`, so: ( `{julia} quantile(Normal(),1-(1-LC_p)/2)` ÷ `{julia} LC_r`)² ≈ `{julia} LC_full_credibility`. """
+Using the inputs above, we have a z-score corresponding to `{julia} LC_p` of `{julia} quantile(Normal(),1-(1-LC_p)/2)`, so: ( `{julia} quantile(Normal(),1-(1-LC_p)/2)` ÷ `{julia} LC_r`)² ≈ `{julia} LC_full_credibility`.
 
-[Atkinson](https://www.soa.org/globalassets/assets/files/resources/tables-calcs-tools/credibility-methods-life-health-pensions.pdf) goes on to nicely summarize the square root method which assigns full credibility, $$Z = 1$$, when the number of actual claims equals or exceeds the full credibility threshold of \$LC_full_credibility claims.
+[Atkinson](https://www.soa.org/globalassets/assets/files/resources/tables-calcs-tools/credibility-methods-life-health-pensions.pdf) goes on to nicely summarize the square root method which assigns full credibility, $$Z = 1$$, when the number of actual claims equals or exceeds the full credibility threshold of `{julia} LC_full_credibility` claims.
 
 When the number of claims is less than full credibility:
 
@@ -88,7 +88,7 @@ $$
     -   Results in a single point estimate with only approximate measure of estimate uncertainty
 -   Relies on a number of assumptions/constraints:
     -   That aggregated claims can be approximated by a normal distribution
-    -   The thresholds of \$LC_p and \$LC_r are arbitrary (e.g. all of the same arguments against p-value thresholds can apply to this approach) """
+    -   The thresholds of `LC_p` and `LC_r` are arbitrary (e.g. all of the same arguments against p-value thresholds can apply to this approach)
 
 ## Bayesian Approach
 
@@ -147,7 +147,7 @@ A complete overview of modern Bayesian models is beyond the scope of this notebo
     -   `σ \sim Exponential(0.25)` says that we expect the standard devation of an individual group to be positive, but not super wide.
     -   `μ_i \sim Normal(μ,σ)` is the actual prior for each group's rate of claim and is informed by the above hyperparameters.
 -   `@model` is a Turing.jl macro which enables interpreting the nice `~` syntax, which makes the Julia code look very similar to the traditional mathematical notation.
--   Note the use of broadcasting with the dot syntax (e.g. the `.` in `.~`). This tells Julia to vectorize and fuse the computation.
+-   Note the use of broadcasting with the dot syntax (e.g. the `.` in `Poisson.(...)`). This tells Julia to vectorize the computation, creating one distribution per group, and `product_distribution` combines them into a joint distribution for the vector of observations.
     -   `data.claims ~ product_distribution(Poisson.(data.n .* logistic.(μ_i)))` means "each value in `data.claims` is a random outcome (`~`) distributed accroding to a corresponding Poisson distribution with `\lambda =n \times \text{logistic}(\mu_i)` where `text{logistic}(\mu_i)` is the average claims rate for each group.
 
 ```{julia}
@@ -166,7 +166,7 @@ A complete overview of modern Bayesian models is beyond the scope of this notebo
 end
 ```
 
-Here's what the prior distribution of claims looks like... and peeking ahead to what the posterior for a single group of claims looks like. See how even though our posterior was very wide (favoring small claims rates), it was dominated by the data to create a very narrow posterior average claims rate.
+Here's what the prior distribution of claims looks like... and peeking ahead to what the posterior for a single group of claims looks like. See how even though our prior was very wide (favoring small claims rates), it was dominated by the data to create a very narrow posterior average claims rate.
 
 The model is combined with the data and [Turing.jl](https://turing.ml/stable/) is used to computationally arrive at the posterior distribution for the parameters in the statistical model, $\mu$, $\mu_i$, and $\sigma$.
 
@@ -271,7 +271,7 @@ Here we compare four predictive models:
 
 ### Bayesian approach has lower error
 
-Looking at the accumulated absolute error, the bayesian approach has about 16% lower error than the Limited Fluctuation approaches.
+Looking at the accumulated absolute error (plotted below), the bayesian approach has meaningfully lower total error than the Limited Fluctuation approaches.
 
 ### Total Actual to Expected
 
@@ -422,4 +422,4 @@ With limited, real-world data drawing conclusions is a little bit messy because 
 
 -   The Bayesian approach partially pools the data: it's an approach in-between assuming each group is independent from the rest and assuming that a single rate applies to all exposures.
 -   The partial pooling limits over-fitting, which happens with the naive approach. Our Bayesian approach is somewhat skeptical of groups with low observation counts that stand out from the rest. But it also doesn't forgoe useful data, as it learns from even low exposures according to what's consistent with probability theory (Baye's rule).
--   The naive approach is pretty close to the textbook definition of over-fitting. The LF approaches appear to be under-fitting group-level as there are only \$(sum(claims_summary_posterior.LF_Z_train .\>= .9999)) groups with "full credibility" (`Z=1`), even though there are groups with less than "full credibility" with over 100,000 observations in the training set.
+-   The naive approach is pretty close to the textbook definition of over-fitting. The LF approaches appear to be under-fitting group-level as there are only `{julia} sum(claims_summary_posterior.LF_Z_train.>=0.9999)` groups with "full credibility" (`Z=1`), even though there are groups with less than "full credibility" with over 100,000 observations in the training set.

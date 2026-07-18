@@ -78,7 +78,7 @@ And then what retention means for a `Life`:
 
 ``` julia:./post/julia-for-the-future/code/ex3
 function retained(l::Life)
-  sum(retained(policy) for policy in life.policies)
+  sum(retained(policy) for policy in l.policies)
 end
 ```
 
@@ -139,7 +139,7 @@ We generate 100:
 | ``` julia                           | ``` r                              | ``` python                                  |
 | using Distributions                 | runif(100)                         | import scipy.stats as sps                   |
 |                                     | rnorm(100)                         | import numpy as np                          |
-| rand(100)                           | rbern(100, 0.5)                    |                                             |
+| rand(100)                           | rbinom(100, 1, 0.5)                |                                             |
 | rand(Normal(), 100)                 | sample(c("Preferred","Standard"),  |                                             |
 | rand(Bernoulli(0.5), 100)           | 100, replace=TRUE)                 | sps.uniform.rvs(size=100)                   |
 | rand(["Preferred","Standard"], 100) | ```                                | sps.norm.rvs(size=100)                      |
@@ -165,7 +165,7 @@ Speaking from experience, speed is not just great for production time improvemen
 
 Admittedly, most workflows don't see a 1000x speedup, but 10x to 1000x is a very common range of speed differences vs R or Python or MATLAB.
 
-Sometimes you will see less of a speed difference; R and Python have already circumvented this and written much core code in low-level languages. This is an example of what's called the "two-language" problem where the language productive to write in isn't very fast. For example, [more than half of R packages use C/C++/Fortran](https://developer.r-project.org/Blog/public/2019/03/28/use-of-c---in-packages/) and core packages in Python like Pandas, PyTorch, NumPy, SciPy, etc. do this too.
+Sometimes you will see less of a speed difference; R and Python have already circumvented this and written much core code in low-level languages. This is an example of what's called the "two-language" problem where the language productive to write in isn't very fast. For example, [about 20% of R packages include compiled C/C++/Fortran code — including many of the most-used ones](https://blog.r-project.org/2019/03/28/use-of-c-in-packages/) — and core packages in Python like Pandas, PyTorch, NumPy, SciPy, etc. do this too.
 
 Within the bounds of the optimized R/Python libraries, you can leverage this work. Extending it can be difficult: what if you have a custom retention management system running on millions of policies every night?
 

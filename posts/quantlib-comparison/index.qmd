@@ -28,7 +28,7 @@ For the workflows it covers, [JuliaActuary](https://juliaactuary.org)'s answer i
 
 ## The cashflow vector
 
-A 5-year, 4% semi-annual-coupon bond at a flat 3% continuously-compounded yield. Once the vector exists, price and duration are one function call each.
+A 5-year, 4% semi-annual-coupon bond priced against a simple upward-sloping zero curve (a flat 3% continuously-compounded yield appears later for the convention comparisons). Once the vector exists, price and duration are one function call each.
 
 ```{julia}
 using FinanceCore
@@ -65,6 +65,7 @@ QuantLib's setup is longer — a `Schedule`, a `FixedRateBond`, a `FlatForward` 
 import QuantLib as ql
 
 settle    = ql.Date(1, 1, 2026)
+ql.Settings.instance().evaluationDate = settle
 maturity  = ql.Date(1, 1, 2031)
 day_count = ql.Thirty360(ql.Thirty360.BondBasis)
 
@@ -80,12 +81,18 @@ curve = ql.ZeroCurve(pillar_dates, zeros, day_count, ql.NullCalendar(),
 bond.setPricingEngine(ql.DiscountingBondEngine(ql.YieldTermStructureHandle(curve)))
 
 print(bond.NPV())  # → 103.6781792217
+
+ytm = bond.bondYield(day_count, ql.Continuous, ql.NoFrequency)   # ≈ 0.0317283
+ir  = ql.InterestRate(ytm, day_count, ql.Continuous, ql.NoFrequency)
+print(ql.BondFunctions.duration(bond, ir, ql.Duration.Modified))  # → 4.5902412191
 ```
 
-| metric            | FinanceModels / ActuaryUtilities | QuantLib (Python) | diff |
-|-------------------|----------------------------------|-------------------|------|
-| Price             | 103.6781792217                   | 103.6781792217    | 0.00 |
-| Modified duration | 4.5873235505                     | 4.5873235505      | 0.00 |
+| metric            | FinanceModels / ActuaryUtilities | QuantLib (Python) | diff    |
+|-------------------|----------------------------------|-------------------|---------|
+| Price             | 103.6781792217                   | 103.6781792217    | 0.00    |
+| Modified duration | 4.5873235505                     | 4.5902412191      | 2.9e-03 |
+
+The prices agree to the last printed digit. The durations differ slightly because the two are answering slightly different questions: `duration(Modified(), curve, cfs)` differentiates the price with respect to a *parallel shift of the term-structured curve*, while QL's native `BondFunctions.duration` works from a single flat yield-to-maturity (the bond's continuously-compounded ytm of ≈3.17%). Reproducing the curve-based number in QL means bumping every pillar of the `ZeroCurve` and repricing by hand — which is exactly what the key-rate-duration section below does.
 
 The interesting part is what the same `cfs` is about to do without writing any new code.
 
@@ -142,6 +149,7 @@ QuantLib has a native `BondFunctions.convexity`:
 
 ```python
 # Python — QuantLib
+import math
 y_ann = math.exp(0.03) - 1                  # annual-effective equiv. of 3% cont.
 ir    = ql.InterestRate(y_ann, day_count, ql.Compounded, ql.Annual)
 convex_quantlib = ql.BondFunctions.convexity(bond, ir)   # → 25.2585956899
@@ -149,13 +157,13 @@ convex_quantlib = ql.BondFunctions.convexity(bond, ir)   # → 25.2585956899
 
 They report different numbers — exactly `(1+y)²` apart — because they use different conventions:
 
-| metric                                         |    value    |
-|------------------------------------------------|------------:|
-| `ActuaryUtilities.convexity`     ("Macaulay")  |  26.8205000 |
-| `QuantLib.BondFunctions.convexity` ("modified")|  25.2585957 |
-| QL × `(1 + y_ann)²`                            |  26.8205000 |
+| metric                                                     |    value    |
+|------------------------------------------------------------|------------:|
+| `ActuaryUtilities.convexity`     (annual-effective shock)  |  26.8205000 |
+| `QuantLib.BondFunctions.convexity` ("modified")            |  25.2585957 |
+| QL × `(1 + y_ann)²`                                        |  26.8205000 |
 
-QuantLib normalizes by `(1+y)²` — the extra chain-rule factor that drops out when you differentiate against the *periodic* yield. That's "modified convexity" in the discrete-compounding sense. ActuaryUtilities reports the unnormalized second moment of cashflow times — the convexity that Bloomberg and most actuarial references show. Neither is wrong; both show up in industry. The conversion is a single multiplication.
+QuantLib normalizes by `(1+y)²` — the extra chain-rule factor from differentiating against the *periodic* yield. That's "modified convexity" in the discrete-compounding sense, and it's the figure most market data terminals display. ActuaryUtilities reports the unnormalized second derivative with respect to an annual-effective shock — `Σ t(t+1)·w` in discounted-cashflow-weight terms, i.e. the same quantity before the `(1+y)⁻²` normalization. Neither is wrong; both show up in industry. The conversion is a single multiplication.
 
 ::: {.callout-note collapse="true"}
 ## Under the hood: how `convexity` works (and how to write your own convention)
@@ -170,7 +178,7 @@ function convexity(yield, cfs)
 end
 ```
 
-The shock convention is set by how `yield + Δ` is defined for the yield type. For `Yield.Constant{Continuous}`, `+` uses `log1p` semantics so `Δ` is interpreted as a *periodic*-rate shock — which gives Macaulay-style `t·(t+1)` convexity. For a continuous-rate convexity instead, write the AD call directly against your own parameterization:
+The shock convention is set by how `yield + Δ` is defined for the yield type. For `Yield.Constant{Continuous}`, `+` uses `log1p` semantics so `Δ` is interpreted as a *periodic*-rate shock — which gives the annual-effective-shock `t·(t+1)` convexity. For a continuous-rate convexity instead, write the AD call directly against your own parameterization:
 
 ```{julia}
 using ForwardDiff
@@ -249,7 +257,7 @@ println("durations by pillar    = ", round.(result.durations; digits=6))
     sum(result.convexities))
 ```
 
-Each entry of `result.durations` is the bond's sensitivity at the corresponding knot in `tenors` — the same Ho-1992 triangular-hat decomposition as the previous section, computed analytically in a single forward pass instead of pillar-by-pillar finite differences. The full convexity *matrix* (6×6 here) gives cross-pillar second-order effects: `result.convexities[i, j]` is `∂²price / ∂z_i ∂z_j`; summed, that matrix gives the *continuous-shock* convexity, which sits exactly one Modified duration below the Macaulay `convexity()` reported earlier — the compounding-convention split from the convexity section resurfacing, not a discrepancy. There is no "sensitivity mode" anywhere in the library; `ZeroRateCurve` and `pv` are ordinary functions that happen to be generic on numeric types, and `sensitivities` bundles the value, gradient, and Hessian.
+Each entry of `result.durations` is the bond's sensitivity at the corresponding knot in `tenors` — the same Ho-1992 triangular-hat decomposition as the previous section, computed analytically in a single forward pass instead of pillar-by-pillar finite differences. The full convexity *matrix* (6×6 here) gives cross-pillar second-order effects: `result.convexities[i, j]` is `∂²price / ∂z_i ∂z_j`; summed, that matrix gives the *continuous-shock* convexity under `zrc`. Recall from the convexity section that the continuous-shock and annual-effective-shock conventions differ by one Modified duration — an identity that is exact when both are computed against the same discounting model (the earlier `convexity()` figure used the flat 3% model, so the relationship to that specific number is approximate). The compounding-convention split resurfacing, not a discrepancy. There is no "sensitivity mode" anywhere in the library; `ZeroRateCurve` and `pv` are ordinary functions that happen to be generic on numeric types, and `sensitivities` bundles the value, gradient, and Hessian.
 
 Switch the reporting unit without touching the inputs: a `DV01()` marker turns the same call into the per-pillar *dollar value of a basis point*, summing to the position-level DV01:
 
@@ -268,7 +276,7 @@ cfs_big = collect(FinanceModels.Bond.Fixed(big"0.04", Periodic(2), 5))
 duration(Modified(), yield_big, cfs_big)
 ```
 
-With QuantLib the entire library is `double`; raising precision is a library fork.
+With QuantLib the entire library is compiled against a single `Real` typedef (`double` in every stock distribution); changing precision means recompiling the C++ library and its bindings, not swapping a type at the call site.
 
 The composability does have limits worth naming. `ForwardDiff` walks through whatever Julia code you write *as long as* the code stays in generic-numeric territory — Float64 type pins, in-place mutation, and FFI calls into non-Dual-aware solvers (some configurations of `Optim.LBFGS`, certain root-finders) break the chain. FinanceModels' own interfaces are written to be AD-friendly throughout; the caveats are about user code that reaches outside the library.
 
@@ -371,7 +379,7 @@ hw_pvs = [FinanceCore.present_value(p, cfs_static) for p in paths]
     mc_standard_error=std(hw_pvs) / sqrt(length(hw_pvs)))
 ```
 
-Under a flat calibrating curve and σ = 1% the MC mean sits a few cents above the deterministic, with an MC standard error of comparable size — read: the gap is *consistent with* a small Jensen's-inequality correction from rate volatility, but at this σ the signal isn't large versus the MC noise. A realistic 2026 calibration would put σ in the 80–120bp range, where the correction is comfortably outside the SE. The composition itself is the takeaway: `simulate` produces yield-curve scenarios, `present_value` prices contracts against them, and the existing valuation machinery handles the rest. Closed-form `present_value` is also available under the Gaussian models for ZCB calls and puts, caps, floors, and Jamshidian-decomposed European swaptions.
+The MC mean sits within a couple of standard errors of the deterministic PV — and that's the expected result, not a shortfall of the simulation. Hull-White's θ(t) is fitted to the calibrating curve, so by construction the expectation of the pathwise discount factors reproduces the curve's discount factors; for *fixed* cashflows the MC mean is an unbiased estimator of the deterministic PV at any σ. The residual gap is Monte-Carlo noise plus the Euler scheme's O(Δt) discretization bias, and it shrinks with more scenarios and finer timesteps. (Volatility-driven "convexity corrections" arise for rate-*dependent* payoffs — a floating leg, an option — not for fixed cashflows discounted along each path.) The composition itself is the takeaway: `simulate` produces yield-curve scenarios, `present_value` prices contracts against them, and the existing valuation machinery handles the rest. Closed-form `present_value` is also available under the Gaussian models for ZCB calls and puts, caps, floors, and Jamshidian-decomposed European swaptions.
 
 The payoff of scenarios *being* yield curves shows up when you differentiate. `simulate` threads `ForwardDiff.Dual` types, so the AD walks straight *through* the Monte Carlo PV — no bumping, no separate Greek path. ActuaryUtilities 5.8 ships that as a first-class call: hand `sensitivities` a `KeyRates(tenors)` marker and a short-rate model, and it returns Monte-Carlo key-rate durations (plus a convexity matrix, and a `DV01()` variant) from one AD pass over the scenario set:
 
@@ -407,7 +415,7 @@ dPdr0_vas = ForwardDiff.derivative(pv_mc_vasicek_r0, r0_base)
 
 Same common-random-numbers seed across the value and the gradient, so the derivative is the pathwise sensitivity rather than a bumped finite difference — and like any MC estimate it carries a standard error you'd report alongside it. Two kinds of stochastic-model sensitivity flow through `ForwardDiff` today: against the calibrating *curve* (the shipped `sensitivities(KeyRates(…), hw, …)` call above) and against an *initial rate* (the scalar derivative here). Differentiating against the SDE *coefficients* — mean reversion `a`, vol `σ` — still trips a `Float64` type-pin inside `simulate`'s path buffers; it's a narrow FM fix, but not yet shipped.
 
-QL fundamentally can't do any of this through Python, because the FFI boundary breaks the AD chain. For MC-based calibration objectives with exact gradients, or pathwise sensitivities under a short-rate model, JA is ahead of QL by capability, not by speed.
+Stock QuantLib-Python can't do any of this, because the FFI boundary breaks the AD chain. (Specialized AAD builds of QuantLib exist — e.g. the XAD-based QuantLib-Risks project, which embeds the AD inside the C++ layer and exposes it to Python — but they are separate distributions, not the library most users install.) For MC-based calibration objectives with exact gradients, or pathwise sensitivities under a short-rate model, JA is ahead of QL by capability, not by speed.
 
 What FM lacks is the *lattice* layer: there's no trinomial-tree engine for early-exercise payoffs, no built-in Longstaff-Schwartz for American Monte Carlo, no multi-factor models like G2++ or LMM, and no calibrator against a swaption-cube vol surface. For a Bermudan callable bond valued under a calibrated short-rate model with market vols, QL's tree engine is still the right tool. The QL-only territory is more precisely *lattice-based early-exercise valuation under stochastic rates*, rather than stochastic rates in general, which JA handles directly.
 
@@ -440,12 +448,14 @@ QuantLib-Python via `timeit`:
 
 | Workload — JA call / QL call                                                            | FinanceModels (Julia) | QuantLib (Python)  | factor |
 |------------------------------------------------------------------------------------------|-----------------------|--------------------|--------|
-| Bond price — `FinanceCore.pv` / `bond.NPV()`                                             | ~25 ns                | ~235 ns            | ~9×    |
+| Bond price — `FinanceCore.pv` / `bond.NPV()` (cached / forced reprice)                   | ~25 ns                | ~235 ns / ~1.2 μs  | ~9× / ~50× |
 | Modified duration — `duration(Modified(), …)` / `BondFunctions.duration`                 | ~260 ns (AD)          | ~1.25 μs           | ~5×    |
 | Convexity — `convexity` / `BondFunctions.convexity`                                      | ~300 ns (nested AD)   | ~1.25 μs           | ~4×    |
 | 30-pillar KRD — `duration(KeyRates(tenors), zrc, cfs)` / per-pillar `ZeroCurve` bumps          | ~10 μs (single AD pass)| ~1170 μs          | ~120×  |
 
-Two things drive the gap. First, **the Python boundary, not the C++ math**: every QL call dispatched from Python costs ~200–300 ns of object marshaling regardless of what's on the other side. For single-instrument metrics — price, duration, convexity — the actual C++ work is fast enough that the boundary cost dominates, which is why all three rows land in the same 4–9× neighborhood. Duration and convexity both clock in at ~1.25 μs because they're the same shape from Python's perspective: one bond, one `InterestRate`, one C++ function call, one returned scalar.
+One caveat on the price row: QL `Instrument`s are `LazyObject`s, so after the first call `bond.NPV()` returns a cached value until an observable changes — the ~235 ns figure is SWIG marshaling plus a cache hit, not repricing. Forcing a recalculation (`bond.recalculate()` before the `NPV()` call, or bumping a `SimpleQuote` feeding the curve) costs ~1.2 μs, in line with the duration and convexity rows, which do recompute on every call.
+
+Two things drive the gap. First, **the Python boundary, not the C++ math**: every QL call dispatched from Python costs ~200–300 ns of object marshaling regardless of what's on the other side. For single-instrument metrics — price, duration, convexity — the C++ work per call is small enough that the boundary cost is a large share of the total, which is why the recomputing rows all land in the same ~1.2 μs neighborhood: one bond, one `InterestRate`, one C++ function call, one returned scalar.
 
 ::: {.callout-note collapse="true"}
 ## Is the ~200–300 ns Python boundary fundamental, or just SWIG?
@@ -525,20 +535,28 @@ bond.setPricingEngine(ql.DiscountingBondEngine(ql.YieldTermStructureHandle(flat)
 y_ann = math.exp(0.03) - 1
 ir    = ql.InterestRate(y_ann, day_count, ql.Compounded, ql.Annual)
 
+# NB: Instruments are LazyObjects — after the first call NPV() is cached until an
+# observable changes, so the first line times marshaling + a cache hit. The
+# second forces a full reprice on every iteration.
 timeit.timeit(lambda: bond.NPV(),                                                number=10_000)
+timeit.timeit(lambda: (bond.recalculate(), bond.NPV()),                          number=10_000)
 timeit.timeit(lambda: ql.BondFunctions.duration(bond, ir, ql.Duration.Modified), number=10_000)
 timeit.timeit(lambda: ql.BondFunctions.convexity(bond, ir),                      number=10_000)
 
-# 30-pillar KRD setup
+base_price = bond.NPV()
+
+# 30-pillar KRD setup. The t = 0 anchor pillar is required: without it the
+# ZeroCurve's reference date becomes the 1y pillar and the bond's first coupon
+# sits at negative time, which throws.
 pillars         = list(range(1, 31))
-pillar_dates_30 = [settle + ql.Period(y, ql.Years) for y in pillars]
-flat_zeros_30   = [0.03] * len(pillars)
+pillar_dates_30 = [settle + ql.Period(y, ql.Years) for y in [0] + pillars]
+flat_zeros_30   = [0.03] * (len(pillars) + 1)
 shift           = 1e-3
 
 # Per-pillar ZeroCurve bump-and-rebuild
 def krd_zerocurve():
     out = []
-    for i in range(len(pillars)):
+    for i in range(1, len(pillars) + 1):   # bump the 1y..30y pillars, not the anchor
         up = flat_zeros_30[:];  up[i] += shift
         dn = flat_zeros_30[:];  dn[i] -= shift
         zc_up = ql.ZeroCurve(pillar_dates_30, up, day_count, ql.NullCalendar(),
@@ -549,7 +567,7 @@ def krd_zerocurve():
         p_up = bond.NPV()
         bond.setPricingEngine(ql.DiscountingBondEngine(ql.YieldTermStructureHandle(zc_dn)))
         p_dn = bond.NPV()
-        out.append((p_dn - p_up) / (2 * shift * 100))
+        out.append((p_dn - p_up) / (2 * shift * base_price))
     bond.setPricingEngine(ql.DiscountingBondEngine(ql.YieldTermStructureHandle(flat)))
     return out
 
@@ -567,7 +585,7 @@ The two libraries aren't really competing for the same job. They're optimized fo
 
 ---
 
-The `cfs` defined at the top of this post threaded through every example: price, Macaulay and Modified duration, convexity, ten KRDs, a 30-pillar KRD benchmark, the second-order sensitivity through a calibrated zero curve, the prepayment-sensitive mortgage pool with refi response, the Hull-White Monte Carlo. The library never needed a sensitivity-specific API or an AD-aware override; generic numeric types flowed through ordinary functions, and `ForwardDiff` extracted whatever derivative each step needed.
+The `cfs` defined at the top of this post threaded through most of the examples: price, Modified duration, convexity, ten KRDs, a 30-pillar KRD benchmark, the second-order sensitivity through a calibrated zero curve. Its mortgage-pool sibling carried the prepayment-sensitive refi example and the Hull-White Monte Carlo — same `Cashflow` vocabulary, same functions. The library never needed a sensitivity-specific API or an AD-aware override; generic numeric types flowed through ordinary functions, and `ForwardDiff` extracted whatever derivative each step needed.
 
 That's the part that's hard to retrofit into a framework written before automatic differentiation became cheap.
 

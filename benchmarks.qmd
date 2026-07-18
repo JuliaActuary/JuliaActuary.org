@@ -107,7 +107,7 @@ All of the benchmarked code can be found in the [JuliaActuary Learn repository](
 
 ## IRRs
 
-**Task:** determine the IRR for a series of cashflows 701 elements long (e.g. monthly cashflows for 60 years).
+**Task:** determine the IRR for a series of cashflows 701 elements long (roughly 58 years of monthly cashflows).
 
 ### Benchmarks
 
@@ -127,7 +127,7 @@ Times are in nanoseconds:
 
 ### Discussion
 
-The ActuaryUtilities implementation is over 100,000 times faster than `numpy_financial`, and 91 to 722 times faster than the `better` Python package. The [ActuaryUtilities.jl](/#actuaryutilitiesjl) implementation is also more flexible, as it can be given an argument with timepoints, similar to Excel's `XIRR`.
+The ActuaryUtilities implementation is over 100,000 times faster than `numpy_financial`, and 91 to 722 times faster than the `better` Python package. The [ActuaryUtilities.jl](/packages.html#actuaryutilities.jl) implementation is also more flexible, as it can be given an argument with timepoints, similar to Excel's `XIRR`.
 
 Excel was used to attempt a benchmark, but the `IRR` formula returned a `#DIV/0!` error.
 
@@ -154,7 +154,7 @@ Times are in nanoseconds:
 ┌──────────┬─────────┬─────────────┬───────────────┐
 │ Language │  Median │        Mean │ Relative Mean │
 ├──────────┼─────────┼─────────────┼───────────────┤
-│   Python │ missing │    817000.0 │       19926.0 │
+│   Python │ missing │    817000.0 │       19639.4 │
 │        R │  3649.0 │      3855.2 │          92.7 │
 │    Julia │    41.0 │        41.6 │           1.0 │
 └──────────┴─────────┴─────────────┴───────────────┘
@@ -180,6 +180,6 @@ All of the benchmarked code can be found in the [JuliaActuary Learn repository](
 
 ## Footnotes
 
-[^1] If benchmarking memoization, it's essentially benchmarking how long it takes to perform hashing in a language. While interesting, especially in the context of [incremental computing](https://scattered-thoughts.net/writing/an-opinionated-map-of-incremental-and-streaming-systems), it's not the core issue at hand. Incremental computing libraries exist for all of the modern languages discussed here.
+[^1]: If benchmarking memoization, it's essentially benchmarking how long it takes to perform hashing in a language. While interesting, especially in the context of [incremental computing](https://scattered-thoughts.net/writing/an-opinionated-map-of-incremental-and-streaming-systems), it's not the core issue at hand. Incremental computing libraries exist for all of the modern languages discussed here.
 
-[^2] Note that not all languages have both a mean and median result in their benchmarking libraries. Mean is a better representation for a garbage-collected modern language, because sometimes the computation just takes longer than the median result. Where the mean is not available in the graph below, median is substituted.
+[^2]: Note that not all languages have both a mean and median result in their benchmarking libraries. Mean is a better representation for a garbage-collected modern language, because sometimes the computation just takes longer than the median result. Where one of the two statistics is not reported, the other is shown.

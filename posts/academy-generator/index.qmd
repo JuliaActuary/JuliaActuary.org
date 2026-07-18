@@ -179,4 +179,4 @@ end
 
 ## See also
 
-[Interactive AAA Economic Scenario Generator](/examples/academy-generator-rates/)
+[Interactive AAA Economic Scenario Generator](/posts/academy-generator-rates/)

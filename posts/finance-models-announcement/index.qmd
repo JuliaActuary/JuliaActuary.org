@@ -21,16 +21,16 @@ This blog post describes the conceptual overview and motivation for the change.
 
 ## 1. `Cashflow` - a fundamental financial type
 
-Say you wanted to model a contract that paid quarterly payments, and those payments occurred starting 15 days from the valuation date (first payment time = 15/365 = 0.057)
+Say you wanted to model a contract that paid quarterly payments, and those payments occurred starting 15 days from the valuation date (first payment time = 15/365 ≈ 0.041)
 
 Previously, you had two options:
 
 1. Choose a discrete timestep to model (e.g. monthly, quarterly, annual) and then lump the cashflows into those timesteps. E.g. with monthly timesteps  of a unit payment of our contract, it might look like: `[1,0,0,1,0,0...]`
-2. Keep track of two vectors: one for the payment and one for the times. In this case, that might look like: `cfs = [1,1,...]; `times = `[0.057, 0.307...]`
+2. Keep track of two vectors: one for the payment and one for the times. In this case, that might look like: `cfs = [1,1,...]; `times = `[0.041, 0.291...]`
 
 The former has inaccuracies due to the simplified timing and logical complication related to mapping the contracts natural periodicity into an arbitrary modeling choice. The latter becomes unwieldy and fails to take advantage of Julia's type system. 
 
-The new solution: `Cashflow`s. Our example above would become: `[Cashflow(1,0.057), Cashflow(1,0.307),...]`
+The new solution: `Cashflow`s. Our example above would become: `[Cashflow(1,0.041), Cashflow(1,0.291),...]`
 
 ## 2. **Contracts** - A composable way to represent financial instruments
 
@@ -57,7 +57,7 @@ A contract is anything that creates a vector of `Cashflow`s when `collect`ed. Fo
 using FinanceModels,FinanceCore
 
 # Transducers is used to provide a more powerful, composable way to construct collections than the basic iteration interface
-using Transducers: __foldl__, @next, complete
+using Transducers: Transducers, __foldl__, @next, complete
 
 """
 A bond which pays down its par (one unit) in equal payments. 
@@ -190,14 +190,14 @@ julia> map(q -> pv(m,q.instrument),quotes)
        Model                                                               Method
           |                                                                   |
     |------------|                                                     |---------------|
-fit(Spline.Cubic(), CMTYield.([0.04,0.05,0.055,0.06,0055],[1,2,3,4,5]), Fit.Bootstrap())
+fit(Spline.Cubic(), CMTYield.([0.04,0.05,0.055,0.06,0.065],[1,2,3,4,5]), Fit.Bootstrap())
                     |-------------------------------------------------|
                                               |
                                               Quotes
 ```
 
  - **Model** could be `Spline.Linear()`, `Yield.NelsonSiegelSvensson()`, `Equity.BlackScholesMerton(...)`, etc.
- - **Quote** could be `CMTYield`s, `ParYield`s, `Option.Eurocall`, etc.
+ - **Quote** could be `CMTYield`s, `ParYield`s, `Option.EuroCall`, etc.
  - **Method** could be `Fit.Loss(x->x^2)`, `Fit.Loss(x->abs(x))`, `Fit.Bootstrap()`, etc.
 
 The benefit of this versus the old Yields.jl API is:
@@ -211,9 +211,9 @@ The benefit of this versus the old Yields.jl API is:
 Model fitting can be customized:
 
 - The **loss function** (least squares, absolute difference, etc.) via the third argument to `fit`:
-  - e.g.`fit(ABDiscountLine(), quotes, FIt.Loss(x -> abs(x))`
+  - e.g.`fit(ABDiscountLine(), quotes, Fit.Loss(x -> abs(x)))`
   - the default is `Fit.Loss(x->x^2)`
-- the **optimization algorithm** by defining a method `FinanceModels.__default_optim__(m::ABDiscountLine) = OptimizationOptimJL.Newton()`
+- the **optimization algorithm** by defining a method `FinanceModels.__default_optim(m::ABDiscountLine) = OptimizationOptimJL.Newton()`
   - you may need to change the `__default_optic` to be unbounded (simply omit the `=>` and subsequent bounds)
   - The default is OptimizationMetaheuristics.ECA()
 - The **general algorithm** can be customized by creating a new method for fit: 
@@ -352,7 +352,7 @@ julia> collect(p)
 10-element Vector{NamedTuple{(:time, :payment, :outstanding), Tuple{Float64, Float64, Float64}}}:
  (time = 0.5, payment = 0.1, outstanding = 0.9)
  (time = 1.0, payment = 0.1, outstanding = 0.8)
- (time = 1.5, payment = 0.1, outstnding = 0.7000000000000001)
+ (time = 1.5, payment = 0.1, outstanding = 0.7000000000000001)
  (time = 2.0, payment = 0.1, outstanding = 0.6000000000000001)
  (time = 2.5, payment = 0.1, outstanding = 0.5000000000000001)
  (time = 3.0, payment = 0.1, outstanding = 0.40000000000000013)

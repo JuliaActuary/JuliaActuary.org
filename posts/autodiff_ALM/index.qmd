@@ -260,14 +260,14 @@ The first element of `vgh_liab` is the value of the liability portfolio using th
 vgh_liab[1]
 ```
 
-The second element of `vgh_liab` is the partial derivative with respect to each of the inputs (here, just the `zeros` rates that dictate the curve). The sum of the partials is the effective duration of the liabilities. 
+The second element of `vgh_liab` is the partial derivative with respect to each of the inputs (here, just the `zeros` rates that dictate the curve). The sum of the partials is the (dollar) sensitivity of the liabilities to a parallel shift in rates — a dollar duration, which becomes the effective duration once divided by the value (shown below).
 
 ```{julia}
 @show sum(vgh_liab[2])
 vgh_liab[2]
 ```
 
-This is the sensitivity relative to a full unit change in rates (e.g. `1.0`). So if we wanted to estimate the dollar impact of a 50bps change, we would take `0.005` times the gradient/hessian. Also note these are 'dollar durations' but we could divide by the price to get `effective` or percentage durations:
+This is the sensitivity relative to a full unit change in rates (e.g. `1.0`). So if we wanted to estimate the dollar impact of a 50bps change, we would take `0.005` times the gradient (and for the second-order refinement, add `½ × 0.005²` times the hessian). Also note these are 'dollar durations' but we could divide by the price to get `effective` or percentage durations:
 
 ```{julia}
 -sum(vgh_liab[2]) / vgh_liab[1]
@@ -292,7 +292,7 @@ let
 end
 ```
 
-Due to the steepness of the surrender function, the policy exiting sooner, on average, results in a higher change in value than if the policy was not sensitive to the change in rates. The increase in value from earlier cashflows outweighs the greater discount rate.
+Due to the steepness of the surrender function, a rise in rates causes the policy to exit sooner on average, shortening the liability and partially offsetting the discounting effect. The dynamic sensitivity is therefore smaller in magnitude than the static sensitivity, which ignores the interest-sensitive behavior.
 
 The third element of `vgh_liab` is the Hessian matrix, containing all second partial derivatives with respect to the yield curve inputs:
 
@@ -386,7 +386,7 @@ function optimize_portfolio(assets, vgh_assets, liabs, vgh_liabs, constraints)
 
     # Gradient component (krd) constraints
     for j in 1:length(vgh_liabs[2])
-        gradient_sum = sum(w[i] * vgh_assets[i][2][j] for i in 1:n) - sum(vgh_liabs[2][j])
+        gradient_sum = sum(w[i] * vgh_assets[i][2][j] for i in 1:n) + vgh_liabs[2][j]
 
         @constraint(model, gradient_sum >= constraints[:krd][:lower])
         @constraint(model, gradient_sum <= constraints[:krd][:upper])
@@ -394,8 +394,8 @@ function optimize_portfolio(assets, vgh_assets, liabs, vgh_liabs, constraints)
 
     # total duration constraint 
     duration_gap = sum(w[i] * sum(vgh_assets[i][2]) for i in 1:n) + sum(vgh_liabs[2])
-    @constraint(model, duration_gap <= constraints[:krd][:upper])
-    @constraint(model, duration_gap >= constraints[:krd][:lower])
+    @constraint(model, duration_gap <= constraints[:duration][:upper])
+    @constraint(model, duration_gap >= constraints[:duration][:lower])
 
     # Solve
     optimize!(model)
