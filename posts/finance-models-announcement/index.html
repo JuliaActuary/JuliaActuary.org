@@ -44,7 +44,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-a0731b9a3a5d496010872d775e5d9bc3.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-a9c66334b43f472998d4f0687f28726e.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-98ac2d5361ef6f18cc0525d38bedc462.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -72,6 +72,9 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&amp;family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&amp;display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../../assets/highlight/styles/github.min.css">
 <script src="../../assets/highlight/highlight.min.js"></script>
 <script src="../../assets/highlight/languages/julia.min.js"></script>
@@ -109,6 +112,14 @@ ul.task-list li input[type="checkbox"] {
   <li class="nav-item">
     <a class="nav-link" href="../../packages.html"> 
 <span class="menu-text">Packages</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://docs.juliaactuary.org"> 
+<span class="menu-text">Docs</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://modernfinancialmodeling.com"> 
+<span class="menu-text">Book</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="../../learn.html"> 
@@ -215,14 +226,14 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="cashflow---a-fundamental-financial-type" class="level2">
 <h2 class="anchored" data-anchor-id="cashflow---a-fundamental-financial-type">1. <code>Cashflow</code> - a fundamental financial type</h2>
-<p>Say you wanted to model a contract that paid quarterly payments, and those payments occurred starting 15 days from the valuation date (first payment time = 15/365 = 0.057)</p>
+<p>Say you wanted to model a contract that paid quarterly payments, and those payments occurred starting 15 days from the valuation date (first payment time = 15/365 ≈ 0.041)</p>
 <p>Previously, you had two options:</p>
 <ol type="1">
 <li>Choose a discrete timestep to model (e.g.&nbsp;monthly, quarterly, annual) and then lump the cashflows into those timesteps. E.g. with monthly timesteps of a unit payment of our contract, it might look like: <code>[1,0,0,1,0,0...]</code></li>
-<li>Keep track of two vectors: one for the payment and one for the times. In this case, that might look like: <code>cfs = [1,1,...];</code>times = <code>[0.057, 0.307...]</code></li>
+<li>Keep track of two vectors: one for the payment and one for the times. In this case, that might look like: <code>cfs = [1,1,...];</code>times = <code>[0.041, 0.291...]</code></li>
 </ol>
 <p>The former has inaccuracies due to the simplified timing and logical complication related to mapping the contracts natural periodicity into an arbitrary modeling choice. The latter becomes unwieldy and fails to take advantage of Julia’s type system.</p>
-<p>The new solution: <code>Cashflow</code>s. Our example above would become: <code>[Cashflow(1,0.057), Cashflow(1,0.307),...]</code></p>
+<p>The new solution: <code>Cashflow</code>s. Our example above would become: <code>[Cashflow(1,0.041), Cashflow(1,0.291),...]</code></p>
 </section>
 <section id="contracts---a-composable-way-to-represent-financial-instruments" class="level2">
 <h2 class="anchored" data-anchor-id="contracts---a-composable-way-to-represent-financial-instruments">2. <strong>Contracts</strong> - A composable way to represent financial instruments</h2>
@@ -251,7 +262,7 @@ ul.task-list li input[type="checkbox"] {
 <pre class="julia"><code>using FinanceModels,FinanceCore
 
 # Transducers is used to provide a more powerful, composable way to construct collections than the basic iteration interface
-using Transducers: __foldl__, @next, complete
+using Transducers: Transducers, __foldl__, @next, complete
 
 """
 A bond which pays down its par (one unit) in equal payments. 
@@ -367,13 +378,13 @@ m = fit(ABDiscountLine(),quotes)</code></pre>
 <pre class="plaintext"><code>       Model                                                               Method
           |                                                                   |
     |------------|                                                     |---------------|
-fit(Spline.Cubic(), CMTYield.([0.04,0.05,0.055,0.06,0055],[1,2,3,4,5]), Fit.Bootstrap())
+fit(Spline.Cubic(), CMTYield.([0.04,0.05,0.055,0.06,0.065],[1,2,3,4,5]), Fit.Bootstrap())
                     |-------------------------------------------------|
                                               |
                                               Quotes</code></pre>
 <ul>
 <li><strong>Model</strong> could be <code>Spline.Linear()</code>, <code>Yield.NelsonSiegelSvensson()</code>, <code>Equity.BlackScholesMerton(...)</code>, etc.</li>
-<li><strong>Quote</strong> could be <code>CMTYield</code>s, <code>ParYield</code>s, <code>Option.Eurocall</code>, etc.</li>
+<li><strong>Quote</strong> could be <code>CMTYield</code>s, <code>ParYield</code>s, <code>Option.EuroCall</code>, etc.</li>
 <li><strong>Method</strong> could be <code>Fit.Loss(x-&gt;x^2)</code>, <code>Fit.Loss(x-&gt;abs(x))</code>, <code>Fit.Bootstrap()</code>, etc.</li>
 </ul>
 <p>The benefit of this versus the old Yields.jl API is:</p>
@@ -388,10 +399,10 @@ fit(Spline.Cubic(), CMTYield.([0.04,0.05,0.055,0.06,0055],[1,2,3,4,5]), Fit.Boot
 <ul>
 <li>The <strong>loss function</strong> (least squares, absolute difference, etc.) via the third argument to <code>fit</code>:
 <ul>
-<li>e.g.<code>fit(ABDiscountLine(), quotes, FIt.Loss(x -&gt; abs(x))</code></li>
+<li>e.g.<code>fit(ABDiscountLine(), quotes, Fit.Loss(x -&gt; abs(x)))</code></li>
 <li>the default is <code>Fit.Loss(x-&gt;x^2)</code></li>
 </ul></li>
-<li>the <strong>optimization algorithm</strong> by defining a method <code>FinanceModels.__default_optim__(m::ABDiscountLine) = OptimizationOptimJL.Newton()</code>
+<li>the <strong>optimization algorithm</strong> by defining a method <code>FinanceModels.__default_optim(m::ABDiscountLine) = OptimizationOptimJL.Newton()</code>
 <ul>
 <li>you may need to change the <code>__default_optic</code> to be unbounded (simply omit the <code>=&gt;</code> and subsequent bounds)</li>
 <li>The default is OptimizationMetaheuristics.ECA()</li>
@@ -507,7 +518,7 @@ end</code></pre>
 10-element Vector{NamedTuple{(:time, :payment, :outstanding), Tuple{Float64, Float64, Float64}}}:
  (time = 0.5, payment = 0.1, outstanding = 0.9)
  (time = 1.0, payment = 0.1, outstanding = 0.8)
- (time = 1.5, payment = 0.1, outstnding = 0.7000000000000001)
+ (time = 1.5, payment = 0.1, outstanding = 0.7000000000000001)
  (time = 2.0, payment = 0.1, outstanding = 0.6000000000000001)
  (time = 2.5, payment = 0.1, outstanding = 0.5000000000000001)
  (time = 3.0, payment = 0.1, outstanding = 0.40000000000000013)

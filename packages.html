@@ -42,7 +42,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-a0731b9a3a5d496010872d775e5d9bc3.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-a9c66334b43f472998d4f0687f28726e.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-98ac2d5361ef6f18cc0525d38bedc462.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -70,6 +70,9 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&amp;family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&amp;display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./assets/highlight/styles/github.min.css">
 <script src="./assets/highlight/highlight.min.js"></script>
 <script src="./assets/highlight/languages/julia.min.js"></script>
@@ -105,12 +108,16 @@ ul.task-list li input[type="checkbox"] {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
+    <a class="nav-link active" href="./packages.html" aria-current="page"> 
+<span class="menu-text">Packages</span></a>
+  </li>  
+  <li class="nav-item">
     <a class="nav-link" href="https://docs.juliaactuary.org"> 
 <span class="menu-text">Docs</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="./packages.html" aria-current="page"> 
-<span class="menu-text">Packages</span></a>
+    <a class="nav-link" href="https://modernfinancialmodeling.com"> 
+<span class="menu-text">Book</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="./learn.html"> 
@@ -352,7 +359,6 @@ julia&gt; decrement(vbt2001.ultimate,30,40) # the decrement between ages 30 and 
 m[20]                 # the mortality rate at age 20
 decrement(m,20,25)    # the five year cumulative mortality rate
 survival(m,20,25) # the five year survival rate</code></pre>
-<p><a href="https://docs.juliaactuary.org/MortalityTables/stable/">MortalityTables documentation 🡭</a></p>
 <p><a href="https://github.com/JuliaActuary/MortalityTables.jl">MortalityTables package on Github 🡭</a></p>
 </section>
 </section>
@@ -424,7 +430,6 @@ convexity(discount_rate, cfs, times)               #  10.62</code></pre>
 <li>Calculate the duration given an issue date and date (a.k.a. policy duration)</li>
 </ul></li>
 </ul>
-<p><a href="https://docs.juliaactuary.org/ActuaryUtilities/stable/">ActuaryUtilities documentation 🡭</a></p>
 <p><a href="https://github.com/JuliaActuary/ActuaryUtilities.jl">ActuaryUtilities package on GitHub 🡭</a></p>
 </section>
 </section>
@@ -500,7 +505,7 @@ premium_net(lc)                    # Net whole life premium
 V(lc,5)                            # Net premium reserve for whole life insurance at time 5</code></pre>
 <p>Other types of life contingent benefits:</p>
 <pre class="julia"><code>Insurance(lc,10)                 # 10 year term insurance
-AnnuityImmediate(lc)               # Whole life annuity due
+AnnuityImmediate(lc)               # Whole life annuity immediate
 AnnuityDue(lc)                     # Whole life annuity due
 ä(lc)                              # Shortform notation
 ä(lc, 5)                           # 5 year annuity due
@@ -514,7 +519,6 @@ SingleLife(vbt2001.select[50],issue_age = 60)  # select at 50, but now 60
 SingleLife(vbt2001.select,issue_age = 50)      # use issue_age to pick the right select vector
 SingleLife(mortality=vbt2001.select,issue_age = 50) # mort can also be a keyword
 </code></pre>
-<p><a href="https://docs.juliaactuary.org/LifeContingencies/stable/">LifeContingencies documentation 🡭</a></p>
 <p><a href="https://github.com/JuliaActuary/LifeContingencies.jl">LifeContingencies package on GitHub 🡭</a></p>
 </section>
 </section>
@@ -542,17 +546,17 @@ q_rate = ZCBYield([0.01,0.02,0.03]);
 q_spread = ZCBYield([0.01,0.01,0.01]);
 
 # bootstrap a linear spline yield model
-model_rate = fit(Spline.Linear(),q_rate,Fit.Bootstrap());⠀           
+model_rate = fit(Spline.Linear(),q_rate,Fit.Bootstrap());
 model_spread = fit(Spline.Linear(),q_spread,Fit.Bootstrap());
 
 # the zero rate is the combination of the two underlying rates
-zero(m_spread + m_rate,1) # 0.02 annual effective rate 
+zero(model_spread + model_rate,1) # ≈ 0.02
 
-# the discount is the same as if we added the underlying zero rates
-discount(m_spread + m_rate,0,3) ≈ discount(0.01 + 0.03,3)   # true
+# combining models composes the discount factors multiplicatively
+discount(model_spread + model_rate,0,3) ≈ discount(model_spread,0,3) * discount(model_rate,0,3)   # true
 
 # compute the present value of a contract (a cashflow of 10 at time 3)
-present_value(m_rate,Cashflow(10,3)) # 9.15...</code></pre>
+present_value(model_rate,Cashflow(10,3)) # 9.15...</code></pre>
 </section>
 <section id="overview-of-financemodels" class="level3">
 <h3 class="anchored" data-anchor-id="overview-of-financemodels">Overview of FinanceModels</h3>
@@ -614,7 +618,7 @@ present_value(m_rate,Cashflow(10,3)) # 9.15...</code></pre>
 <ul>
 <li><code>discount(curve,from,to)</code> or <code>discount(curve,to)</code> gives the discount factor</li>
 <li><code>accumulation(curve,from,to)</code> or <code>accumulation(curve,to)</code> gives the accumulation factor</li>
-<li><code>zero(curve,time)</code> or <code>zero(curve,time,Frequency)</code> gives the zero-coupon spot rate for the given time.</li>
+<li><code>zero(curve,time)</code> gives the zero-coupon spot rate for the given time (returned as a <code>Continuous</code> <code>Rate</code>).</li>
 <li><code>forward(curve,from,to)</code> gives the zero rate between the two given times</li>
 <li><code>par(curve,time;frequency=2)</code> gives the coupon-paying par equivalent rate for the given time.</li>
 </ul>
@@ -667,13 +671,13 @@ julia&gt; collect(b)
 <pre class="plaintext"><code>       Model                                                               Method
           |                                                                   |
     |------------|                                                     |---------------|
-fit(Spline.Cubic(), CMTYield.([0.04,0.05,0.055,0.06,0055],[1,2,3,4,5]), Fit.Bootstrap())
+fit(Spline.Cubic(), CMTYield.([0.04,0.05,0.055,0.06,0.065],[1,2,3,4,5]), Fit.Bootstrap())
                     |-------------------------------------------------|
                                               |
                                               Quotes</code></pre>
 <ul>
 <li><strong>Model</strong> could be <code>Spline.Linear()</code>, <code>Yield.NelsonSiegelSvensson()</code>, <code>Equity.BlackScholesMerton(...)</code>, etc.</li>
-<li><strong>Quote</strong> could be <code>CMTYield</code>s, <code>ParYield</code>s, <code>Option.Eurocall</code>, etc.</li>
+<li><strong>Quote</strong> could be <code>CMTYield</code>s, <code>ParYield</code>s, <code>Option.EuroCall</code>, etc.</li>
 <li><strong>Method</strong> could be <code>Fit.Loss(x-&gt;x^2)</code>, <code>Fit.Loss(x-&gt;abs(x))</code>, <code>Fit.Bootstrap()</code>, etc.</li>
 </ul>
 <p>This unified way to fit models offers a much simpler way to extend functionality to new models or contract types.</p>
@@ -714,7 +718,6 @@ convert(FinanceModels.Continuous(),r)          # convert monthly rate to continu
 <section id="arithmetic" class="level4">
 <h4 class="anchored" data-anchor-id="arithmetic">Arithmetic</h4>
 <p>Adding, substracting, multiplying, dividing, and comparing rates is supported.</p>
-<p><a href="https://docs.juliaactuary.org/FinanceModels/stable/">FinanceModels documentation 🡭</a></p>
 <p><a href="https://github.com/JuliaActuary/FinanceModels.jl">FinanceModels package on GitHub 🡭</a></p>
 <!-- =============================
      ExperienceAnalysis
@@ -862,11 +865,10 @@ df.exposure_fraction =
 <li><code>ExperienceAnalysis.AnniversaryCalendar(period,period)</code> will split into the smaller of the calendar or policy period.</li>
 </ul>
 <p>Where <code>period</code> is a <a href="https://docs.julialang.org/en/v1/stdlib/Dates/#Period-Types">Period Type from the Dates standard library</a>.</p>
-<p>Calculate exposures with <code>exposures(basis,from,to,continue_exposure)</code>.</p>
+<p>Calculate exposures with <code>exposure(basis, from, to, continued_exposure; study_start, study_end)</code>.</p>
 <ul>
-<li><code>continue_exposures</code> indicates whether the exposure should be extended through the full exposure period rather than terminate at the <code>to</code> date.</li>
+<li><code>continued_exposure</code> indicates whether the exposure should be extended through the full exposure period rather than terminate at the <code>to</code> date.</li>
 </ul>
-<p><a href="https://docs.juliaactuary.org/ExperienceAnalysis/stable/">ExperienceAnalysis documentation 🡭</a></p>
 <p><a href="https://github.com/JuliaActuary/ExperienceAnalysis.jl">ExperienceAnalysis package on GitHub 🡭</a></p>
 <!-- =============================
      ExperienceAnalysis
@@ -884,7 +886,7 @@ df.exposure_fraction =
 <h4 class="anchored" data-anchor-id="interest-rate-models">Interest Rate Models</h4>
 <ul>
 <li><code>Vasicek</code></li>
-<li><code>CoxIngersolRoss</code></li>
+<li><code>CoxIngersollRoss</code></li>
 <li><code>HullWhite</code></li>
 </ul>
 </section>
@@ -915,7 +917,7 @@ end</code></pre>
 <pre class="julia"><code>YieldCurve(s)
 </code></pre>
 <p>will produce a yield curve object:</p>
-<pre class="julia-repl"><code>              ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀Yield Curve (FinanceModels.BootstrapCurve)⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀           
+<pre class="julia-repl"><code>              ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀Yield Curve (FinanceModels.Yield.Spline)⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
               ┌────────────────────────────────────────────────────────────┐           
          0.03 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⠤⠤⠔⠒⠉⠉⠒⠒⠒⠒⠒⠤⣄⣀│ Zero rates
               │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⠤⠒⠒⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│           
@@ -934,7 +936,6 @@ end</code></pre>
             0 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│           
               └────────────────────────────────────────────────────────────┘           
               ⠀0⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀time⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀30⠀           </code></pre>
-<p><a href="https://docs.juliaactuary.org/EconomicScenarioGenerators/stable/">EconomicScenarioGenerators documentation 🡭</a></p>
 <p><a href="https://github.com/JuliaActuary/EconomicScenarioGenerators.jl">EconomicScenarioGenerators package on GitHub 🡭</a></p>
 
 
