@@ -82,9 +82,9 @@ ul.task-list li input[type="checkbox"] {
     }
 
     const options = {
-      valueNames: ['listing-date','listing-title','listing-author','listing-image','listing-description','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
+      valueNames: ['listing-date','listing-title','listing-author','listing-subtitle','listing-image','listing-description','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
       
-      searchColumns: ["listing-date","listing-title","listing-author","listing-image","listing-description","listing-categories"],
+      searchColumns: ["listing-date","listing-title","listing-author","listing-subtitle","listing-image","listing-description","listing-categories"],
     };
 
     window['quarto-listings'] = window['quarto-listings'] || {};
@@ -243,7 +243,7 @@ window.Quarto = {
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         
-    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(17)</span></div><div class="category" data-category="YWN0dWFyeXV0aWxpdGllcw==">actuaryutilities <span class="quarto-category-count">(3)</span></div><div class="category" data-category="YWxt">alm <span class="quarto-category-count">(1)</span></div><div class="category" data-category="YXNzZXRz">assets <span class="quarto-category-count">(1)</span></div><div class="category" data-category="YXV0b2RpZmY=">autodiff <span class="quarto-category-count">(1)</span></div><div class="category" data-category="YmF5ZXNpYW4=">bayesian <span class="quarto-category-count">(2)</span></div><div class="category" data-category="YmVuY2htYXJr">benchmark <span class="quarto-category-count">(2)</span></div><div class="category" data-category="Y29kZQ==">code <span class="quarto-category-count">(1)</span></div><div class="category" data-category="ZGF0YWZyYW1lcw==">dataframes <span class="quarto-category-count">(3)</span></div><div class="category" data-category="ZGVzaWdu">design <span class="quarto-category-count">(1)</span></div><div class="category" data-category="ZGlmZmVx">diffeq <span class="quarto-category-count">(1)</span></div><div class="category" data-category="ZXhwZXJpZW5jZS1hbmFseXNpcw==">experience-analysis <span class="quarto-category-count">(5)</span></div><div class="category" data-category="ZXhwb3N1cmVz">exposures <span class="quarto-category-count">(2)</span></div><div class="category" data-category="ZmluYW5jZW1vZGVscw==">financemodels <span class="quarto-category-count">(3)</span></div><div class="category" data-category="bWFya2V0">market <span class="quarto-category-count">(1)</span></div><div class="category" data-category="bW9kZWxpbmc=">modeling <span class="quarto-category-count">(9)</span></div><div class="category" data-category="bW9ydGFsaXR5dGFibGVz">mortalitytables <span class="quarto-category-count">(5)</span></div><div class="category" data-category="c2NlbmFyaW8tZ2VuZXJhdG9y">scenario-generator <span class="quarto-category-count">(2)</span></div><div class="category" data-category="c3RhdGlzdGljcw==">statistics <span class="quarto-category-count">(3)</span></div><div class="category" data-category="c3Vydml2YWw=">survival <span class="quarto-category-count">(1)</span></div><div class="category" data-category="dHV0b3JpYWw=">tutorial <span class="quarto-category-count">(9)</span></div><div class="category" data-category="eWllbGRjdXJ2ZXM=">yieldcurves <span class="quarto-category-count">(1)</span></div></div></div>
+    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(18)</span></div><div class="category" data-category="YWN0dWFyeXV0aWxpdGllcw==">actuaryutilities <span class="quarto-category-count">(3)</span></div><div class="category" data-category="YWxt">alm <span class="quarto-category-count">(1)</span></div><div class="category" data-category="YXNzZXRz">assets <span class="quarto-category-count">(1)</span></div><div class="category" data-category="YXV0b2RpZmY=">autodiff <span class="quarto-category-count">(1)</span></div><div class="category" data-category="YmF5ZXNpYW4=">bayesian <span class="quarto-category-count">(3)</span></div><div class="category" data-category="YmVuY2htYXJr">benchmark <span class="quarto-category-count">(2)</span></div><div class="category" data-category="Y29kZQ==">code <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Y3JlZGliaWxpdHk=">credibility <span class="quarto-category-count">(1)</span></div><div class="category" data-category="ZGF0YWZyYW1lcw==">dataframes <span class="quarto-category-count">(3)</span></div><div class="category" data-category="ZGVzaWdu">design <span class="quarto-category-count">(1)</span></div><div class="category" data-category="ZGlmZmVx">diffeq <span class="quarto-category-count">(1)</span></div><div class="category" data-category="ZXhwZXJpZW5jZS1hbmFseXNpcw==">experience-analysis <span class="quarto-category-count">(6)</span></div><div class="category" data-category="ZXhwb3N1cmVz">exposures <span class="quarto-category-count">(2)</span></div><div class="category" data-category="ZmluYW5jZW1vZGVscw==">financemodels <span class="quarto-category-count">(3)</span></div><div class="category" data-category="bWFya2V0">market <span class="quarto-category-count">(1)</span></div><div class="category" data-category="bW9kZWxpbmc=">modeling <span class="quarto-category-count">(10)</span></div><div class="category" data-category="bW9ydGFsaXR5dGFibGVz">mortalitytables <span class="quarto-category-count">(5)</span></div><div class="category" data-category="c2NlbmFyaW8tZ2VuZXJhdG9y">scenario-generator <span class="quarto-category-count">(2)</span></div><div class="category" data-category="c3RhdGlzdGljcw==">statistics <span class="quarto-category-count">(4)</span></div><div class="category" data-category="c3Vydml2YWw=">survival <span class="quarto-category-count">(1)</span></div><div class="category" data-category="dHV0b3JpYWw=">tutorial <span class="quarto-category-count">(9)</span></div><div class="category" data-category="eWllbGRjdXJ2ZXM=">yieldcurves <span class="quarto-category-count">(1)</span></div></div></div>
 <!-- main -->
 <main class="content quarto-banner-title-block column-page-left" id="quarto-document-content">
 
@@ -282,7 +282,42 @@ window.Quarto = {
     </div>
 </div>
 <div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-categories="YWN0dWFyeXV0aWxpdGllcyUyQ2ZpbmFuY2Vtb2RlbHMlMkNhc3NldHM=" data-listing-file-modified-sort="1784337922982" data-listing-reading-time-sort="1" data-listing-word-count-sort="96">
+<div class="quarto-post image-right" data-index="0" data-categories="c3RhdGlzdGljcyUyQ2V4cGVyaWVuY2UtYW5hbHlzaXMlMkNiYXllc2lhbiUyQ2NyZWRpYmlsaXR5JTJDbW9kZWxpbmc=" data-listing-file-modified-sort="1785075351398" data-listing-reading-time-sort="53" data-listing-word-count-sort="10510">
+<div class="thumbnail"><a href="./posts/credibility-sparse-data/index.html" class="no-external">
+
+<p class="card-img-top"><img src="posts/credibility-sparse-data/index_files/figure-html/cell-5-output-1.svg"  class="thumbnail-image card-img"/></p>
+
+</a></div>
+<div class="body">
+<h3 class="no-anchor listing-title">
+<a href="./posts/credibility-sparse-data/index.html" class="no-external">Credibility When Claims Are Scarce</a>
+</h3>
+<div class="listing-subtitle">
+<a href="./posts/credibility-sparse-data/index.html" class="no-external">Comparing limited fluctuation, Bühlmann–Straub, and hierarchical Bayes on sparse mortality data</a>
+</div>
+<div class="listing-categories">
+
+<div class="listing-category" onclick="window.quartoListingCategory('c3RhdGlzdGljcw=='); return false;">statistics</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('ZXhwZXJpZW5jZS1hbmFseXNpcw=='); return false;">experience-analysis</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('YmF5ZXNpYW4='); return false;">bayesian</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('Y3JlZGliaWxpdHk='); return false;">credibility</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('bW9kZWxpbmc='); return false;">modeling</div>
+
+</div>
+<div class="delink listing-description"><a href="./posts/credibility-sparse-data/index.html" class="no-external">
+<em>Your best customers are the ones you know least about.</em>
+</a></div>
+</div>
+<div class="metadata">
+<a href="./posts/credibility-sparse-data/index.html" class="no-external">
+</a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="1" data-categories="YWN0dWFyeXV0aWxpdGllcyUyQ2ZpbmFuY2Vtb2RlbHMlMkNhc3NldHM=" data-listing-file-modified-sort="1784337922982" data-listing-reading-time-sort="1" data-listing-word-count-sort="96">
 <div class="thumbnail"><a href="./posts/cashflow-interactive/index.html" class="no-external">
 
 <p class="card-img-top"><img src="posts/cashflow-interactive/demo.gif"  class="thumbnail-image card-img"/></p>
@@ -292,6 +327,9 @@ window.Quarto = {
 <h3 class="no-anchor listing-title">
 <a href="./posts/cashflow-interactive/index.html" class="no-external">Interactive Cashflow Analysis with ActuaryUtilities.jl</a>
 </h3>
+<div class="listing-subtitle">
+<a href="./posts/cashflow-interactive/index.html" class="no-external"></a>
+</div>
 <div class="listing-categories">
 
 <div class="listing-category" onclick="window.quartoListingCategory('YWN0dWFyeXV0aWxpdGllcw=='); return false;">actuaryutilities</div>
@@ -310,7 +348,7 @@ Scroll down below the sample video to see how to run it.
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="1" data-categories="bW9kZWxpbmclMkNkaWZmZXElMkNtb3J0YWxpdHl0YWJsZXMlMkNhY3R1YXJ5dXRpbGl0aWVzJTJDdHV0b3JpYWw=" data-listing-file-modified-sort="1784337922986" data-listing-reading-time-sort="8" data-listing-word-count-sort="1463">
+<div class="quarto-post image-right" data-index="2" data-categories="bW9kZWxpbmclMkNkaWZmZXElMkNtb3J0YWxpdHl0YWJsZXMlMkNhY3R1YXJ5dXRpbGl0aWVzJTJDdHV0b3JpYWw=" data-listing-file-modified-sort="1784337922986" data-listing-reading-time-sort="8" data-listing-word-count-sort="1463">
 <div class="thumbnail"><a href="./posts/policy-diffeq/index.html" class="no-external">
 
 <p class="card-img-top"><img src="posts/policy-diffeq/index_files/figure-html/cell-7-output-1.svg"  class="thumbnail-image card-img"/></p>
@@ -320,6 +358,9 @@ Scroll down below the sample video to see how to run it.
 <h3 class="no-anchor listing-title">
 <a href="./posts/policy-diffeq/index.html" class="no-external">Universal Life Policy Account Mechanics as a Differential Equation</a>
 </h3>
+<div class="listing-subtitle">
+<a href="./posts/policy-diffeq/index.html" class="no-external"></a>
+</div>
 <div class="listing-categories">
 
 <div class="listing-category" onclick="window.quartoListingCategory('bW9kZWxpbmc='); return false;">modeling</div>
@@ -342,7 +383,7 @@ This demonstrates an example of defining an universal life policy value roll lik
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="2" data-categories="bW9kZWxpbmclMkNmaW5hbmNlbW9kZWxzJTJDdHV0b3JpYWw=" data-listing-file-modified-sort="1749927926449" data-listing-reading-time-sort="1" data-listing-word-count-sort="104">
+<div class="quarto-post image-right" data-index="3" data-categories="bW9kZWxpbmclMkNmaW5hbmNlbW9kZWxzJTJDdHV0b3JpYWw=" data-listing-file-modified-sort="1749927926449" data-listing-reading-time-sort="1" data-listing-word-count-sort="104">
 <div class="thumbnail"><a href="./posts/treasury-interactive/index.html" class="no-external">
 
 <p class="card-img-top"><img src="posts/treasury-interactive/PlutoScreenshot.png"  class="thumbnail-image card-img"/></p>
@@ -352,6 +393,9 @@ This demonstrates an example of defining an universal life policy value roll lik
 <h3 class="no-anchor listing-title">
 <a href="./posts/treasury-interactive/index.html" class="no-external">US Treasury Comparison Tool</a>
 </h3>
+<div class="listing-subtitle">
+<a href="./posts/treasury-interactive/index.html" class="no-external"></a>
+</div>
 <div class="listing-categories">
 
 <div class="listing-category" onclick="window.quartoListingCategory('bW9kZWxpbmc='); return false;">modeling</div>
@@ -370,7 +414,7 @@ The screenshot above shows a Pluto.jl notebook where you can select a pair of da
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="3" data-categories="bW9ydGFsaXR5dGFibGVzJTJDZXhwb3N1cmVzJTJDZXhwZXJpZW5jZS1hbmFseXNpcyUyQ2RhdGFmcmFtZXMlMkN0dXRvcmlhbCUyQ3N0YXRpc3RpY3MlMkNiYXllc2lhbg==" data-listing-file-modified-sort="1784337922981" data-listing-reading-time-sort="12" data-listing-word-count-sort="2316">
+<div class="quarto-post image-right" data-index="4" data-categories="bW9ydGFsaXR5dGFibGVzJTJDZXhwb3N1cmVzJTJDZXhwZXJpZW5jZS1hbmFseXNpcyUyQ2RhdGFmcmFtZXMlMkN0dXRvcmlhbCUyQ3N0YXRpc3RpY3MlMkNiYXllc2lhbg==" data-listing-file-modified-sort="1784337922981" data-listing-reading-time-sort="12" data-listing-word-count-sort="2316">
 <div class="thumbnail"><a href="./posts/bayesian-claims-demo/index.html" class="no-external">
 
 <p class="card-img-top"><img src="posts/bayesian-claims-demo/index_files/figure-html/cell-9-output-2.svg"  class="thumbnail-image card-img"/></p>
@@ -380,6 +424,9 @@ The screenshot above shows a Pluto.jl notebook where you can select a pair of da
 <h3 class="no-anchor listing-title">
 <a href="./posts/bayesian-claims-demo/index.html" class="no-external">Bayesian Markov-Chain-Monte-Carlo and Claims Data</a>
 </h3>
+<div class="listing-subtitle">
+<a href="./posts/bayesian-claims-demo/index.html" class="no-external"></a>
+</div>
 <div class="listing-categories">
 
 <div class="listing-category" onclick="window.quartoListingCategory('bW9ydGFsaXR5dGFibGVz'); return false;">mortalitytables</div>
@@ -406,7 +453,7 @@ The problem of interest is to look at mortality rates, which are given in terms 
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="4" data-categories="bW9kZWxpbmclMkNiZW5jaG1hcmslMkNhY3R1YXJ5dXRpbGl0aWVzJTJDdHV0b3JpYWw=" data-listing-file-modified-sort="1784337922985" data-listing-reading-time-sort="7" data-listing-word-count-sort="1397">
+<div class="quarto-post image-right" data-index="5" data-categories="bW9kZWxpbmclMkNiZW5jaG1hcmslMkNhY3R1YXJ5dXRpbGl0aWVzJTJDdHV0b3JpYWw=" data-listing-file-modified-sort="1784337922985" data-listing-reading-time-sort="7" data-listing-word-count-sort="1397">
 <div class="thumbnail"><a href="./posts/nested-policy-projections/index.html" class="no-external">
 
 <div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
@@ -416,6 +463,9 @@ The problem of interest is to look at mortality rates, which are given in terms 
 <h3 class="no-anchor listing-title">
 <a href="./posts/nested-policy-projections/index.html" class="no-external">Nested Projection Mechanics</a>
 </h3>
+<div class="listing-subtitle">
+<a href="./posts/nested-policy-projections/index.html" class="no-external"></a>
+</div>
 <div class="listing-categories">
 
 <div class="listing-category" onclick="window.quartoListingCategory('bW9kZWxpbmc='); return false;">modeling</div>
@@ -436,7 +486,7 @@ A simple example of how one could define a nested projection system. Includes th
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="5" data-categories="bW9ydGFsaXR5dGFibGVzJTJDZGF0YWZyYW1lcyUyQ3R1dG9yaWFs" data-listing-file-modified-sort="1750483870069" data-listing-reading-time-sort="2" data-listing-word-count-sort="367">
+<div class="quarto-post image-right" data-index="6" data-categories="bW9ydGFsaXR5dGFibGVzJTJDZGF0YWZyYW1lcyUyQ3R1dG9yaWFs" data-listing-file-modified-sort="1750483870069" data-listing-reading-time-sort="2" data-listing-word-count-sort="367">
 <div class="thumbnail"><a href="./posts/mortalitytables-and-dataframes/index.html" class="no-external">
 
 <div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
@@ -446,6 +496,9 @@ A simple example of how one could define a nested projection system. Includes th
 <h3 class="no-anchor listing-title">
 <a href="./posts/mortalitytables-and-dataframes/index.html" class="no-external">Using MortaltiyTables.jl with DataFrames</a>
 </h3>
+<div class="listing-subtitle">
+<a href="./posts/mortalitytables-and-dataframes/index.html" class="no-external"></a>
+</div>
 <div class="listing-categories">
 
 <div class="listing-category" onclick="window.quartoListingCategory('bW9ydGFsaXR5dGFibGVz'); return false;">mortalitytables</div>
@@ -464,7 +517,7 @@ MortalityTables.jl stores the rates in a very efficient manner as a collection o
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="6" data-categories="bW9kZWxpbmclMkNzdGF0aXN0aWNzJTJDZXhwZXJpZW5jZS1hbmFseXNpcw==" data-listing-file-modified-sort="1784337922985" data-listing-reading-time-sort="7" data-listing-word-count-sort="1208">
+<div class="quarto-post image-right" data-index="7" data-categories="bW9kZWxpbmclMkNzdGF0aXN0aWNzJTJDZXhwZXJpZW5jZS1hbmFseXNpcw==" data-listing-file-modified-sort="1784337922985" data-listing-reading-time-sort="7" data-listing-word-count-sort="1208">
 <div class="thumbnail"><a href="./posts/poisson-approximation/index.html" class="no-external">
 
 <p class="card-img-top"><img src="posts/poisson-approximation/index_files/figure-html/cell-7-output-1.svg"  class="thumbnail-image card-img"/></p>
@@ -474,6 +527,9 @@ MortalityTables.jl stores the rates in a very efficient manner as a collection o
 <h3 class="no-anchor listing-title">
 <a href="./posts/poisson-approximation/index.html" class="no-external">Poisson approximation to Binomial</a>
 </h3>
+<div class="listing-subtitle">
+<a href="./posts/poisson-approximation/index.html" class="no-external"></a>
+</div>
 <div class="listing-categories">
 
 <div class="listing-category" onclick="window.quartoListingCategory('bW9kZWxpbmc='); return false;">modeling</div>
@@ -492,7 +548,7 @@ This notebook explores using the Poissson approximation to the Binomial. This ca
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="7" data-categories="bW9kZWxpbmclMkNzdGF0aXN0aWNzJTJDZXhwZXJpZW5jZS1hbmFseXNpcyUyQ2JheWVzaWFu" data-listing-file-modified-sort="1784337922981" data-listing-reading-time-sort="18" data-listing-word-count-sort="3442">
+<div class="quarto-post image-right" data-index="8" data-categories="bW9kZWxpbmclMkNzdGF0aXN0aWNzJTJDZXhwZXJpZW5jZS1hbmFseXNpcyUyQ2JheWVzaWFu" data-listing-file-modified-sort="1784337922981" data-listing-reading-time-sort="18" data-listing-word-count-sort="3442">
 <div class="thumbnail"><a href="./posts/bayes-vs-limited-fluctuation/index.html" class="no-external">
 
 <p class="card-img-top"><img src="posts/bayes-vs-limited-fluctuation/index_files/figure-html/cell-9-output-1.svg"  class="thumbnail-image card-img"/></p>
@@ -502,6 +558,9 @@ This notebook explores using the Poissson approximation to the Binomial. This ca
 <h3 class="no-anchor listing-title">
 <a href="./posts/bayes-vs-limited-fluctuation/index.html" class="no-external">Bayesian vs Limited Fluctuation Experience Analysis</a>
 </h3>
+<div class="listing-subtitle">
+<a href="./posts/bayes-vs-limited-fluctuation/index.html" class="no-external"></a>
+</div>
 <div class="listing-categories">
 
 <div class="listing-category" onclick="window.quartoListingCategory('bW9kZWxpbmc='); return false;">modeling</div>
@@ -522,7 +581,7 @@ Alternate title: Why actuaries should cease to care about the number 1082.
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="8" data-categories="bWFya2V0JTJDeWllbGRjdXJ2ZXMlMkNmaW5hbmNlbW9kZWxzJTJDdHV0b3JpYWw=" data-listing-file-modified-sort="1784337922983" data-listing-reading-time-sort="3" data-listing-word-count-sort="425">
+<div class="quarto-post image-right" data-index="9" data-categories="bWFya2V0JTJDeWllbGRjdXJ2ZXMlMkNmaW5hbmNlbW9kZWxzJTJDdHV0b3JpYWw=" data-listing-file-modified-sort="1784337922983" data-listing-reading-time-sort="3" data-listing-word-count-sort="425">
 <div class="thumbnail"><a href="./posts/fitting-yield-curves/index.html" class="no-external">
 
 <p class="card-img-top"><img src="posts/fitting-yield-curves/index_files/figure-html/cell-7-output-1.svg"  class="thumbnail-image card-img"/></p>
@@ -532,6 +591,9 @@ Alternate title: Why actuaries should cease to care about the number 1082.
 <h3 class="no-anchor listing-title">
 <a href="./posts/fitting-yield-curves/index.html" class="no-external">Fitting Rate Data to Yield Curves</a>
 </h3>
+<div class="listing-subtitle">
+<a href="./posts/fitting-yield-curves/index.html" class="no-external"></a>
+</div>
 <div class="listing-categories">
 
 <div class="listing-category" onclick="window.quartoListingCategory('bWFya2V0'); return false;">market</div>
@@ -552,7 +614,7 @@ Given rates and maturities, we can fit the yield curves with different technique
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="9" data-categories="c3Vydml2YWwlMkN0dXRvcmlhbA==" data-listing-file-modified-sort="1784337922983" data-listing-reading-time-sort="3" data-listing-word-count-sort="484">
+<div class="quarto-post image-right" data-index="10" data-categories="c3Vydml2YWwlMkN0dXRvcmlhbA==" data-listing-file-modified-sort="1784337922983" data-listing-reading-time-sort="3" data-listing-word-count-sort="484">
 <div class="thumbnail"><a href="./posts/fitting-survival-data/index.html" class="no-external">
 
 <p class="card-img-top"><img src="posts/fitting-survival-data/index_files/figure-html/cell-5-output-1.svg"  class="thumbnail-image card-img"/></p>
@@ -562,6 +624,9 @@ Given rates and maturities, we can fit the yield curves with different technique
 <h3 class="no-anchor listing-title">
 <a href="./posts/fitting-survival-data/index.html" class="no-external">Fitting survival data with MortaltityTables.jl</a>
 </h3>
+<div class="listing-subtitle">
+<a href="./posts/fitting-survival-data/index.html" class="no-external"></a>
+</div>
 <div class="listing-categories">
 
 <div class="listing-category" onclick="window.quartoListingCategory('c3Vydml2YWw='); return false;">survival</div>
@@ -578,7 +643,7 @@ Given rates and maturities, we can fit the yield curves with different technique
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="10" data-categories="bW9kZWxpbmclMkNzY2VuYXJpby1nZW5lcmF0b3I=" data-listing-file-modified-sort="1784337922980" data-listing-reading-time-sort="1" data-listing-word-count-sort="179">
+<div class="quarto-post image-right" data-index="11" data-categories="bW9kZWxpbmclMkNzY2VuYXJpby1nZW5lcmF0b3I=" data-listing-file-modified-sort="1784337922980" data-listing-reading-time-sort="1" data-listing-word-count-sort="179">
 <div class="thumbnail"><a href="./posts/academy-generator-rates/index.html" class="no-external">
 
 <div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
@@ -588,6 +653,9 @@ Given rates and maturities, we can fit the yield curves with different technique
 <h3 class="no-anchor listing-title">
 <a href="./posts/academy-generator-rates/index.html" class="no-external">Interactive AAA Economic Scenario Generator</a>
 </h3>
+<div class="listing-subtitle">
+<a href="./posts/academy-generator-rates/index.html" class="no-external"></a>
+</div>
 <div class="listing-categories">
 
 <div class="listing-category" onclick="window.quartoListingCategory('bW9kZWxpbmc='); return false;">modeling</div>
@@ -604,7 +672,7 @@ Scroll down below the sample video to see how to run it.
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="11" data-categories="bW9kZWxpbmclMkNiZW5jaG1hcmslMkN0dXRvcmlhbA==" data-listing-file-modified-sort="1784337922986" data-listing-reading-time-sort="6" data-listing-word-count-sort="1167">
+<div class="quarto-post image-right" data-index="12" data-categories="bW9kZWxpbmclMkNiZW5jaG1hcmslMkN0dXRvcmlhbA==" data-listing-file-modified-sort="1784337922986" data-listing-reading-time-sort="6" data-listing-word-count-sort="1167">
 <div class="thumbnail"><a href="./posts/stochastic-mortality/index.html" class="no-external">
 
 <p class="card-img-top"><img src="posts/stochastic-mortality/index_files/figure-html/cell-14-output-1.svg"  class="thumbnail-image card-img"/></p>
@@ -614,6 +682,9 @@ Scroll down below the sample video to see how to run it.
 <h3 class="no-anchor listing-title">
 <a href="./posts/stochastic-mortality/index.html" class="no-external">Stochastic claims projections demo</a>
 </h3>
+<div class="listing-subtitle">
+<a href="./posts/stochastic-mortality/index.html" class="no-external"></a>
+</div>
 <div class="listing-categories">
 
 <div class="listing-category" onclick="window.quartoListingCategory('bW9kZWxpbmc='); return false;">modeling</div>
@@ -632,7 +703,7 @@ Define a datatype. Not strictly necessary, but will make extending the program w
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="12" data-categories="bW9ydGFsaXR5dGFibGVzJTJDZXhwb3N1cmVzJTJDZXhwZXJpZW5jZS1hbmFseXNpcyUyQ2RhdGFmcmFtZXMlMkN0dXRvcmlhbA==" data-listing-file-modified-sort="1784337922983" data-listing-reading-time-sort="3" data-listing-word-count-sort="492">
+<div class="quarto-post image-right" data-index="13" data-categories="bW9ydGFsaXR5dGFibGVzJTJDZXhwb3N1cmVzJTJDZXhwZXJpZW5jZS1hbmFseXNpcyUyQ2RhdGFmcmFtZXMlMkN0dXRvcmlhbA==" data-listing-file-modified-sort="1784337922983" data-listing-reading-time-sort="3" data-listing-word-count-sort="492">
 <div class="thumbnail"><a href="./posts/exposures-example/index.html" class="no-external">
 
 <div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
@@ -642,6 +713,9 @@ Define a datatype. Not strictly necessary, but will make extending the program w
 <h3 class="no-anchor listing-title">
 <a href="./posts/exposures-example/index.html" class="no-external">Exposure Calculation with ExperienceAnalysis.jl</a>
 </h3>
+<div class="listing-subtitle">
+<a href="./posts/exposures-example/index.html" class="no-external"></a>
+</div>
 <div class="listing-categories">
 
 <div class="listing-category" onclick="window.quartoListingCategory('bW9ydGFsaXR5dGFibGVz'); return false;">mortalitytables</div>
@@ -664,7 +738,7 @@ In this tutorial, we will walk through how to calculate exposures using the Expe
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="13" data-categories="bW9kZWxpbmclMkNzY2VuYXJpby1nZW5lcmF0b3I=" data-listing-file-modified-sort="1784337922981" data-listing-reading-time-sort="3" data-listing-word-count-sort="543">
+<div class="quarto-post image-right" data-index="14" data-categories="bW9kZWxpbmclMkNzY2VuYXJpby1nZW5lcmF0b3I=" data-listing-file-modified-sort="1784337922981" data-listing-reading-time-sort="3" data-listing-word-count-sort="543">
 <div class="thumbnail"><a href="./posts/academy-generator/index.html" class="no-external">
 
 <p class="card-img-top"><img src="posts/academy-generator/index_files/figure-html/cell-9-output-1.svg"  class="thumbnail-image card-img"/></p>
@@ -674,6 +748,9 @@ In this tutorial, we will walk through how to calculate exposures using the Expe
 <h3 class="no-anchor listing-title">
 <a href="./posts/academy-generator/index.html" class="no-external">Replicating the AAA equtity generator</a>
 </h3>
+<div class="listing-subtitle">
+<a href="./posts/academy-generator/index.html" class="no-external"></a>
+</div>
 <div class="listing-categories">
 
 <div class="listing-category" onclick="window.quartoListingCategory('bW9kZWxpbmc='); return false;">modeling</div>
@@ -690,7 +767,7 @@ This notebook replicates the model and parameters for the real world equity gene
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="14" data-categories="bW9kZWxpbmclMkNhdXRvZGlmZiUyQ2FsbQ==" data-listing-file-modified-sort="1784337922981" data-listing-reading-time-sort="21" data-listing-word-count-sort="4131">
+<div class="quarto-post image-right" data-index="15" data-categories="bW9kZWxpbmclMkNhdXRvZGlmZiUyQ2FsbQ==" data-listing-file-modified-sort="1784337922981" data-listing-reading-time-sort="21" data-listing-word-count-sort="4131">
 <div class="thumbnail"><a href="./posts/autodiff_ALM/index.html" class="no-external">
 
 <p class="card-img-top"><img src="posts/autodiff_ALM/index_files/figure-html/cell-10-output-1.svg"  class="thumbnail-image card-img"/></p>
@@ -700,6 +777,9 @@ This notebook replicates the model and parameters for the real world equity gene
 <h3 class="no-anchor listing-title">
 <a href="./posts/autodiff_ALM/index.html" class="no-external">Autodifferentiation and Asset Liability Management (AAD &amp; ALM)</a>
 </h3>
+<div class="listing-subtitle">
+<a href="./posts/autodiff_ALM/index.html" class="no-external"></a>
+</div>
 <div class="listing-categories">
 
 <div class="listing-category" onclick="window.quartoListingCategory('bW9kZWxpbmc='); return false;">modeling</div>
@@ -718,7 +798,7 @@ Asset liability modeling requires computing derivatives of portfolio values with
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="15" data-categories="ZXhwZXJpZW5jZS1hbmFseXNpcyUyQ21vcnRhbGl0eXRhYmxlcw==" data-listing-file-modified-sort="1749927926448" data-listing-reading-time-sort="1" data-listing-word-count-sort="90">
+<div class="quarto-post image-right" data-index="16" data-categories="ZXhwZXJpZW5jZS1hbmFseXNpcyUyQ21vcnRhbGl0eXRhYmxlcw==" data-listing-file-modified-sort="1749927926448" data-listing-reading-time-sort="1" data-listing-word-count-sort="90">
 <div class="thumbnail"><a href="./posts/mortality-comparison/index.html" class="no-external">
 
 <p class="card-img-top"><img src="posts/mortality-comparison/demo.gif"  class="thumbnail-image card-img"/></p>
@@ -728,6 +808,9 @@ Asset liability modeling requires computing derivatives of portfolio values with
 <h3 class="no-anchor listing-title">
 <a href="./posts/mortality-comparison/index.html" class="no-external">Interactive Mortality Comparison Tool</a>
 </h3>
+<div class="listing-subtitle">
+<a href="./posts/mortality-comparison/index.html" class="no-external"></a>
+</div>
 <div class="listing-categories">
 
 <div class="listing-category" onclick="window.quartoListingCategory('ZXhwZXJpZW5jZS1hbmFseXNpcw=='); return false;">experience-analysis</div>
@@ -744,7 +827,7 @@ Scroll down below the sample video to see how to run it.
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="16" data-categories="ZGVzaWduJTJDY29kZQ==" data-listing-date-sort="1779602400000" data-listing-file-modified-sort="1784337922982" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="6" data-listing-word-count-sort="1158">
+<div class="quarto-post image-right" data-index="17" data-categories="ZGVzaWduJTJDY29kZQ==" data-listing-date-sort="1779602400000" data-listing-file-modified-sort="1784337922982" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="6" data-listing-word-count-sort="1158">
 <div class="thumbnail"><a href="./posts/cassette-futurism-theme/index.html" class="no-external">
 
 <p class="card-img-top"><img src="posts/cassette-futurism-theme/index_files/figure-html/cell-4-output-1.svg"  class="thumbnail-image card-img"/></p>
@@ -754,6 +837,9 @@ Scroll down below the sample video to see how to run it.
 <h3 class="no-anchor listing-title">
 <a href="./posts/cassette-futurism-theme/index.html" class="no-external">Cassette Futurism: a Makie theme preview</a>
 </h3>
+<div class="listing-subtitle">
+<a href="./posts/cassette-futurism-theme/index.html" class="no-external"></a>
+</div>
 <div class="listing-categories">
 
 <div class="listing-category" onclick="window.quartoListingCategory('ZGVzaWdu'); return false;">design</div>

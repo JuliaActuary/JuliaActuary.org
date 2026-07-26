@@ -2993,6 +2993,1402 @@ size=100)</code></pre></td>
   <pubDate>Thu, 09 Jul 2020 06:00:00 GMT</pubDate>
 </item>
 <item>
+  <title>Credibility When Claims Are Scarce</title>
+  <link>https://JuliaActuary.org/posts/credibility-sparse-data/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<blockquote class="blockquote">
+<p><em>Your best customers are the ones you know least about.</em></p>
+</blockquote>
+<p>Suppose you launched a new preferred risk class structure five years ago. The underwriting team is proud of it. The super-preferred class — the healthiest 10% of applicants — has produced <strong>zero death claims</strong>. What is its mortality?</p>
+<p>The textbook credibility answer: zero claims means zero credibility, so use the expected basis. But the expected basis is an industry or company table that knows nothing about your new class structure. And the threshold for <em>full</em> credibility — about 1,082 claims under the standard limited fluctuation parameters — may never arrive for a small preferred class.</p>
+<p>This post tests a thesis: <strong>that traditional credibility methods struggle when observations are scarce, and that a Bayesian hierarchical model can learn more from the same data.</strong> Rather than argue it, we will run an experiment. Simulate a block of business where the true mortality is known. Hide the truth. Give each method only the data an actuary would actually see, and check which one comes closest.</p>
+<section id="the-experiment" class="level2">
+<h2 class="anchored" data-anchor-id="the-experiment">The experiment</h2>
+<p>The setup, in brief:</p>
+<ul>
+<li>An <strong>industry ultimate mortality table</strong> (parametric Makeham). This is the expected basis every method is handed.</li>
+<li>A block whose true mortality runs at <strong>70% of that table</strong>. This is the realistic situation for well-underwritten business measured against a broad industry table.</li>
+<li><strong>Five risk classes</strong> making up 10% / 20% / 20% / 30% / 20% of issues, with true class factors at issue from 0.55× (super-preferred) to 1.40× (table-rated). <strong>Underwriting information wears off</strong>: each class factor grades linearly to 1.0 over 20 years, so class differences are widest at issue and fade with duration.</li>
+<li>Cohorts of <img src="https://latex.codecogs.com/png.latex?N%20%5Cin%20%5C%7B500,%202000,%2010000%5C%7D"> lives issued at ages drawn from <img src="https://latex.codecogs.com/png.latex?%5Cmathrm%7BNormal%7D(50,%2010)">, observed for <strong>5 policy years</strong>.</li>
+<li>Every method — traditional and Bayesian alike — gets the same expected basis: the <strong>industry table, with no level adjustment and no class adjustment</strong>. Each must learn both the level and the class structure from claims alone.</li>
+</ul>
+<p>So there are two things to learn, and the expected basis knows neither: the block runs well below the table, and the classes differ from one another. The table being wrong is deliberate — a prior that is already correct leaves nothing to learn, and a newly underwritten block can differ materially from a broad industry table. The question is which methods notice, and how fast.</p>
+<div id="4" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>using Random, Distributions, DataFrames, DataFramesMeta, StatsBase, Statistics
+using Turing, MCMCChains, StatsFuns, ThreadsX, KernelDensity
+using Logging
+Logging.disable_logging(Logging.Warn) # quiet Turing's per-fit chatter
+
+using CairoMakie
+# Apply the site's custom Makie plot theme (cassette futurism).
+include(joinpath(@__DIR__, "..", "..", "assets", "themes", "cassette_futurism.jl"))
+set_theme!(cassette_futurism_theme())</code></pre>
+</div>
+</section>
+<section id="ground-truth" class="level2">
+<h2 class="anchored" data-anchor-id="ground-truth">Ground truth</h2>
+<p>The truth has three parts, all in the next code cell. The industry table is a Makeham curve, <img src="https://latex.codecogs.com/png.latex?%5Cmu(x)%20=%20A%20+%20B%20c%5Ex">, converted to annual rates. The block’s true aggregate level is 70% of that table. And each class’s factor starts at its issue value (0.55× to 1.40×) and grades linearly to 1.0 by duration 20 — underwriting information fades. Putting it together: <code>true_q = 0.70 × table × class_factor(duration)</code>.</p>
+<div id="6" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>const A_MAK, B_MAK, C_MAK = 5.0e-4, 4.7e-5, 1.09
+base_q(age) = 1 - exp(-(A_MAK + B_MAK * C_MAK^age * (C_MAK - 1) / log(C_MAK)))  # the industry table
+
+const SHARES = [0.1, 0.2, 0.2, 0.3, 0.2]  # class mix at issue
+const MULT = [0.55, 0.75, 0.95, 1.1, 1.4]    # class factors at issue
+const LEVEL = 0.7                             # the block's true level vs the industry table
+
+class_factor(t, cls) = 1 + (MULT[cls] - 1) * max(0.0, 1 - (t - 1) / 19)  # wears off to 1.0 by t=20
+
+true_q(age, dur, cls) = min(1.0, LEVEL * base_q(age) * class_factor(dur, cls))</code></pre>
+</div>
+<div id="8" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>FIG. 01 plotting code</summary>
+<pre class="julia cell-code"><code>let
+    f = Figure(size=(720, 420))
+    ax = Axis(
+        f[1, 1];
+        title="FIG. 01 — TRUE MORTALITY AT ISSUE VS THE INDUSTRY TABLE",
+        xlabel="attained age", ylabel="annual mortality rate q(x)", yscale=log10
+    )
+    ages = 30:90
+    for c in 5:-1:1
+        lines!(
+            ax, ages, LEVEL .* base_q.(ages) .* MULT[c];
+            color=CASSETTE_PALETTE[c], linewidth=2,
+            label="class $c ($(round(LEVEL * MULT[c], digits = 2))× table)"
+        )
+    end
+    lines!(
+        ax, ages, base_q.(ages);
+        color=CF_INK, linestyle=:dash, linewidth=2, label="industry table"
+    )
+    axislegend(ax, position=:rb, nbanks=2)
+    f
+end</code></pre>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div>
+<figure class="figure">
+<p><img src="https://JuliaActuary.org/posts/credibility-sparse-data/index_files/figure-html/cell-5-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Every class sits below the dashed industry table at issue — even table-rated class 5, at 0.70 × 1.40 ≈ 0.98, barely touches it. The class curves then drift toward the block level of 0.70 × table as the factors wear off:</p>
+<div id="10" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>FIG. 02 plotting code</summary>
+<pre class="julia cell-code"><code>let
+    f = Figure(size=(720, 400))
+    ax = Axis(
+        f[1, 1];
+        title="FIG. 02 — CLASS FACTORS WEAR OFF TOWARD THE BLOCK LEVEL",
+        xlabel="policy duration", ylabel="true A/E vs industry table",
+        xticks=0:2:20
+    )
+    vspan!(ax, 0.5, 5.5; color=(CF_BLUE, 0.1))
+    vspan!(ax, 5.5, 10.5; color=(CF_AMBER, 0.12))
+    hlines!(ax, [1.0]; color=CF_INK, linestyle=:dash, linewidth=2)
+    for c in 5:-1:1
+        lines!(
+            ax, 1:21, [LEVEL * class_factor(t, c) for t in 1:21];
+            color=CASSETTE_PALETTE[c], linewidth=2, label="class $c"
+        )
+    end
+    text!(
+        ax, 3, 0.36; text="observed\n(years 1–5)", align=(:center, :bottom),
+        color=CF_BLUE, fontsize=12
+    )
+    text!(
+        ax, 8, 0.36; text="forecast\n(years 6–10)", align=(:center, :bottom),
+        color=CF_AMBER, fontsize=12
+    )
+    text!(
+        ax, 0.7, 1.01; text="industry table", align=(:left, :bottom),
+        color=CF_INK, fontsize=12
+    )
+    ylims!(ax, 0.33, 1.1)
+    axislegend(ax, position=:rt, nbanks=2)
+    f
+end</code></pre>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div>
+<figure class="figure">
+<p><img src="https://JuliaActuary.org/posts/credibility-sparse-data/index_files/figure-html/cell-6-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>At issue the classes span 0.39 to 0.98 of the table; by duration 20 they all converge to the block level of 0.70. The observation window (blue) is where class gaps are widest; by the forecast window (amber) they have already narrowed. None of this is told to the methods.</p>
+<p>From here on, the methods see only three things: death counts, exposures, and the industry table. We put <code>LEVEL</code>, <code>MULT</code>, and <code>class_factor</code> away until the end, when we compare each method’s estimates against the truth.</p>
+</section>
+<section id="simulating-five-years-of-experience" class="level2">
+<h2 class="anchored" data-anchor-id="simulating-five-years-of-experience">Simulating five years of experience</h2>
+<p>Each life gets a class (sampled by share), an issue age, and then an annual coin flip against its true mortality rate until it dies or the observation period ends. We aggregate to cells of class × duration × attained age, attaching the <em>expected claims on the industry-table basis</em> — the quantity every method will compare actuals against. (One convention to note: a death earns a full year of exposure in its year of death — <em>annual initial exposure</em>, the convention that matches estimating an annual death probability <img src="https://latex.codecogs.com/png.latex?q">. Central exposure, the other common convention, would count only the fraction of the year actually lived.)</p>
+<div id="12" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>function simulate_cohort(N, rng)
+    cls = sample(rng, 1:5, Weights(SHARES), N)
+    ages = clamp.(round.(Int, rand(rng, Normal(50, 10), N)), 30, 75)
+    return DataFrame(class=cls, issue_age=ages)
+end
+
+function simulate_experience(cohort, rng; years=5)
+    cells = Dict{Tuple{Int,Int,Int},Vector{Float64}}() # (class,dur,age) =&gt; [exposure, deaths]
+    inforce = Tuple{Int,Int}[]                         # (class, issue_age) of survivors
+    for r in eachrow(cohort)
+        alive = true
+        for t in 1:years
+            alive || break
+            age = r.issue_age + t - 1
+            v = get!(cells, (r.class, t, age), [0.0, 0.0])
+            v[1] += 1.0
+            if rand(rng) &lt; true_q(age, t, r.class)
+                v[2] += 1.0
+                alive = false
+            end
+        end
+        alive &amp;&amp; push!(inforce, (r.class, r.issue_age))
+    end
+    df = DataFrame(
+        [
+        (
+            class=k[1], duration=k[2], attained_age=k[3],
+            exposure=v[1], deaths=v[2],
+        ) for (k, v) in cells
+    ]
+    )
+    df.expected = df.exposure .* base_q.(df.attained_age)
+    sort!(df, [:class, :duration, :attained_age])
+    return df, inforce
+end
+
+class_totals(expdf) =
+    sort(combine(groupby(expdf, :class), :deaths =&gt; sum =&gt; :A, :expected =&gt; sum =&gt; :E), :class)</code></pre>
+</div>
+<section id="defining-the-target" class="level3">
+<h3 class="anchored" data-anchor-id="defining-the-target">Defining the target</h3>
+<p>Because the class factors wear off, the true actual-to-expected ratio drifts over time, and “the true A/E for class c” is ambiguous unless we pin it to a window. We therefore define the estimand every method is implicitly targeting — the ratio of expected claims under <em>truth</em> to expected claims on the <em>industry table</em>, per class — computed deterministically (no simulation noise) by running survivorship under both bases:</p>
+<div id="14" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>function true_multiplier(cohort; window=1:5)
+    num = zeros(5);
+    den = zeros(5)
+    for r in eachrow(cohort)
+        surv = 1.0
+        for t in 1:last(window)
+            age = r.issue_age + t - 1
+            qt = true_q(age, t, r.class)
+            if t in window
+                num[r.class] += surv * qt
+                den[r.class] += surv * base_q(age)
+            end
+            surv *= 1 - qt
+        end
+    end
+    return num ./ den
+end
+
+# expected forecast-window claims on the realized survivors, under basis and truth
+function forecast_expecteds(inforce; window=6:10)
+    Ebasis = zeros(5);
+    Etrue = zeros(5)
+    for (cls, ia) in inforce
+        surv = 1.0
+        for t in first(window):last(window)
+            age = ia + t - 1
+            qt = true_q(age, t, cls)
+            Ebasis[cls] += surv * base_q(age)
+            Etrue[cls] += surv * qt
+            surv *= 1 - qt
+        end
+    end
+    return (Ebasis=Ebasis, Etrue=Etrue)
+end</code></pre>
+</div>
+<p>Numerically the fit-window targets run from about <strong>0.42 (class 1) to 0.95 (class 5)</strong> — the block level of 0.70 times each class’s average factor over years 1–5. Every class is below 1.0, even table-rated class 5, because the whole block runs at 70% of the table and rated lives only reach 0.98 × table at issue. The basis is materially wrong for every class. That is what there is to learn.</p>
+</section>
+<section id="what-n500-gives-you" class="level3">
+<h3 class="anchored" data-anchor-id="what-n500-gives-you">What N=500 gives you</h3>
+<div id="16" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>const SEED = 20260724
+
+rng = Xoshiro(SEED)
+cohort500 = simulate_cohort(500, rng)
+exp500, inforce500 = simulate_experience(cohort500, rng)
+ct500 = class_totals(exp500)
+θtrue = true_multiplier(cohort500)
+ct500.AE = ct500.A ./ ct500.E
+ct500</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div><div style="float: left;"><span>5×4 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
+<table class="data-frame caption-top table table-sm table-striped small">
+<thead>
+<tr class="columnLabelRow header">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">class</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">A</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">E</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">AE</th>
+</tr>
+<tr class="columnLabelRow even">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
+</tr>
+</thead>
+<tbody>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">1.6484</td>
+<td style="text-align: right;">0.60665</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2.0</td>
+<td style="text-align: right;">2.60381</td>
+<td style="text-align: right;">0.768106</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">4.0</td>
+<td style="text-align: right;">3.3812</td>
+<td style="text-align: right;">1.18301</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">5.71199</td>
+<td style="text-align: right;">0.17507</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">3.0</td>
+<td style="text-align: right;">2.79221</td>
+<td style="text-align: right;">1.07442</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p>Five hundred policies, five years, and the whole block produced 11 death claims. The most-preferred class produced 1. This is not an engineered worst case; across repeated simulations at N=500 the most-preferred class has zero claims about half the time.</p>
+<div id="18" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>FIG. 03 plotting code</summary>
+<pre class="julia cell-code"><code>let
+    f = Figure(size=(720, 400))
+    ax = Axis(
+        f[1, 1];
+        title="FIG. 03 — FIVE YEARS OF EXPERIENCE, N=500",
+        xlabel="risk class", ylabel="claims (5-year total)",
+        xticks=(1:5, ["1\nsuper-pref", "2", "3", "4", "5\ntable-rated"])
+    )
+    barplot!(
+        ax, 1:5, ct500.A; color=[(c, 0.85) for c in CASSETTE_PALETTE[1:5]],
+        strokecolor=CF_INK, strokewidth=1, label="actual deaths"
+    )
+    scatter!(
+        ax, 1:5, ct500.E; color=CF_INK, marker=:diamond, markersize=14,
+        label="expected on industry table"
+    )
+    axislegend(ax, position=:lt)
+    f
+end</code></pre>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div>
+<figure class="figure">
+<p><img src="https://JuliaActuary.org/posts/credibility-sparse-data/index_files/figure-html/cell-10-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The industry table expected 16.1 claims; 11 occurred. Two signals are mixed together here: the block as a whole is running below the table (the level), and the classes may differ from one another (the factors). Each method has to separate those two signals using 11 claims.</p>
+</section>
+</section>
+<section id="method-1-limited-fluctuation-credibility" class="level2">
+<h2 class="anchored" data-anchor-id="method-1-limited-fluctuation-credibility">Method 1: Limited fluctuation credibility</h2>
+<p>Limited fluctuation is the workhorse of practice: give the observed experience weight <img src="https://latex.codecogs.com/png.latex?Z">, the prior expectation weight <img src="https://latex.codecogs.com/png.latex?1-Z">, with</p>
+<p><img src="https://latex.codecogs.com/png.latex?Z%20=%20%5Cmin%5Cleft(1,%20%5Csqrt%7B%5Ctext%7Bclaims%7D/1082%7D%5Cright)"></p>
+<p>where 1,082 claims is the classic full-credibility standard (90% probability of being within 5% of the mean — see <a href="../../posts/bayes-vs-limited-fluctuation/index.html">our earlier deep-dive on where that number comes from and why its limitations deserve more attention than they get</a>). The prior multiplier here is 1.0 — the industry table taken at face value.</p>
+<div id="20" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>const NFULL = 1082
+
+function lfc_estimate(A, E; nfull=NFULL, prior=1.0)
+    Z = min.(1.0, sqrt.(A ./ nfull))
+    θ = Z .* (A ./ E) .+ (1 .- Z) .* prior
+    return (Z=Z, θ=θ)
+end</code></pre>
+</div>
+<div id="22" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>lfc500 = lfc_estimate(ct500.A, ct500.E)
+DataFrame(class=1:5, Z=round.(lfc500.Z, digits=3), estimate=round.(lfc500.θ, digits=3))</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div><div style="float: left;"><span>5×3 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
+<table class="data-frame caption-top table table-sm table-striped small">
+<thead>
+<tr class="columnLabelRow header">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">class</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Z</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">estimate</th>
+</tr>
+<tr class="columnLabelRow even">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
+</tr>
+</thead>
+<tbody>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.03</td>
+<td style="text-align: right;">0.988</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">0.043</td>
+<td style="text-align: right;">0.99</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">0.061</td>
+<td style="text-align: right;">1.011</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">0.03</td>
+<td style="text-align: right;">0.975</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">0.053</td>
+<td style="text-align: right;">1.004</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p>The largest credibility weight any class earns is 0.061. The estimates barely move from 1.0 — even though the block just produced 11 claims when the table expected 16.1. This implementation never touches the strongest signal in the data: the whole block is running at about two-thirds of the table.</p>
+<p>Two assumptions, both implicit, drive the result. The prior is treated as beyond question — weight <img src="https://latex.codecogs.com/png.latex?1-Z"> goes to it no matter how strongly the data disagrees. And the credibility standard is calibrated to <em>stabilize</em> estimates, not to <em>learn</em> efficiently.</p>
+<section id="a-fairer-variant-experience-rate-the-table-first" class="level3">
+<h3 class="anchored" data-anchor-id="a-fairer-variant-experience-rate-the-table-first">A fairer variant: experience-rate the table first</h3>
+<p>An experienced practitioner would object here: nobody blends against a table the block visibly doesn’t follow. The usual remedy is to run the same formula in <strong>two stages</strong> — first blend the whole block’s A/E against 1.0 using the portfolio’s total claim count, producing an experience-rated table level, then blend each class against <em>that</em> level instead of 1.0. The aggregate signal is no longer thrown away:</p>
+<div id="24" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>function lfc2_estimate(A, E; nfull=NFULL)
+    Zp = min(1.0, sqrt(sum(A) / nfull))               # portfolio-level credibility
+    level = Zp * (sum(A) / sum(E)) + (1 - Zp) * 1.0   # experience-rated table level
+    Z = min.(1.0, sqrt.(A ./ nfull))                  # class-level Z, same as before
+    return (Zp=Zp, level=level, Z=Z, θ=Z .* (A ./ E) .+ (1 .- Z) .* level)
+end</code></pre>
+</div>
+<div id="26" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>lfc2_500 = lfc2_estimate(ct500.A, ct500.E)
+DataFrame(class=1:5, Z=round.(lfc2_500.Z, digits=3), estimate=round.(lfc2_500.θ, digits=3))</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div><div style="float: left;"><span>5×3 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
+<table class="data-frame caption-top table table-sm table-striped small">
+<thead>
+<tr class="columnLabelRow header">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">class</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Z</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">estimate</th>
+</tr>
+<tr class="columnLabelRow even">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
+</tr>
+</thead>
+<tbody>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.03</td>
+<td style="text-align: right;">0.957</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">0.043</td>
+<td style="text-align: right;">0.959</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">0.061</td>
+<td style="text-align: right;">0.981</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">0.03</td>
+<td style="text-align: right;">0.944</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">0.053</td>
+<td style="text-align: right;">0.974</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p>It helps less than you might hope. The whole block’s 11 claims earn a portfolio-level credibility of only 0.1, so the experience-rated level lands at 0.97 — the estimates budge from 1.0, but not by much. The obstacle has moved, not disappeared: the same 1,082-claim standard that limited the classes now limits the portfolio. We carry this two-stage variant through the rest of the post to keep the comparison fair to the method.</p>
+</section>
+</section>
+<section id="method-2-bühlmannstraub-credibility" class="level2">
+<h2 class="anchored" data-anchor-id="method-2-bühlmannstraub-credibility">Method 2: Bühlmann–Straub credibility</h2>
+<p>Bühlmann–Straub improves on limited fluctuation in two ways. First, <img src="https://latex.codecogs.com/png.latex?Z%20=%20m/(m+k)"> where <img src="https://latex.codecogs.com/png.latex?k"> is <em>estimated from the data</em> — the ratio of within-class process variance to between-class variance of hypothetical means. Second, the complement of credibility goes not to the prior table but to the <strong>overall portfolio A/E</strong> — so the level signal is not thrown away.</p>
+<p>Using class × policy-year cells with <img src="https://latex.codecogs.com/png.latex?X_%7Bct%7D%20=%20%5Ctext%7Bdeaths%7D/%5Ctext%7Bexpected%7D"> weighted by expected claims <img src="https://latex.codecogs.com/png.latex?m_%7Bct%7D">, the standard nonparametric estimators are:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%5Chat%20v%20=%20%5Cfrac%7B%5Csum_c%20%5Csum_t%20m_%7Bct%7D(X_%7Bct%7D%20-%20%5Cbar%20X_c)%5E2%7D%7B%5Csum_c%20(n_c%20-%201)%7D,%20%5Cqquad%0A%5Chat%20a%20=%20%5Cfrac%7B%5Csum_c%20m_c(%5Cbar%20X_c%20-%20%5Cbar%20X)%5E2%20-%20%5Chat%20v%5C,(C-1)%7D%7Bm%20-%20%5Csum_c%20m_c%5E2%20/%20m%7D"></p>
+<div id="28" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>function bs_estimate(expdf)
+    cells = combine(groupby(expdf, [:class, :duration]),
+        :deaths =&gt; sum =&gt; :d, :expected =&gt; sum =&gt; :m)
+    cells.X = cells.d ./ cells.m
+    C = length(unique(cells.class))
+    g = groupby(cells, :class)
+    m_c = [sum(sub.m) for sub in g]
+    X_c = [sum(sub.m .* sub.X) / sum(sub.m) for sub in g]
+    m = sum(m_c)
+    X̄ = sum(m_c .* X_c) / m
+    v̂ = sum(sum(sub.m .* (sub.X .- X_c[i]) .^ 2) for (i, sub) in enumerate(g)) /
+        sum(nrow(sub) - 1 for sub in g)
+    â = (sum(m_c .* (X_c .- X̄) .^ 2) - v̂ * (C - 1)) / (m - sum(m_c .^ 2) / m)
+    â ≤ 0 &amp;&amp; return (Z=zeros(C), θ=fill(X̄, C), k=Inf, fallback=true)
+    k = v̂ / â
+    Z = m_c ./ (m_c .+ k)
+    (Z=Z, θ=Z .* X_c .+ (1 .- Z) .* X̄, k=k, fallback=false)
+end</code></pre>
+</div>
+<div id="30" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>bs500 = bs_estimate(exp500)
+DataFrame(class=1:5, Z=round.(bs500.Z, digits=3), estimate=round.(bs500.θ, digits=3))</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div><div style="float: left;"><span>5×3 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
+<table class="data-frame caption-top table table-sm table-striped small">
+<thead>
+<tr class="columnLabelRow header">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">class</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Z</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">estimate</th>
+</tr>
+<tr class="columnLabelRow even">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
+</tr>
+</thead>
+<tbody>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">0.682</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">0.682</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">0.682</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">0.682</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">0.682</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p>A large improvement on the level: every estimate moved from 1.0 to 0.68 — the block’s observed portfolio A/E — because that is where the complement of credibility goes. But look at the <img src="https://latex.codecogs.com/png.latex?Z"> column: zero for every class. On this data, the between-class variance estimate came back <em>negative</em> (<img src="https://latex.codecogs.com/png.latex?%5Chat%20a%20%5Cleq%200">), and the textbook convention in that case is to drop class differentiation and use the grand mean for every class. With five classes and a dozen claims, <img src="https://latex.codecogs.com/png.latex?%5Chat%20a"> is too noisy to reliably come back positive, and this fallback is not an edge case — we will count later how often it fires, and the answer is roughly half the time at this block size. One more caveat: treating policy years as exchangeable replicates while the class factors trend inflates <img src="https://latex.codecogs.com/png.latex?%5Chat%20v"> — the estimator reads wear-off as process noise. Still, this is exactly what a practitioner following the textbook would compute. Keep the fallback in mind: when it fires, Bühlmann–Straub reduces to complete pooling — we will see in the repetition study what that costs, and what it doesn’t.</p>
+</section>
+<section id="method-3-hierarchical-bayes" class="level2">
+<h2 class="anchored" data-anchor-id="method-3-hierarchical-bayes">Method 3: Hierarchical Bayes</h2>
+<p>If Bayesian modeling is new to you, here is the whole idea. A Bayesian model has two ingredients. A <strong>prior</strong>: for each unknown quantity, a distribution describing which values are plausible before seeing any data. And a <strong>likelihood</strong>: how probable the observed data would be under any particular candidate values. Bayes’ theorem combines them into the <strong>posterior</strong> — an updated distribution saying, given the data actually observed, how plausible each candidate value is now. The answer is not a single number but a curve: values where the curve is tall are well supported, and the width of the curve measures the remaining uncertainty. (For a longer introduction, see <a href="../../posts/bayesian-intro/index.html">our introduction to Bayesian methods for actuaries</a>.)</p>
+<p>The <strong>hierarchical</strong> part addresses the problem both credibility methods struggle with. Estimating each class purely from its own data means working with five tiny datasets — one or two claims each. Lumping everything together means pretending classes don’t exist. The hierarchical model takes the middle road: each class’s multiplier is a draw from a shared distribution whose center (the portfolio level) and spread (how much classes genuinely differ) are estimated from the same data, at the same time. The consequence is <strong>partial pooling</strong>: each class’s estimate gets pulled toward the portfolio average — strongly when that class has little data of its own, weakly when it has plenty. If that sounds like credibility, it should. Bühlmann–Straub is the best <em>linear</em> predictor under its credibility-model assumptions — shrinkage closely analogous to Bayesian partial pooling, and in some models identical to a posterior mean. (Limited fluctuation is a different animal — a stability rule, not an approximation to anything Bayesian.) The difference is that here the pooling is computed in full rather than linearized, and the model is code you can extend.</p>
+<p>Claims are modeled as Poisson counts against the table’s expected claims. The whole model, in math:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0A%5Cbegin%7Baligned%7D%0A%5Cmu%20&amp;%5Csim%20%5Cmathrm%7BNormal%7D(0,%5C,1)%20&amp;&amp;%20%5Ctext%7Blog-scale%20center%20of%20the%20class%20multipliers%7D%20%5C%5C%0A%5Csigma%20&amp;%5Csim%20%5Cmathrm%7BExponential%7D(0.5)%20&amp;&amp;%20%5Ctext%7Bhow%20much%20classes%20spread,%20log%20scale%7D%20%5C%5C%0Az_c%20&amp;%5Csim%20%5Cmathrm%7BNormal%7D(0,%5C,1)%20&amp;&amp;%20%5Ctext%7Bclass%20%7D%20c%5Ctext%7B's%20standardized%20deviation%7D%20%5C%5C%0AD_c%20&amp;%5Csim%20%5Cmathrm%7BPoisson%7D(E_c%20%5Ccdot%20%5Ctheta_c)%20&amp;&amp;%20%5Ctext%7Bdeaths,%20given%20table-expected%20%7D%20E_c%0A%5Cend%7Baligned%7D%0A"></p>
+<p>where the exponent of each class’s A/E multiplier is where the structure lives:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0A%5Ctheta_c%20%5C;=%5C;%20%5Cexp%5CBigl(%5C,%0A%5Cunderbrace%7B%5Ctextcolor%7B#1F4E79%7D%7B%5Cmu%7D%7D_%7B%5Ctextcolor%7B#1F4E79%7D%7B%5Ctext%7Bpopulation%20center%7D%7D%7D%0A%5C;+%5C;%0A%5Cunderbrace%7B%5Ctextcolor%7B#3F7D4E%7D%7B%5Csigma%5C,%20z_c%7D%7D_%7B%5Ctextcolor%7B#3F7D4E%7D%7B%5Ctext%7Bclass%20effect%7D%7D%7D%0A%5C,%5CBigr)%0A"></p>
+<p>One precision worth noting: <img src="https://latex.codecogs.com/png.latex?%5Cexp(%5Cmu)"> is the <em>median</em> of the distribution the class multipliers are drawn from — close to, but not exactly, the block’s overall A/E. We’ll keep calling it the block level informally, because at these parameter values the two are within a couple of percent.</p>
+<p>In Turing.jl the model is a direct transcription:</p>
+<div id="32" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>@model function hier_ae(deaths, expected)
+    μ ~ Normal(0, 1)         # log-scale center of the class multipliers
+    σ ~ Exponential(0.5)     # spread of classes around it, log scale
+    z ~ filldist(Normal(0, 1), length(deaths))
+    for c in eachindex(deaths)
+        deaths[c] ~ Poisson(expected[c] * exp(μ + σ * z[c]))
+    end
+end
+
+function bayes_estimate(A, E; rng=Xoshiro(0), samples=500, warmup=500, target=0.9)
+    ch = Chains(sample(rng, hier_ae(A, E), NUTS(warmup, target), samples;
+        progress=false, verbose=false))
+    μs, σs = vec(ch[:μ]), vec(ch[:σ])
+    θsamples = [exp.(μs .+ σs .* vec(ch[Symbol("z[$c]")])) for c in eachindex(A)]
+    (θ=mean.(θsamples), θsamples=θsamples, chain=ch)
+end</code></pre>
+</div>
+<p>The priors are weak but honest: <img src="https://latex.codecogs.com/png.latex?%5Cmu%20%5Csim%20%5Cmathrm%7BNormal%7D(0,1)"> says the block’s A/E is probably within a factor of ~2.7 of the table either way; <img src="https://latex.codecogs.com/png.latex?%5Csigma%20%5Csim%20%5Cmathrm%7BExponential%7D(0.5)"> says classes probably differ by tens of percent, not orders of magnitude. Note what is <em>not</em> in the model: no 1,082, no credibility formula, no <img src="https://latex.codecogs.com/png.latex?Z"> — the partial pooling emerges from the structure rather than being bolted on. (Writing the class effect as <img src="https://latex.codecogs.com/png.latex?%5Csigma%20z_c"> with standardized <img src="https://latex.codecogs.com/png.latex?z_c"> is a <a href="https://mc-stan.org/docs/stan-users-guide/reparameterization.html">non-centered parameterization</a> — a standard trick for sampling hierarchical models efficiently.)</p>
+<div id="34" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>bayes500 = bayes_estimate(ct500.A, ct500.E; rng=Xoshiro(SEED), samples=1000, warmup=1000)
+DataFrame(class=1:5, estimate=round.(bayes500.θ, digits=3))</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div><div style="float: left;"><span>5×2 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
+<table class="data-frame caption-top table table-sm table-striped small">
+<thead>
+<tr class="columnLabelRow header">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">class</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">estimate</th>
+</tr>
+<tr class="columnLabelRow even">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
+</tr>
+</thead>
+<tbody>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.74</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">0.744</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">0.843</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">0.578</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">0.819</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p>The <code>estimate</code> column is each class’s <strong>posterior mean</strong> — the probability-weighted center of its posterior curve. We use it as the single-number summary whenever methods are compared head to head. The full curves appear in FIG. 05 below.</p>
+<p>Before comparing estimates, compare how much weight each method gives the data. FIG. 04 shows the credibility weight <img src="https://latex.codecogs.com/png.latex?Z"> for the two traditional methods at each sample size. (The Bayesian model has no single <img src="https://latex.codecogs.com/png.latex?Z"> — its shrinkage adapts per class.)</p>
+<div id="36" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>FIG. 04 plotting code (re-simulates the illustrative seed at each N)</summary>
+<pre class="julia cell-code"><code>illustrative = map((500, 2000, 10000)) do N
+    rng = Xoshiro(SEED)
+    coh = simulate_cohort(N, rng)
+    expdf, inforce = simulate_experience(coh, rng)
+    ct = class_totals(expdf)
+    (; N, ct, expdf, inforce,
+        θtrue=true_multiplier(coh),
+        lfc=lfc_estimate(ct.A, ct.E),
+        lfc2=lfc2_estimate(ct.A, ct.E),
+        bs=bs_estimate(expdf),
+        bayes=bayes_estimate(ct.A, ct.E; rng=Xoshiro(SEED), samples=1000, warmup=1000))
+end
+
+let
+    f = Figure(size=(720, 400))
+    axs = [Axis(f[1, i];
+        subtitle="N = $(ill.N)", xlabel="risk class",
+        ylabel=i == 1 ? "Z" : "", xticks=1:5, limits=(nothing, (-0.05, 1.05)))
+           for (i, ill) in enumerate(illustrative)]
+    Label(f[0, :], "FIG. 04 — CREDIBILITY WEIGHT Z GIVEN TO THE DATA";
+        halign=:left, fontsize=15, tellwidth=false)
+    for (ax, ill) in zip(axs, illustrative)
+        scatterlines!(ax, 1:5, ill.lfc.Z; color=CF_RED, marker=:rect,
+            markersize=11, label="limited fluctuation")
+        scatterlines!(ax, 1:5, ill.bs.Z; color=CF_BLUE, marker=:utriangle,
+            markersize=12, label="Bühlmann–Straub")
+        ill.bs.fallback &amp;&amp; text!(ax, 3, 0.5; text="BS: â ≤ 0\n(fallback to\ngrand mean)",
+            align=(:center, :center), color=CF_BLUE, fontsize=11)
+    end
+    hideydecorations!.(axs[2:3]; grid=false)
+    Legend(f[2, :], axs[1]; orientation=:horizontal, framevisible=false)
+    f
+end</code></pre>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div>
+<figure class="figure">
+<p><img src="https://JuliaActuary.org/posts/credibility-sparse-data/index_files/figure-html/cell-19-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Limited fluctuation’s <img src="https://latex.codecogs.com/png.latex?Z"> stays near zero at every sample size — even 10,000 policies and ~230 claims earn the largest class a weight of only ~0.26. Bühlmann–Straub’s <img src="https://latex.codecogs.com/png.latex?Z"> rises quickly with data — except in the left panel, where its negative variance estimate forced the grand-mean fallback and <img src="https://latex.codecogs.com/png.latex?Z%20=%200"> for everyone. Note the contrast: Bühlmann–Straub gives the data no weight at N=500 because its variance estimate failed; limited fluctuation gives it almost no weight at every N because of its fixed standard. (The two-stage variant is not drawn separately — its per-class <img src="https://latex.codecogs.com/png.latex?Z"> is identical to limited fluctuation’s; only the complement of credibility differs.)</p>
+<p>One more check before leaning on the Bayesian posteriors: MCMC gives a correct answer only when its chains have explored the posterior properly, and there are standard diagnostics for that — run several independent chains and confirm they agree (<img src="https://latex.codecogs.com/png.latex?%5Chat%20R%20%5Capprox%201">), that the effective sample size is adequate, and that divergent transitions are rare. Refitting each illustrative block with four chains:</p>
+<div id="38" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>MCMC diagnostics code</summary>
+<pre class="julia cell-code"><code>diag = map(illustrative) do ill
+    ch = Chains(sample(Xoshiro(SEED), hier_ae(ill.ct.A, ill.ct.E), NUTS(1000, 0.9),
+        MCMCThreads(), 1000, 4; progress=false, verbose=false))
+    sm = DataFrame(summarystats(ch))
+    (N=ill.N, max_R̂=round(maximum(sm.rhat), digits=3),
+        min_ESS=round(Int, minimum(sm.ess_bulk)),
+        divergences="$(Int(sum(ch[:numerical_error])))/4000")
+end
+DataFrame(diag)</code></pre>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div><div style="float: left;"><span>3×4 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
+<table class="data-frame caption-top table table-sm table-striped small">
+<thead>
+<tr class="columnLabelRow header">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">N</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">max_R̂</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">min_ESS</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">divergences</th>
+</tr>
+<tr class="columnLabelRow even">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String">String</th>
+</tr>
+</thead>
+<tbody>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">1</td>
+<td style="text-align: right;">500</td>
+<td style="text-align: right;">1.002</td>
+<td style="text-align: right;">1709</td>
+<td style="text-align: left;">3/4000</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">2</td>
+<td style="text-align: right;">2000</td>
+<td style="text-align: right;">1.002</td>
+<td style="text-align: right;">1207</td>
+<td style="text-align: left;">0/4000</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">3</td>
+<td style="text-align: right;">10000</td>
+<td style="text-align: right;">1.003</td>
+<td style="text-align: right;">934</td>
+<td style="text-align: left;">1/4000</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p>All three fits look healthy: <img src="https://latex.codecogs.com/png.latex?%5Chat%20R"> within a hair of 1, effective sample sizes in the high hundreds or better, and at most a few divergent transitions out of 4,000 draws. The repetition study later in the post uses a single chain per fit as a computational shortcut, and three clean fits don’t guarantee 300 — so the study also records each fit’s divergence count and effective sample size, and the tally appears with the results.</p>
+</section>
+<section id="comparing-to-the-truth" class="level2">
+<h2 class="anchored" data-anchor-id="comparing-to-the-truth">Comparing to the truth</h2>
+<p>Now bring back the true values. FIG. 05 shows all three methods against the truth for the N=500 block. How to read it:</p>
+<ul>
+<li>Each <strong>row</strong> is a risk class — super-preferred (class 1) at the bottom, table-rated (class 5) at the top.</li>
+<li>The <strong>colored curve</strong> is the Bayesian posterior for that class’s multiplier. Values under the tall part are well supported by the data; values in the flat tail are effectively ruled out. The width of the curve shows how uncertain the model still is.</li>
+<li>The <strong>tall dark tick</strong> is the truth: the value <img src="https://latex.codecogs.com/png.latex?%5Ctheta_c"> we computed before any method ran — expected claims under the true mortality divided by expected claims on the industry table, over years 1–5. This is the number every method is trying to estimate.</li>
+<li>The <strong>red square</strong> and <strong>blue triangle</strong> are the one-stage limited fluctuation and Bühlmann–Straub estimates. Each is a single point — neither method reports its own uncertainty.</li>
+<li>The <strong>green circle</strong> is the Bayesian posterior mean: the single-number summary of each curve, and the marker used for this method in later figures.</li>
+<li>The <strong>grey ×</strong> is the observed A/E — that class’s deaths divided by its table-expected claims, with no method applied. It is what each method starts from.</li>
+</ul>
+<div id="40" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>FIG. 05 plotting code</summary>
+<pre class="julia cell-code"><code>let
+    f = Figure(size=(720, 460))
+    ax = Axis(f[1, 1];
+        title="FIG. 05 — WHAT EACH METHOD BELIEVES AT N=500 ($(Int(sum(ct500.A))) CLAIMS)",
+        xlabel="A/E vs industry table (years 1–5)",
+        yticks=(1:5, ["class $c" for c in 1:5]), limits=((0, 1.55), (0.75, 6.05)))
+    for c in 1:5
+        k = kde(bayes500.θsamples[c])
+        ridge = c .+ 0.85 .* k.density ./ maximum(k.density)
+        band!(ax, k.x, fill(Float64(c), length(k.x)), ridge;
+            color=(CASSETTE_PALETTE[c], 0.55))
+        lines!(ax, k.x, ridge; color=CASSETTE_PALETTE[c], linewidth=1.5)
+        linesegments!(ax, [Point2f(θtrue[c], c), Point2f(θtrue[c], c + 0.85)];
+            color=CF_INK, linewidth=3)
+    end
+    scatter!(ax, lfc500.θ, (1:5) .+ 0.12; color=CF_RED, marker=:rect, markersize=11,
+        label="limited fluctuation")
+    scatter!(ax, bs500.θ, (1:5) .+ 0.12; color=CF_BLUE, marker=:utriangle, markersize=12,
+        label="Bühlmann–Straub")
+    scatter!(ax, bayes500.θ, (1:5) .+ 0.12; color=CF_GREEN, marker=:circle, markersize=10,
+        strokecolor=CF_INK, strokewidth=0.5, label="posterior mean")
+    scatter!(ax, ct500.A ./ ct500.E, (1:5) .+ 0.12; color=CF_INK_SOFT, marker=:xcross,
+        markersize=11, label="observed A/E")
+    linesegments!(ax, [Point2f(θtrue[1], 1), Point2f(θtrue[1], 1.85)];
+        color=CF_INK, linewidth=3, label="truth")
+    axislegend(ax, position=:rt)
+    f
+end</code></pre>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div>
+<figure class="figure">
+<p><img src="https://JuliaActuary.org/posts/credibility-sparse-data/index_files/figure-html/cell-21-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The red squares sit near 1.0 in every row — from about 1.05 times the truth for class 5 up to about 2.4 times for class 1 — because limited fluctuation gave the data almost no weight. The blue triangles are all stacked at the grand mean, 0.68: the fallback found the level and then had nothing to say about classes. The posteriors also center near the level, but they lean the right way for most classes and, more importantly, they are wide — the model has found the level and is openly unsure about the class structure.</p>
+<p>Two details are worth a second look. First, the posteriors are widest exactly where data is scarcest — at N=500 the model is sure of very little, and says so. Second, look at class 4: one claim against 5.7 expected — the grey × at a raw A/E of 0.18 — was simple bad luck (its true value is 0.76). Partial pooling pulled the estimate most of the way back, to about 0.58, but with 11 claims even the best method gets individual classes wrong. The difference is that the width of that curve tells you not to bet much on the point estimate.</p>
+<p>The natural follow-up: what happens to those curves when the data arrives? FIG. 06 overlays the N=500 posteriors (dotted outlines) with the posteriors from the N=10,000 block (filled), along with Bühlmann–Straub’s N=10,000 estimates (blue triangles) for comparison:</p>
+<div id="42" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>FIG. 06 plotting code</summary>
+<pre class="julia cell-code"><code>bayes10k = illustrative[3].bayes
+θtrue10k = illustrative[3].θtrue
+ci_width(s) = quantile(s, 0.95) - quantile(s, 0.05)
+narrow_ratio = mean([ci_width(bayes500.θsamples[c]) / ci_width(bayes10k.θsamples[c]) for c in 1:5])
+
+let
+    f = Figure(size=(720, 460))
+    ax = Axis(f[1, 1];
+        title="FIG. 06 — THE SAME POSTERIORS AT N=10,000 ($(Int(sum(illustrative[3].ct.A))) CLAIMS)",
+        xlabel="A/E vs industry table (years 1–5)",
+        yticks=(1:5, ["class $c" for c in 1:5]), limits=((0, 1.55), (0.75, 6.05)))
+    for c in 1:5
+        k5 = kde(bayes500.θsamples[c])
+        r5 = c .+ 0.85 .* k5.density ./ maximum(k5.density)
+        lines!(ax, k5.x, r5; color=(CASSETTE_PALETTE[c], 0.7), linewidth=1.8, linestyle=:dot,
+            label=c == 5 ? "posterior at N=500 (dotted)" : nothing)
+        k = kde(bayes10k.θsamples[c])
+        ridge = c .+ 0.85 .* k.density ./ maximum(k.density)
+        band!(ax, k.x, fill(Float64(c), length(k.x)), ridge; color=(CASSETTE_PALETTE[c], 0.55),
+            label=c == 5 ? "posterior at N=10,000 (filled)" : nothing)
+        lines!(ax, k.x, ridge; color=CASSETTE_PALETTE[c], linewidth=1.5)
+        linesegments!(ax, [Point2f(θtrue10k[c], c), Point2f(θtrue10k[c], c + 0.85)];
+            color=CF_INK, linewidth=3, label=c == 5 ? "truth" : nothing)
+    end
+    scatter!(ax, illustrative[3].bs.θ, (1:5) .+ 0.12; color=CF_BLUE, marker=:utriangle,
+        markersize=12, label="Bühlmann–Straub")
+    scatter!(ax, bayes10k.θ, (1:5) .+ 0.12; color=CF_GREEN, marker=:circle, markersize=10,
+        strokecolor=CF_INK, strokewidth=0.5, label="posterior mean")
+    scatter!(ax, illustrative[3].ct.A ./ illustrative[3].ct.E, (1:5) .+ 0.12;
+        color=CF_INK_SOFT, marker=:xcross, markersize=11, label="observed A/E")
+    axislegend(ax, position=:rb)
+    f
+end</code></pre>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div>
+<figure class="figure">
+<p><img src="https://JuliaActuary.org/posts/credibility-sparse-data/index_files/figure-html/cell-22-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Each curve tightens around its truth tick — the 90% intervals are about 3.1× narrower on average than at N=500 — and classes that were indistinguishable at 11 claims now separate. Notice also how close the grey × marks sit to the green circles here, compared to FIG. 05: with a few hundred claims the observed A/E mostly speaks for itself and the model shrinks it only a little. The blue triangles tell a similar story: at this block size Bühlmann–Straub’s variance estimates work, and its estimates land near the posterior means — the two shrinkage methods agree once the data can support class differentiation. What Bühlmann–Straub still lacks is the curve around each point. Nobody adjusted a credibility standard to make either behavior happen. The shrinkage and the narrowing both fall out of the same model as claims accumulate.</p>
+<p>FIG. 07 repeats the comparison at all three block sizes, keeping only point estimates. It has two reference marks:</p>
+<ul>
+<li><strong>Truth (dark tick, one per class)</strong> — what a perfect estimator would return for each class.</li>
+<li><strong>Pooled portfolio A/E (dotted line)</strong> — the simplest data-driven estimate available: total actual claims for the whole block divided by total expected on the industry table. One number, applied to every class. It captures the <em>level</em> of the block but says nothing about how classes differ.</li>
+</ul>
+<p>These two marks define the task. First, a method has to move from 1.0 down to the overall level — the dotted line. Second, given enough data, it has to spread away from the dotted line toward the individual truth ticks.</p>
+<div id="44" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>FIG. 07 plotting code</summary>
+<pre class="julia cell-code"><code>let
+    f = Figure(size=(720, 420))
+    axs = [Axis(f[1, i];
+        subtitle="N = $(ill.N)  ($(Int(sum(ill.ct.A))) claims)", xlabel="risk class",
+        ylabel=i == 1 ? "A/E vs industry table (yrs 1–5)" : "",
+        xticks=1:5, limits=((0.3, 5.7), (0, 1.25)))
+           for (i, ill) in enumerate(illustrative)]
+    Label(f[0, :], "FIG. 07 — ESTIMATES VS TRUTH ACROSS SAMPLE SIZES";
+        halign=:left, fontsize=15, tellwidth=false)
+    for (ax, ill) in zip(axs, illustrative)
+        pooled = sum(ill.ct.A) / sum(ill.ct.E)
+        hlines!(ax, [pooled]; color=CF_INK_SOFT, linestyle=:dot, linewidth=1.5,
+            label="pooled portfolio A/E (class-blind)")
+        linesegments!(ax,
+            reduce(vcat, [[Point2f(c - 0.35, ill.θtrue[c]), Point2f(c + 0.35, ill.θtrue[c])]
+                          for c in 1:5]);
+            color=CF_INK, linewidth=3, label="truth")
+        scatter!(ax, (1:5) .- 0.24, ill.lfc.θ; color=CF_RED, marker=:rect,
+            markersize=10, label="limited fluctuation")
+        scatter!(ax, (1:5) .- 0.08, ill.lfc2.θ; color=:transparent, marker=:rect,
+            markersize=10, strokecolor=CF_RED, strokewidth=1.5, label="two-stage LFC")
+        scatter!(ax, (1:5) .+ 0.08, ill.bs.θ; color=CF_BLUE, marker=:utriangle,
+            markersize=11, label="Bühlmann–Straub")
+        scatter!(ax, (1:5) .+ 0.24, ill.bayes.θ; color=CF_GREEN, marker=:circle,
+            markersize=10, label="hierarchical Bayes")
+    end
+    hideydecorations!.(axs[2:3]; grid=false)
+    Legend(f[2, :], axs[1]; orientation=:horizontal, nbanks=2, framevisible=false)
+    f
+end</code></pre>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div>
+<figure class="figure">
+<p><img src="https://JuliaActuary.org/posts/credibility-sparse-data/index_files/figure-html/cell-23-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Watch the green circles (hierarchical Bayes) as N grows. At N=500 they sit near the dotted pooled line — defensible behavior, not a failure: eleven claims cannot distinguish five classes, so the model stays near the level and (as FIG. 05 showed) keeps its posteriors wide. At N=2,000 they begin to spread. At N=10,000 classes 4 and 5 separate clearly and the ordering emerges, though the three preferred classes — with 18 to 36 claims each — remain hard to tell apart. Bühlmann–Straub behaves much the same once its variance estimate starts working. The filled red squares never accomplish even the first step: at N=10,000 — over 230 claims — one-stage limited fluctuation still prices this block at roughly 1.3 times its true mortality. The hollow squares show the two-stage variant doing visibly better — it drifts toward the level as its portfolio credibility grows — but even at N=10,000 its experience-rated level of 0.86 remains well above the true level of about 0.70.</p>
+</section>
+<section id="was-that-one-lucky-seed" class="level2">
+<h2 class="anchored" data-anchor-id="was-that-one-lucky-seed">Was that one lucky seed?</h2>
+<p>A single simulation proves nothing. The question is the <em>distribution</em> of estimation error, so we rerun the whole experiment 100 times per sample size. We also add two reference baselines: <strong>no pooling</strong> (raw class A/E) and <strong>complete pooling</strong> (portfolio A/E applied to every class). Each method is scored two ways:</p>
+<ol type="1">
+<li><strong>Multiplier RMSE</strong> against the fit-window truth <img src="https://latex.codecogs.com/png.latex?%5Ctheta_c"> — did you learn the class structure?</li>
+<li><strong>Class-level forecast miss</strong> — for each class, predicted vs true expected claims for policy years 6–10 on the actual survivors; the absolute errors are <em>summed across classes</em> and expressed as a percentage of true claims. Summing absolute class errors means an overshoot on the rated classes cannot cancel an undershoot on the preferred ones — this is the pricing view, where each class must be right on its own. We also record the <strong>aggregate forecast miss</strong> (total predicted vs total true claims — the reserve-adequacy view, where offsetting class errors <em>do</em> cancel). (Class gaps keep narrowing after the fit window — a drift every flat-multiplier method shares equally — so the comparison isolates estimation quality.)</li>
+</ol>
+<div id="46" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>rmse(θ̂, θ) = sqrt(mean((θ̂ .- θ) .^ 2))
+
+function run_replication(N, seed)
+    rng = Xoshiro(seed)
+    coh = simulate_cohort(N, rng)
+    expdf, inforce = simulate_experience(coh, rng)
+    ct = class_totals(expdf)
+    θt = true_multiplier(coh)
+    fc = forecast_expecteds(inforce)
+    bsr = bs_estimate(expdf)
+    bay = try
+        bayes_estimate(ct.A, ct.E; rng=Xoshiro(seed))
+    catch
+        bayes_estimate(ct.A, ct.E; rng=Xoshiro(seed + 10_000))  # rare sampler failure: retry
+    end
+    q05, q95 = quantile.(bay.θsamples, 0.05), quantile.(bay.θsamples, 0.95)
+    ess = filter(x -&gt; !ismissing(x) &amp;&amp; !isnan(x), DataFrame(summarystats(bay.chain)).ess_bulk)
+    ests = (raw=ct.A ./ ct.E, pooled=fill(sum(ct.A) / sum(ct.E), 5),
+        lfc=lfc_estimate(ct.A, ct.E).θ, lfc2=lfc2_estimate(ct.A, ct.E).θ,
+        bs=bsr.θ, bayes=bay.θ)
+    (N=N, seed=seed,
+        rmse=map(θ̂ -&gt; rmse(θ̂, θt), ests),
+        fcerr=map(θ̂ -&gt; sum(abs.(θ̂ .* fc.Ebasis .- fc.Etrue)) / sum(fc.Etrue), ests),
+        aggerr=map(θ̂ -&gt; abs(sum(θ̂ .* fc.Ebasis) - sum(fc.Etrue)) / sum(fc.Etrue), ests),
+        covered=sum((q05 .≤ θt) .&amp; (θt .≤ q95)),  # classes whose truth falls in the 90% interval
+        ndiv=Int(sum(bay.chain[:numerical_error])),  # per-fit sampler diagnostics
+        min_ess=isempty(ess) ? NaN : minimum(ess),
+        bs_fallback=bsr.fallback, claims=sum(ct.A))
+end
+
+study = ThreadsX.map(g -&gt; run_replication(g...),
+    [(N, s) for N in (500, 2000, 10000) for s in 1:100]);
+length(study)</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>300</code></pre>
+</div>
+</div>
+<div id="48" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>Summary table code</summary>
+<pre class="julia cell-code"><code>methods = (raw="no pooling (raw A/E)", lfc="limited fluctuation", lfc2="two-stage LFC",
+    bs="Bühlmann–Straub", bayes="hierarchical Bayes", pooled="complete pooling")
+summary = DataFrame([
+    (N=N, method=label,
+        median_RMSE=round(median([getfield(r.rmse, m) for r in study if r.N == N]), digits=3),
+        class_fc_miss=round(100 * median([getfield(r.fcerr, m) for r in study if r.N == N]), digits=1),
+        agg_fc_miss=round(100 * median([getfield(r.aggerr, m) for r in study if r.N == N]), digits=1))
+    for N in (500, 2000, 10000) for (m, label) in pairs(methods)])
+summary</code></pre>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div><div style="float: left;"><span>18×5 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
+<table class="data-frame caption-top table table-sm table-striped small">
+<thead>
+<tr class="columnLabelRow header">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">N</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">method</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">median_RMSE</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">class_fc_miss</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">agg_fc_miss</th>
+</tr>
+<tr class="columnLabelRow even">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String">String</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
+</tr>
+</thead>
+<tbody>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">1</td>
+<td style="text-align: right;">500</td>
+<td style="text-align: left;">no pooling (raw A/E)</td>
+<td style="text-align: right;">0.389</td>
+<td style="text-align: right;">46.7</td>
+<td style="text-align: right;">18.1</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">2</td>
+<td style="text-align: right;">500</td>
+<td style="text-align: left;">limited fluctuation</td>
+<td style="text-align: right;">0.371</td>
+<td style="text-align: right;">41.8</td>
+<td style="text-align: right;">41.8</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">3</td>
+<td style="text-align: right;">500</td>
+<td style="text-align: left;">two-stage LFC</td>
+<td style="text-align: right;">0.344</td>
+<td style="text-align: right;">37.6</td>
+<td style="text-align: right;">37.6</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">4</td>
+<td style="text-align: right;">500</td>
+<td style="text-align: left;">Bühlmann–Straub</td>
+<td style="text-align: right;">0.241</td>
+<td style="text-align: right;">27.3</td>
+<td style="text-align: right;">18.0</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">5</td>
+<td style="text-align: right;">500</td>
+<td style="text-align: left;">hierarchical Bayes</td>
+<td style="text-align: right;">0.221</td>
+<td style="text-align: right;">21.3</td>
+<td style="text-align: right;">18.1</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">6</td>
+<td style="text-align: right;">500</td>
+<td style="text-align: left;">complete pooling</td>
+<td style="text-align: right;">0.234</td>
+<td style="text-align: right;">21.0</td>
+<td style="text-align: right;">18.5</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">7</td>
+<td style="text-align: right;">2000</td>
+<td style="text-align: left;">no pooling (raw A/E)</td>
+<td style="text-align: right;">0.203</td>
+<td style="text-align: right;">23.5</td>
+<td style="text-align: right;">10.0</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">8</td>
+<td style="text-align: right;">2000</td>
+<td style="text-align: left;">limited fluctuation</td>
+<td style="text-align: right;">0.353</td>
+<td style="text-align: right;">39.2</td>
+<td style="text-align: right;">39.2</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">9</td>
+<td style="text-align: right;">2000</td>
+<td style="text-align: left;">two-stage LFC</td>
+<td style="text-align: right;">0.301</td>
+<td style="text-align: right;">30.4</td>
+<td style="text-align: right;">30.4</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">10</td>
+<td style="text-align: right;">2000</td>
+<td style="text-align: left;">Bühlmann–Straub</td>
+<td style="text-align: right;">0.181</td>
+<td style="text-align: right;">16.2</td>
+<td style="text-align: right;">10.2</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">11</td>
+<td style="text-align: right;">2000</td>
+<td style="text-align: left;">hierarchical Bayes</td>
+<td style="text-align: right;">0.166</td>
+<td style="text-align: right;">14.5</td>
+<td style="text-align: right;">9.6</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">12</td>
+<td style="text-align: right;">2000</td>
+<td style="text-align: left;">complete pooling</td>
+<td style="text-align: right;">0.191</td>
+<td style="text-align: right;">15.9</td>
+<td style="text-align: right;">9.6</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">13</td>
+<td style="text-align: right;">10000</td>
+<td style="text-align: left;">no pooling (raw A/E)</td>
+<td style="text-align: right;">0.09</td>
+<td style="text-align: right;">12.5</td>
+<td style="text-align: right;">5.3</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">14</td>
+<td style="text-align: right;">10000</td>
+<td style="text-align: left;">limited fluctuation</td>
+<td style="text-align: right;">0.319</td>
+<td style="text-align: right;">34.6</td>
+<td style="text-align: right;">34.6</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">15</td>
+<td style="text-align: right;">10000</td>
+<td style="text-align: left;">two-stage LFC</td>
+<td style="text-align: right;">0.226</td>
+<td style="text-align: right;">19.6</td>
+<td style="text-align: right;">19.3</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">16</td>
+<td style="text-align: right;">10000</td>
+<td style="text-align: left;">Bühlmann–Straub</td>
+<td style="text-align: right;">0.094</td>
+<td style="text-align: right;">9.9</td>
+<td style="text-align: right;">5.0</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">17</td>
+<td style="text-align: right;">10000</td>
+<td style="text-align: left;">hierarchical Bayes</td>
+<td style="text-align: right;">0.097</td>
+<td style="text-align: right;">9.5</td>
+<td style="text-align: right;">5.5</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">18</td>
+<td style="text-align: right;">10000</td>
+<td style="text-align: left;">complete pooling</td>
+<td style="text-align: right;">0.185</td>
+<td style="text-align: right;">13.7</td>
+<td style="text-align: right;">5.2</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div id="50" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>FIG. 08 plotting code</summary>
+<pre class="julia cell-code"><code>let
+    ms = [:raw, :lfc, :lfc2, :bs, :bayes, :pooled]
+    mcolors = Dict(:raw =&gt; (CF_INK_SOFT, 0.7), :lfc =&gt; (CF_RED, 0.7), :lfc2 =&gt; (CF_RED, 0.3),
+        :bs =&gt; (CF_BLUE, 0.7), :bayes =&gt; (CF_GREEN, 0.7), :pooled =&gt; (CF_AMBER, 0.7))
+    mlabels = ["raw", "LFC", "LFC-2", "BS", "Bayes", "pooled"]
+    f = Figure(size=(720, 580))
+    for (row, (field, ylab, scale)) in enumerate(
+        [(:rmse, "multiplier RMSE", identity), (:fcerr, "class-level forecast miss (%)", x -&gt; 100x)])
+        for (col, N) in enumerate((500, 2000, 10000))
+            ax = Axis(f[row, col];
+                subtitle=row == 1 ? "N = $N" : "",
+                ylabel=col == 1 ? ylab : "", xticks=(1:6, mlabels),
+                xticklabelsize=9, xticklabelrotation=π/4)
+            sub = [r for r in study if r.N == N]
+            for (i, m) in enumerate(ms)
+                vals = scale.([getfield(getfield(r, field), m) for r in sub])
+                boxplot!(ax, fill(i, length(vals)), vals;
+                    color=mcolors[m], strokecolor=CF_INK, strokewidth=1,
+                    whiskercolor=CF_INK, mediancolor=CF_INK, width=0.6,
+                    show_outliers=false)
+            end
+            row == 1 &amp;&amp; ylims!(ax, 0, 0.85)
+            row == 2 &amp;&amp; ylims!(ax, 0, 110)
+        end
+    end
+    Label(f[0, :], "FIG. 08 — ERROR DISTRIBUTIONS OVER 100 SIMULATIONS";
+        halign=:left, fontsize=15, tellwidth=false)
+    f
+end</code></pre>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div>
+<figure class="figure">
+<p><img src="https://JuliaActuary.org/posts/credibility-sparse-data/index_files/figure-html/cell-26-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The pattern is consistent:</p>
+<ul>
+<li><strong>Limited fluctuation is the worst forecaster at every sample size.</strong> Anchored to a table the block does not follow, its median class-level miss is 42% of true claims at N=500 and still 35% at N=10,000 — while the Bayesian model goes from 21% down to 9%. More data barely helps it, because <img src="https://latex.codecogs.com/png.latex?Z"> grows too slowly to matter.</li>
+<li><strong>The two-stage variant closes about half the gap, then stalls in the same place.</strong> Its median miss falls from 38% at N=500 to 20% at N=10,000 — clearly better than one-stage, still about twice the Bayesian miss with 230+ claims in hand. The aggregate signal explains only part of the gap; the fixed credibility standard adjusts slowly at the portfolio level just as it does at the class level.</li>
+<li><strong>At N=500, complete pooling is hard to beat.</strong> When the data cannot distinguish classes, the best move is to find the level and stop, and Bühlmann–Straub and Bayes both approximately do that here. The difference shows up later: the Bayesian model pools because the data warrants it, and stops pooling when the data warrants that instead. Complete pooling never stops.</li>
+<li><strong>At N=10,000 the ranking tightens.</strong> Real class differences are now estimable, so complete pooling falls behind while Bayes, Bühlmann–Straub, and even raw A/E converge — Bühlmann–Straub in fact edges out Bayes on median RMSE (0.094 vs 0.097) while Bayes stays slightly ahead on forecast miss. The hierarchical model’s distinction is not winning every column at every size; it is being at or near the front at <em>every</em> sample size, with no settings changed.</li>
+<li><strong>Bühlmann–Straub’s fragility is procedural, not (at these sizes) an accuracy problem.</strong> Its negative-variance fallback fired in 52/100 simulations at N=500 and 34/100 at N=2,000. The boxplots don’t show it, because the fallback reduces to complete pooling, and complete pooling is competitive at these block sizes. The cost is the discontinuity itself: the fallback turns on the sign of an estimated variance component, so a modest change in experience can move the method between complete pooling and class differentiation from one study to the next.</li>
+<li><strong>The single-chain shortcut mostly held up.</strong> Of the 300 study fits, 39 had at least one divergent transition (57 of 150,000 draws in total), and the smallest per-parameter effective sample size in any fit was about 40 of 500 draws. That is adequate for the median-of-100 point-estimate comparisons above; it also means individual interval endpoints carry some Monte Carlo noise.</li>
+<li><strong>The Bayesian intervals mean roughly what they say.</strong> Across the study, the 90% posterior intervals contained the true class multiplier 90.4% of the time at N=500, 85.2% at N=2,000, and 87.6% at N=10,000 — close to nominal, though somewhat low at the two larger sizes. Possible contributors include the Poisson approximation, the hierarchical model’s assumptions, and Monte Carlo error in the interval endpoints; this experiment doesn’t isolate them. (Bayesian intervals carry no general guarantee of exact frequentist coverage, even when the model is right.)</li>
+<li><strong>The two error metrics tell different stories, on purpose.</strong> On the aggregate (reserve) view, every method that finds the level — pooling, Bühlmann–Straub, Bayes, even raw A/E — lands within a few percent at N=10,000, and the two limited fluctuation variants are the outliers because their class misses all point the same way. Class differentiation only matters in the class-level (pricing) metric — but that is the metric class pricing lives on.</li>
+</ul>
+</section>
+<section id="why-this-happens" class="level2">
+<h2 class="anchored" data-anchor-id="why-this-happens">Why this happens</h2>
+<p>The bias–variance decomposition makes the mechanics plain. Each method is a different answer to “how much should estimates be shrunk, and toward what?”</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Method</th>
+<th>Shrinks toward</th>
+<th>Shrinkage set by</th>
+<th>Likelihood for counts</th>
+<th>Uses portfolio signal?</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>No pooling</td>
+<td>— (none)</td>
+<td>—</td>
+<td>—</td>
+<td>no</td>
+</tr>
+<tr class="even">
+<td>Limited fluctuation</td>
+<td>prior table (1.0×)</td>
+<td>fixed 1082-claim standard</td>
+<td>normal approximation</td>
+<td><strong>no</strong></td>
+</tr>
+<tr class="odd">
+<td>Two-stage LFC</td>
+<td>experience-rated level</td>
+<td>fixed 1082-claim standard</td>
+<td>normal approximation</td>
+<td>slowly, via the standard</td>
+</tr>
+<tr class="even">
+<td>Bühlmann–Straub</td>
+<td>portfolio A/E</td>
+<td>estimated variance ratio</td>
+<td>moment-based</td>
+<td>yes</td>
+</tr>
+<tr class="odd">
+<td>Complete pooling</td>
+<td>portfolio A/E (fully)</td>
+<td>total, always</td>
+<td>—</td>
+<td>only the portfolio signal</td>
+</tr>
+<tr class="even">
+<td>Hierarchical Bayes</td>
+<td><em>learned</em> distribution</td>
+<td>posterior, per class</td>
+<td>Poisson counts</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+<p>Limited fluctuation loses because of the first two columns: it shrinks toward a prior it never questions, at a rate fixed by a stability criterion designed long before computers. It is a high-bias estimator whenever the prior is materially wrong — and for a newly underwritten block measured against a broad industry table, the prior can readily be materially wrong. The two-stage variant repairs the shrinkage target but keeps the fixed standard, which is why it improves and then stalls.</p>
+<p>Bühlmann–Straub fixes both defects in expectation — it is the best <em>linear</em> predictor under its credibility-model assumptions, which produces shrinkage closely analogous to the Bayesian answer. Its weakness is that the variance components controlling the shrinkage must themselves be estimated from five noisy class means, which leaves it erratic exactly where it is needed most.</p>
+<p>The hierarchical model has no magic ingredient — it combines the portfolio and class signals in one joint probability model. The Poisson count likelihood stays faithful at low counts, where normal approximations degrade: the difference between 0 and 2 claims on 1.7 expected says a lot about a rate, and a method built on a normal approximation extracts little of it. (Strictly, our simulated deaths are Bernoulli draws, so a binomial likelihood would be exact; at mortality rates this low, Poisson is the standard substitute and numerically indistinguishable.) The shrinkage target and strength are estimated jointly with everything else, with uncertainty carried through instead of plugged in. And a zero-claim class is not “no information” — it is a likelihood term pulling that class’s rate down, moderated by the hierarchy.</p>
+</section>
+<section id="what-bayes-costs" class="level2">
+<h2 class="anchored" data-anchor-id="what-bayes-costs">What Bayes costs</h2>
+<p>Bayes is not free. The costs:</p>
+<ul>
+<li><strong>You must write down priors and defend them.</strong> Ours are weakly informative and were not tuned to this data — but in a regulatory or audit setting, “why Exponential(0.5)?” is a question you’ll answer. (The traditional methods embed stronger assumptions — one-stage LFC’s prior gets 74–100% of the weight in every scenario above — they’re just not written where anyone can see them.)</li>
+<li><strong>Compute and diagnostics.</strong> Each fit here takes well under a second, but real models are bigger, and MCMC brings a genuine skill requirement: divergences, <img src="https://latex.codecogs.com/png.latex?%5Chat%20R">, effective sample size — the checks we ran after FIG. 04. The non-centered parameterization above exists precisely because the naive version of this model samples badly.</li>
+<li><strong>Model risk is explicit.</strong> Our model assumes a flat multiplier per class and is <em>wrong</em> — the true class factors wear off with duration, and the model doesn’t know that. Every method above shares that misspecification; the Bayesian one at least makes it visible and, as we’ll see next, fixable.</li>
+<li><strong>When is traditional fine?</strong> If all you need is the portfolio-level rate and you have plentiful claims, complete pooling or an aggregate Bühlmann–Straub estimate is simple, defensible, and nearly as accurate. The Bayesian advantage concentrates where data are thin and structure matters: new classes, new products, small blocks, reinsurance carve-outs.</li>
+</ul>
+</section>
+<section id="extending-the-model" class="level2">
+<h2 class="anchored" data-anchor-id="extending-the-model">Extending the model</h2>
+<p>So far the Bayesian model was restricted to one flat multiplier per class, to match what the credibility methods can express. But the model is code, not a formula, and we know underwriting information decays. Add one parameter — a shared wear-off rate <img src="https://latex.codecogs.com/png.latex?%5Clambda"> — and each class’s deviation from the block level shrinks with duration:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0AD_%7Bc,t%7D%20%5C;%5Csim%5C;%20%5Cmathrm%7BPoisson%7D%5CBigl(%5C,%20E_%7Bc,t%7D%20%5Ccdot%20%5Cexp%5Cbigl(%5C,%20%5Cmu%20+%20%5Csigma%20z_c%20%5Ccdot%0A%5Cunderbrace%7B%5Ctextcolor%7B#D4A017%7D%7B%5Cmax%5Cbigl(0,%5C;%201%20-%20%5Clambda%5C,(t-1)%5Cbigr)%7D%7D_%7B%5Ctextcolor%7B#D4A017%7D%7B%5Ctext%7Bunderwriting%20information%20remaining%20at%20duration%20%7D%20t%7D%7D%0A%5C,%5Cbigr)%20%5CBigr)%0A"></p>
+<div id="52" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>@model function hier_ae_wear(deaths, expected, dur, cls)
+    μ ~ Normal(0, 0.5)       # log block level vs the table
+    σ ~ Exponential(0.5)     # class spread at issue, log scale
+    z ~ filldist(Normal(0, 1), 5)
+    λ ~ truncated(Normal(0.05, 0.05), 0, 0.2)   # per-year wear-off of the class effect
+    for i in eachindex(deaths)
+        deaths[i] ~ Poisson(expected[i] * exp(μ + σ * z[cls[i]] * max(0, 1 - λ * (dur[i] - 1))))
+    end
+end</code></pre>
+</div>
+<div id="54" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>Wear-off model fit and FIG. 09 plotting code</summary>
+<pre class="julia cell-code"><code>ill10k = illustrative[3]
+cells10k = combine(groupby(ill10k.expdf, [:class, :duration]),
+    :deaths =&gt; sum =&gt; :d, :expected =&gt; sum =&gt; :m)
+chw = Chains(sample(Xoshiro(SEED), hier_ae_wear(cells10k.d, cells10k.m,
+        cells10k.duration, cells10k.class), NUTS(1000, 0.9), 1000;
+    progress=false, verbose=false))
+μw, σw, λw = vec(chw[:μ]), vec(chw[:σ]), vec(chw[:λ])
+zw = [vec(chw[Symbol("z[$c]")]) for c in 1:5]
+wear_path(c, t) = exp.(μw .+ σw .* zw[c] .* max.(0, 1 .- λw .* (t - 1)))
+
+let
+    f = Figure(size=(720, 440))
+    ax = Axis(f[1, 1];
+        title="FIG. 09 — LEARNING THE WEAR-OFF (N=10,000, FIT TO YEARS 1–5)",
+        xlabel="policy duration", ylabel="A/E vs industry table", xticks=1:15,
+        limits=((0.5, 15.5), (0.3, 1.15)))
+    vspan!(ax, 0.5, 5.5; color=(CF_BLUE, 0.10))
+    vspan!(ax, 5.5, 15.5; color=(CF_AMBER, 0.12))
+    durs = 1:15
+    for c in (1, 5)  # uncertainty bands for the extreme classes only
+        band!(ax, durs, [quantile(wear_path(c, t), 0.05) for t in durs],
+            [quantile(wear_path(c, t), 0.95) for t in durs];
+            color=(CASSETTE_PALETTE[c], 0.18))
+    end
+    for c in 5:-1:1
+        lines!(ax, durs, [LEVEL * class_factor(t, c) for t in durs];
+            color=CASSETTE_PALETTE[c], linestyle=:dash, linewidth=1.5)
+        lines!(ax, durs, [mean(wear_path(c, t)) for t in durs];
+            color=CASSETTE_PALETTE[c], linewidth=2, label="class $c")
+    end
+    lines!(ax, durs, fill(NaN, 15); color=CF_INK, linestyle=:dash, label="truth (dashed)")
+    text!(ax, 3, 0.33; text="fit window", align=(:center, :bottom), color=CF_BLUE, fontsize=12)
+    text!(ax, 10, 0.33; text="extrapolation", align=(:center, :bottom), color=CF_AMBER, fontsize=12)
+    axislegend(ax, position=:rt, nbanks=2)
+    f
+end</code></pre>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div>
+<figure class="figure">
+<p><img src="https://JuliaActuary.org/posts/credibility-sparse-data/index_files/figure-html/cell-28-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="56" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>Ten-year forecast comparison code (60 simulations)</summary>
+<pre class="julia cell-code"><code>function forecast_bydur(inforce; window=6:15)
+    Eb = zeros(5, last(window)); Et = zeros(5)
+    for (cls, ia) in inforce
+        surv = 1.0
+        for t in first(window):last(window)
+            age = ia + t - 1
+            qt = true_q(age, t, cls)
+            Eb[cls, t] += surv * base_q(age)
+            Et[cls] += surv * qt
+            surv *= 1 - qt
+        end
+    end
+    (Eb=Eb, Et=Et)
+end
+
+function horizon_compare(N, seed; window=6:15)
+    rng = Xoshiro(seed)
+    coh = simulate_cohort(N, rng)
+    expdf, inforce = simulate_experience(coh, rng)
+    ct = class_totals(expdf)
+    cells = combine(groupby(expdf, [:class, :duration]), :deaths =&gt; sum =&gt; :d, :expected =&gt; sum =&gt; :m)
+    bay = bayes_estimate(ct.A, ct.E; rng=Xoshiro(seed))
+    ch = Chains(sample(Xoshiro(seed), hier_ae_wear(cells.d, cells.m, cells.duration, cells.class),
+        NUTS(500, 0.9), 500; progress=false, verbose=false))
+    μs, σs, λs = vec(ch[:μ]), vec(ch[:σ]), vec(ch[:λ])
+    zs = [vec(ch[Symbol("z[$c]")]) for c in 1:5]
+    fcd = forecast_bydur(inforce; window)
+    Ebtot = vec(sum(fcd.Eb[:, window], dims=2))
+    pred_wear = [sum(mean(exp.(μs .+ σs .* zs[c] .* max.(0, 1 .- λs .* (t - 1)))) * fcd.Eb[c, t]
+                     for t in window) for c in 1:5]
+    tot = sum(fcd.Et)
+    (lfc=sum(abs.(lfc_estimate(ct.A, ct.E).θ .* Ebtot .- fcd.Et)) / tot,
+        flat=sum(abs.(bay.θ .* Ebtot .- fcd.Et)) / tot,
+        wear=sum(abs.(pred_wear .- fcd.Et)) / tot)
+end
+
+horizon = ThreadsX.map(s -&gt; horizon_compare(10000, s), 1:60);
+length(horizon)</code></pre>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>60</code></pre>
+</div>
+</div>
+<p>Fit to years 1–5 only, the model comes close on all three structural pieces: the block level (posterior mean 0.72, true 0.70), the class spread, and the wear-off rate (<img src="https://latex.codecogs.com/png.latex?%5Clambda"> = 0.056, where the truth’s grading corresponds to roughly <img src="https://latex.codecogs.com/png.latex?1/19%20%5Capprox%200.053"> on this scale). <em>Close</em> is the honest word, because the model is not even the same functional form as the truth: the simulation grades each class’s <em>factor</em> linearly toward 1.0, while the model grades the factor’s <em>logarithm</em> linearly toward zero (with the <img src="https://latex.codecogs.com/png.latex?%5Cmax(0,%5Ccdot)"> clamp keeping the effect from overshooting in long extrapolations — it never binds in the fit window). At these effect sizes the two forms differ by a couple of percent, and the misspecified model tracks the truth anyway. In FIG. 09 the solid posterior paths follow the dashed truth through the fit window and keep following it as the class gaps narrow in the extrapolation — something no flat multiplier can do. It pays off at longer horizons: over policy years 6–15 at N=10,000, the median class-level forecast miss across 60 simulations is 8.0% for the wear-off model, 10.3% for the flat Bayesian model, and 34.7% for limited fluctuation. The Bayesian formulation makes the extension direct: one new line in the model and a prior for the rate.</p>
+</section>
+<section id="conclusion" class="level2">
+<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
+<p>The thesis holds for the methods tested here, with one nuance worth keeping. Limited fluctuation was the worst forecaster at every sample size — in its textbook class-vs-table form because it anchors to a table the block does not follow, and even in the more charitable two-stage form, which experience-rates the table first, because the 1,082-claim standard allows only slow adjustment. More data helps either variant less than it should: their errors at 10,000 lives are much closer to their errors at 500 than to anyone else’s. Bühlmann–Straub — the traditional method closest in spirit to Bayes — did well when its variance estimates worked, which at realistic block sizes was only about half the time; when they failed, it fell back to complete pooling, which happened to be a competitive answer at these sizes.</p>
+<p>The nuance: at N=500, simply pooling the whole block was nearly as accurate as the Bayesian model, because a dozen claims can establish a level but not a class structure. The hierarchical model’s advantage is that it is at or near the front at <em>every</em> sample size, moving on its own from pooling (when eleven claims can’t tell classes apart) to differentiation (when a few hundred can). It reports its uncertainty the whole way, and it can be extended — a wear-off rate, age effects, covariates — when a flat multiplier stops being good enough.</p>
+<p>The 1,082-claim standard answered a real question in 1914: <em>when is this number stable enough to publish?</em> The question that matters for pricing and forecasting is different: <em>what is the best estimate I can build from everything I know?</em> For that question, on this evidence, the traditional implementations tested here were consistently less accurate — most of all for the classes with the fewest claims. Giving limited fluctuation an aggregate first stage narrowed the difference, but did not close it.</p>
+</section>
+<section id="further-reading" class="level2">
+<h2 class="anchored" data-anchor-id="further-reading">Further reading</h2>
+<ul>
+<li><a href="../../posts/bayes-vs-limited-fluctuation/index.html">Bayesian vs Limited Fluctuation Experience Analysis</a> — where the 1,082 comes from, and a real-data version of this comparison.</li>
+<li><a href="../../posts/bayesian-claims-demo/index.html">A Bayesian Approach to Claims Rate Analysis</a> — Turing.jl on simulated select mortality with more MCMC diagnostics.</li>
+<li>Bühlmann &amp; Gisler, <em>A Course in Credibility Theory and its Applications</em> — the definitive treatment of the greatest-accuracy tradition.</li>
+<li>Atkinson &amp; McGarry, <a href="https://www.soa.org/resources/tables-calcs-tools/experience-study-calculations/"><em>Experience Study Calculations</em></a> (SOA) — practical experience-study mechanics.</li>
+<li>Gelman et al., <em>Bayesian Data Analysis</em>, ch.&nbsp;5 — hierarchical models and partial pooling.</li>
+<li>Meyers, <a href="https://www.casact.org/monograph/cas-monograph-no-8"><em>Stochastic Loss Reserving Using Bayesian MCMC Models</em></a> (CAS) — the same philosophy applied to reserving.</li>
+</ul>
+</section>
+<section id="footnotes-and-colophon" class="level2">
+<h2 class="anchored" data-anchor-id="footnotes-and-colophon">Footnotes and colophon</h2>
+<p>Simulation, fitting, and figures were produced with the code shown on this page, in Julia with <a href="https://turing.ml">Turing.jl</a>, <a href="https://dataframes.juliadata.org">DataFrames.jl</a>, and <a href="https://makie.org">Makie.jl</a>. The 100-simulation repetition study runs in a few seconds on a laptop.</p>
+<p><em>Disclosure: this post was written by AI (Anthropic’s Claude) and reviewed by a human.</em></p>
+
+
+</section>
+
+ ]]></description>
+  <category>statistics</category>
+  <category>experience-analysis</category>
+  <category>bayesian</category>
+  <category>credibility</category>
+  <category>modeling</category>
+  <guid>https://JuliaActuary.org/posts/credibility-sparse-data/</guid>
+  <pubDate>Sun, 26 Jul 2026 14:17:18 GMT</pubDate>
+</item>
+<item>
   <title>Interactive Cashflow Analysis with ActuaryUtilities.jl</title>
   <link>https://JuliaActuary.org/posts/cashflow-interactive/</link>
   <description><![CDATA[ 
@@ -3028,7 +4424,7 @@ using Pluto; Pluto.run()</code></pre>
   <category>financemodels</category>
   <category>assets</category>
   <guid>https://JuliaActuary.org/posts/cashflow-interactive/</guid>
-  <pubDate>Sat, 18 Jul 2026 01:27:54 GMT</pubDate>
+  <pubDate>Sun, 26 Jul 2026 14:17:18 GMT</pubDate>
 </item>
 <item>
   <title>Universal Life Policy Account Mechanics as a Differential Equation</title>
@@ -3307,7 +4703,7 @@ end</code></pre>
   <category>actuaryutilities</category>
   <category>tutorial</category>
   <guid>https://JuliaActuary.org/posts/policy-diffeq/</guid>
-  <pubDate>Sat, 18 Jul 2026 01:27:54 GMT</pubDate>
+  <pubDate>Sun, 26 Jul 2026 14:17:18 GMT</pubDate>
 </item>
 <item>
   <title>US Treasury Comparison Tool</title>
@@ -3345,7 +4741,7 @@ using Pluto; Pluto.run()</code></pre>
   <category>financemodels</category>
   <category>tutorial</category>
   <guid>https://JuliaActuary.org/posts/treasury-interactive/</guid>
-  <pubDate>Sat, 18 Jul 2026 01:27:54 GMT</pubDate>
+  <pubDate>Sun, 26 Jul 2026 14:17:18 GMT</pubDate>
 </item>
 <item>
   <title>Bayesian Markov-Chain-Monte-Carlo and Claims Data</title>
@@ -5441,7 +6837,7 @@ Use `describe(chains)` for summary statistics and quantiles.</code></pre>
   <category>statistics</category>
   <category>bayesian</category>
   <guid>https://JuliaActuary.org/posts/bayesian-claims-demo/</guid>
-  <pubDate>Sat, 18 Jul 2026 01:27:54 GMT</pubDate>
+  <pubDate>Sun, 26 Jul 2026 14:17:18 GMT</pubDate>
 </item>
 <item>
   <title>Nested Projection Mechanics</title>
@@ -6656,7 +8052,7 @@ end</code></pre>
   <category>actuaryutilities</category>
   <category>tutorial</category>
   <guid>https://JuliaActuary.org/posts/nested-policy-projections/</guid>
-  <pubDate>Sat, 18 Jul 2026 01:27:54 GMT</pubDate>
+  <pubDate>Sun, 26 Jul 2026 14:17:18 GMT</pubDate>
 </item>
 <item>
   <title>Using MortaltiyTables.jl with DataFrames</title>
@@ -7277,7 +8673,7 @@ sample_data</code></pre>
   <category>dataframes</category>
   <category>tutorial</category>
   <guid>https://JuliaActuary.org/posts/mortalitytables-and-dataframes/</guid>
-  <pubDate>Sat, 18 Jul 2026 01:27:54 GMT</pubDate>
+  <pubDate>Sun, 26 Jul 2026 14:17:18 GMT</pubDate>
 </item>
 <item>
   <title>Poisson approximation to Binomial</title>
@@ -7505,7 +8901,7 @@ end</code></pre>
   <category>statistics</category>
   <category>experience-analysis</category>
   <guid>https://JuliaActuary.org/posts/poisson-approximation/</guid>
-  <pubDate>Sat, 18 Jul 2026 01:27:54 GMT</pubDate>
+  <pubDate>Sun, 26 Jul 2026 14:17:18 GMT</pubDate>
 </item>
 <item>
   <title>Bayesian vs Limited Fluctuation Experience Analysis</title>
@@ -8628,7 +10024,7 @@ end</code></pre>
   <category>experience-analysis</category>
   <category>bayesian</category>
   <guid>https://JuliaActuary.org/posts/bayes-vs-limited-fluctuation/</guid>
-  <pubDate>Sat, 18 Jul 2026 01:27:54 GMT</pubDate>
+  <pubDate>Sun, 26 Jul 2026 14:17:18 GMT</pubDate>
 </item>
 <item>
   <title>Fitting Rate Data to Yield Curves</title>
@@ -8764,7 +10160,7 @@ end</code></pre>
   <category>financemodels</category>
   <category>tutorial</category>
   <guid>https://JuliaActuary.org/posts/fitting-yield-curves/</guid>
-  <pubDate>Sat, 18 Jul 2026 01:27:54 GMT</pubDate>
+  <pubDate>Sun, 26 Jul 2026 14:17:18 GMT</pubDate>
 </item>
 <item>
   <title>Fitting survival data with MortaltityTables.jl</title>
@@ -9089,51 +10485,7 @@ plt2</code></pre>
   <category>survival</category>
   <category>tutorial</category>
   <guid>https://JuliaActuary.org/posts/fitting-survival-data/</guid>
-  <pubDate>Sat, 18 Jul 2026 01:27:54 GMT</pubDate>
-</item>
-<item>
-  <title>Interactive AAA Economic Scenario Generator</title>
-  <link>https://JuliaActuary.org/posts/academy-generator-rates/</link>
-  <description><![CDATA[ 
-
-
-
-
-
-<p>Scroll down below the sample video to see how to run it.</p>
-<video autoplay="" loop="" muted="" playsinline="" style=" object-fit: cover; height:50%; width:50%; border:2px solid;">
- <source src="PlutoESG.webm" type="video/webm">
- <source src="PlutoESG.mp4" type="video/mp4">
- </video>
-<p>The recording above shows a <a href="https://github.com/fonsp/Pluto.jl">Pluto.jl</a> notebook manipulating the long-rate mean reversion parameter of the stochastic interest rate process (with the full curve interpolated via a Nelson-Siegel functional form), based on the American Academy of Actuaries’ (AAA) <a href="https://www.actuary.org/content/economic-scenario-generators">Economic Scenario Generator</a> (ESG).</p>
-<section id="instructions-to-run" class="level2">
-<h2 class="anchored" data-anchor-id="instructions-to-run">Instructions to Run</h2>
-<p>Because JuliaActuary doesn’t have a beefy server to run this on and let anybody run/visualize thousands of stochastic scenarios, for this one you have to run it locally. Assuming that you already have Julia installed but still need to install Pluto notebooks:</p>
-<ol type="1">
-<li>Open a Julia REPL and copy and paste the following:</li>
-</ol>
-<pre class="julia"><code># install these dependencies
-import Pkg; Pkg.add(["Pluto"]) 
-
-# use and start Pluto
-using Pluto; Pluto.run()                        </code></pre>
-<ol start="2" type="1">
-<li>In the Pluto window that opens, enter this URL into the <code>Open from file:</code> box:</li>
-</ol>
-<pre><code>https://raw.githubusercontent.com/JuliaActuary/Learn/master/AAA_ESG.jl</code></pre>
-</section>
-<section id="see-also" class="level2">
-<h2 class="anchored" data-anchor-id="see-also">See also</h2>
-<p><a href="../../posts/academy-generator/">Replicating the AAA equity generator</a></p>
-
-
-</section>
-
- ]]></description>
-  <category>modeling</category>
-  <category>scenario-generator</category>
-  <guid>https://JuliaActuary.org/posts/academy-generator-rates/</guid>
-  <pubDate>Sat, 18 Jul 2026 01:27:54 GMT</pubDate>
+  <pubDate>Sun, 26 Jul 2026 14:17:18 GMT</pubDate>
 </item>
 </channel>
 </rss>

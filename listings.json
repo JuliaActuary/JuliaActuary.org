@@ -15,6 +15,7 @@
   {
     "listing": "/examples.html",
     "items": [
+      "/posts/credibility-sparse-data/index.html",
       "/posts/cashflow-interactive/index.html",
       "/posts/policy-diffeq/index.html",
       "/posts/treasury-interactive/index.html",
@@ -37,6 +38,7 @@
   {
     "listing": "/all-posts.html",
     "items": [
+      "/posts/credibility-sparse-data/index.html",
       "/posts/cashflow-interactive/index.html",
       "/posts/policy-diffeq/index.html",
       "/posts/treasury-interactive/index.html",
