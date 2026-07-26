@@ -4386,7 +4386,7 @@ length(horizon)</code></pre>
   <category>credibility</category>
   <category>modeling</category>
   <guid>https://JuliaActuary.org/posts/credibility-sparse-data/</guid>
-  <pubDate>Sun, 26 Jul 2026 14:17:18 GMT</pubDate>
+  <pubDate>Sun, 26 Jul 2026 14:21:58 GMT</pubDate>
 </item>
 <item>
   <title>Interactive Cashflow Analysis with ActuaryUtilities.jl</title>
@@ -4424,7 +4424,7 @@ using Pluto; Pluto.run()</code></pre>
   <category>financemodels</category>
   <category>assets</category>
   <guid>https://JuliaActuary.org/posts/cashflow-interactive/</guid>
-  <pubDate>Sun, 26 Jul 2026 14:17:18 GMT</pubDate>
+  <pubDate>Sun, 26 Jul 2026 14:21:58 GMT</pubDate>
 </item>
 <item>
   <title>Universal Life Policy Account Mechanics as a Differential Equation</title>
@@ -4703,7 +4703,7 @@ end</code></pre>
   <category>actuaryutilities</category>
   <category>tutorial</category>
   <guid>https://JuliaActuary.org/posts/policy-diffeq/</guid>
-  <pubDate>Sun, 26 Jul 2026 14:17:18 GMT</pubDate>
+  <pubDate>Sun, 26 Jul 2026 14:21:58 GMT</pubDate>
 </item>
 <item>
   <title>US Treasury Comparison Tool</title>
@@ -4741,7 +4741,7 @@ using Pluto; Pluto.run()</code></pre>
   <category>financemodels</category>
   <category>tutorial</category>
   <guid>https://JuliaActuary.org/posts/treasury-interactive/</guid>
-  <pubDate>Sun, 26 Jul 2026 14:17:18 GMT</pubDate>
+  <pubDate>Sun, 26 Jul 2026 14:21:58 GMT</pubDate>
 </item>
 <item>
   <title>Bayesian Markov-Chain-Monte-Carlo and Claims Data</title>
@@ -6837,7 +6837,7 @@ Use `describe(chains)` for summary statistics and quantiles.</code></pre>
   <category>statistics</category>
   <category>bayesian</category>
   <guid>https://JuliaActuary.org/posts/bayesian-claims-demo/</guid>
-  <pubDate>Sun, 26 Jul 2026 14:17:18 GMT</pubDate>
+  <pubDate>Sun, 26 Jul 2026 14:21:58 GMT</pubDate>
 </item>
 <item>
   <title>Nested Projection Mechanics</title>
@@ -8052,7 +8052,7 @@ end</code></pre>
   <category>actuaryutilities</category>
   <category>tutorial</category>
   <guid>https://JuliaActuary.org/posts/nested-policy-projections/</guid>
-  <pubDate>Sun, 26 Jul 2026 14:17:18 GMT</pubDate>
+  <pubDate>Sun, 26 Jul 2026 14:21:58 GMT</pubDate>
 </item>
 <item>
   <title>Using MortaltiyTables.jl with DataFrames</title>
@@ -8673,7 +8673,7 @@ sample_data</code></pre>
   <category>dataframes</category>
   <category>tutorial</category>
   <guid>https://JuliaActuary.org/posts/mortalitytables-and-dataframes/</guid>
-  <pubDate>Sun, 26 Jul 2026 14:17:18 GMT</pubDate>
+  <pubDate>Sun, 26 Jul 2026 14:21:58 GMT</pubDate>
 </item>
 <item>
   <title>Poisson approximation to Binomial</title>
@@ -8901,7 +8901,7 @@ end</code></pre>
   <category>statistics</category>
   <category>experience-analysis</category>
   <guid>https://JuliaActuary.org/posts/poisson-approximation/</guid>
-  <pubDate>Sun, 26 Jul 2026 14:17:18 GMT</pubDate>
+  <pubDate>Sun, 26 Jul 2026 14:21:58 GMT</pubDate>
 </item>
 <item>
   <title>Bayesian vs Limited Fluctuation Experience Analysis</title>
@@ -10024,7 +10024,7 @@ end</code></pre>
   <category>experience-analysis</category>
   <category>bayesian</category>
   <guid>https://JuliaActuary.org/posts/bayes-vs-limited-fluctuation/</guid>
-  <pubDate>Sun, 26 Jul 2026 14:17:18 GMT</pubDate>
+  <pubDate>Sun, 26 Jul 2026 14:21:58 GMT</pubDate>
 </item>
 <item>
   <title>Fitting Rate Data to Yield Curves</title>
@@ -10160,7 +10160,7 @@ end</code></pre>
   <category>financemodels</category>
   <category>tutorial</category>
   <guid>https://JuliaActuary.org/posts/fitting-yield-curves/</guid>
-  <pubDate>Sun, 26 Jul 2026 14:17:18 GMT</pubDate>
+  <pubDate>Sun, 26 Jul 2026 14:21:58 GMT</pubDate>
 </item>
 <item>
   <title>Fitting survival data with MortaltityTables.jl</title>
@@ -10485,7 +10485,7 @@ plt2</code></pre>
   <category>survival</category>
   <category>tutorial</category>
   <guid>https://JuliaActuary.org/posts/fitting-survival-data/</guid>
-  <pubDate>Sun, 26 Jul 2026 14:17:18 GMT</pubDate>
+  <pubDate>Sun, 26 Jul 2026 14:21:58 GMT</pubDate>
 </item>
 </channel>
 </rss>

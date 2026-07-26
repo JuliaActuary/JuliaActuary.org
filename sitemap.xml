@@ -61,16 +61,20 @@
     <lastmod>2026-07-18T01:25:22.986Z</lastmod>
   </url>
   <url>
-    <loc>https://JuliaActuary.org/posts/finance-models-announcement/index.html</loc>
-    <lastmod>2026-07-18T01:25:22.983Z</lastmod>
+    <loc>https://JuliaActuary.org/posts/credibility-sparse-data/index.html</loc>
+    <lastmod>2026-07-26T14:15:51.398Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.org/examples.html</loc>
+    <lastmod>2025-06-14T19:05:26.432Z</lastmod>
   </url>
   <url>
     <loc>https://JuliaActuary.org/community.html</loc>
     <lastmod>2025-06-14T19:05:26.432Z</lastmod>
   </url>
   <url>
-    <loc>https://JuliaActuary.org/examples.html</loc>
-    <lastmod>2025-06-14T19:05:26.432Z</lastmod>
+    <loc>https://JuliaActuary.org/posts/finance-models-announcement/index.html</loc>
+    <lastmod>2026-07-18T01:25:22.983Z</lastmod>
   </url>
   <url>
     <loc>https://JuliaActuary.org/posts/cashflow-interactive/index.html</loc>
@@ -131,9 +135,5 @@
   <url>
     <loc>https://JuliaActuary.org/learn.html</loc>
     <lastmod>2026-02-17T21:35:32.694Z</lastmod>
-  </url>
-  <url>
-    <loc>https://JuliaActuary.org/posts/credibility-sparse-data/index.html</loc>
-    <lastmod>2026-07-26T14:15:51.398Z</lastmod>
   </url>
 </urlset>
