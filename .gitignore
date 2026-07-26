@@ -8,3 +8,4 @@ Manifest.toml
 
 /.quarto/
 _freeze/
+**/*.quarto_ipynb

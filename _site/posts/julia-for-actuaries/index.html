@@ -44,7 +44,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-a0731b9a3a5d496010872d775e5d9bc3.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-a9c66334b43f472998d4f0687f28726e.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-98ac2d5361ef6f18cc0525d38bedc462.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -72,6 +72,9 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&amp;family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&amp;display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../../assets/highlight/styles/github.min.css">
 <script src="../../assets/highlight/highlight.min.js"></script>
 <script src="../../assets/highlight/languages/julia.min.js"></script>
@@ -109,6 +112,14 @@ ul.task-list li input[type="checkbox"] {
   <li class="nav-item">
     <a class="nav-link" href="../../packages.html"> 
 <span class="menu-text">Packages</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://docs.juliaactuary.org"> 
+<span class="menu-text">Docs</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://modernfinancialmodeling.com"> 
+<span class="menu-text">Book</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="../../learn.html"> 
@@ -248,7 +259,7 @@ function retained(pol::Policy)
 end</code></pre>
 <p>And then what retention means for a <code>Life</code>:</p>
 <pre class="julia:./post/julia-for-the-future/code/ex3"><code>function retained(l::Life)
-  sum(retained(policy) for policy in life.policies)
+  sum(retained(policy) for policy in l.policies)
 end</code></pre>
 <p>It’s almost exactly how you’d specify it English. No joins, no boilerplate, no fiddling with complicated syntax. You can express ideas and concepts the way that you think of them, not, for example, as a series of dataframe joins or as row/column coordinates on a spreadsheet.</p>
 <p>We defined <code>retained</code> and adapted it to mean related, but different things depending on the specific context. That is, we didn’t have to define <code>retained_life(...)</code> and <code>retained_pol(...)</code> because Julia can be <em>dispatch</em> based on what you give it. This is, as some would call it, <a href="https://www.youtube.com/watch?v=kc9HwsxE1OY">unreasonably effective</a>.</p>
@@ -313,7 +324,7 @@ rand(Bernoulli(0.5), 100)
 rand(["Preferred","Standard"], 100)</code></pre></td>
 <td><pre class="r"><code>runif(100)
 rnorm(100)
-rbern(100, 0.5)
+rbinom(100, 1, 0.5)
 sample(c("Preferred","Standard"),
 100, replace=TRUE)</code></pre></td>
 <td><pre class="python"><code>import scipy.stats as sps
@@ -338,7 +349,7 @@ size=100)</code></pre></td>
 <p><strong>What analysis would you like to do if it took less time? A stochastic analysis of life-level claims? Machine learning with your experience data? Daily valuation instead of quarterly?</strong></p>
 <p>Speaking from experience, speed is not just great for production time improvements. During development, it’s really helpful too. When building something, I can see that I messed something up in a couple of seconds instead of 20 minutes. The build, test, fix, iteration cycle goes faster this way.</p>
 <p>Admittedly, most workflows don’t see a 1000x speedup, but 10x to 1000x is a very common range of speed differences vs R or Python or MATLAB.</p>
-<p>Sometimes you will see less of a speed difference; R and Python have already circumvented this and written much core code in low-level languages. This is an example of what’s called the “two-language” problem where the language productive to write in isn’t very fast. For example, <a href="https://developer.r-project.org/Blog/public/2019/03/28/use-of-c---in-packages/">more than half of R packages use C/C++/Fortran</a> and core packages in Python like Pandas, PyTorch, NumPy, SciPy, etc. do this too.</p>
+<p>Sometimes you will see less of a speed difference; R and Python have already circumvented this and written much core code in low-level languages. This is an example of what’s called the “two-language” problem where the language productive to write in isn’t very fast. For example, <a href="https://blog.r-project.org/2019/03/28/use-of-c-in-packages/">about 20% of R packages include compiled C/C++/Fortran code — including many of the most-used ones</a> — and core packages in Python like Pandas, PyTorch, NumPy, SciPy, etc. do this too.</p>
 <p>Within the bounds of the optimized R/Python libraries, you can leverage this work. Extending it can be difficult: what if you have a custom retention management system running on millions of policies every night?</p>
 <p>Julia packages you are using are almost always written in pure Julia: you can see what’s going on, learn from them, or even contribute a package of your own!</p>
 </section>

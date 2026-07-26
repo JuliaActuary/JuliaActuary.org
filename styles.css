@@ -280,6 +280,14 @@ table { color: var(--cf-ink); }
 thead { border-bottom: 1.5px solid var(--cf-ink); }
 tbody tr { border-color: var(--cf-rule); }
 
+/* DataFrame output tables: size columns to content instead of stretching
+   to full page width. DataFrames.jl emits left-aligned headers over
+   right-aligned numeric cells; in stretched columns the two edges drift
+   apart and headers appear misaligned with their data. */
+.data-frame table {
+    width: auto;
+}
+
 /* ---- Buttons --------------------------------------------------------- */
 .btn-primary {
     background-color: var(--cf-blue);
