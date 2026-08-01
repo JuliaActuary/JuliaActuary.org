@@ -1428,6 +1428,13 @@
     "text": "Black-Scholes-Merton European Option Pricing\nTask: calculate the price of a vanilla european call option using the Black-Scholes-Merton formula.\n\\[\\begin{align}\nC(S_t, t) &= N(d_1)S_t - N(d_2)Ke^{-r(T - t)} \\\\\n\nd_1 &= \\frac{1}{\\sigma\\sqrt{T - t}}\\left[\\ln\\left(\\frac{S_t}{K}\\right) + \\left(r + \\frac{\\sigma^2}{2}\\right)(T - t)\\right] \\\\\n\nd_2 &= d_1 - \\sigma\\sqrt{T - t}\n\n\\end{align}\\]\n\nBenchmarks\nTimes are in nanoseconds:\n┌──────────┬─────────┬─────────────┬───────────────┐\n│ Language │  Median │        Mean │ Relative Mean │\n├──────────┼─────────┼─────────────┼───────────────┤\n│   Python │ missing │    817000.0 │       19639.4 │\n│        R │  3649.0 │      3855.2 │          92.7 │\n│    Julia │    41.0 │        41.6 │           1.0 │\n└──────────┴─────────┴─────────────┴───────────────┘\n\n\nDiscussion\nJulia is nearly 20,000 times faster than Python, and two orders of magnitude faster than R."
   },
   {
+    "objectID": "benchmarks.html#nested-stochastic-projections",
+    "href": "benchmarks.html#nested-stochastic-projections",
+    "title": "Benchmarks",
+    "section": "Nested Stochastic Projections",
+    "text": "Nested Stochastic Projections\nTask: value a 190,000-policy variable annuity block (GMWB/GMDB/GMMB riders) by full brute force — 1,000 outer real-world scenarios × 500 inner risk-neutral scenarios at each of 120 quarterly switch points, about \\(10^{13}\\) path valuations — reproducing the reference model of the SOA’s 2021 Efficient Computational Structure of Nested Stochastic Modeling paper exactly.\n\nBenchmarks\n\n\n\nTable 2: The nested stochastic ladder. Full problem is the paper’s complete configuration above, extrapolated linearly from the measured per-unit cost for every row except the H100 kernel, which ran it end-to-end. Code size is gzipped source of each implementation (state, setup, stepping, and valuation driver; comments stripped). CPU rows: Apple M4 Max; H100 rows: a rented Lambda instance.\n\n\n\n\n\n\n\n\n\n\n\nimplementation\nper policy · inner scenario\nfull problem\ncode size\n\n\n\n\nPython naive loops (the reference)\n34,000 µs\n~100 years\n1.1 KB\n\n\nJulia — the same naive code, translated\n~400 µs\n~1.2 years\n1.0 KB\n\n\nNumPy vectorized (RISP, completed)\n285 µs\n~10 months\n1.1 KB\n\n\nJulia — the broadcasting idiom, translated\n~110 µs\n~4 months\n1.1 KB\n\n\nJulia — fused kernel, one core\n~22 µs\n~24 days\n1.4 KB\n\n\nJulia — fused kernel, ten cores\n~2.6 µs\n~2.8 days\n1.4 KB\n\n\nCuPy vectorized, H100 (float64)\n15.6 µs\n~17 days\n1.1 KB\n\n\nJulia — fused kernel, H100\n~0.015 µs\n24.8 min (measured)\n1.9 KB\n\n\n\n\n\n\n\n\nDiscussion\nTranslating the Python line-for-line into Julia is worth ~90X on the naive loops and ~2.7X on the completed NumPy/RISP version. Restructuring into a fused seriatim kernel — about 40 lines that read like the model specification and reproduce every other implementation’s numbers to ~1e-11 or better — is worth ~110X over the completed NumPy version on the same laptop, largely by skipping work (each policy stops at its own maturity) and threading freely. The same kernel, moved to a rented H100 via KernelAbstractions.jl, ran the paper’s full “560-day” configuration in 24.8 measured minutes (~$1 of compute) — roughly 1,000X more throughput per unit of work than CuPy on the same GPU, whose array formulation is launch-overhead-bound.\nFor the full ladder, cross-implementation validation, pathwise AD sensitivities, and the GPU details — plus the archived code and results — see the post."
+  },
+  {
     "objectID": "benchmarks.html#other-benchmarks",
     "href": "benchmarks.html#other-benchmarks",
     "title": "Benchmarks",
@@ -1435,11 +1442,11 @@
     "text": "Other benchmarks\nThese benchmarks have been performed by others, but provide relevant information for actuarial-related work:\n\nH2Oai DataFrames/Database-like Operations\nReading CSVs"
   },
   {
-    "objectID": "benchmarks.html#colophone",
-    "href": "benchmarks.html#colophone",
+    "objectID": "benchmarks.html#colophon",
+    "href": "benchmarks.html#colophon",
     "title": "Benchmarks",
-    "section": "Colophone",
-    "text": "Colophone\n\nCode\nAll of the benchmarked code can be found in the JuliaActuary Learn repository. Please file an issue or submit a PR request there for issues/suggestions."
+    "section": "Colophon",
+    "text": "Colophon\n\nCode\nAll of the benchmarked code can be found in the JuliaActuary Learn repository. Please file an issue or submit a PR request there for issues/suggestions."
   },
   {
     "objectID": "benchmarks.html#footnotes",
@@ -1524,19 +1531,5 @@
     "title": "Learn",
     "section": "Share",
     "text": "Share\nFollow JuliaActuary on LinkedIn for updates and to share with colleagues!"
-  },
-  {
-    "objectID": "benchmarks.html#nested-stochastic-projections",
-    "href": "benchmarks.html#nested-stochastic-projections",
-    "title": "Benchmarks",
-    "section": "Nested Stochastic Projections",
-    "text": "Nested Stochastic Projections\nTask: value a 190,000-policy variable annuity block (GMWB/GMDB/GMMB riders) by full brute force — 1,000 outer real-world scenarios × 500 inner risk-neutral scenarios at each of 120 quarterly switch points, about \\(10^{13}\\) path valuations — reproducing the reference model of the SOA’s 2021 Efficient Computational Structure of Nested Stochastic Modeling paper exactly.\n\nBenchmarks\n\n\n\nTable 2: The nested stochastic ladder. Full problem is the paper’s complete configuration above, extrapolated linearly from the measured per-unit cost for every row except the H100 kernel, which ran it end-to-end. Code size is gzipped source of each implementation (state, setup, stepping, and valuation driver; comments stripped). CPU rows: Apple M4 Max; H100 rows: a rented Lambda instance.\n\n\n\n\n\n\n\n\n\n\n\nimplementation\nper policy · inner scenario\nfull problem\ncode size\n\n\n\n\nPython naive loops (the reference)\n34,000 µs\n~100 years\n1.1 KB\n\n\nJulia — the same naive code, translated\n~400 µs\n~1.2 years\n1.0 KB\n\n\nNumPy vectorized (RISP, completed)\n285 µs\n~10 months\n1.1 KB\n\n\nJulia — the broadcasting idiom, translated\n~110 µs\n~4 months\n1.1 KB\n\n\nJulia — fused kernel, one core\n~22 µs\n~24 days\n1.4 KB\n\n\nJulia — fused kernel, ten cores\n~2.6 µs\n~2.8 days\n1.4 KB\n\n\nCuPy vectorized, H100 (float64)\n15.6 µs\n~17 days\n1.1 KB\n\n\nJulia — fused kernel, H100\n~0.015 µs\n24.8 min (measured)\n1.9 KB\n\n\n\n\n\n\n\n\nDiscussion\nTranslating the Python line-for-line into Julia is worth ~90X on the naive loops and ~2.7X on the completed NumPy/RISP version. Restructuring into a fused seriatim kernel — about 40 lines that read like the model specification and reproduce every other implementation’s numbers to ~1e-11 or better — is worth ~110X over the completed NumPy version on the same laptop, largely by skipping work (each policy stops at its own maturity) and threading freely. The same kernel, moved to a rented H100 via KernelAbstractions.jl, ran the paper’s full “560-day” configuration in 24.8 measured minutes (~$1 of compute) — roughly 1,000X more throughput per unit of work than CuPy on the same GPU, whose array formulation is launch-overhead-bound.\nFor the full ladder, cross-implementation validation, pathwise AD sensitivities, and the GPU details — plus the archived code and results — see the post."
-  },
-  {
-    "objectID": "benchmarks.html#colophon",
-    "href": "benchmarks.html#colophon",
-    "title": "Benchmarks",
-    "section": "Colophon",
-    "text": "Colophon\n\nCode\nAll of the benchmarked code can be found in the JuliaActuary Learn repository. Please file an issue or submit a PR request there for issues/suggestions."
   }
 ]
