@@ -23,7 +23,7 @@ Inspired by the discussion in the [ActuarialOpenSource](https://github.com/actua
 
 ### Benchmarks
 
-After the original user submitted a proposal, others chimed in and submitted versions in their favorite languages. I have collected those versions, and run them on a consistent set of hardware.
+After the original user submitted a proposal, others chimed in and submitted versions in their favorite languages. I have collected those versions, and run them on a consistent set of hardware.[^2]
 
 Some submissions were excluded because from the benchmarks they involved an entirely different approach, such as [memoizing](https://en.wikipedia.org/wiki/Memoization) the function calls[^1].
 
@@ -164,6 +164,31 @@ Times are in nanoseconds:
 
 Julia is nearly 20,000 times faster than Python, and two orders of magnitude faster than R.
 
+## Nested Stochastic Projections
+
+**Task:** value a 190,000-policy variable annuity block (GMWB/GMDB/GMMB riders) by full brute force — 1,000 outer real-world scenarios × 500 inner risk-neutral scenarios at each of 120 quarterly switch points, about $10^{13}$ path valuations — reproducing the reference model of the SOA's 2021 [*Efficient Computational Structure of Nested Stochastic Modeling*](https://www.soa.org/resources/research-reports/2021/efficient-computation-nested-stochastic/) paper exactly.
+
+### Benchmarks
+
+| implementation | per policy · inner scenario | full problem | code size |
+|---|--:|--:|--:|
+| Python naive loops (the reference) | 34,000 µs | ~100 years | 1.1 KB |
+| Julia — the same naive code, translated | ~400 µs | ~1.2 years | 1.0 KB |
+| NumPy vectorized (RISP, completed) | 285 µs | ~10 months | 1.1 KB |
+| Julia — the broadcasting idiom, translated | ~110 µs | ~4 months | 1.1 KB |
+| Julia — fused kernel, one core | ~22 µs | ~24 days | 1.4 KB |
+| Julia — fused kernel, ten cores | ~2.6 µs | ~2.8 days | 1.4 KB |
+| CuPy vectorized, H100 (float64) | 15.6 µs | ~17 days | 1.1 KB |
+| **Julia — fused kernel, H100** | **~0.015 µs** | **24.8 min (measured)** | **1.9 KB** |
+
+: The nested stochastic ladder. *Full problem* is the paper's complete configuration above, extrapolated linearly from the measured per-unit cost for every row except the H100 kernel, which ran it end-to-end. *Code size* is gzipped source of each implementation (state, setup, stepping, and valuation driver; comments stripped). CPU rows: Apple M4 Max; H100 rows: a rented Lambda instance. {#tbl-nested-stochastic-benchmark}
+
+### Discussion
+
+Translating the Python line-for-line into Julia is worth ~90X on the naive loops and ~2.7X on the completed NumPy/RISP version. Restructuring into a fused seriatim kernel — about 40 lines that read like the model specification and reproduce every other implementation's numbers to ~1e-11 or better — is worth ~110X over the completed NumPy version on the same laptop, largely by *skipping work* (each policy stops at its own maturity) and threading freely. The same kernel, moved to a rented H100 via KernelAbstractions.jl, ran the paper's full "560-day" configuration in **24.8 measured minutes** (~\$1 of compute) — roughly 1,000X more throughput per unit of work than CuPy on the same GPU, whose array formulation is launch-overhead-bound.
+
+For the full ladder, cross-implementation validation, pathwise AD sensitivities, and the GPU details — plus the archived code and results — see [the post](/posts/nested-stochastic-va/).
+
 ## Other benchmarks
 
 These benchmarks have been performed by others, but provide relevant information for actuarial-related work:
@@ -172,7 +197,7 @@ These benchmarks have been performed by others, but provide relevant information
 - [Reading CSVs](https://juliacomputing.com/blog/2020/06/fast-csv/)
 
 
-## Colophone
+## Colophon
 
 ### Code
 
