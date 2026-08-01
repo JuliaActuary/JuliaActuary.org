@@ -1,0 +1,11 @@
+=== CUPY header fix ===
+=== CUPY 500x3 (must match numpy R_sum 6760624231.40387) ===
+{"xp": "cupy", "dtype": "float64", "I": 500, "rn": 3, "inforce": "inforce.csv", "total_s": 8.538354502999937, "us_per_policy_scenario": 5692.236335333291, "R_sum": 6760624231.40387, "R_sp1": 106353548.46324545}
+=== CUPY 38000x10 ===
+{"xp": "cupy", "dtype": "float64", "I": 38000, "rn": 10, "inforce": "inforce.csv", "total_s": 25.285359385999982, "us_per_policy_scenario": 66.54041943684206, "R_sum": 875561412550.1415, "R_sp1": 18401035479.840366}
+=== CUPY 190000x10 ===
+{"xp": "cupy", "dtype": "float64", "I": 190000, "rn": 10, "inforce": "inforce190k.csv", "total_s": 29.571515413999805, "us_per_policy_scenario": 15.563955481052531, "R_sum": 4377807062750.707, "R_sp1": 92005177399.20181}
+=== CUPY 190000x10 float32 ===
+{"xp": "cupy", "dtype": "float32", "I": 190000, "rn": 10, "inforce": "inforce190k.csv", "total_s": 25.415599588000077, "us_per_policy_scenario": 13.376631362105304, "R_sum": 4377806138361.335, "R_sp1": 92005144149.66893}
+=== STAGE2 CUPY COMPLETE — launching full run ===
+full_run launched pid 8533

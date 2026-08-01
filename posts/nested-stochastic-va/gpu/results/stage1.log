@@ -1,0 +1,119 @@
+=== VALIDATE (cuda) ===
+CUDA toolchain: 
+- runtime 13.3.0, artifact installation
+- driver 580.105.8 for 13.3
+- compiler 13.3.33, artifact installation
+
+CUDA libraries: 
+- cuBLAS: 13.6.0
+- cuSPARSE: 12.8.2
+- cuSOLVER: 12.2.6
+- cuFFT: 12.3.0
+- cuRAND: 10.4.3
+- CUPTI: 2026.2.1 (API 13.3.1)
+- NVML: 13.0.0+580.105.8
+
+Julia packages: 
+- CUDACore: 6.2.1
+- GPUArrays: 11.5.8
+- GPUCompiler: 1.23.0
+- KernelAbstractions: 0.9.42
+- CUDA_Driver_jll: 13.3.0+1
+- CUDA_Compiler_jll: 0.4.4+1
+- CUDA_Runtime_jll: 0.23.0+1
+- NVPTX_LLVM_Backend_jll: 22.1.7+1
+
+Toolchain:
+- Julia: 1.12.6
+- LLVM: 18.1.7
+
+1 device:
+  0: NVIDIA H100 80GB HBM3 (sm_90, 79.176 GiB / 79.647 GiB available)
+     compiles to sm_90a / PTX 9.3 (LLVM: sm_90a / PTX 9.0)
+backend: CUDABackend
+== 500 policies
+  ka atomic  vs cpu f32: 1.1218502092138455e-6
+  ka blockrd vs cpu f32: 2.57422441450038e-7
+  ka blockrd vs cpu f64: 8.155880553360163e-6
+  cpu f32    vs cpu f64: 8.155880553360163e-6
+== full 38K block
+  ka atomic  vs cpu f32: 1.5098019244399883e-5
+  ka blockrd vs cpu f32: 1.0025580812492183e-6
+  ka blockrd vs cpu f64: 7.248851440088367e-7
+  cpu f32    vs cpu f64: 9.114303714494868e-7
+validation complete
+=== BENCH (cuda) ===
+device: NVIDIA H100 80GB HBM3
+KA  NVIDIA H100 80GB I= 38000 N= 10:     0.01 s    0.027 µs/pol·scen   73.85 Gsteps/s
+CPU 26 threads (f64)  I= 38000 N= 10:     0.79 s    2.083 µs/pol·scen  (gpu speedup 76.5x)
+KA  NVIDIA H100 80GB I= 38000 N=100:     0.05 s    0.014 µs/pol·scen  141.23 Gsteps/s
+CPU 26 threads (f64)  I= 38000 N=100:     7.93 s    2.087 µs/pol·scen  (gpu speedup 146.9x)
+KA  NVIDIA H100 80GB I= 38000 N=500:     0.33 s    0.017 µs/pol·scen  114.60 Gsteps/s
+CPU 26 threads (f64)  I= 38000 N=500:    39.68 s    2.088 µs/pol·scen  (gpu speedup 119.3x)
+KA  NVIDIA H100 80GB I=190000 N=500:     1.45 s    0.015 µs/pol·scen  131.40 Gsteps/s
+=== CUPY numpy reference 500x3 ===
+{"xp": "numpy", "dtype": "float64", "I": 500, "rn": 3, "inforce": "inforce.csv", "total_s": 1.470279324999865, "us_per_policy_scenario": 980.1862166665765, "R_sum": 6760624231.40387, "R_sp1": 106353548.46324545}
+=== CUPY 500x3 ===
+Traceback (most recent call last):
+  File "/home/ubuntu/nsva/gpu/bench_cupy.py", line 180, in <module>
+    main()
+  File "/home/ubuntu/nsva/gpu/bench_cupy.py", line 170, in main
+    R = vm.valuation(rw1, rns)
+  File "/home/ubuntu/nsva/gpu/bench_cupy.py", line 133, in valuation
+    self.init_t0()
+  File "/home/ubuntu/nsva/gpu/bench_cupy.py", line 97, in init_t0
+    self.fund[0] = self.funds0
+  File "cupy/_core/core.pyx", line 1873, in cupy._core.core._ndarray_base.__setitem__
+  File "cupy/_core/_routines_indexing.pyx", line 75, in cupy._core._routines_indexing._ndarray_setitem
+  File "cupy/_core/_routines_indexing.pyx", line 1102, in cupy._core._routines_indexing._scatter_op
+  File "cupy/_core/_kernel.pyx", line 1397, in cupy._core._kernel.ufunc.__call__
+  File "cupy/_core/_kernel.pyx", line 1426, in cupy._core._kernel.ufunc._get_ufunc_kernel
+  File "cupy/_core/_kernel.pyx", line 1098, in cupy._core._kernel._get_ufunc_kernel
+  File "cupy/_core/_kernel.pyx", line 124, in cupy._core._kernel._get_simple_elementwise_kernel
+  File "cupy/_core/_kernel.pyx", line 112, in cupy._core._kernel._get_simple_elementwise_kernel_from_code
+  File "cupy/_core/core.pyx", line 2590, in cupy._core.core.compile_with_cache
+  File "cupy/_core/core.pyx", line 2552, in cupy._core.core.assemble_cupy_compiler_options
+RuntimeError: Failed to find CUDA headers. Please install CUDA toolkit headers (e.g., pip install cupy-cuda12x[ctk]) or specify CUDA_PATH environment variable.
+=== CUPY 38000x10 ===
+Traceback (most recent call last):
+  File "/home/ubuntu/nsva/gpu/bench_cupy.py", line 180, in <module>
+    main()
+  File "/home/ubuntu/nsva/gpu/bench_cupy.py", line 170, in main
+    R = vm.valuation(rw1, rns)
+  File "/home/ubuntu/nsva/gpu/bench_cupy.py", line 133, in valuation
+    self.init_t0()
+  File "/home/ubuntu/nsva/gpu/bench_cupy.py", line 97, in init_t0
+    self.fund[0] = self.funds0
+  File "cupy/_core/core.pyx", line 1873, in cupy._core.core._ndarray_base.__setitem__
+  File "cupy/_core/_routines_indexing.pyx", line 75, in cupy._core._routines_indexing._ndarray_setitem
+  File "cupy/_core/_routines_indexing.pyx", line 1102, in cupy._core._routines_indexing._scatter_op
+  File "cupy/_core/_kernel.pyx", line 1397, in cupy._core._kernel.ufunc.__call__
+  File "cupy/_core/_kernel.pyx", line 1426, in cupy._core._kernel.ufunc._get_ufunc_kernel
+  File "cupy/_core/_kernel.pyx", line 1098, in cupy._core._kernel._get_ufunc_kernel
+  File "cupy/_core/_kernel.pyx", line 124, in cupy._core._kernel._get_simple_elementwise_kernel
+  File "cupy/_core/_kernel.pyx", line 112, in cupy._core._kernel._get_simple_elementwise_kernel_from_code
+  File "cupy/_core/core.pyx", line 2590, in cupy._core.core.compile_with_cache
+  File "cupy/_core/core.pyx", line 2552, in cupy._core.core.assemble_cupy_compiler_options
+RuntimeError: Failed to find CUDA headers. Please install CUDA toolkit headers (e.g., pip install cupy-cuda12x[ctk]) or specify CUDA_PATH environment variable.
+=== CUPY 190000x10 ===
+Traceback (most recent call last):
+  File "/home/ubuntu/nsva/gpu/bench_cupy.py", line 180, in <module>
+    main()
+  File "/home/ubuntu/nsva/gpu/bench_cupy.py", line 170, in main
+    R = vm.valuation(rw1, rns)
+  File "/home/ubuntu/nsva/gpu/bench_cupy.py", line 133, in valuation
+    self.init_t0()
+  File "/home/ubuntu/nsva/gpu/bench_cupy.py", line 97, in init_t0
+    self.fund[0] = self.funds0
+  File "cupy/_core/core.pyx", line 1873, in cupy._core.core._ndarray_base.__setitem__
+  File "cupy/_core/_routines_indexing.pyx", line 75, in cupy._core._routines_indexing._ndarray_setitem
+  File "cupy/_core/_routines_indexing.pyx", line 1102, in cupy._core._routines_indexing._scatter_op
+  File "cupy/_core/_kernel.pyx", line 1397, in cupy._core._kernel.ufunc.__call__
+  File "cupy/_core/_kernel.pyx", line 1426, in cupy._core._kernel.ufunc._get_ufunc_kernel
+  File "cupy/_core/_kernel.pyx", line 1098, in cupy._core._kernel._get_ufunc_kernel
+  File "cupy/_core/_kernel.pyx", line 124, in cupy._core._kernel._get_simple_elementwise_kernel
+  File "cupy/_core/_kernel.pyx", line 112, in cupy._core._kernel._get_simple_elementwise_kernel_from_code
+  File "cupy/_core/core.pyx", line 2590, in cupy._core.core.compile_with_cache
+  File "cupy/_core/core.pyx", line 2552, in cupy._core.core.assemble_cupy_compiler_options
+RuntimeError: Failed to find CUDA headers. Please install CUDA toolkit headers (e.g., pip install cupy-cuda12x[ctk]) or specify CUDA_PATH environment variable.
+=== STAGE1 COMPLETE ===

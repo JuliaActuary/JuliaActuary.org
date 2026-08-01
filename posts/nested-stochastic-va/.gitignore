@@ -1,0 +1,3 @@
+_data/
+pysrc/.venv/
+pysrc/__pycache__/
