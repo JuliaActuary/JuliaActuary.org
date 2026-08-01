@@ -2,6 +2,7 @@
   {
     "listing": "/blog.html",
     "items": [
+      "/posts/nested-stochastic-va/index.html",
       "/posts/quantlib-comparison/index.html",
       "/posts/finance-models-announcement/index.html",
       "/posts/bayesian-intro/index.html",
@@ -55,6 +56,7 @@
       "/posts/academy-generator/index.html",
       "/posts/autodiff_ALM/index.html",
       "/posts/mortality-comparison/index.html",
+      "/posts/nested-stochastic-va/index.html",
       "/posts/cassette-futurism-theme/index.html",
       "/posts/quantlib-comparison/index.html",
       "/posts/finance-models-announcement/index.html",

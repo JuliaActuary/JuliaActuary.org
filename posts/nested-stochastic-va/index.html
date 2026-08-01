@@ -1,0 +1,2071 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.16">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Alec Loudenback">
+<meta name="dcterms.date" content="2026-07-31">
+<meta name="description" content="JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.">
+
+<title>Nested Stochastic Projections: Python vs.&nbsp;Julia – JuliaActuary</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../..//assets/favicon.ico" rel="icon">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-a0731b9a3a5d496010872d775e5d9bc3.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-98ac2d5361ef6f18cc0525d38bedc462.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&amp;family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/highlight/styles/github.min.css">
+<script src="../../assets/highlight/highlight.min.js"></script>
+<script src="../../assets/highlight/languages/julia.min.js"></script>
+<script src="../../assets/highlight/languages/julia-repl.min.js"></script>
+<script src="../../assets/highlight/languages/python.min.js"></script>
+<script src="../../assets/highlight/languages/r.min.js"></script>
+<script>hljs.highlightAll();</script>
+<script data-goatcounter="https://juliaactuary.goatcounter.com/count" async="" src="//gc.zgo.at/count.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed fullcontent quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../assets/logos/android-chrome-512x512.png" alt="JuliaActuary Logo" class="navbar-logo light-content">
+    <img src="../../assets/logos/android-chrome-512x512.png" alt="JuliaActuary Logo" class="navbar-logo dark-content">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">JuliaActuary</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../packages.html"> 
+<span class="menu-text">Packages</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://docs.juliaactuary.org"> 
+<span class="menu-text">Docs</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://modernfinancialmodeling.com"> 
+<span class="menu-text">Book</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../learn.html"> 
+<span class="menu-text">Learn</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../examples.html"> 
+<span class="menu-text">Examples</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../benchmarks.html"> 
+<span class="menu-text">Benchmarks</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../community.html"> 
+<span class="menu-text">Community</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/JuliaActuary"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="../../all-posts.xml"> <i class="bi bi-rss" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Nested Stochastic Projections: Python vs.&nbsp;Julia</h1>
+            <p class="subtitle lead">Reworking the SOA’s open-source VA valuation, where the fastest implementation turns out to be the one that looks like the specification</p>
+                  <div>
+        <div class="description">
+          JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">modeling</div>
+                <div class="quarto-category">benchmark</div>
+                <div class="quarto-category">code</div>
+                <div class="quarto-category">autodiff</div>
+                <div class="quarto-category">blog</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Alec Loudenback </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">July 31, 2026</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<blockquote class="blockquote">
+<p><em>“The computational structure of a NSM has been the elephant in the room over the past few years. While we were all busy talking about the different approximation methods to avoid a true brute force NSM, it’s easy to lose track of the more fundamental question: how to set up an efficient computational algorithm for an NSM?”</em> — Victoria Zhang, <a href="https://www.soa.org/resources/research-reports/2021/efficient-computation-nested-stochastic/">Discussion of Efficient Computational Structure of Nested Stochastic Modeling</a> (SOA, 2021)</p>
+</blockquote>
+<p>Nested stochastic projection is the honest way to value path-dependent guarantees: an outer loop of real-world scenarios walks the business forward, and at every future node an inner loop of risk-neutral scenarios values the embedded options. It is also famously expensive. For a 190,000-policy variable annuity block with 1,000 outer and 500 inner scenarios projected quarterly over 30 years, the <a href="https://www.soa.org/resources/research-reports/2021/efficient-computation-nested-stochastic/">2021 SOA research paper</a> quoted above counts about <span class="math inline">\(10^{13}\)</span> path valuations and estimates that a naive implementation would take <em>decades</em> of compute.</p>
+<p>Most published research escapes this by approximating — cluster the policies, reduce the scenarios, regress a proxy for the inner loop. The SOA paper takes a different and, I think, more interesting position: before approximating anything, get the <em>computational structure</em> right. Its <a href="https://github.com/rranxxi/soa_nested_stochastic">open-source Python implementation</a> climbs a ladder of structural rungs, each intended to preserve brute-force numbers exactly:</p>
+<ol type="1">
+<li><strong>Vectorize with NumPy</strong> — replace Python loops with whole-portfolio array operations (~50X in the paper’s microbenchmark),</li>
+<li><strong>Reverse Inner Switch Points (RISP)</strong> — reuse the shared real-world prefix of every inner path, halving the step count,</li>
+<li><strong>Swap NumPy for CuPy</strong> — run the same array code on an NVIDIA GPU (another ~9–18X at scale).</li>
+</ol>
+<p>That thesis — <em>structure beats approximation, and you shouldn’t have to trade accuracy for speed</em> — deserves to be taken seriously. This post takes it one language further. I reimplemented the paper’s model in Julia three ways: a line-by-line translation of the naive loops, a line-by-line translation of the NumPy broadcasting version, and then the implementation the paper’s ladder is reaching toward but can’t express in NumPy — a fused, seriatim kernel where each policy’s whole nested projection runs in registers and cache. All four implementations (and the original Python) are validated against each other on the same data — path-level matrices on representative policies, whole-block aggregates, and engineered edge cases — to near machine precision.</p>
+<p>Three questions drive the comparison, and they get concrete answers:</p>
+<ul>
+<li><strong>Cleaner?</strong> The fused Julia kernel is about 40 lines and reads like the model’s specification. It <em>is</em> the fast implementation — there is no second, vectorized dialect to maintain.</li>
+<li><strong>Faster?</strong> On the same laptop, per policy and inner scenario: the fused kernel is ~13X faster than the completed NumPy implementation on one core, and ~110X faster using the machine’s cores. The full 190K × 1,000 × 500 problem extrapolates to <strong>months (NumPy) versus days (Julia)</strong> — before any GPU is involved.</li>
+<li><strong>More generic?</strong> The same kernel runs with dual numbers flowing through it: pathwise AD sensitivities — both partials at once — for roughly the cost of one extra valuation, no rewrite. It is number-type- and accelerator-generic: <a href="#the-gpu-rung-measured">the same <code>step</code>, moved to a rented H100</a>, ran the paper’s entire “560-day” configuration in 24.8 measured minutes and beat CuPy on the same silicon by ~1,000X per unit of work.</li>
+</ul>
+<section id="the-results-first" class="level2">
+<h2 class="anchored" data-anchor-id="the-results-first">The results, first</h2>
+<p>If you take one thing away, take this figure. Each point is one implementation of the same model producing the same validated numbers on the same data. Across is speed: the cost of one policy × one inner scenario across all 120 switch points, whole-portfolio workload. Up is code: the gzipped size of the source that expresses that rung, measured live at render from this post’s own cells and the <code>pysrc/</code> and <code>gpu/</code> bundles. The gray annotations scale each point’s rate to the paper’s full 190,000-policy × 1,000 outer × 500 inner problem — down and to the left wins:</p>
+<div id="cell-fig-headline" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>Headline chart: code sizes measured live (strip comments, gzip -9); timings from the benchmark cells below and gpu/results/</summary>
+<pre class="julia cell-code"><code># Sizes: extract each rung's source (state, setup, stepping, valuation driver),
+# strip comments, gzip -9. @tbl-codesize below tabulates the same measurements.
+postsrc = read(joinpath(@__DIR__, "index.qmd"), String)
+fence = "`"^3
+cells = [m.captures[1] for m in eachmatch(Regex(fence * "\\{julia\\}\\n(.*?)" * fence, "s"), postsrc)]
+filter!(c -&gt; !occursin("gzsize", c), cells)   # exclude the measurement cells themselves
+jcell(sig) = cells[findfirst(c -&gt; occursin(sig, c), cells)]
+function stripped(code)
+    out = String[]
+    intriple = false
+    for ln in split(code, '\n')
+        s = strip(ln)
+        n3 = count("\"\"\"", s)
+        if intriple
+            isodd(n3) &amp;&amp; (intriple = false)
+            continue
+        elseif isodd(n3)
+            intriple = true
+            continue
+        end
+        (isempty(s) || startswith(s, "#")) &amp;&amp; continue
+        startswith(s, "\"") &amp;&amp; endswith(s, "\"") &amp;&amp; !occursin("=", s) &amp;&amp; continue
+        push!(out, rstrip(replace(ln, r"\s+#[^\"']*$" =&gt; "")))
+    end
+    join(out, '\n')
+end
+gzsize(s) = length(read(pipeline(IOBuffer(s), `gzip -9`)))
+pysource(f) = read(joinpath(@__DIR__, "pysrc", f), String)
+function pydef(src, name)
+    i = findfirst(Regex("^(def|class) $name", "m"), src)
+    rest = src[first(i):end]
+    j = findnext(r"^(def |class )"m, rest, 2)
+    isnothing(j) ? rest : rest[1:first(j)-1]
+end
+function jblock(src, sig)   # a top-level block (through its unindented `end`) from a .jl file
+    lines = split(src, '\n')
+    i = findfirst(l -&gt; occursin(sig, l), lines)
+    join(lines[i:findnext(l -&gt; rstrip(l) == "end", lines, i)], '\n')
+end
+model_py, naive_py, vec_py = pysource("model.py"), pysource("naive.py"), pysource("vectorized.py")
+gpu_m = read(joinpath(@__DIR__, "gpu", "model.jl"), String)
+gpu_k = read(joinpath(@__DIR__, "gpu", "kernels.jl"), String)
+cupy_py = read(joinpath(@__DIR__, "gpu", "bench_cupy.py"), String)
+rungsrc = [
+    "Python naive loops" =&gt; stripped(pydef(model_py, "merge_scenarios") *
+                                     pydef(model_py, "policy_inputs") *
+                                     pydef(naive_py, "va_payout_naive")),
+    "Julia naive (translated)" =&gt; stripped(jcell("function va_payout_naive")),
+    "NumPy vectorized (RISP)" =&gt; stripped(pydef(vec_py, "VectorizedModel")),
+    "Julia broadcast (translated)" =&gt; stripped(jcell("struct VecModel")),
+    "Julia fused kernel" =&gt; stripped(jcell("struct Policy{FT}") * "\n" * jcell("function value_policy!")),
+    "CuPy vectorized (array module injected)" =&gt; stripped(pydef(cupy_py, "VectorizedModelXP")),
+    "Julia fused kernel + KA GPU driver" =&gt;
+        stripped(join([jblock(gpu_m, s) for s in ("struct Policy{FT}", "struct PathState{FT}",
+                "@inline function step", "function build_portfolio", "function scenario_matrix")], '\n') *
+            '\n' * join([jblock(gpu_k, s) for s in ("@kernel function backbone!",
+                "@kernel function inner_sp!", "function value_portfolio_ka")], '\n')),
+]
+rung_kb = Dict(name =&gt; gzsize(src) / 1000 for (name, src) in rungsrc)
+# (label, µs per policy·inner scenario, KB, full-problem scale, julia?, gpu?, placement, one-line?)
+pts = [
+    ("Python naive", 34_237.0, rung_kb["Python naive loops"], "~100 yr", false, false, :aboveleft, true),
+    ("Julia naive", 400.0, rung_kb["Julia naive (translated)"], "~1.2 yr", true, false, :right, true),
+    ("NumPy (RISP)", 285.5, rung_kb["NumPy vectorized (RISP)"], "~10 mo", false, false, :right, true),
+    ("Julia broadcast", 110.0, rung_kb["Julia broadcast (translated)"], "~4 mo", true, false, :below, true),
+    ("Julia fused, 1 core", 22.0, rung_kb["Julia fused kernel"], "~24 d", true, false, :right, false),
+    ("Julia fused, 10 cores", 2.6, rung_kb["Julia fused kernel"], "~2.8 d", true, false, :left, false),
+    ("CuPy, H100", 15.6, rung_kb["CuPy vectorized (array module injected)"], "~17 d proj.", false, true, :left, true),
+    ("Julia fused, H100", 0.0153, rung_kb["Julia fused kernel + KA GPU driver"], "24.8 min measured", true, true, :right, false),
+]
+fig0 = Figure(size=(760, 500))
+ax0 = Axis(fig0[1, 1]; xscale=log10,
+    xticks=(10.0 .^ (-2:5), ["10⁻²", "10⁻¹", "1", "10", "10²", "10³", "10⁴", "10⁵"]),
+    xlabel="runtime per policy · inner scenario (µs, log scale — left is faster)",
+    ylabel="gzipped source (KB)",
+    title="Every rung of the ladder: runtime vs. code you write")
+for (name, us, kb, full, isjl, isgpu, place, oneline) in pts
+    scatter!(ax0, [us], [kb]; color=isjl ? CF_BLUE : CF_RED,
+        marker=isgpu ? :utriangle : :circle, markersize=isgpu ? 17 : 15)
+    lab = oneline ?
+          rich(name, rich("  $full"; color=CF_INK_SOFT, fontsize=10); fontsize=12) :
+          rich(name, "\n", rich(full; color=CF_INK_SOFT, fontsize=10); fontsize=12)
+    align, offset = place == :left ? ((:right, :center), (-11, 0)) :
+                    place == :right ? ((:left, :center), (11, 0)) :
+                    place == :aboveleft ? ((:right, :bottom), (8, 10)) :
+                    ((:center, :top), (0, -15))
+    text!(ax0, us, kb; text=lab, align=align, offset=offset)
+end
+axislegend(ax0,
+    [MarkerElement(color=CF_RED, marker=:circle, markersize=15),
+        MarkerElement(color=CF_BLUE, marker=:circle, markersize=15),
+        MarkerElement(color=CF_INK, marker=:utriangle, markersize=17)],
+    ["Python", "Julia", "H100 GPU"]; position=:rt)
+xlims!(ax0, 0.004, 4e5)
+ylims!(ax0, 0.93, 2.03)
+fig0</code></pre>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div id="fig-headline" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-headline-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-headline-output-1.svg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-headline-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: The ladder in one view — runtime per policy · inner scenario against gzipped source of each rung (state, setup, stepping, and valuation driver; comments stripped; measured live at render — details in <a href="#tbl-codesize" class="quarto-xref">Table&nbsp;3</a>). Circles: Apple M4 Max. Triangles: rented Lambda H100. Gray annotations scale each rate to the paper’s full 190,000 × 1,000 × 500 problem, extrapolated linearly per <a href="#tbl-full" class="quarto-xref">Table&nbsp;5</a> — except the H100 kernel, which ran the whole thing, measured, in 24.8 minutes. Timings here are authoring-time measurements, rounded; each laptop number is re-measured live in the sections below.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Three facts qualify the chart. Every implementation produces the same numbers — path-by-path to ~1e-11 against the original Python, and across whole-block aggregates and engineered edge cases to ~1e-14 (<a href="#did-everyone-get-the-same-answer">the validation table</a>). The entire vertical axis spans ~1.0–1.9 KB of compressed source while the horizontal one spans nearly seven orders of magnitude — the expensive-looking implementations are design effort, not code volume, and the biggest single win is the fused kernel <em>doing less work</em> (stopping each policy at its own maturity), not exotic tuning: per unit of work actually done, the array implementations stay within ~1.3–3.6X of it. And the two triangles are one story, not two: the CuPy triangle is the paper’s third rung run faithfully on an H100, while the fused-kernel triangle — the <em>same</em> ~40 lines that read like the model specification, deliver pathwise AD sensitivities, and compile to <code>Float32</code> — ran the paper’s entire “560-day” configuration in 24.8 measured minutes, ~1,000X more work per second than CuPy on the same GPU.</p>
+<p>The rest of the post is the receipts.</p>
+</section>
+<section id="the-model-briefly" class="level2">
+<h2 class="anchored" data-anchor-id="the-model-briefly">The model, briefly</h2>
+<p>The reference model values a block of variable annuities carrying three guarantee riders. Writing <span class="math inline">\(t = 0, 1, \dots, 120\)</span> for quarterly steps over 30 years:</p>
+<ul>
+<li>Each policy allocates across <strong>10 investment funds</strong>. Each quarter, fund balances grow with mapped index returns, then shed asset fees and any guaranteed withdrawals (taken pro-rata across funds, floored at zero).</li>
+<li>A <strong>benefit base</strong> ratchets up to the account value each quarter (for policies not yet withdrawing) or amortizes down by withdrawals (for those that are).</li>
+<li><strong>GMWB</strong>: when the contractual withdrawal exceeds the account value, the writer pays the shortfall. <strong>GMDB</strong>: on death, the writer pays the excess of the guarantee base over account value. <strong>GMMB</strong>: at policy maturity, the writer pays the terminal excess.</li>
+<li>Payouts are probability-weighted with survivorship from a mortality table (using the reference’s decrement conventions, itemized below) and discounted at a flat risk-free rate.</li>
+</ul>
+<p>The nesting: along an outer real-world path, every future quarter <span class="math inline">\(s\)</span> (the <em>switch point</em>) spawns <span class="math inline">\(N\)</span> inner risk-neutral continuations that value the guarantees as of <span class="math inline">\(s\)</span>. One outer scenario therefore prices <span class="math inline">\(N \times 120\)</span> paths per policy, where the path for switch point <span class="math inline">\(s\)</span> follows the real-world returns through quarter <span class="math inline">\(s-1\)</span> and inner scenario returns thereafter. The output we track is the inner-average guarantee value at each switch point,</p>
+<p><span class="math display">\[R[s] = \frac{1}{N}\sum_{n=1}^{N} \sum_{i \in \text{policies}} \; \sum_{t \ge s} \text{payout}_{i,n,s}(t)\, e^{-r(t-s)/4},\]</span></p>
+<p>which plays the role of the <em>future reserve profile</em> along that outer path — the kind of quantity a nested stochastic run exists to produce. Under this reference model’s semantics and the synthetic scenarios below, read it as a benchmark metric with the shape of a reserve profile, not a bookable reserve.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
+<p>I follow the reference implementation’s semantics <em>exactly as coded</em>, including quirks a production model would correct<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> — the point of this exercise is computational structure on a fixed specification, not model design. That choice has a labeling consequence used throughout: the outputs here are <em>benchmark metrics under reference semantics</em>, validated across implementations to high precision, rather than actuarially defensible reserves. Where the repo’s two implementations disagree with each other, I follow the naive version and note the difference <a href="#what-porting-found">below</a>.</p>
+</section>
+<section id="data" class="level2">
+<h2 class="anchored" data-anchor-id="data">Data</h2>
+<p>The paper uses the <a href="https://www.math.uconn.edu/~gan/software.html">Gan &amp; Valdez synthetic VA portfolio</a> — 19 product types of realistic synthetic policies — plus scenarios from the American Academy of Actuaries’ generator. The full 190K inforce is no longer readily downloadable, but the authors’ <code>vamc</code> bundle ships a 38,000-policy version of the same portfolio (19 types × 2,000), along with the fund-to-index mapping and the 1996 IAM mortality tables the model expects. That bundle is our data source; scenarios come from a seeded lognormal generator calibrated to the bundle’s own published index statistics (annual means, volatilities, and correlations for 5 indices).<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a> Everything downloads and regenerates from scratch at render time:</p>
+<div id="8" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>Data preparation: download the Gan–Valdez bundle, derive model fields, generate scenarios</summary>
+<pre class="julia cell-code"><code>using Downloads, ZipArchives, CSV, DataFrames, Dates, Random, LinearAlgebra, Statistics
+
+const DATA = joinpath(@__DIR__, "_data")
+const VAMC_URL = "https://www2.math.uconn.edu/~gan/datasets/vamc20180422.zip"
+const VAMC_ZIP = joinpath(DATA, "vamc20180422.zip")
+
+isdir(DATA) || mkpath(DATA)
+isfile(VAMC_ZIP) || Downloads.download(VAMC_URL, VAMC_ZIP)
+
+archive = ZipReader(read(VAMC_ZIP))
+zread(name) = zip_readentry(archive, "vamc20180422/demo/InforceValuationSoS/" * name)
+
+# Excel serial dates (1900 system)
+xldate(n) = Date(1899, 12, 30) + Day(n)
+
+inforce = CSV.read(IOBuffer(zread("inforce38k.csv")), DataFrame)
+let cur = xldate.(inforce.currentDate), birth = xldate.(inforce.birthDate), mat = xldate.(inforce.matDate)
+    inforce.AttainedAge = [floor(Int, Dates.value(c - b) / 365.25) for (c, b) in zip(cur, birth)]
+    inforce.ProjectionMonths = [12 * (year(m) - year(c)) + (month(m) - month(c)) for (c, m) in zip(cur, mat)]
+end
+
+# 1996 IAM mortality from the same bundle, extended so age+30 lookups never fall off the end
+function read_iam(name)
+    lines = split(String(zread(name)), r"\r?\n")
+    istart = findfirst(l -&gt; startswith(l, "Row\\Column"), lines) + 1
+    pairs = [parse.(Float64, split(l, ",")) for l in lines[istart:end] if occursin(",", l)]
+    Dict(Int(a) =&gt; q for (a, q) in pairs)
+end
+male, female = read_iam("1996iammale.csv"), read_iam("1996iamfemale.csv")
+ages = 0:145
+fill_q(tbl) = [get(tbl, clamp(a, 5, 115), NaN) for a in ages]
+CSV.write(joinpath(DATA, "mortality.csv"),
+    DataFrame(age=collect(ages), male=fill_q(male), female=fill_q(female)))
+
+# fund mapping: 5 indices × 10 funds
+fundmap10x5 = Matrix{Float64}(CSV.read(IOBuffer(zread("FundMap.csv")), DataFrame)[:, 2:end])
+CSV.write(joinpath(DATA, "fundmap.csv"), DataFrame(permutedims(fundmap10x5), ["fund$i" for i in 1:10]))
+
+# seeded quarterly lognormal scenarios from the bundle's index statistics
+stats_lines = split(String(zread("RW/indexStatistics.csv")), r"\r?\n")
+parserow(l) = parse.(Float64, split(l, ",")[2:6])
+μ, σ = parserow(stats_lines[1]), parserow(stats_lines[2])
+C = vcat([parserow(l)' for l in stats_lines[3:7]]...)
+
+const RISK_FREE = 0.03
+const T = 121   # 30 years × 4 quarters + the valuation date
+
+function gen_scenarios(rng, n, drift)
+    L = cholesky(Symmetric(C)).L
+    σq, μq = σ ./ 2, (drift .- σ .^ 2 ./ 2) ./ 4
+    scen = zeros(n, T, 5)
+    for s in 1:n, t in 2:T
+        scen[s, t, :] = μq .+ σq .* (L * randn(rng, 5))
+    end
+    scen
+end
+
+rng = Xoshiro(20210731)
+rw_scens = gen_scenarios(rng, 8, μ)                      # outer: real-world drift
+rn_scens = gen_scenarios(rng, 500, fill(RISK_FREE, 5))   # inner: risk-free drift (see the scenario footnote)
+
+function write_scen(path, scen)
+    n, _, K = size(scen)
+    df = DataFrame(scenario=repeat(1:n, inner=T), t=repeat(0:T-1, n))
+    for k in 1:K
+        df[!, "idx$k"] = vec(permutedims(scen[:, :, k]))
+    end
+    CSV.write(path, df)
+end
+write_scen(joinpath(DATA, "scenarios_rw.csv"), rw_scens)
+write_scen(joinpath(DATA, "scenarios_rn.csv"), rn_scens)
+
+CSV.write(joinpath(DATA, "inforce.csv"),
+    inforce[:, [:recordID, :productType, :gender, :AttainedAge, :ProjectionMonths,
+        :gbAmt, :gmwbBalance, :wbWithdrawalRate, :withdrawal,
+        [Symbol("FundValue$i") for i in 1:10]...,
+        [Symbol("FundFee$i") for i in 1:10]...]])</code></pre>
+</details>
+</div>
+<p>The prepared CSVs (<code>inforce.csv</code>, <code>mortality.csv</code>, <code>fundmap.csv</code>, two scenario files) are read identically by the Julia code below and by the Python reference scripts, so every implementation consumes byte-identical inputs.</p>
+<p>One property of this portfolio matters a great deal later. Policies mature at different dates:</p>
+<div id="10" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>tp_all = min.(ceil.(Int, inforce.ProjectionMonths ./ 3), 120)  # projection quarters per policy
+ragged = sum(t -&gt; t * (t + 1) ÷ 2, tp_all) / (length(tp_all) * sum(sp -&gt; 121 - sp, 1:120))
+(median_quarters=median(tp_all), max_quarters=maximum(tp_all),
+    ragged_vs_rectangular_work=round(ragged, digits=3))</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>(median_quarters = 58.0, max_quarters = 114, ragged_vs_rectangular_work = 0.276)</code></pre>
+</div>
+</div>
+<p>The median policy runs 58 of the 120 projection quarters, and none runs all 120. An implementation that steps each policy only to <em>its own</em> maturity does about 28% of the work of one that marches the whole portfolio across the full time rectangle. Hold that thought.</p>
+</section>
+<section id="shared-assumptions-in-julia" class="level2">
+<h2 class="anchored" data-anchor-id="shared-assumptions-in-julia">Shared assumptions in Julia</h2>
+<p>A handful of small functions used by every Julia implementation — loading, the mortality path construction, fund-return mapping, and discounting — ported directly from the reference code:</p>
+<div id="12" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>using StaticArrays
+
+const VAL_FREQ = 4
+
+load_inforce() = CSV.read(joinpath(DATA, "inforce.csv"), DataFrame)
+load_fund_map() = Matrix{Float64}(CSV.read(joinpath(DATA, "fundmap.csv"), DataFrame))
+
+function load_scenarios(name)
+    df = CSV.read(joinpath(DATA, name), DataFrame)
+    n = maximum(df.scenario)
+    scen = reshape(Matrix{Float64}(df[:, r"idx"])', 5, T, n)
+    [permutedims(scen[:, :, s]) for s in 1:n]
+end
+
+function load_mortality()
+    df = CSV.read(joinpath(DATA, "mortality.csv"), DataFrame)
+    qx = Dict{String,Vector{Float64}}()
+    for sex in ("male", "female")
+        v = zeros(146)
+        v[df.age.+1] = df[!, sex]
+        qx[sex] = v
+    end
+    qx
+end
+
+"Quarterly mortality &amp; survivorship from attained age (port of the reference logic)."
+function mortality_path(qx_by_age, attained_age, is_male)
+    rate = qx_by_age[is_male ? "male" : "female"][attained_age+1:end]
+    rate3 = repeat(rate[1:31] ./ VAL_FREQ, inner=VAL_FREQ)[1:T]
+    rate3[1] = 0.0
+    surv = similar(rate3)
+    surv[1] = 1.0
+    for i in 2:length(rate3)
+        surv[i] = surv[i-1] * (1.0 - rate3[i])
+    end
+    rate3, surv
+end
+
+fund_returns(scen, fund_map) = exp.(scen * fund_map)  # (T×5)·(5×10) -&gt; T×10 growth ratios
+accum_discount() = exp.(-RISK_FREE / VAL_FREQ .* (0:T-1))
+
+qx = load_mortality()
+fmap = load_fund_map()
+rw = load_scenarios("scenarios_rw.csv")
+rn = load_scenarios("scenarios_rn.csv")
+rw1 = fund_returns(rw[1], fmap);</code></pre>
+</div>
+</section>
+<section id="reference-points-the-python-ladder-on-2026-hardware" class="level2">
+<h2 class="anchored" data-anchor-id="reference-points-the-python-ladder-on-2026-hardware">Reference points: the Python ladder on 2026 hardware</h2>
+<p>Before comparing languages, it’s worth refreshing the paper’s own numbers on a current machine (Apple M4 Max here; the paper used a 2018-era i7-8850H and an RTX-class GPU). First its Appendix A microbenchmark — apply one quarter’s fund-return ratios (a 10-vector) to every policy’s fund balances (200,000 × 10), 121 times:</p>
+<pre class="python"><code># Python — the paper's two CPU rungs (pysrc/microbench.py)
+for t in range(num_proj):                 # naive: loop the policies
+    for i in range(num_inforces):
+        ret = ratios[t] * inforce[i]
+
+for t in range(num_proj):                 # vectorization &amp; broadcasting
+    ret = ratios[t] * inforce</code></pre>
+<div id="tbl-micro" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-micro-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1: The paper’s Appendix A microbenchmark, then and now. Broadcasting still buys roughly the same ~50–70X over interpreted loops.
+</figcaption>
+<div aria-describedby="tbl-micro-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>variant</th>
+<th style="text-align: right;">paper (2021)</th>
+<th style="text-align: right;">this machine</th>
+<th style="text-align: right;">ratio</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Python loop over policies</td>
+<td style="text-align: right;">77.70 µs/policy</td>
+<td style="text-align: right;">36.93 µs/policy</td>
+<td style="text-align: right;">2.1X faster hw/numpy</td>
+</tr>
+<tr class="even">
+<td>NumPy broadcast</td>
+<td style="text-align: right;">1.604 µs/policy</td>
+<td style="text-align: right;">0.509 µs/policy</td>
+<td style="text-align: right;">3.2X</td>
+</tr>
+<tr class="odd">
+<td>CuPy on GPU</td>
+<td style="text-align: right;">0.208 µs/policy</td>
+<td style="text-align: right;"><em>(not run — no CUDA on this laptop)</em></td>
+<td style="text-align: right;"></td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>And the same operation in Julia, executed now:</p>
+<div id="14" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>using BenchmarkTools
+rng_mb = Xoshiro(1)
+inforce_m = rand(rng_mb, 200_000, 10) .* 10_000
+ratios_m = 0.8 .+ 0.4 .* rand(rng_mb, 121, 10)
+inforce_s = [SVector{10,Float64}(r) for r in eachrow(inforce_m)]  # one small vector per policy
+ratios_s = [SVector{10,Float64}(r) for r in eachrow(ratios_m)]
+out_s, out_m = similar(inforce_s), similar(inforce_m)
+
+t_loop = @belapsed (for t in 1:121, i in 1:200_000
+    $out_s[i] = $ratios_s[t] .* $inforce_s[i]
+end)
+t_bcast = @belapsed (for t in 1:121
+    $out_m .= $inforce_m .* view($ratios_m, t, :)'
+end)
+(julia_loop_us_per_policy=round(t_loop / 200_000 * 1e6, digits=3),
+    julia_broadcast_us_per_policy=round(t_bcast / 200_000 * 1e6, digits=3))</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>(julia_loop_us_per_policy = 0.147, julia_broadcast_us_per_policy = 0.11)</code></pre>
+</div>
+</div>
+<p>The plain Julia loop over policies — the exact structure the paper’s first rung exists to eliminate — runs at about 0.15 µs per policy: ~3X faster than NumPy’s broadcast and faster than the paper’s 2021 <em>GPU</em> figure, on a laptop CPU core.<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a> That’s the whole story of this post in miniature: <em>vectorization is a workaround for interpreted loops, not a law of nature.</em> The question is what the workaround costs when the model is more than one multiply — and the answer is that it costs structure: extra memory traffic, a forced full-time-rectangle work schedule, and a second dialect of the model.</p>
+<p>For the full model, I completed the repo’s unfinished RISP implementation into a clean, allocation-conscious NumPy version (shared step function, guarded divisions, payouts accumulated during stepping — details in <code>pysrc/vectorized.py</code>), and benchmarked both Python rungs on the prepared data. One outer scenario, all 120 switch points, measured per policy · inner scenario:</p>
+<div id="tbl-python" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-python-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;2: Full-model Python timings on this machine (best of repeated runs, <code>pysrc/bench.py</code>). The naive rung times policies 1–8, whose mean maturity (63 quarters) runs a bit longer than the portfolio’s 58; the Julia naive rung below uses the same eight policies, so cross-language ratios are like-for-like.
+</figcaption>
+<div aria-describedby="tbl-python-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Python implementation</th>
+<th>config</th>
+<th style="text-align: right;">per policy·scenario</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>naive loops (<code>pysrc/naive.py</code>)</td>
+<td>8 policies × 2 inner</td>
+<td style="text-align: right;">34,237 µs</td>
+</tr>
+<tr class="even">
+<td>vectorized RISP (<code>pysrc/vectorized.py</code>)</td>
+<td>2,000 × 10</td>
+<td style="text-align: right;">353 µs</td>
+</tr>
+<tr class="odd">
+<td>vectorized RISP</td>
+<td>38,000 × 10</td>
+<td style="text-align: right;">285 µs</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>Vectorizing the full model buys ~120X here — even more than the paper’s 50X microbenchmark claim, because the naive rung also pays Python-level overhead on the benefit logic, not just the fund multiply.</p>
+</section>
+<section id="rung-1-translated-the-naive-loops-in-julia" class="level2">
+<h2 class="anchored" data-anchor-id="rung-1-translated-the-naive-loops-in-julia">Rung 1, translated: the naive loops in Julia</h2>
+<p>The most literal experiment: translate <code>va_calculator_naive.py</code> line by line — same loop nesting, same intermediate arrays, same operation order (array axes flipped for Julia’s column-major layout). The heart of it, for one policy against the 120 merged switch-point paths of one scenario pair:</p>
+<div id="16" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>"All 120 switch-point paths for one (outer, inner) pair, shaped (fund, t, path)."
+function merge_scenarios(rw_ret, rn_ret)
+    merged = Array{Float64,3}(undef, 10, T, T - 1)
+    for sp in 1:T-1
+        merged[:, 1:sp, sp] = rw_ret[1:sp, :]'
+        merged[:, sp+1:T, sp] = rn_ret[sp+1:T, :]'
+    end
+    merged
+end
+
+struct PolicyInputs
+    funds::Vector{Float64}
+    fees::Vector{Float64}
+    gb_amt::Float64
+    gmwb_balance::Float64
+    wd_rate::Float64
+    withdrawal::Float64
+    q::Vector{Float64}
+    surv::Vector{Float64}
+    tp::Int
+end
+
+function policy_inputs(inforce, qx_by_age, i)
+    row = inforce[i, :]
+    q, surv = mortality_path(qx_by_age, row.AttainedAge, row.gender == "M")
+    PolicyInputs(
+        [row[Symbol("FundValue$j")] for j in 1:10],
+        [row[Symbol("FundFee$j")] for j in 1:10],
+        row.gbAmt, row.gmwbBalance, row.wbWithdrawalRate / VAL_FREQ, row.withdrawal,
+        q, surv, min(ceil(Int, row.ProjectionMonths / 3), T - 1))
+end
+
+"Line-by-line translation of the reference VAPayoutCalculation."
+function va_payout_naive(p::PolicyInputs, merged)
+    npaths = size(merged, 3)
+    proj_fund = zeros(10, T, npaths)
+    account_values = zeros(T, npaths)
+    withdrawal_from_av = zeros(T, npaths)
+    gmwb = zeros(T, npaths)
+    gmwb_withdrawal = zeros(T, npaths)
+    gmwb_balance = zeros(T, npaths)
+    gmwb_payout = zeros(T, npaths)
+    prev_fund_weight = zeros(10)
+    tp = p.tp
+
+    for i in 1:npaths
+        for t in 1:tp+1
+            if t == 1
+                proj_fund[:, 1, i] = p.funds
+                gmwb[1, i] = p.gb_amt
+                gmwb_withdrawal[1, i] = p.withdrawal
+                gmwb_balance[1, i] = p.gmwb_balance
+                sum_av = sum(p.funds)
+                account_values[1, i] = sum_av
+                prev_fund_weight .= sum_av &gt; 0 ? p.funds ./ sum_av : 0.0
+            else
+                @views begin
+                    fund_growth = proj_fund[:, t-1, i] .* merged[:, t, i]
+                    fund_withdraw = prev_fund_weight .* withdrawal_from_av[t-1, i]
+                    proj_fund[:, t, i] .= max.(0.0, fund_growth .* (1.0 .- p.fees) .- fund_withdraw)
+                    av = sum(proj_fund[:, t, i])
+                    account_values[t, i] = av
+                    prev_fund_weight .= av &gt; 0 ? proj_fund[:, t, i] ./ av : 0.0
+                end
+                if p.withdrawal &gt; 0   # in the withdrawal phase, the base amortizes; else it ratchets
+                    gmwb[t, i] = gmwb[t-1, i] - gmwb_withdrawal[t-1, i]
+                else
+                    gmwb[t, i] = max(account_values[t, i], gmwb[t-1, i])
+                end
+                gmwb_withdrawal[t, i] = gmwb[t, i] * p.wd_rate
+                gmwb_balance[t, i] = max(0.0, gmwb_balance[t-1, i] - gmwb_withdrawal[t-1, i])
+                gmwb_payout[t, i] = max(0.0, gmwb_withdrawal[t, i] - account_values[t, i]) * p.surv[t]
+                withdrawal_from_av[t, i] = min(account_values[t, i], gmwb_withdrawal[t, i])
+            end
+        end
+    end
+
+    mbdb = p.wd_rate &gt; 0 ? gmwb_balance : gmwb
+    total_payout = gmwb_payout
+    for i in 1:npaths
+        for t in 2:T
+            total_payout[t, i] += max(0.0, mbdb[t, i] - account_values[t, i]) * p.q[t] * p.surv[t]
+        end
+        total_payout[tp+1, i] += (mbdb[tp+1, i] - account_values[tp+1, i]) * p.surv[tp+1]
+    end
+
+    disc = accum_discount()
+    pv_payout = zeros(T, npaths)
+    for i in 1:npaths
+        for t in i+1:T
+            pv_payout[t, i] = total_payout[t, i] * disc[t-i]
+        end
+    end
+    pv_payout
+end;</code></pre>
+</div>
+<p>Nothing clever happened here — this is the same algorithm with the same redundancies (every switch-point path recomputes its full history from <span class="math inline">\(t=0\)</span>). It is simply compiled instead of interpreted:</p>
+<div id="18" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>inforce_df = load_inforce()
+rns2 = [fund_returns(rn[n], fmap) for n in 1:2]
+merged2 = [merge_scenarios(rw1, r) for r in rns2]
+pols8 = [policy_inputs(inforce_df, qx, i) for i in 1:8]
+
+t_naive_j = (@belapsed sum(sum(va_payout_naive(p, m)) for p in $pols8, m in $merged2)) / 16
+py_naive_us = 34_237.0   # measured above, same policies &amp; scenarios
+(julia_naive_us=round(t_naive_j * 1e6, digits=0), speedup_vs_python_naive=round(py_naive_us / (t_naive_j * 1e6), digits=0))</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>(julia_naive_us = 397.0, speedup_vs_python_naive = 86.0)</code></pre>
+</div>
+</div>
+<p>A ~90X speedup for a mechanical translation, single-threaded, with the naive algorithm intact. This is the <em>Life Modeling Problem</em> result all over again: the readable, obvious loop is not the slow version in Julia.<a href="#fn5" class="footnote-ref" id="fnref5" role="doc-noteref"><sup>5</sup></a> Notice what that does to the paper’s ladder — its entire first rung (rewrite your loops as array algebra) exists because the loops were interpreted. In Julia there is nothing to climb out of.</p>
+</section>
+<section id="rung-2-translated-the-broadcasting-version-in-julia" class="level2">
+<h2 class="anchored" data-anchor-id="rung-2-translated-the-broadcasting-version-in-julia">Rung 2, translated: the broadcasting version in Julia</h2>
+<p>The same experiment for the vectorized implementation: keep the whole-portfolio arrays, the time-indexed state, and the RISP reuse trick, and translate the NumPy into Julia broadcasts. One representative piece — the shared per-quarter step over all policies at once (<code>f</code>, <code>av</code>, <code>B</code>, <code>W</code>, <code>GB</code> are views into time-indexed state arrays):</p>
+<div id="20" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>struct VecModel
+    I::Int
+    fees::Vector{Float64}
+    wd_rate::Vector{Float64}
+    wd_phase::Vector{Bool}
+    use_gb::Vector{Bool}
+    funds0::Matrix{Float64}      # 10 × I
+    gb_amt::Vector{Float64}
+    gmwb_balance0::Vector{Float64}
+    withdrawal0::Vector{Float64}
+    valid::Matrix{Float64}       # I × T: t ≤ policy's maturity
+    attained::Matrix{Float64}    # I × T: t = policy's maturity
+    q::Matrix{Float64}
+    surv::Matrix{Float64}
+    fund::Array{Float64,3}       # 10 × I × T  (the RISP time-indexed backbone)
+    weights::Array{Float64,3}
+    av::Matrix{Float64}          # I × T
+    wav::Matrix{Float64}
+    B::Matrix{Float64}
+    W::Matrix{Float64}
+    GB::Matrix{Float64}
+end
+
+function VecModel(inforce, qx_by_age)
+    I = nrow(inforce)
+    funds0 = collect(Matrix{Float64}(inforce[:, r"FundValue"])')
+    fees = collect(Float64, inforce[1, r"FundFee"])
+    wd_rate = inforce.wbWithdrawalRate ./ VAL_FREQ
+    tp = min.(ceil.(Int, inforce.ProjectionMonths ./ 3), T - 1)
+    tgrid = (0:T-1)'
+    q = zeros(I, T)
+    surv = zeros(I, T)
+    for i in 1:I
+        qi, si = mortality_path(qx_by_age, inforce.AttainedAge[i], inforce.gender[i] == "M")
+        q[i, :], surv[i, :] = qi, si
+    end
+    VecModel(I, fees, wd_rate, inforce.withdrawal .&gt; 0, wd_rate .&gt; 0,
+        funds0, Float64.(inforce.gbAmt), Float64.(inforce.gmwbBalance), Float64.(inforce.withdrawal),
+        Float64.(tgrid .&lt;= tp), Float64.(tgrid .== tp), q, surv,
+        zeros(10, I, T), zeros(10, I, T), zeros(I, T), zeros(I, T),
+        zeros(I, T), zeros(I, T), zeros(I, T))
+end
+
+function init_t0!(m::VecModel)
+    @views begin
+        m.fund[:, :, 1] .= m.funds0
+        sum!(reshape(m.av[:, 1], 1, :), m.fund[:, :, 1])
+        m.weights[:, :, 1] .= ifelse.(m.av[:, 1]' .&gt; 0, m.fund[:, :, 1] ./ m.av[:, 1]', 0.0)
+        m.B[:, 1] .= m.gb_amt
+        m.W[:, 1] .= m.withdrawal0
+        m.GB[:, 1] .= m.gmwb_balance0
+        m.wav[:, 1] .= 0.0
+    end
+end
+
+"Advance every policy from column t-1 to t; returns the period's summed payout."
+function step!(m::VecModel, t, r)
+    @views begin
+        f, f0 = m.fund[:, :, t], m.fund[:, :, t-1]
+        av = m.av[:, t]
+        f .= max.(0.0, f0 .* r .* (1.0 .- m.fees) .- m.weights[:, :, t-1] .* m.wav[:, t-1]')
+        sum!(reshape(av, 1, :), f)
+        m.weights[:, :, t] .= ifelse.(av' .&gt; 0, f ./ av', 0.0)
+        m.B[:, t] .= ifelse.(m.wd_phase, m.B[:, t-1] .- m.W[:, t-1], max.(av, m.B[:, t-1]))
+        m.W[:, t] .= m.B[:, t] .* m.wd_rate
+        m.GB[:, t] .= max.(0.0, m.GB[:, t-1] .- m.W[:, t-1])
+        m.wav[:, t] .= min.(av, m.W[:, t])
+        mbdb = ifelse.(m.use_gb, m.GB[:, t], m.B[:, t])
+        sum((max.(0.0, m.W[:, t] .- av) .* m.surv[:, t] .+
+             max.(0.0, mbdb .- av) .* m.q[:, t] .* m.surv[:, t]) .* m.valid[:, t] .+
+            (mbdb .- av) .* m.surv[:, t] .* m.attained[:, t])
+    end
+end
+
+"One outer scenario against N inner scenarios × 120 switch points (RISP order)."
+function valuation!(m::VecModel, rw_ret, rn_rets)
+    N = length(rn_rets)
+    disc = accum_discount()
+    R = zeros(N, T - 1)
+    Vvec = zeros(N, T)
+    init_t0!(m)
+    for t in 2:T                    # real-world backbone
+        step!(m, t, @view rw_ret[t, :])
+    end
+    for sp in T-1:-1:1, n in 1:N    # reverse switch points: rows &lt; sp still hold
+        for t in sp+1:T             # real-world state, so restart reads are free
+            pv = step!(m, t, @view rn_rets[n][t, :]) * disc[t-sp]
+            R[n, sp] += pv
+            Vvec[n, t] += pv
+        end
+    end
+    R, Vvec
+end;</code></pre>
+</div>
+<p>This is a faithful mirror of the NumPy structure (<code>pysrc/vectorized.py</code>), with the layout flipped so that the fund and policy axes are contiguous in memory — the same adaptation any NumPy programmer makes in reverse. Timing it on the two configurations from <a href="#tbl-python" class="quarto-xref">Table&nbsp;2</a>:</p>
+<div id="22" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>rns10 = [fund_returns(rn[n], fmap) for n in 1:10]
+vm2k = VecModel(inforce_df[1:2000, :], qx)
+t_vec2k = minimum((@elapsed valuation!(vm2k, rw1, rns10)) for _ in 1:3)
+vm38k = VecModel(inforce_df, qx)
+t_vec38k = minimum((@elapsed valuation!(vm38k, rw1, rns10)) for _ in 1:2)
+vm2k = nothing
+(vec_2k_us=round(t_vec2k / 2000 / 10 * 1e6, digits=1),
+    vec_38k_us=round(t_vec38k / 38000 / 10 * 1e6, digits=1),
+    speedup_vs_numpy_38k=round(285.5 / (t_vec38k / 38000 / 10 * 1e6), digits=1))</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>(vec_2k_us = 110.8, vec_38k_us = 106.8, speedup_vs_numpy_38k = 2.7)</code></pre>
+</div>
+</div>
+<p>Same idiom, ~2–3X faster than NumPy.<a href="#fn6" class="footnote-ref" id="fnref6" role="doc-noteref"><sup>6</sup></a> Worth having, but this is the <em>wrong local maximum</em> to polish, because the array formulation itself is what’s expensive now: every one of those <code>10 × I</code> sweeps streams the whole portfolio through memory ~15 times per quarter, and the time-rectangle problem — marching all 38,000 policies through all 120 quarters when the median policy matures at 58 — is baked into the data layout. NumPy and Julia-written-as-NumPy both pay it.</p>
+</section>
+<section id="rung-3-stop-translating-restructure" class="level2">
+<h2 class="anchored" data-anchor-id="rung-3-stop-translating-restructure">Rung 3: stop translating, restructure</h2>
+<p>Here is the implementation the ladder was reaching for. Instead of arrays-of-state-over-the-portfolio, give each policy a small immutable struct, give each <em>live path</em> a 15-number state struct, and write the model’s quarter-to-quarter transition once, as a plain function:</p>
+<div id="24" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>struct Policy{FT}
+    funds::SVector{10,FT}
+    fees::SVector{10,FT}
+    gb_amt::FT
+    gmwb_balance::FT
+    wd_rate::FT       # per-quarter withdrawal rate
+    withdrawal::FT
+    wd_phase::Bool
+    use_gb::Bool
+    tp::Int32         # this policy's final projection quarter
+    mort::Int32       # column into the shared q/surv tables
+end
+
+struct PathState{FT}
+    funds::SVector{10,FT}
+    av::FT
+    B::FT             # benefit base ("gmwb" in the reference)
+    W::FT             # current period withdrawal amount
+    GB::FT            # remaining guaranteed withdrawal balance
+    WAV::FT           # withdrawal actually taken from the account
+end
+
+init_state(p::Policy{FT}) where {FT} =
+    PathState(p.funds, sum(p.funds), p.gb_amt, p.withdrawal, p.gmwb_balance, zero(FT))
+
+"One quarter for one policy on one path: (state, returns) -&gt; (state′, payout)."
+@inline function step(s::PathState{FT}, p::Policy{FT}, r::SVector{10},
+    q_t, surv_t, at_maturity::Bool) where {FT}
+    wd_scale = s.av &gt; 0 ? s.WAV / s.av : zero(FT)            # withdrawals pro-rata by fund
+    funds = max.(zero(FT), s.funds .* r .* (one(FT) .- p.fees) .- s.funds .* wd_scale)
+    av = sum(funds)
+    B = p.wd_phase ? s.B - s.W : max(av, s.B)                # amortize vs. ratchet
+    W = B * p.wd_rate
+    GB = max(zero(FT), s.GB - s.W)
+    mbdb = p.use_gb ? GB : B
+    payout = max(zero(FT), W - av) * surv_t +                # GMWB shortfall
+             max(zero(FT), mbdb - av) * q_t * surv_t +       # GMDB on deaths
+             (at_maturity ? (mbdb - av) * surv_t : zero(FT)) # GMMB at maturity
+    PathState(funds, av, B, W, GB, min(av, W)), payout
+end;</code></pre>
+</div>
+<p>That <code>step</code> function <em>is</em> the model — every mechanic from the specification section is one visible line. The nested structure then falls out in a dozen more: walk the outer path once, snapshotting the state at each quarter (a policy’s full snapshot vector is ~13 KB — it lives in L1/L2 cache); then every (inner scenario, switch point) continuation restarts from a snapshot and runs only to <em>this policy’s</em> maturity:</p>
+<div id="26" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>function value_policy!(R, Vvec, p::Policy{FT}, rw, rns, q, surv, disc,
+    snaps::Vector{PathState{FT}}) where {FT}
+    qv = @view q[:, p.mort]
+    sv = @view surv[:, p.mort]
+    tp = Int(p.tp)
+    s = init_state(p)
+    snaps[1] = s
+    for t in 1:tp                                  # outer backbone, snapshotted
+        s, _ = step(s, p, rw[t+1], qv[t+1], sv[t+1], t == tp)
+        snaps[t+1] = s
+    end
+    for rn in rns, sp in 1:tp                      # inner continuations
+        s = snaps[sp]
+        pv = zero(FT)
+        for t in sp:tp
+            s, payout = step(s, p, rn[t+1], qv[t+1], sv[t+1], t == tp)
+            d = disc[t-sp+1]
+            pv += payout * d
+            Vvec[t+1] += payout * d
+        end
+        R[sp] += pv
+    end
+    nothing
+end
+
+"Portfolio valuation, threaded across policies."
+function value_portfolio(policies::Vector{Policy{FT}}, rw, rns, q, surv;
+    ntasks=Threads.nthreads()) where {FT}
+    disc = FT.(accum_discount())
+    chunks = Iterators.partition(eachindex(policies), cld(length(policies), ntasks))
+    tasks = map(chunks) do idxs
+        Threads.@spawn begin
+            R = zeros(FT, T - 1)
+            Vvec = zeros(FT, T)
+            snaps = Vector{PathState{FT}}(undef, T)
+            for i in idxs
+                value_policy!(R, Vvec, policies[i], rw, rns, q, surv, disc, snaps)
+            end
+            R, Vvec
+        end
+    end
+    results = fetch.(tasks)
+    sum(first.(results)), sum(last.(results))
+end
+
+to_svectors(ret, FT=Float64) = [SVector{10,FT}(view(ret, t, :)) for t in 1:size(ret, 1)]
+
+function build_portfolio(inforce, qx_by_age, FT=Float64)
+    keys_ = collect(zip(inforce.AttainedAge, inforce.gender .== "M"))
+    uniq = unique(keys_)
+    col = Dict(k =&gt; Int32(j) for (j, k) in enumerate(uniq))
+    q = zeros(FT, T, length(uniq))
+    surv = zeros(FT, T, length(uniq))
+    for (j, (age, m)) in enumerate(uniq)
+        q[:, j], surv[:, j] = mortality_path(qx_by_age, age, m)
+    end
+    policies = map(1:nrow(inforce)) do i
+        row = inforce[i, :]
+        Policy{FT}(
+            SVector{10,FT}(row[Symbol("FundValue$j")] for j in 1:10),
+            SVector{10,FT}(row[Symbol("FundFee$j")] for j in 1:10),
+            row.gbAmt, row.gmwbBalance, row.wbWithdrawalRate / VAL_FREQ, row.withdrawal,
+            row.withdrawal &gt; 0, row.wbWithdrawalRate &gt; 0,
+            Int32(min(ceil(Int, row.ProjectionMonths / 3), T - 1)),
+            col[(row.AttainedAge, row.gender == "M")])
+    end
+    policies, q, surv
+end;</code></pre>
+</div>
+<p>Note what became of the paper’s two structural ideas. <strong>RISP is still here</strong> — it’s the snapshot vector, reduced from a clever array-pollution ordering to “save your state before trying alternatives,” with no reverse iteration or aliasing discipline required.<a href="#fn7" class="footnote-ref" id="fnref7" role="doc-noteref"><sup>7</sup></a> <strong>Vectorization is gone</strong>, replaced by something better: because each policy’s projection is again a scalar recursion, it stops at that policy’s own maturity. The rectangle problem from the data section disappears — and with it ~72% of the work. SIMD parallelism doesn’t go away either; it moves <em>inside</em> the step, across the 10 funds, where <code>SVector</code> arithmetic compiles to vector instructions.</p>
+<div id="28" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>rw1v = to_svectors(rw1)
+rns10v = [to_svectors(fund_returns(rn[n], fmap)) for n in 1:10]
+pols38, q38, surv38 = build_portfolio(inforce_df, qx)
+
+t_fused_1 = minimum((@elapsed value_portfolio(pols38, rw1v, rns10v, q38, surv38; ntasks=1)) for _ in 1:2)
+t_fused_nt = minimum((@elapsed value_portfolio(pols38, rw1v, rns10v, q38, surv38)) for _ in 1:3)
+(fused_serial_us=round(t_fused_1 / 38000 / 10 * 1e6, digits=2),
+    fused_threaded_us=round(t_fused_nt / 38000 / 10 * 1e6, digits=2),
+    threads=Threads.nthreads())</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>(fused_serial_us = 21.91, fused_threaded_us = 2.56, threads = 10)</code></pre>
+</div>
+</div>
+<p>And the headline run — the entire 38,000-policy block against <strong>all 500 inner scenarios</strong> and all 120 switch points for one outer scenario, a workload the NumPy implementation would need roughly an hour and a half for:</p>
+<div id="30" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>rns500v = [to_svectors(fund_returns(rn[n], fmap)) for n in 1:500]
+t_full = @elapsed ((R500, Vvec500) = value_portfolio(pols38, rw1v, rns500v, q38, surv38))
+println("38,000 policies × 500 inner × 120 switch points: $(round(t_full, digits=1)) s")</code></pre>
+<div class="cell-output cell-output-stdout">
+<pre><code>38,000 policies × 500 inner × 120 switch points: 49.0 s</code></pre>
+</div>
+</div>
+</section>
+<section id="did-everyone-get-the-same-answer" class="level2">
+<h2 class="anchored" data-anchor-id="did-everyone-get-the-same-answer">Did everyone get the same answer?</h2>
+<p>Structure games are only interesting if the numbers don’t move. Validation runs at two levels. During authoring, the original Python implementations (<code>pysrc/</code>) were run on this same data and their results archived (<code>ref/</code>); the naive Python and naive Julia agree path-by-path and quarter-by-quarter to ~1e-11 (the residual is libm <code>exp</code> differing by an ulp between the two runtimes), and the vectorized pair agree to ~1e-13. At render time, the three Julia rungs are checked against each other — path-level matrices on representative policies, the complete 38,000-policy block, the calendar-time and scalar aggregates, and engineered edge cases — and against those archives:</p>
+<div id="32" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>rns3 = [fund_returns(rn[n], fmap) for n in 1:3]
+rns3v = [to_svectors(r) for r in rns3]
+relerr(a, b) = maximum(abs.(a .- b) ./ max.(abs.(b), 1e-6))
+
+# 1 — naive Julia vs archived naive Python: full PV matrices for 19 policies
+#     (one per product type) × 3 inner scenarios, including a check that Julia
+#     produces no nonzero payouts the archive lacks
+ref = CSV.read(joinpath(@__DIR__, "ref", "naive_pv.csv.gz"), DataFrame)
+function naive_vs_reference(ref)
+    worst = 0.0
+    for pid in 0:2000:37999, n in 1:3
+        p = policy_inputs(inforce_df, qx, pid + 1)
+        pv = va_payout_naive(p, merge_scenarios(rw1, rns3[n]))
+        seen = falses(size(pv))
+        for r in eachrow(ref[(ref.policy.==pid+1).&amp;(ref.rn.==n), :])
+            worst = max(worst, abs(pv[r.t+1, r.sp] - r.pv) / max(abs(r.pv), 1e-9))
+            seen[r.t+1, r.sp] = true
+        end
+        maximum(abs.(pv[.!seen]); init=0.0) &lt; 1e-6 ||
+            error("nonzero payouts beyond the archive for policy $(pid+1)")
+    end
+    worst
+end
+
+# 2 — broadcast Julia vs archived NumPy: R over 500 policies × 3 inner
+refR = CSV.read(joinpath(@__DIR__, "ref", "vec_R.csv"), DataFrame)
+Rp = zeros(3, T - 1)
+for r in eachrow(refR)
+    Rp[r.rn, r.sp] = r.R
+end
+vm500 = VecModel(inforce_df[1:500, :], qx)
+Rj, Vj = valuation!(vm500, rw1, rns3)
+
+# 3 — fused vs broadcast on those 500 policies: switch-point PVs, calendar-time
+#     PVs, and the aggregate scalar together
+pols500, q500, surv500 = build_portfolio(inforce_df[1:500, :], qx)
+Rf, Vf = value_portfolio(pols500, rw1v, rns3v, q500, surv500)
+d0 = accum_discount()
+agg(V) = sum(d0[t-1] * V[t] / 3 for t in 2:T)
+err500 = max(relerr(Rf, vec(sum(Rp, dims=1))),
+    relerr(Vf[2:end], vec(sum(Vj, dims=1))[2:end]),
+    relerr(agg(Vf), agg(vec(sum(Vj, dims=1)))))
+
+# 4 — fused vs broadcast on the complete 38,000-policy block
+R38v, V38v = valuation!(vm38k, rw1, rns3)
+R38f, V38f = value_portfolio(pols38, rw1v, rns3v, q38, surv38)
+err38k = max(relerr(R38f, vec(sum(R38v, dims=1))),
+    relerr(V38f[2:end], vec(sum(V38v, dims=1))[2:end]))
+
+# 5 — engineered edge cases vs the naive translation: a policy holding no funds
+#     at all, one whose withdrawals exhaust the account mid-projection, and one
+#     maturing after a single quarter
+wbrow = findfirst(&gt;(0), inforce_df.withdrawal)
+edge_df = copy(inforce_df[[wbrow, wbrow, 1], :])
+for j in 1:10
+    edge_df[1, "FundValue$j"] = 0.0
+    edge_df[2, "FundValue$j"] = 1.0
+end
+edge_df[3, :ProjectionMonths] = 3
+pe, qe, se = build_portfolio(edge_df, qx)
+Re, _ = value_portfolio(pe, rw1v, rns3v, qe, se; ntasks=1)
+Rn_edge = zeros(T - 1)
+for i in 1:3, n in 1:3
+    pv = va_payout_naive(policy_inputs(edge_df, qx, i), merge_scenarios(rw1, rns3[n]))
+    for sp in 1:T-1
+        Rn_edge[sp] += sum(@view pv[:, sp])
+    end
+end
+all(isfinite, Re) || error("non-finite edge-case results")
+
+DataFrame(
+    comparison=["naive Julia vs archived Python: PV matrices, 19 policies (incl. no-extras check)",
+        "broadcast Julia vs archived NumPy: R, 500 policies",
+        "fused vs broadcast: R + calendar PVs + aggregate, 500 policies",
+        "fused vs broadcast: full 38,000-policy block",
+        "fused vs naive: zero-fund / depleting / one-quarter edge policies"],
+    worst_relative_error=[naive_vs_reference(ref), relerr(Rj, Rp), err500, err38k,
+        relerr(Re, Rn_edge)])</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div><div style="float: left;"><span>5×2 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
+<table class="data-frame caption-top table table-sm table-striped small">
+<thead>
+<tr class="columnLabelRow header">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">comparison</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">worst_relative_error</th>
+</tr>
+<tr class="columnLabelRow even">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String">String</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
+</tr>
+</thead>
+<tbody>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">1</td>
+<td style="text-align: left;">naive Julia vs archived Python: PV matrices, 19 policies (incl. no-extras check)</td>
+<td style="text-align: right;">5.53588e-11</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">2</td>
+<td style="text-align: left;">broadcast Julia vs archived NumPy: R, 500 policies</td>
+<td style="text-align: right;">7.52669e-14</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">3</td>
+<td style="text-align: left;">fused vs broadcast: R + calendar PVs + aggregate, 500 policies</td>
+<td style="text-align: right;">6.79221e-15</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">4</td>
+<td style="text-align: left;">fused vs broadcast: full 38,000-policy block</td>
+<td style="text-align: right;">2.72883e-14</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">5</td>
+<td style="text-align: left;">fused vs naive: zero-fund / depleting / one-quarter edge policies</td>
+<td style="text-align: right;">5.04381e-16</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p>Five implementations, two languages, three computational structures — one set of answers on every case tested. That last qualifier is doing honest work: validation can only ever sample the input space, so the cases are chosen adversarially — every product type, the whole block in aggregate, and the paths most likely to break (accounts at exactly zero, mid-projection depletion, single-quarter maturities).</p>
+<section id="what-porting-found" class="level3">
+<h3 class="anchored" data-anchor-id="what-porting-found">What porting found</h3>
+<p>Reimplementation is also an audit, and it surfaced real divergences <em>between the reference repo’s own two rungs</em> — exactly the kind of drift you’d expect when the readable version and the fast version of a model are separate programs:</p>
+<ul>
+<li><strong>Zero-account-value paths.</strong> When withdrawals exhaust all funds, the naive version computes fund weights as 0/0 and propagates <code>NaN</code> through the rest of the path; the vectorized version guards the division. (All implementations here guard, matching the vectorized intent.)</li>
+<li><strong>The GMMB floor.</strong> At maturity the naive version pays <code>(guarantee − account value)</code> — possibly <em>negative</em>, offsetting other benefits — while the vectorized version pays <code>max(0, ...)</code>. Same repo, two different maturity benefits. I follow the naive version, it being the complete one; this is the main reason the outputs here are labeled benchmark metrics rather than reserves. A production model floors it — a one-<code>max</code> change inside <code>step</code> with identical operation count, so no timing in this post moves — but the unfloored behavior is kept so the cross-language checksums stay exact.</li>
+<li><strong>Unfinished rungs.</strong> The published RISP file hardcodes 10 inner scenarios, stops its switch-point loop one short of the full set, and leaves a <code>pdb.set_trace()</code> inside the loop — it was a demonstration of the stepping structure, not a finished valuation (its payout accumulation is absent, which is why I completed it for benchmarking).</li>
+</ul>
+<p>None of this is a criticism of the research — the paper’s claims were about structure and they hold up. But it <em>is</em> evidence for the post’s central design point: <strong>when the specification-shaped code and the production-speed code are the same 40 lines, this class of bug has nowhere to live.</strong> In the NumPy world the naive and vectorized implementations are different enough that they drifted apart <em>within a single supervised research project</em>; the Julia fused kernel was validated against the naive translation in an afternoon because both are executable and fast enough to compare at scale.</p>
+</section>
+</section>
+<section id="the-assembled-ladder" class="level2">
+<h2 class="anchored" data-anchor-id="the-assembled-ladder">The assembled ladder</h2>
+<div id="cell-fig-ladder" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div id="fig-ladder" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-ladder-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-ladder-output-1.svg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-ladder-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Full-model cost per policy · inner scenario (one outer scenario, all 120 switch points; log scale). Python points measured with pysrc/bench.py during authoring on the same machine and data; Julia laptop points measured at render time; the two H100 triangles as measured on the rented instance (<a href="#tbl-h100" class="quarto-xref">Table&nbsp;4</a>).
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Three observations tie the chart together (the two triangles — the H100 rungs — get <a href="#the-gpu-rung-measured">their own section</a>):</p>
+<div id="36" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div><div style="float: left;"><span>3×3 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
+<table class="data-frame caption-top table table-sm table-striped small">
+<thead>
+<tr class="columnLabelRow header">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">implementation</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">policy_quarter_steps_per_policy_scenario</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">ns_per_step</th>
+</tr>
+<tr class="columnLabelRow even">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String">String</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
+</tr>
+</thead>
+<tbody>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">1</td>
+<td style="text-align: left;">NumPy vectorized</td>
+<td style="text-align: right;">7260</td>
+<td style="text-align: right;">39.3</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">2</td>
+<td style="text-align: left;">Julia broadcast</td>
+<td style="text-align: right;">7260</td>
+<td style="text-align: right;">14.7</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">3</td>
+<td style="text-align: left;">Julia fused (1 core)</td>
+<td style="text-align: right;">2005</td>
+<td style="text-align: right;">10.9</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p><strong>First, the per-unit-of-work gap is modest.</strong> Measured per policy-quarter-step actually computed, the broadcast implementations are within ~1.3–3.6X of the fused kernel. Arrays are not slow — the M4’s memory system is heroic.</p>
+<p><strong>Second, the work itself differs by 3.6X.</strong> The array formulation must march the full 38,000 × 120 rectangle; the seriatim kernel stops each policy at its own maturity (and both reuse the outer prefix, RISP-style). The fused version’s largest single advantage isn’t doing work faster — it’s a shape that lets it <em>not do</em> 72% of the work. That option isn’t practically available to the array formulation: ragged policy-by-policy termination is exactly what whole-portfolio vectorization can’t express cheaply.</p>
+<p><strong>Third, threads multiply only the seriatim shape.</strong> Policies are embarrassingly parallel, and per-policy state is tiny, so threading across policies gives 8.6X on this machine. The NumPy version is structurally single-threaded (elementwise kernels don’t multithread, and its RISP state arrays would need duplicating per process); the Julia broadcast version could be threaded per inner scenario at the cost of duplicating its ~1 GB of state per task. The kernel that keeps 15 numbers per path threads for free. (Per-task partial sums keep the reduction deterministic for a fixed task count; a production system wanting bitwise reproducibility across machines would pin the chunking too.)</p>
+<p>Multiply the three effects and you get the end-to-end result: <strong>~110X</strong> over the completed NumPy implementation on identical data and hardware, exact same answers.</p>
+<p>The fourth dimension is the headline chart’s y-axis: what did each rung <em>cost in code</em>? Following the <a href="../../benchmarks/">benchmarks page</a>’s convention of gzipped source as a complexity proxy, the headline figure’s folded cell extracts each implementation — its state layout, portfolio setup, stepping, and valuation driver — from this post’s own cells, from <code>pysrc/</code>, and from the <code>gpu/</code> bundle, strips comments, and compresses it. The details:</p>
+<div class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>Tabulate the rung sources measured in the headline-figure cell</summary>
+<pre class="julia cell-code"><code>DataFrame(implementation=first.(rungsrc),
+    noncomment_lines=[count('\n', c) + 1 for c in last.(rungsrc)],
+    gzipped_bytes=[gzsize(c) for c in last.(rungsrc)])</code></pre>
+</details>
+<div id="tbl-codesize" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-execution_count="1">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-codesize-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;3: Compressed code size by rung, as measured live by the headline figure’s cell: state, setup, stepping, and valuation driver; comments, blank lines, and docstrings stripped; gzip -9. Shared utilities (data loading, mortality construction, discounting) excluded everywhere. The fused kernel is one entry: the 1-core, 10-thread, and Float32 runs are the same source; the H100 run swaps the threaded driver for the KernelAbstractions row’s kernels.
+</figcaption>
+<div aria-describedby="tbl-codesize-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div><div style="float: left;"><span>7×3 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
+<table class="data-frame do-not-create-environment cell caption-top table table-sm table-striped small">
+<thead>
+<tr class="columnLabelRow header">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">implementation</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">noncomment_lines</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">gzipped_bytes</th>
+</tr>
+<tr class="columnLabelRow even">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String">String</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
+</tr>
+</thead>
+<tbody>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">1</td>
+<td style="text-align: left;">Python naive loops</td>
+<td style="text-align: right;">81</td>
+<td style="text-align: right;">1103</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">2</td>
+<td style="text-align: left;">Julia naive (translated)</td>
+<td style="text-align: right;">87</td>
+<td style="text-align: right;">1002</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">3</td>
+<td style="text-align: left;">NumPy vectorized (RISP)</td>
+<td style="text-align: right;">76</td>
+<td style="text-align: right;">1080</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">4</td>
+<td style="text-align: left;">Julia broadcast (translated)</td>
+<td style="text-align: right;">87</td>
+<td style="text-align: right;">1096</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">5</td>
+<td style="text-align: left;">Julia fused kernel</td>
+<td style="text-align: right;">100</td>
+<td style="text-align: right;">1367</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">6</td>
+<td style="text-align: left;">CuPy vectorized (array module injected)</td>
+<td style="text-align: right;">80</td>
+<td style="text-align: right;">1134</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">7</td>
+<td style="text-align: left;">Julia fused kernel + KA GPU driver</td>
+<td style="text-align: right;">166</td>
+<td style="text-align: right;">1904</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<p>The five laptop rungs live in a 1.0–1.4 KB band while spanning four orders of magnitude in runtime; with the GPU rows the ladder tops out near 1.9 KB across nearly seven. Three readings of that. First, Julia’s speed is not purchased with verbosity — each rung compresses to about the size of its Python counterpart. Second, the fused restructuring costs ~25% more compressed bytes than the array forms (the premium is the portfolio builder and threaded driver, not the kernel — the step-and-state core is still the ~40 lines shown above) and buys 13–110X; the KernelAbstractions driver’s further ~0.5 KB — a launch loop and an unrolled workgroup reduction around the <em>same</em> <code>step</code> — buys another ~170X on rented silicon. Third, the CuPy rung really is nearly free code-wise (the vectorized class with the array module injected), which is the paper’s point — and the ~1,000X same-GPU gap against the fused kernel is what that convenience costs at runtime. The <a href="../../posts/life-modeling-problem/index.html">Life Modeling Problem</a> plotted exactly this trade across languages; the headline figure is the same picture within one problem: the expensive-looking implementation is design effort, not code volume.</p>
+<section id="what-the-run-actually-produces" class="level3">
+<h3 class="anchored" data-anchor-id="what-the-run-actually-produces">What the run actually produces</h3>
+<p>Lest the benchmark tables obscure that a full valuation engine is running underneath: the guarantee-value profile <span class="math inline">\(R[s]\)</span> — the inner-scenario-average metric at each future quarter — for four outer scenarios (the first uses the full 500 inner scenarios from the headline run; the others 100). Given the reference’s unfloored maturity benefit and the synthetic inner scenarios, read these as benchmark outputs with the <em>shape</em> of a reserve profile, not bookable reserves:</p>
+<div id="cell-fig-reserves" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>Code</summary>
+<pre class="julia cell-code"><code>rns100v = rns500v[1:100]
+profiles = [R500 ./ 500]
+for m in 2:4
+    Rm, _ = value_portfolio(pols38, to_svectors(fund_returns(rw[m], fmap)), rns100v, q38, surv38)
+    push!(profiles, Rm ./ 100)
+end
+scen_colors = [CF_RED, CF_BLUE, CF_GREEN, CF_PLUM]
+fig2 = Figure(size=(760, 380))
+ax2 = Axis(fig2[1, 1]; xlabel="switch point (years from valuation)",
+    ylabel="inner-average guarantee PV (\$M)",
+    title="Nested valuation output: guarantee-value profile by outer scenario")
+for (m, prof) in enumerate(profiles)
+    lines!(ax2, (1:120) ./ 4, prof ./ 1e6; color=scen_colors[m], label="outer scenario $m")
+end
+axislegend(ax2)
+fig2</code></pre>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div id="fig-reserves" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-reserves-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-reserves-output-1.svg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-reserves-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: Future guarantee-value profiles along four outer paths: 38,000 policies, inner valuation at every future quarter under the reference semantics (unfloored maturity benefit; risk-free-drifted synthetic inner scenarios). Profiles decline as policies mature out of the projection.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="what-the-generic-kernel-buys" class="level2">
+<h2 class="anchored" data-anchor-id="what-the-generic-kernel-buys">What the generic kernel buys</h2>
+<p>The step function was written generically — <code>Policy{FT}</code>, <code>PathState{FT}</code> — with the scenario data left as plain floats. That’s not ceremony; it’s capability. Ask a pricing question: <em>how does the block’s guarantee metric move under a uniform shock to starting account values, and per basis point of fund fees?</em> Push a dual number through the same kernel:</p>
+<div id="42" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>using ForwardDiff
+
+inf1k = inforce_df[1:1000, :]
+rns20v = rns500v[1:20]
+
+function guarantee_value(θ::AbstractVector{FT}) where {FT}
+    pols, q, surv = build_portfolio(inf1k, qx, FT)
+    shocked = [Policy{FT}(p.funds .* θ[1], p.fees .+ θ[2], p.gb_amt, p.gmwb_balance,
+        p.wd_rate, p.withdrawal, p.wd_phase, p.use_gb, p.tp, p.mort) for p in pols]
+    _, Vv = value_portfolio(shocked, rw1v, rns20v, q, surv)
+    disc = accum_discount()
+    sum(disc[t-1] * Vv[t] / 20 for t in 2:T)   # the reference driver's aggregate metric
+end
+
+v = guarantee_value([1.0, 0.0])
+t_primal = @elapsed guarantee_value([1.0, 0.0])
+g = ForwardDiff.gradient(guarantee_value, [1.0, 0.0])
+t_grad = @elapsed ForwardDiff.gradient(guarantee_value, [1.0, 0.0])
+
+DataFrame(quantity=["portfolio guarantee value", "∂V/∂(account values)", "∂V/∂(fee, per bp)"],
+    value=round.([v, g[1], g[2] * 1e-4], sigdigits=5),
+    seconds=round.([t_primal, t_grad, t_grad], digits=3))</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div><div style="float: left;"><span>3×3 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
+<table class="data-frame caption-top table table-sm table-striped small">
+<thead>
+<tr class="columnLabelRow header">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">quantity</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">value</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">seconds</th>
+</tr>
+<tr class="columnLabelRow even">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String">String</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
+</tr>
+</thead>
+<tbody>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">1</td>
+<td style="text-align: left;">portfolio guarantee value</td>
+<td style="text-align: right;">2.3432e9</td>
+<td style="text-align: right;">0.059</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">2</td>
+<td style="text-align: left;">∂V/∂(account values)</td>
+<td style="text-align: right;">2.309e9</td>
+<td style="text-align: right;">0.132</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">3</td>
+<td style="text-align: left;">∂V/∂(fee, per bp)</td>
+<td style="text-align: right;">9.4069e6</td>
+<td style="text-align: right;">0.132</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p>Both partials of a 1,000-policy nested stochastic valuation — through 120 quarters of path-dependent <code>max</code>/<code>min</code> benefit logic, ratchets, and pro-rata withdrawals — for about 2.2X the cost of a single valuation. Precision about what these are: <em>pathwise AD sensitivities of the fixed-scenario estimator</em> — derivatives of exactly what the computer computed, with the standard caveats that at a benefit kink (<code>max</code>/<code>min</code> boundaries) AD reports the realized branch’s one-sided derivative, and that no derivative of a finite-sample estimator is the derivative of the underlying expectation. A central finite difference lands within ~2e-4 at ~4X the cost and one parameter at a time — corroboration, with the residual consistent with FD truncation around those same kinks. The signs are themselves a small actuarial lesson: the fee sensitivity is positive (fees drain accounts and deepen guarantee moneyness — recall the reference applies fees at 4× their annualized level, which scales this partial), and the account-value sensitivity is positive too, because ratcheting benefit bases scale <em>with</em> account values and dominate the fixed-guarantee moneyness effect for this block.</p>
+<p>For the NumPy implementation, none of this exists without a rewrite: derivatives mean bump-and-revalue, at one full valuation per parameter per side, with noise that path-dependent kinks amplify. The same genericity makes a <code>Float32</code> build mechanical — convert the portfolio and the scenario tables, and nothing else changes — and the precision cost is measurable rather than hypothetical:</p>
+<div id="44" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>pols32, q32, surv32 = build_portfolio(inforce_df[1:500, :], qx, Float32)
+R32, _ = value_portfolio(pols32, to_svectors(rw1, Float32),
+    [to_svectors(r, Float32) for r in rns3], q32, surv32)
+(float32_vs_float64_worst_rel=relerr(Float64.(R32), Rf),)</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>(float32_vs_float64_worst_rel = 8.155880553112175e-6,)</code></pre>
+</div>
+</div>
+<p>Single precision reproduces the double-precision switch-point values to ~1e-5, through 120 quarters of compounded, kinked benefit logic — the kind of evidence a GPU migration decision actually needs, and the reason the next section can be about design rather than feasibility.</p>
+</section>
+<section id="the-gpu-rung-measured" class="level2">
+<h2 class="anchored" data-anchor-id="the-gpu-rung-measured">The GPU rung, measured</h2>
+<p>The paper’s third rung — CuPy — bought ~9–18X over NumPy broadcasting at 200–400K policies on 2021 hardware. The CPU sections set up two claims about it. First, <strong>this laptop already clears the paper’s entire 1000X without a GPU</strong>: against the naive baseline as measured here, the threaded fused kernel at 2.6 µs is a ~13000X speedup. Second, the fused kernel should be a <em>better</em> GPU program than broadcast arrays, for the same reason it’s a better CPU program: 15 numbers of state per path against a per-quarter cascade of whole-portfolio kernels. We rented a Lambda H100 and measured both claims. The mapping is one work-item per (policy, inner scenario), running the same <code>step</code>:</p>
+<pre class="julia"><code>@kernel function inner_sp!(Rpart, @Const(policies), @Const(snaps), @Const(rns),
+    @Const(q), @Const(surv), @Const(disc), N, total, sp)
+    # one work-item per (policy, inner scenario); inner-scenario-fastest, so a
+    # warp holds one policy: snapshots broadcast, scenario reads coalesce, and
+    # the per-policy maturity bound is warp-uniform
+    idx = @index(Global, Linear)
+    i, n = (Int(idx) - 1) ÷ N + 1, (Int(idx) - 1) % N + 1
+    p = policies[i]
+    s = snaps[Int(sp), i]                  # restart from the snapshotted outer state
+    pv = 0.0f0
+    for t in Int(sp):Int(p.tp)
+        s, payout = step(s, p, rns[n, t+1], q[t+1, p.mort], surv[t+1, p.mort], t == p.tp)
+        pv += payout * disc[t-Int(sp)+1]
+    end
+    # … workgroup tree-reduction into Rpart[sp, group] elided …
+end</code></pre>
+<p><em>(Abridged: the executed version — with the block reduction, bounds guards, maturity-sorted policies, and a one-launch-per-switch-point host loop — is <a href="https://github.com/JuliaActuary/JuliaActuary.org/tree/master/posts/nested-stochastic-va/gpu"><code>gpu/kernels.jl</code></a>, alongside the data prep, validation, benchmark, and checkpointed full-run scripts.)</em> Because KernelAbstractions has a CPU backend, the kernel was validated on the laptop <em>before</em> the instance existed; on the H100 it reproduced the same tolerances — agreement with the CPU Float32 driver to 1.0e-6 on the full 38K block and with Float64 ground truth to 7.2e-7 — and the CuPy port (the vectorized class with the array module injected) reproduced the NumPy <code>R</code> totals <strong>to the last printed digit</strong>. The measured ladder on that one piece of silicon:</p>
+<div id="tbl-h100" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-h100-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;4: Measured on a Lambda H100 80GB (CUDA 13.3, Julia 1.12.6, CuPy 13/cuda12x); logs archived in <code>gpu/results/</code>.
+</figcaption>
+<div aria-describedby="tbl-h100-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>H100 measurement</th>
+<th style="text-align: right;">result</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>KA fused kernel, 38K × 100 inner × 120 switch points</td>
+<td style="text-align: right;">0.05 s</td>
+</tr>
+<tr class="even">
+<td>KA fused kernel, 190K × 500 inner (one full outer scenario)</td>
+<td style="text-align: right;"><strong>1.45 s</strong></td>
+</tr>
+<tr class="odd">
+<td>sustained kernel throughput</td>
+<td style="text-align: right;">~131 Gsteps/s</td>
+</tr>
+<tr class="even">
+<td>KA kernel vs the same box’s 26-thread CPU</td>
+<td style="text-align: right;">77–147X</td>
+</tr>
+<tr class="odd">
+<td>CuPy vectorized, 190K × 10 inner, float64</td>
+<td style="text-align: right;">29.6 s — 15.6 µs/policy·scenario</td>
+</tr>
+<tr class="even">
+<td>CuPy vectorized, same, float32</td>
+<td style="text-align: right;">25.4 s (barely better: it is launch-bound, not bandwidth-bound)</td>
+</tr>
+<tr class="odd">
+<td><strong>fused kernel vs CuPy, same GPU, per unit of work</strong></td>
+<td style="text-align: right;"><strong>~1,000X</strong></td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>The same-silicon gap is the structural argument’s cleanest confirmation — and it’s <em>larger</em> on the GPU than on CPU. A CuPy valuation issues ~1.45 million small kernel launches (15–20 per quarter per switch point per inner scenario), so the array formulation is bound by launch overhead before it is bound by memory; that its float32 run barely helps is the tell. The fused kernel amortizes 120 launches per outer scenario, total. One consequence worth savoring: <strong>this laptop’s CPU running the fused kernel beats the H100 running the array formulation by ~6X.</strong> The formulation, not the hardware, is the bottleneck.</p>
+<p>Then the run the paper opens by pricing at 560 days: <strong>190,000 policies × 1,000 outer × 500 inner × 120 switch points, exact brute force, completed in 24.8 minutes</strong> — roughly a dollar of rented compute — with every switch-point value checkpointed. What that buys an actuary is the full distribution, not a point estimate:</p>
+<div id="cell-fig-h100dist" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>Percentile fan of the 1,000-outer full run (reads gpu/results/full_run_R.csv.gz)</summary>
+<pre class="julia cell-code"><code>h100 = CSV.read(joinpath(@__DIR__, "gpu", "results", "full_run_R.csv.gz"), DataFrame)
+fan = combine(groupby(h100, :sp),
+    :R =&gt; (r -&gt; quantile(r ./ 500, 0.05) / 1e9) =&gt; :q05,
+    :R =&gt; (r -&gt; quantile(r ./ 500, 0.25) / 1e9) =&gt; :q25,
+    :R =&gt; (r -&gt; quantile(r ./ 500, 0.50) / 1e9) =&gt; :q50,
+    :R =&gt; (r -&gt; quantile(r ./ 500, 0.75) / 1e9) =&gt; :q75,
+    :R =&gt; (r -&gt; quantile(r ./ 500, 0.95) / 1e9) =&gt; :q95)
+sort!(fan, :sp)
+yrs = fan.sp ./ 4
+fig3 = Figure(size=(760, 380))
+ax3 = Axis(fig3[1, 1]; xlabel="switch point (years from valuation)",
+    ylabel="inner-average guarantee PV (\$B)",
+    title="1,000 outer scenarios, measured on the H100")
+band!(ax3, yrs, fan.q05, fan.q95; color=(CF_BLUE, 0.20), label="5th–95th percentile")
+band!(ax3, yrs, fan.q25, fan.q75; color=(CF_BLUE, 0.40), label="25th–75th percentile")
+lines!(ax3, yrs, fan.q50; color=CF_RED, linewidth=2.5, label="median")
+axislegend(ax3)
+fig3</code></pre>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div id="fig-h100dist" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-h100dist-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-h100dist-output-1.svg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-h100dist-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: The measured full run: guarantee-value profiles across all 1,000 outer scenarios (190,000 policies, 500 inner scenarios each, H100, 24.8 minutes). Bands are percentiles across outer scenarios of the inner-average value at each future quarter; every path prices identically at the valuation date and disperses with the real-world market.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>The tail is the deliverable: at year 5 the guarantee value spans $6.7B–$11.4B (5th–95th percentile) with a CTE95 of $12.7B; by year 10 the tail stretches to CTE95 ≈ $15.4B against a $5.9B median; at year 20 the median block is nearly exhausted while the worst paths still hold ~$7.9B. Exact conditional-tail term structures from brute force, in less time than a proxy model takes to calibrate — which is the paper’s “structure beats approximation” thesis, carried to its conclusion.</p>
+<p>For reference, the laptop-only extrapolations the earlier sections established:</p>
+<div class="cell" data-execution_count="1">
+<div id="tbl-full" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-execution_count="1">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-full-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;5: Extrapolated cost of the paper’s full configuration — 190,000 policies × 1,000 outer × 500 inner scenarios × 120 switch points — scaled linearly from the per-unit costs measured above at 38,000 policies. (The 190K Gan–Valdez portfolio is the same 19 product types at 5× the count, so a similar maturity mix is assumed.) The two Python rows are single-process; even perfect 10-way multiprocessing would leave vectorized NumPy at roughly a month.
+</figcaption>
+<div aria-describedby="tbl-full-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div><div style="float: left;"><span>6×3 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
+<table class="data-frame do-not-create-environment cell caption-top table table-sm table-striped small">
+<thead>
+<tr class="columnLabelRow header">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">implementation</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">one_outer_scenario</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">full_problem</th>
+</tr>
+<tr class="columnLabelRow even">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String">String</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String">String</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String">String</th>
+</tr>
+</thead>
+<tbody>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">1</td>
+<td style="text-align: left;">Python naive loops</td>
+<td style="text-align: left;">903.5 hr</td>
+<td style="text-align: left;">103.1 years</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">2</td>
+<td style="text-align: left;">Julia naive (translated)</td>
+<td style="text-align: left;">628.9 min</td>
+<td style="text-align: left;">1.2 years</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">3</td>
+<td style="text-align: left;">NumPy vectorized (RISP)</td>
+<td style="text-align: left;">452.0 min</td>
+<td style="text-align: left;">313.9 days</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">4</td>
+<td style="text-align: left;">Julia broadcast (translated)</td>
+<td style="text-align: left;">169.1 min</td>
+<td style="text-align: left;">117.4 days</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">5</td>
+<td style="text-align: left;">Julia fused (1 core)</td>
+<td style="text-align: left;">34.7 min</td>
+<td style="text-align: left;">24.1 days</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">6</td>
+<td style="text-align: left;">Julia fused (10 threads)</td>
+<td style="text-align: left;">4.0 min</td>
+<td style="text-align: left;">2.8 days</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<p>The full brute-force problem — the one the paper opens by calling a 560-day computation and the industry treats as impossible without approximation — projects to about three days on a laptop in the fused form, and <strong>took 24.8 measured minutes on one rented GPU</strong>, with no approximation relative to brute force. That reframes the approximation literature: proxy models and clustering aren’t wrong, but the bar they must clear starts about four orders of magnitude lower than the folklore assumes.</p>
+</section>
+<section id="objections-worth-taking-seriously" class="level2">
+<h2 class="anchored" data-anchor-id="objections-worth-taking-seriously">Objections worth taking seriously</h2>
+<p><strong>“You could do this in Python too — Numba, Cython, JAX.”</strong> Partly true, and worth being precise about. Numba can compile something close to the seriatim kernel; at that point you’re writing statically-typed kernel code in a Python-hosted dialect with its own debugger boundary, no composable ecosystem across it (the <code>ForwardDiff</code>-through-<code>Policy{Dual}</code> trick has no Numba equivalent), and the two-dialect problem this post is about reappears one layer down. JAX gives you AD and GPUs, but its <code>vmap</code>/<code>scan</code> formulation forces the time rectangle back in (ragged per-policy termination is exactly what <code>vmap</code> can’t express cheaply), and duals-through-isbits-structs becomes pytrees-and-tracers. The claim is not that Python <em>cannot</em> be made fast — it’s that in Julia the readable version, the fast version, the differentiable version, and the GPU version are <em>the same 40 lines</em>, and that identity is what kept seven implementations, on three pieces of hardware, agreeing in this post.</p>
+<p><strong>“NumPy was handicapped by your hardware/thread choices.”</strong> The per-step table above is the fair per-core comparison: ~1.3–3.6X, not 110X. The rest of the gap is work-shape (3.6X) and threading (8.5X) — both <em>consequences of the formulation</em>, which is the point. I also completed and improved the reference NumPy implementation before benchmarking it (fused payout accumulation, single-pass guarded divides), and its numbers here beat the paper’s published per-policy figures on comparable configurations.</p>
+<p><strong>“The model itself is simplified.”</strong> Yes — flat risk-free discounting, quarterly steps, fixed fees, no dynamic lapse or hedging, one fund-mapping. That’s inherited from the reference implementation deliberately, so that the <em>only</em> thing varying across the ladder is computational structure. The structural conclusions (fuse the recursion, snapshot the outer state, respect ragged maturities, keep the kernel generic) get stronger with model complexity, not weaker — every added mechanic is another array pass for the vectorized form but a few more lines inside <code>step</code> for the kernel.</p>
+</section>
+<section id="takeaways" class="level2">
+<h2 class="anchored" data-anchor-id="takeaways">Takeaways</h2>
+<ol type="1">
+<li><strong>The paper’s thesis survives translation and gets stronger</strong>: computational structure beats approximation. Its best structural idea (RISP prefix reuse) carries over as a five-line snapshot vector; its language-workaround idea (vectorize everything) turns out to be unnecessary in a compiled language.</li>
+<li><strong>Ladders are language artifacts.</strong> NumPy’s rungs — vectorize, reorder switch points, switch array libraries — are costs imposed by the interpreter. Julia’s translation of the <em>naive</em> code already outruns NumPy’s <em>optimized</em> rung.</li>
+<li><strong>The biggest speedup wasn’t speed.</strong> Per unit of work, arrays were within ~1.3–3.6X. The fused kernel won by <em>changing what work exists</em>: per-policy truncation (3.6X) and trivially-parallel policies (~8.5X) are shapes the array formulation cannot take.</li>
+<li><strong>One kernel, many capabilities.</strong> The same 40 lines ran the valuation, its pathwise sensitivities (two partials for about twice the cost of one valuation), a <code>Float32</code> build agreeing to ~1e-5, and — demonstrated, not promised — the H100 version. In NumPy each of those is a separate program, and the reference repo’s own two programs had already drifted apart.</li>
+<li><strong>Brute force is closer than the folklore says.</strong> 190K policies × 1,000 × 500 × 120: a projected ~10 months in completed NumPy, a projected ~3 days in fused Julia on one laptop, and <strong>24.8 measured minutes — about a dollar of compute — on one rented H100</strong>. The formulation was the bottleneck, not the hardware: the same GPU running the array formulation projects to ~17 days.</li>
+</ol>
+</section>
+<section id="further-reading" class="level2">
+<h2 class="anchored" data-anchor-id="further-reading">Further reading</h2>
+<ul>
+<li>Zhang, <a href="https://www.soa.org/resources/research-reports/2021/efficient-computation-nested-stochastic/"><em>Discussion of Efficient Computational Structure of Nested Stochastic Modeling</em></a> (SOA, 2021) and the <a href="https://github.com/rranxxi/soa_nested_stochastic">reference implementation</a> this post reworks.</li>
+<li>Gan &amp; Valdez, <a href="https://doi.org/10.1515/demo-2017-0021"><em>Valuation of Large Variable Annuity Portfolios: Monte Carlo Simulation and Synthetic Datasets</em></a> — the synthetic inforce used here.</li>
+<li><a href="../../posts/life-modeling-problem/index.html">The Life Modeling Problem</a> — the single-policy version of the loops-vs-arrays argument, across four languages.</li>
+<li><a href="../../posts/nested-policy-projections/index.html">Nested Projection Mechanics</a> — a tutorial build-up of outer/inner projection systems in Julia.</li>
+<li>Cui, Feng &amp; Li, <a href="https://www.soa.org/resources/research-reports/2016/nested-stochastic-modeling/"><em>Nested Stochastic Modeling for Insurance Companies</em></a> (SOA, 2016) — the survey of approximation approaches the structural argument complements.</li>
+</ul>
+</section>
+<section id="colophon-and-disclosure" class="level2">
+<h2 class="anchored" data-anchor-id="colophon-and-disclosure">Colophon and disclosure</h2>
+<p>All Julia code shown executes at render time on an Apple M4 Max (10 performance cores, 10 Julia threads); Python reference numbers were measured on the same machine and data with NumPy 2.5 / Python 3.14 during authoring, using the scripts in <a href="https://github.com/JuliaActuary/JuliaActuary.org/tree/master/posts/nested-stochastic-va/pysrc"><code>pysrc/</code></a> (adapted from the BSD-3-licensed reference repo), with archived outputs in <code>ref/</code> for the render-time cross-checks above. H100 numbers were measured on a Lambda on-demand instance (CUDA 13.3, Julia 1.12.6, KernelAbstractions 0.9, CuPy on cuda12x) using the scripts and runbook in <a href="https://github.com/JuliaActuary/JuliaActuary.org/tree/master/posts/nested-stochastic-va/gpu"><code>gpu/</code></a>; the full-run output and session logs are archived in <code>gpu/results/</code>, and the distribution figure above recomputes from that archive at render time. The Gan–Valdez data bundle downloads from UConn on first render.</p>
+<p><em>Disclosure: this post was written by AI (Anthropic’s Claude) under the direction of and with review by Alec Loudenback.</em></p>
+
+
+</section>
+
+
+<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>The reference implementation’s driver additionally sums these per-switch-point values, discounted by calendar quarter, into a single scalar per outer scenario. Its discounting bookkeeping (payouts are discounted once to the switch point and then again by calendar time) is unusual, but since every implementation here reproduces it exactly, it serves as a demanding cross-language checksum. All implementations compute both <span class="math inline">\(R[s]\)</span> and the scalar.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>The full list found while porting: the inforce <code>withdrawal</code> field is used as the initial per-quarter withdrawal amount; roll-up rates and the base/rider fee fields go unused; fund fees are applied at their stated rates <em>every quarter</em> (≈4× their annualized level, which also inflates the fee sensitivity computed later); quarterly mortality is the annual rate divided by four rather than <span class="math inline">\(1-(1-q)^{1/4}\)</span>; deaths are weighted by end-of-quarter (post-decrement) survivorship rather than beginning-of-quarter exposure; and the maturity benefit is unfloored — it can be negative (see <a href="#what-porting-found">the porting notes</a>). None of these changes the computational-structure comparison, and keeping them preserves the cross-language checksums.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3"><p>The paper (§3.1.2): “The modeling does not make any assumptions regarding the ESG; therefore, the users can replace the SOA ESG with their own.” Efficiency comparisons are unaffected by which scenario set is used, and a seeded generator keeps this post exactly reproducible. Outer scenarios drift at historical index means; inner scenarios at the flat 3% rate used for discounting. One precision of language, though: the inner set is <em>risk-free-drifted</em>, not risk-neutral in the pricing-measure sense. Each index is calibrated so its own expected gross return is <span class="math inline">\(e^{r/4}\)</span>, but a fund’s log-return is a weighted sum of index log-returns, so a blended fund’s expected return misses <span class="math inline">\(e^{r/4}\)</span> by a factor <span class="math inline">\(\exp\!\big(\tfrac{1}{2}(w^\top \Sigma_q w - \sum_i w_i \sigma_{q,i}^2)\big)\)</span> — below the risk-free rate for diversified funds. The reference project’s scenarios have the same character (both of its sets came from the Academy’s <em>real-world</em> generator; the paper notes the difference “does not matter in this project as we are only interested in the efficiency aspect”). Treat all valuation outputs accordingly: computational benchmarks, not priced reserves.<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn4"><p>Each <code>SVector{10}</code> operation compiles to a handful of SIMD instructions with no allocation, interpreter, or dispatch overhead — a Julia loop body is what the NumPy C kernel is, minus the per-call overhead and the forced round-trips through memory. The broadcast variant is memory-bandwidth-bound and lands in the same range in both languages.<a href="#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn5"><p>See <a href="../../posts/life-modeling-problem/index.html">The Life Modeling Problem</a> for the older cross-language version of this observation, and <a href="../../posts/coding-the-future/index.html">Coding the Future</a> for the argument that this changes what actuarial systems can look like.<a href="#fnref5" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn6"><p>Three boring reasons: Julia’s dot-broadcasts fuse an entire right-hand side into one loop over memory where NumPy makes one pass per operator; there’s no per-kernel dispatch overhead, which dominates at small portfolio sizes; and views avoid NumPy’s temporary copies for the guarded divisions. Nothing here reflects better algorithms — it’s the same algorithm with less ceremony per step.<a href="#fnref6" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn7"><p>There is also a subtle robustness gain. The NumPy RISP correctness depends on a global invariant — rows below the current switch point must never be written, which is why the reference iterates switch points in reverse. The snapshot version has no such invariant to violate: each continuation gets an immutable copy. When the state is 15 numbers per path, copying <em>is</em> the cheap operation.<a href="#fnref7" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/JuliaActuary\.org");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
