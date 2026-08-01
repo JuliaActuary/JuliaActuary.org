@@ -212,8 +212,13 @@ window.Quarto = {
   <li><a href="#benchmarks-2" id="toc-benchmarks-2" class="nav-link" data-scroll-target="#benchmarks-2">Benchmarks</a></li>
   <li><a href="#discussion-2" id="toc-discussion-2" class="nav-link" data-scroll-target="#discussion-2">Discussion</a></li>
   </ul></li>
+  <li><a href="#nested-stochastic-projections" id="toc-nested-stochastic-projections" class="nav-link" data-scroll-target="#nested-stochastic-projections">Nested Stochastic Projections</a>
+  <ul class="collapse">
+  <li><a href="#benchmarks-3" id="toc-benchmarks-3" class="nav-link" data-scroll-target="#benchmarks-3">Benchmarks</a></li>
+  <li><a href="#discussion-3" id="toc-discussion-3" class="nav-link" data-scroll-target="#discussion-3">Discussion</a></li>
+  </ul></li>
   <li><a href="#other-benchmarks" id="toc-other-benchmarks" class="nav-link" data-scroll-target="#other-benchmarks">Other benchmarks</a></li>
-  <li><a href="#colophone" id="toc-colophone" class="nav-link" data-scroll-target="#colophone">Colophone</a>
+  <li><a href="#colophon" id="toc-colophon" class="nav-link" data-scroll-target="#colophon">Colophon</a>
   <ul class="collapse">
   <li><a href="#code" id="toc-code" class="nav-link" data-scroll-target="#code">Code</a></li>
   </ul></li>
@@ -253,8 +258,8 @@ window.Quarto = {
 <p>Inspired by the discussion in the <a href="https://github.com/actuarialopensource">ActuarialOpenSource</a> GitHub community discussion, folks started submitted solutions to what someone referred to as the “Life Modeling Problem”. This user <a href="https://github.com/orgs/actuarialopensource/teams/common-room/discussions/5">submitted a short snippet</a> for consideration of a representative problem.</p>
 <section id="benchmarks" class="level3 page-columns page-full">
 <h3 class="anchored" data-anchor-id="benchmarks">Benchmarks</h3>
-<p>After the original user submitted a proposal, others chimed in and submitted versions in their favorite languages. I have collected those versions, and run them on a consistent set of hardware.</p>
-<p>Some submissions were excluded because from the benchmarks they involved an entirely different approach, such as <a href="https://en.wikipedia.org/wiki/Memoization">memoizing</a> the function calls<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>.</p>
+<p>After the original user submitted a proposal, others chimed in and submitted versions in their favorite languages. I have collected those versions, and run them on a consistent set of hardware.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
+<p>Some submissions were excluded because from the benchmarks they involved an entirely different approach, such as <a href="https://en.wikipedia.org/wiki/Memoization">memoizing</a> the function calls<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>.</p>
 <div class="cell" data-execution_count="1">
 <div id="tbl-life-modeling-benchmark" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-execution_count="1">
 <figure class="quarto-float quarto-float-tbl figure">
@@ -529,6 +534,93 @@ d_2 &amp;= d_1 - \sigma\sqrt{T - t}
 <p>Julia is nearly 20,000 times faster than Python, and two orders of magnitude faster than R.</p>
 </section>
 </section>
+<section id="nested-stochastic-projections" class="level2">
+<h2 class="anchored" data-anchor-id="nested-stochastic-projections">Nested Stochastic Projections</h2>
+<p><strong>Task:</strong> value a 190,000-policy variable annuity block (GMWB/GMDB/GMMB riders) by full brute force — 1,000 outer real-world scenarios × 500 inner risk-neutral scenarios at each of 120 quarterly switch points, about <span class="math inline">\(10^{13}\)</span> path valuations — reproducing the reference model of the SOA’s 2021 <a href="https://www.soa.org/resources/research-reports/2021/efficient-computation-nested-stochastic/"><em>Efficient Computational Structure of Nested Stochastic Modeling</em></a> paper exactly.</p>
+<section id="benchmarks-3" class="level3">
+<h3 class="anchored" data-anchor-id="benchmarks-3">Benchmarks</h3>
+<div id="tbl-nested-stochastic-benchmark" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-nested-stochastic-benchmark-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;2: The nested stochastic ladder. <em>Full problem</em> is the paper’s complete configuration above, extrapolated linearly from the measured per-unit cost for every row except the H100 kernel, which ran it end-to-end. <em>Code size</em> is gzipped source of each implementation (state, setup, stepping, and valuation driver; comments stripped). CPU rows: Apple M4 Max; H100 rows: a rented Lambda instance.
+</figcaption>
+<div aria-describedby="tbl-nested-stochastic-benchmark-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>implementation</th>
+<th style="text-align: right;">per policy · inner scenario</th>
+<th style="text-align: right;">full problem</th>
+<th style="text-align: right;">code size</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Python naive loops (the reference)</td>
+<td style="text-align: right;">34,000 µs</td>
+<td style="text-align: right;">~100 years</td>
+<td style="text-align: right;">1.1 KB</td>
+</tr>
+<tr class="even">
+<td>Julia — the same naive code, translated</td>
+<td style="text-align: right;">~400 µs</td>
+<td style="text-align: right;">~1.2 years</td>
+<td style="text-align: right;">1.0 KB</td>
+</tr>
+<tr class="odd">
+<td>NumPy vectorized (RISP, completed)</td>
+<td style="text-align: right;">285 µs</td>
+<td style="text-align: right;">~10 months</td>
+<td style="text-align: right;">1.1 KB</td>
+</tr>
+<tr class="even">
+<td>Julia — the broadcasting idiom, translated</td>
+<td style="text-align: right;">~110 µs</td>
+<td style="text-align: right;">~4 months</td>
+<td style="text-align: right;">1.1 KB</td>
+</tr>
+<tr class="odd">
+<td>Julia — fused kernel, one core</td>
+<td style="text-align: right;">~22 µs</td>
+<td style="text-align: right;">~24 days</td>
+<td style="text-align: right;">1.4 KB</td>
+</tr>
+<tr class="even">
+<td>Julia — fused kernel, ten cores</td>
+<td style="text-align: right;">~2.6 µs</td>
+<td style="text-align: right;">~2.8 days</td>
+<td style="text-align: right;">1.4 KB</td>
+</tr>
+<tr class="odd">
+<td>CuPy vectorized, H100 (float64)</td>
+<td style="text-align: right;">15.6 µs</td>
+<td style="text-align: right;">~17 days</td>
+<td style="text-align: right;">1.1 KB</td>
+</tr>
+<tr class="even">
+<td><strong>Julia — fused kernel, H100</strong></td>
+<td style="text-align: right;"><strong>~0.015 µs</strong></td>
+<td style="text-align: right;"><strong>24.8 min (measured)</strong></td>
+<td style="text-align: right;"><strong>1.9 KB</strong></td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+</section>
+<section id="discussion-3" class="level3">
+<h3 class="anchored" data-anchor-id="discussion-3">Discussion</h3>
+<p>Translating the Python line-for-line into Julia is worth ~90X on the naive loops and ~2.7X on the completed NumPy/RISP version. Restructuring into a fused seriatim kernel — about 40 lines that read like the model specification and reproduce every other implementation’s numbers to ~1e-11 or better — is worth ~110X over the completed NumPy version on the same laptop, largely by <em>skipping work</em> (each policy stops at its own maturity) and threading freely. The same kernel, moved to a rented H100 via KernelAbstractions.jl, ran the paper’s full “560-day” configuration in <strong>24.8 measured minutes</strong> (~$1 of compute) — roughly 1,000X more throughput per unit of work than CuPy on the same GPU, whose array formulation is launch-overhead-bound.</p>
+<p>For the full ladder, cross-implementation validation, pathwise AD sensitivities, and the GPU details — plus the archived code and results — see <a href="./posts/nested-stochastic-va/">the post</a>.</p>
+</section>
+</section>
 <section id="other-benchmarks" class="level2">
 <h2 class="anchored" data-anchor-id="other-benchmarks">Other benchmarks</h2>
 <p>These benchmarks have been performed by others, but provide relevant information for actuarial-related work:</p>
@@ -537,8 +629,8 @@ d_2 &amp;= d_1 - \sigma\sqrt{T - t}
 <li><a href="https://juliacomputing.com/blog/2020/06/fast-csv/">Reading CSVs</a></li>
 </ul>
 </section>
-<section id="colophone" class="level2">
-<h2 class="anchored" data-anchor-id="colophone">Colophone</h2>
+<section id="colophon" class="level2">
+<h2 class="anchored" data-anchor-id="colophon">Colophon</h2>
 <section id="code" class="level3">
 <h3 class="anchored" data-anchor-id="code">Code</h3>
 <p>All of the benchmarked code can be found in the <a href="https://github.com/JuliaActuary/Learn/tree/master/Benchmarks/">JuliaActuary Learn repository</a>. Please file an issue or submit a PR request there for issues/suggestions.</p>
@@ -554,7 +646,8 @@ d_2 &amp;= d_1 - \sigma\sqrt{T - t}
 <div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
 
 <ol>
-<li id="fn1"><p>If benchmarking memoization, it’s essentially benchmarking how long it takes to perform hashing in a language. While interesting, especially in the context of <a href="https://scattered-thoughts.net/writing/an-opinionated-map-of-incremental-and-streaming-systems">incremental computing</a>, it’s not the core issue at hand. Incremental computing libraries exist for all of the modern languages discussed here.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn1"><p>Note that not all languages have both a mean and median result in their benchmarking libraries. Mean is a better representation for a garbage-collected modern language, because sometimes the computation just takes longer than the median result. Where one of the two statistics is not reported, the other is shown.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>If benchmarking memoization, it’s essentially benchmarking how long it takes to perform hashing in a language. While interesting, especially in the context of <a href="https://scattered-thoughts.net/writing/an-opinionated-map-of-incremental-and-streaming-systems">incremental computing</a>, it’s not the core issue at hand. Incremental computing libraries exist for all of the modern languages discussed here.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
