@@ -5824,7 +5824,336 @@ length(horizon)</code></pre>
   <category>credibility</category>
   <category>modeling</category>
   <guid>https://JuliaActuary.org/posts/credibility-sparse-data/</guid>
-  <pubDate>Sat, 01 Aug 2026 04:45:25 GMT</pubDate>
+  <pubDate>Fri, 07 Aug 2026 04:25:12 GMT</pubDate>
+</item>
+<item>
+  <title>How Much Capital Does Model Error Cost?</title>
+  <link>https://JuliaActuary.org/posts/optimal-transport-capital/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<p>Every capital number comes out of a model. Not out of the book of business — out of a model of the book. Everyone in the room knows the model is wrong; the argument is only ever about how wrong, and whether it matters. Usually that argument ends with a margin: some percentage, set years ago, defended in a memo nobody can find.</p>
+<p>This post runs the argument with arithmetic instead. The plan has three steps. First, say in dollars how far from the truth our loss model could plausibly be. Second, consider every distribution that close to our model — not a handful of hand-built stress scenarios, <em>all</em> of them. Third, report the worst capital requirement any of them produces. Step two sounds impossible. It turns out to be a one-line formula.</p>
+<p>The tool is <code>robustvalue</code>, from the optimal-transport toolkit in <a href="https://github.com/JuliaActuary/ActuaryUtilities.jl">ActuaryUtilities.jl</a>. The previous post, <a href="../../posts/optimal-transport/index.html"><em>How Far Did the Book Move?</em></a>, used the toolkit’s other three functions to measure a stop-loss book’s severity drift. You do not need to have read it — everything here is explained from scratch — but the book is the same one, and the numbers carry over.</p>
+<section id="the-book-briefly" class="level2">
+<h2 class="anchored" data-anchor-id="the-book-briefly">The book, briefly</h2>
+<p>Two simulated policy years of a stop-loss claimant file. Each row is one claimant’s ground-up claims for the year, and the carrier reimburses whatever part of each total exceeds a $250,000 deductible. Because the data are simulated, we know the truth exactly: claims come from the mixture laws written out in the code below, and the current year really is worse than the prior one — more cost, thicker tail. To each year we fit the model a busy pricing actuary might actually use, a single lognormal. The fit is deliberately imperfect. That is the point. We are about to charge for the imperfection.</p>
+<div id="4" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>setup and the book from part one (same code, same seeds)</summary>
+<pre class="julia cell-code"><code>using ActuaryUtilities, Distributions, DataFrames, Statistics, Random, Printf
+using CairoMakie
+
+# site plot theme (cassette futurism)
+include(joinpath(@__DIR__, "..", "..", "assets", "themes", "cassette_futurism.jl"))
+set_theme!(cassette_futurism_theme())
+
+# formatting helpers for prose and tables
+comma(x) = replace(@sprintf("%.0f", x), r"(?&lt;=[0-9])(?=(?:[0-9]{3})+$)" =&gt; ",")
+usd(x) = "\$" * comma(x)
+musd(x) = @sprintf("\$%.1fM", x / 1e6)
+pct1(x) = @sprintf("%+.1f%%", 100x)
+
+prior_law = MixtureModel(
+    [LogNormal(log(62_000), 0.95), LogNormal(log(650_000), 0.55)],
+    [0.960, 0.040])
+current_law = MixtureModel(
+    [LogNormal(log(62_000) + log(1.085), 0.97), LogNormal(log(650_000) + log(1.085), 0.55)],
+    [0.945, 0.055])
+claims_prior = rand(Xoshiro(1001), prior_law, 1620)     # prior policy year
+claims_current = rand(Xoshiro(2001), current_law, 1775) # current policy year
+ded = 250_000
+
+fit_prior = fit_mle(LogNormal, claims_prior)
+fit_current = fit_mle(LogNormal, claims_current)
+
+w1 = wasserstein(claims_prior, claims_current)          # a year of drift, per claimant
+misfit = wasserstein(fit_current, claims_current)       # model error, per claimant
+basis_move = wasserstein(fit_prior, fit_current)        # a year of drift, basis to basis
+
+DataFrame([
+    (year = "prior", n = length(claims_prior), mean = usd(mean(claims_prior)),
+        fitted_basis = @sprintf("LogNormal(%.3f, %.3f)", fit_prior.μ, fit_prior.σ)),
+    (year = "current", n = length(claims_current), mean = usd(mean(claims_current)),
+        fitted_basis = @sprintf("LogNormal(%.3f, %.3f)", fit_current.μ, fit_current.σ)),
+])</code></pre>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div><div style="float: left;"><span>2×4 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
+<table class="data-frame caption-top table table-sm table-striped small">
+<thead>
+<tr class="columnLabelRow header">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">year</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">n</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">mean</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">fitted_basis</th>
+</tr>
+<tr class="columnLabelRow even">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String">String</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String">String</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String">String</th>
+</tr>
+</thead>
+<tbody>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">1</td>
+<td style="text-align: left;">prior</td>
+<td style="text-align: right;">1620</td>
+<td style="text-align: left;">$125,986</td>
+<td style="text-align: left;">LogNormal(11.155, 1.036)</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">2</td>
+<td style="text-align: left;">current</td>
+<td style="text-align: right;">1775</td>
+<td style="text-align: left;">$151,514</td>
+<td style="text-align: left;">LogNormal(11.262, 1.094)</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p>Two measurements from part one set the scale of the problem, and both come from the same simple idea, so here it is in one breath. To measure how far apart two loss distributions are: line both up smallest to largest, match them rank for rank — smallest with smallest, median with median, worst with worst — and average the dollar gaps between partners. That average is the <strong>Wasserstein distance</strong>. It is the cost, in dollars per claimant, of rearranging one distribution into the other. Not a test statistic, not a p-value. A moving bill.</p>
+<p>By that ruler, the fitted lognormal misses the very claims it was fitted to by $20,039 per claimant. And the fitted model moved $21,776 per claimant between last year’s fit and this year’s. Read those together: on this dollar ruler, model misfit is about as large as one year of basis movement. Whether the two matter <em>equally</em> is a separate question — a distance says how much probability moved, not where, and tails and layers care where — but the order of magnitude is the point. The error we ignore by trusting the model is the size of an error nobody would knowingly ignore: pricing on a year-old book. This post is about pricing it instead.</p>
+</section>
+<section id="capital-lives-in-the-aggregate" class="level2">
+<h2 class="anchored" data-anchor-id="capital-lives-in-the-aggregate">Capital lives in the aggregate</h2>
+<p>Part one worked claimant by claimant. Capital does not. A capital requirement attaches to the whole year at once: how many claimants show up, times what each one costs, keeping only the part above the deductible. So we need an annual aggregate loss model, and ours is the ordinary textbook one. Claim counts are Poisson, centered on the current year’s volume. Each claim is a draw from the fitted lognormal. The carrier pays each claimant’s excess over $250,000, and the year’s total ceded loss is the number we track.</p>
+<p>Count the assumptions in that paragraph: Poisson counts, independent claims, frequency frozen at this year’s level, and severities from a lognormal we just measured missing by $20,039 a head. None of this is embarrassing — it is how capital models are actually built. But every item is a choice, and for the last one we hold the error in dollars. Keep that number in view. The rest of the post is about what it costs.</p>
+<p>One definitional note before any formulas. The standard we will price is <img src="https://latex.codecogs.com/png.latex?%5Ctext%7BCTE%7D_%5Calpha"> of the annual ceded loss — the average of the worst <img src="https://latex.codecogs.com/png.latex?1-%5Calpha"> share of years. Strictly, that is a required-asset level: a provision against the year’s loss. It is not quite economic capital, which in most frameworks is this provision <em>minus</em> whatever expected loss, premium, or reserve is already funded against it. We stay with the provision throughout, because it is the quantity the robust theorem prices exactly. Netting a funded amount off afterward is simple subtraction — but the worst case of a <em>difference</em> over a ball of models is a different optimization, and this post does not solve that one.</p>
+<div id="6" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>function aggregate_ceded(rng, sev_law, λ, d, nsims)
+    map(1:nsims) do _
+        sum(max(rand(rng, sev_law) - d, 0.0) for _ in 1:rand(rng, Poisson(λ)); init = 0.0)
+    end
+end
+
+λ = length(claims_current)   # claimants per policy year, held fixed across bases
+agg_prior_basis = aggregate_ceded(Xoshiro(11), fit_prior, λ, ded, 40_000)
+agg_current_basis = aggregate_ceded(Xoshiro(12), fit_current, λ, ded, 40_000)
+
+println("aggregate ceded mean: prior basis ", musd(mean(agg_prior_basis)),
+    " → current basis ", musd(mean(agg_current_basis)))</code></pre>
+<div class="cell-output cell-output-stdout">
+<pre><code>aggregate ceded mean: prior basis $41.4M → current basis $64.7M</code></pre>
+</div>
+</div>
+</section>
+<section id="how-wrong-could-we-be-let-last-year-answer" class="level2">
+<h2 class="anchored" data-anchor-id="how-wrong-could-we-be-let-last-year-answer">How wrong could we be? Let last year answer</h2>
+<p>To charge for model error we need one number first: a dollar budget for how far from the truth the model might sit. The code calls this number the <code>radius</code> — the picture behind the name arrives in the next section — and nothing in mathematics will choose it for us. Once it is chosen, the worst-case arithmetic downstream is exact, conditional on the distribution we apply it to. So we want an anchor everyone can see, and history offers one.</p>
+<p>Here is the logic behind that anchor, spelled out, because it is easy to miss. A capital model is never estimated on the year it is used for: you fit on data through the last cycle and apply the result to the next one. And part one established that this book genuinely moves between cycles. Put those two facts together. At the moment the model is used, it is already wrong by <em>at least</em> however far the book has moved since the data it was fitted on — even if the fitting were flawless. Staleness is not an exotic failure mode; it is the default one. So “how wrong could our model be?” contains a measurable special case: “how wrong does one cycle of staleness make it?” That one, our own filing cabinet can answer.</p>
+<p>We hold two fitted models: last year’s and this year’s. Run the identical aggregate machine under each — same counts, same deductible, only the severity model swapped — and we get two versions of the annual loss distribution: what the model said a year looked like <em>then</em>, and what it says <em>now</em>. Then measure the distance between those two annual distributions, with the same sorting idea as before and one small change: square the gaps before averaging, then un-square at the end. Squaring makes the distance pay extra attention to large rearrangements. That version is called <img src="https://latex.codecogs.com/png.latex?W_2">; the plain average is <img src="https://latex.codecogs.com/png.latex?W_1">. The formula coming in the next section is built for <img src="https://latex.codecogs.com/png.latex?W_2">, so that is what we compute:</p>
+<div id="8" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>radius = wasserstein(agg_prior_basis, agg_current_basis; p = 2)
+println("W₂ between the two aggregate laws (one repricing cycle of drift): ", musd(radius))</code></pre>
+<div class="cell-output cell-output-stdout">
+<pre><code>W₂ between the two aggregate laws (one repricing cycle of drift): $23.4M</code></pre>
+</div>
+</div>
+<p>(For these two distributions the squaring hardly matters — <img src="https://latex.codecogs.com/png.latex?W_2"> comes to $23.4M against a <img src="https://latex.codecogs.com/png.latex?W_1"> of $23.3M — because they differ mostly by a plain shift, and every version of the distance scores a plain shift the same. Still, say which one you used; the formula depends on it.) FIG. 01 shows the two annual distributions and the gap between them.</p>
+<div id="10" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>FIG. 01 plotting code</summary>
+<pre class="julia cell-code"><code>let
+    f = Figure(size = (860, 400))
+    ax = Axis(f[1, 1], title = "FIG. 01 — ONE CYCLE OF DRIFT, IN AGGREGATE DOLLARS",
+        xlabel = "annual ceded loss, \$ millions", ylabel = "density")
+    density!(ax, agg_prior_basis ./ 1e6; color = (CF_BLUE, 0.40), label = "prior-year basis")
+    density!(ax, agg_current_basis ./ 1e6; color = (CF_RED, 0.40), label = "current-year basis")
+    text!(ax, (mean(agg_prior_basis) + mean(agg_current_basis)) / 2e6, 0.012;
+        text = "basis moved\nW₂ ≈ " * musd(radius), align = (:center, :bottom),
+        fontsize = 12, color = CF_INK)
+    axislegend(ax; position = :rt)
+    f
+end</code></pre>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div>
+<figure class="figure">
+<p><img src="https://JuliaActuary.org/posts/optimal-transport-capital/index_files/figure-html/cell-6-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>So one year of model movement rearranged the annual loss distribution by $23.4M. That is our candidate radius, and it is worth being precise about what kind of number it is. It is <em>anchored</em>: a measured dollar figure, from our own book, that anyone can recompute. It is not <em>proven</em>: we watched the model move exactly once, and one observation is a hint, not a distribution of model error. And it is <em>partial</em>: the movement is a difference of two fitted models, so any error the two fits share cancels out of it entirely. Both of our lognormals understate the mixture’s tail in the same direction — that is the $20,039-per-claimant misfit from part one — and none of that shared wrongness appears in the $23.4M. This radius prices the world moving while the model lags; it is blind to the model having been wrong all along. What the anchor really buys is a better argument. “Why is the margin 10%?” has no answer. “Do we believe next year’s model error is bigger or smaller than the move we just measured?” — that, an appointed actuary can argue about with a straight face.</p>
+</section>
+<section id="the-worst-case-in-the-ball" class="level2">
+<h2 class="anchored" data-anchor-id="the-worst-case-in-the-ball">The worst case in the ball</h2>
+<p>We now have both ingredients: a fitted model of the annual loss, and a radius of $23.4M. The last idea to build is the set of every distribution the radius allows. Take our fitted model as a center point. Collect every probability distribution whose <img src="https://latex.codecogs.com/png.latex?W_2"> distance from it is at most <img src="https://latex.codecogs.com/png.latex?r"> — every candidate for what the truth could be, if the model is wrong by no more than <img src="https://latex.codecogs.com/png.latex?r"> of rearrangement. That set is called a <em>ball</em>, for the usual geometric reason: a center, a radius, and everything inside.</p>
+<p>It helps to test a few candidate members. A distribution identical to ours but shifted $10M higher is inside the ball, because shifting every outcome by $10M costs exactly $10M of rearrangement — less than <img src="https://latex.codecogs.com/png.latex?r">. The same distribution shifted $40M is outside. A version with our middle but a heavier tail is inside or outside depending on how many rearrangement dollars that heavier tail requires. And many members are shapes no actuary would ever propose, because the ball contains <em>everything</em> within <img src="https://latex.codecogs.com/png.latex?r">, plausible or not. That is deliberate. The next step defends against all of it at once.</p>
+<p>Here is the question, then: among every distribution in the ball, how large can <img src="https://latex.codecogs.com/png.latex?%5Ctext%7BCTE%7D_%5Calpha"> be? The ball has infinitely many members, so this sounds uncomputable. For CTE it has a closed-form answer:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0A%5Csup_%7B%5Cnu%5C,:%5C,W_2(%5Chat%7BP%7D,%20%5Cnu)%20%5Cle%20r%7D%20%5Ctext%7BCTE%7D_%5Calpha(%5Cnu)%20%5C;=%5C;%20%5Ctext%7BCTE%7D_%5Calpha(%5Chat%7BP%7D)%20+%20r%5C,(1-%5Calpha)%5E%7B-1/2%7D.%0A"></p>
+<p>Read it term by term. The left side is the largest <img src="https://latex.codecogs.com/png.latex?%5Ctext%7BCTE%7D_%5Calpha"> that any member <img src="https://latex.codecogs.com/png.latex?%5Cnu"> of the ball can produce — a supremum over every distribution within distance <img src="https://latex.codecogs.com/png.latex?r"> of our fitted <img src="https://latex.codecogs.com/png.latex?%5Chat%7BP%7D">. The right side is our own model’s CTE, plus a charge: the radius, times a multiplier <img src="https://latex.codecogs.com/png.latex?(1-%5Calpha)%5E%7B-1/2%7D"> that depends on the tail level and nothing else. The shape of our distribution does not appear in the charge. Neither does the deductible, the claim count, or anything else about the book.</p>
+<p>Before trusting a formula that compact, compute one case by hand. Take <img src="https://latex.codecogs.com/png.latex?%5Calpha%20=%200.95">. Then <img src="https://latex.codecogs.com/png.latex?1-%5Calpha"> is <img src="https://latex.codecogs.com/png.latex?0.05">, its square root is about <img src="https://latex.codecogs.com/png.latex?0.224">, and the multiplier is one over that: about 4.47. The charge is the multiplier times the radius — 4.47 × $23.4M ≈ $104.7M. Added to the base CTE(0.95) of $81.1M, the worst case comes to $185.8M. Every entry in the table below is this same arithmetic at a different tail level or a different radius, nothing more. One precision note for the audit file: <em>exact</em> means exact for the distribution supplied. What we supply is a 40,000-year simulation, so the base CTE and the radius are Monte Carlo estimates of the underlying compound-Poisson laws — seeded and repeatable, but still estimates.</p>
+<p>It is also worth knowing <em>which</em> member of the ball produces that worst case, because the answer is simple. Start from our own distribution. Leave the bottom 95% of outcomes exactly where they are. Take the worst 5% and slide all of them further out by one common amount, spending rearrangement budget as they go. Only a twentieth of the probability is moving, so each dollar of budget produces several dollars of slide — about 4.47 of them, which is where the multiplier comes from. When the budget is gone, the average of the worst 5% has risen by exactly the charge. That distribution — ours, with the tail slid out — is the worst member of the ball; nothing stranger does better. (The aside at the end of the next section walks through why sliding the tail is the cheapest attack.)</p>
+<p>One more reading of the equals sign, because it matters for how much to trust the number. Equality means no slack: there is no distribution inside the ball, however oddly shaped, whose CTE exceeds the right-hand side.<sup>1</sup> If the theorem gave only an upper bound, we would have to wonder how much of the charge was real exposure and how much was looseness in the mathematics. It gives an equality, so the charge is the exposure — conditional, as always, on the ball.</p>
+<p>Here it is on our book. The radius is a choice, so the table prices more than one choice: the full measured $23.4M, half of it, and a quarter of it. The fractions are not scenarios with stories attached — they are the same formula at smaller radii, which is exactly the sensitivity a decision-maker should ask to see.</p>
+<div id="12" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>αs = [0.90, 0.95, 0.99]
+worst(α, r) = musd(robustvalue(CTE(α), agg_current_basis; radius = r))
+DataFrame(
+    "CTE level" =&gt; αs,
+    "base CTE" =&gt; [musd(CTE(α)(agg_current_basis)) for α in αs],
+    "worst case at ¼ radius" =&gt; [worst(α, radius / 4) for α in αs],
+    "at ½ radius" =&gt; [worst(α, radius / 2) for α in αs],
+    "at full radius" =&gt; [worst(α, radius) for α in αs],
+)</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div><div style="float: left;"><span>3×5 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
+<table class="data-frame caption-top table table-sm table-striped small">
+<thead>
+<tr class="columnLabelRow header">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">CTE level</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">base CTE</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">worst case at ¼ radius</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">at ½ radius</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">at full radius</th>
+</tr>
+<tr class="columnLabelRow even">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String">String</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String">String</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String">String</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String">String</th>
+</tr>
+</thead>
+<tbody>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">1</td>
+<td style="text-align: right;">0.9</td>
+<td style="text-align: left;">$78.3M</td>
+<td style="text-align: left;">$96.8M</td>
+<td style="text-align: left;">$115.3M</td>
+<td style="text-align: left;">$152.4M</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">2</td>
+<td style="text-align: right;">0.95</td>
+<td style="text-align: left;">$81.1M</td>
+<td style="text-align: left;">$107.3M</td>
+<td style="text-align: left;">$133.4M</td>
+<td style="text-align: left;">$185.8M</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">3</td>
+<td style="text-align: right;">0.99</td>
+<td style="text-align: left;">$87.1M</td>
+<td style="text-align: left;">$145.6M</td>
+<td style="text-align: left;">$204.2M</td>
+<td style="text-align: left;">$321.3M</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p>The same function call works for other risk measures, but the guarantee weakens in the way the footnote describes: for anything other than CTE, <code>robustvalue</code> reports what one specific bad distribution inside the ball produces — a floor under the worst case, not the worst case itself:</p>
+<div id="14" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>println("VaR(0.95): base ", musd(VaR(0.95)(agg_current_basis)),
+    "  → at least ", musd(robustvalue(VaR(0.95), agg_current_basis; radius)),
+    " somewhere in the full-radius ball")</code></pre>
+<div class="cell-output cell-output-stdout">
+<pre><code>VaR(0.95): base $77.2M  → at least $181.9M somewhere in the full-radius ball</code></pre>
+</div>
+</div>
+<p>One caveat has to travel with that table. Each column is the exact worst case among distributions inside its ball — and among nothing else. If the truth sits outside the ball — a new therapy class, a court ruling, a pandemic year — the formula says nothing at all. Measuring last year’s move made the radius arguable; it did not make the future stay inside it. Every number above carries the same condition: <em>if</em> the model is wrong by at most the radius, <em>then</em> the worst case is as shown. Nothing in the table checks the <em>if</em>.</p>
+<blockquote class="blockquote">
+<p><em>Aside: robustness is not insurance.</em> It is tempting to hear “worst case over every distribution in the ball” as “we are now safe.” Notice what actually happened: we swapped one assumption for another. “The model is right” became “the model is wrong by at most <img src="https://latex.codecogs.com/png.latex?r">.” The second assumption is weaker, which is why it is more often true — but it is still an assumption, and nothing inside the model can verify it. What the robust value buys is honesty about which assumption you are leaning on, plus exact arithmetic once you commit to it. The trust has not been eliminated. It has been moved into the radius, where it is one dollar figure a committee can look at.</p>
+</blockquote>
+</section>
+<section id="the-fragile-tail" class="level2">
+<h2 class="anchored" data-anchor-id="the-fragile-tail">The fragile tail</h2>
+<p>The multiplier <img src="https://latex.codecogs.com/png.latex?(1-%5Calpha)%5E%7B-1/2%7D"> deserves a slower look, because it is where tail levels get expensive. Compute it at the three standard levels. At <img src="https://latex.codecogs.com/png.latex?%5Calpha%20=%200.90">, <img src="https://latex.codecogs.com/png.latex?1-%5Calpha"> is <img src="https://latex.codecogs.com/png.latex?0.10">, its square root is about <img src="https://latex.codecogs.com/png.latex?0.316">, and the multiplier is about 3.2. At <img src="https://latex.codecogs.com/png.latex?%5Calpha%20=%200.95"> the same steps give 4.5. At <img src="https://latex.codecogs.com/png.latex?%5Calpha%20=%200.99"> they give 10.</p>
+<p>Now put those in dollars. The same $23.4M radius adds $74.1M of model-error charge at CTE(0.90), $104.7M at CTE(0.95), and $234.2M at CTE(0.99). Moving a capital standard from the 90th percentile to the 99th changes neither the model nor the radius, yet it roughly triples the price of every dollar of model error. And because the multiplier contains only <img src="https://latex.codecogs.com/png.latex?%5Calpha">, none of this is a fact about our book. It is the same arithmetic for anyone whose capital metric lives deep in the tail of a model they know is imperfect.</p>
+<div id="16" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>FIG. 02 plotting code</summary>
+<pre class="julia cell-code"><code>let
+    f = Figure(size = (860, 430))
+    ax = Axis(f[1, 1], title = "FIG. 02 — CAPITAL UNDER MODEL ERROR: RADIUS × TAIL LEVEL",
+        xlabel = "CTE level α", ylabel = "required assets, \$ millions")
+    αs = range(0.85, 0.99; length = 57)
+    base_curve = [CTE(α)(agg_current_basis) for α in αs]
+    lines!(ax, αs, base_curve ./ 1e6; color = CF_INK, linewidth = 2.0, label = "base CTE")
+    for (r, clr, lbl) in [(radius / 4, CF_AMBER, "robust CTE, ¼ radius"),
+        (radius / 2, CF_ORANGE, "robust CTE, ½ radius"), (radius, CF_RED, "robust CTE, full radius")]
+        lines!(ax, αs, [robustvalue(CTE(α), agg_current_basis; radius = r) for α in αs] ./ 1e6;
+            color = clr, linewidth = 2.0, label = lbl)
+    end
+    axislegend(ax; position = :lt)
+    f
+end</code></pre>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div>
+<figure class="figure">
+<p><img src="https://JuliaActuary.org/posts/optimal-transport-capital/index_files/figure-html/cell-9-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>FIG. 02 shows the same effect as curves. Follow the black base-CTE line first. It is nearly flat: with 1,775 expected claims a year, the aggregate distribution is close to symmetric, and raising <img src="https://latex.codecogs.com/png.latex?%5Calpha"> from 0.85 to 0.99 adds only modestly to the base requirement. Now follow the three robust curves. They are not flat, and they spread apart as <img src="https://latex.codecogs.com/png.latex?%5Calpha"> grows, because the model-error charge keeps rising with the multiplier even where the base curve has leveled off. Under model uncertainty, the choice of tail level does most of the work in setting the capital number.</p>
+<blockquote class="blockquote">
+<p><em>Under the hood: where <img src="https://latex.codecogs.com/png.latex?(1-%5Calpha)%5E%7B-1/2%7D"> comes from.</em> Sliding the worst <img src="https://latex.codecogs.com/png.latex?1-%5Calpha"> slice of outcomes further out by the same amount <img src="https://latex.codecogs.com/png.latex?%5Cdelta"> moves only a sliver of the distribution, so it is cheap: the <img src="https://latex.codecogs.com/png.latex?W_2"> cost works out to <img src="https://latex.codecogs.com/png.latex?%5Cdelta%5Csqrt%7B1-%5Calpha%7D">, because the rest of the distribution never moves. Spend the whole radius <img src="https://latex.codecogs.com/png.latex?r"> and the slice slides out by <img src="https://latex.codecogs.com/png.latex?%5Cdelta%20=%20r/%5Csqrt%7B1-%5Calpha%7D"> — which is exactly how much the tail average rises. The thinner the slice, the cheaper the attack and the longer the slide. A 99th-percentile promise concentrates everything in the thinnest slice, which is why it carries the largest multiplier.</p>
+</blockquote>
+</section>
+<section id="who-sets-the-radius" class="level2">
+<h2 class="anchored" data-anchor-id="who-sets-the-radius">Who sets the radius?</h2>
+<p>No theorem sets <img src="https://latex.codecogs.com/png.latex?r">. What the formula gives back in exchange is linearity: half the radius, half the loading, so the ¼-, ½-, and full-radius columns of the table are the entire sensitivity analysis. Reasonable anchors, from harder to easier to argue with: the measured cost of one year of model movement, which is what we used — it prices staleness. The model-to-data misfit from part one, pushed through the same aggregate machine — the natural companion, because it prices exactly the shared structural error that a difference of two fits cancels; the two anchors answer complementary halves of “how wrong?”, the model lagging the world and the model missing the world. Or the rearrangement cost of a named scenario somebody in the room actually fears. Each produces a dollar figure a committee can dispute. The disputing is the point. The radius is where the judgment lives, and the table is what owning that judgment looks like.</p>
+</section>
+<section id="what-this-doesnt-establish" class="level2">
+<h2 class="anchored" data-anchor-id="what-this-doesnt-establish">What this doesn’t establish</h2>
+<p>In descending order of importance.</p>
+<p>The worst case is conditional. Every robust number above is the worst among distributions within <img src="https://latex.codecogs.com/png.latex?r"> of the fitted model. The truth has signed no agreement to stay in the ball.</p>
+<p>The aggregate model is a model. Poisson counts, independence, a lognormal basis, frequency held fixed — the ball is drawn around all of those choices at once, and a radius calibrated from severity drift does not measure, say, frequency contagion or dependence across claimants.</p>
+<p>The anchor is one observation, and a one-sided one. We watched the model move once and called that size a radius — an argument-starter, not a distribution of model error — and because the movement is a difference of two fits, error the fits share is invisible to it. A longer history, several scenarios priced the same way, or a misfit-based companion radius would anchor it better.</p>
+<p>And everything is one-dimensional. The ball lives on the scalar annual total; the tail-slide inside <code>robustvalue</code> is one-dimensional to its bones. Joint moves — frequency with severity, several treaties at once — need multivariate transport, and the closed forms stop there.</p>
+</section>
+<section id="the-meeting-one-floor-up" class="level2">
+<h2 class="anchored" data-anchor-id="the-meeting-one-floor-up">The meeting, one floor up</h2>
+<p>The CFO’s question was: how wrong can the model be before the capital number is wrong too? Here is the answer with no theater in it. Base CTE(0.95), straight from the model: $81.1M. Measured movement of the model over one year: $23.4M. If next year’s model error is no bigger than that, the worst the true CTE(0.95) can be is $185.8M — base plus 4.47 for every dollar of radius, because that is what a 95th-percentile promise pays for model error. And one sentence rides along with the number: if the model is wrong by more than the radius, this figure promises nothing.</p>
+<p>That sentence is the improvement. The old margin promised nothing either. It just never said so.</p>
+</section>
+<section id="further-reading" class="level2">
+<h2 class="anchored" data-anchor-id="further-reading">Further reading</h2>
+<ul>
+<li>Daniel Kuhn, Peyman Mohajerin Esfahani, Viet Anh Nguyen &amp; Soroosh Shafieezadeh-Abadeh (2019), <a href="https://arxiv.org/abs/1908.08729"><em>Wasserstein Distributionally Robust Optimization</em></a> — the theory behind the exact worst case, including the CTE stability bound used here.</li>
+<li>Arthur Charpentier (2026), <a href="https://hal.science/hal-05684645"><em>Optimal Transport for Actuarial Science</em></a> ⟨hal-05684645⟩ — a survey of transport ideas across actuarial problems; the package documentation follows it.</li>
+<li><a href="https://juliaactuary.github.io/ActuaryUtilities.jl/stable/risk_measures/">ActuaryUtilities.jl risk measures documentation</a> — <code>robustvalue</code>, <code>CTE</code>, <code>VaR</code>, and exactly what is returned for measures without the closed form.</li>
+<li><a href="../../posts/optimal-transport/index.html"><em>How Far Did the Book Move?</em></a> — part one: the drift measurement, its checks (a permutation screen and a generative Turing model), and the stress this post’s radius is anchored to.</li>
+</ul>
+</section>
+<section id="footnotes-and-colophon" class="level2">
+<h2 class="anchored" data-anchor-id="footnotes-and-colophon">Footnotes and colophon</h2>
+<p>Everything here — the regenerated book, both aggregate simulations, the robust values, the figures — comes from the code shown, run at render time in Julia with <a href="https://github.com/JuliaActuary/ActuaryUtilities.jl">ActuaryUtilities.jl</a>, <a href="https://github.com/JuliaStats/Distributions.jl">Distributions.jl</a>, and <a href="https://makie.org">Makie.jl</a>. The 80,000 simulated policy years take about a second; the transport calls are sorting. Every random draw is seeded, so the numbers reproduce to the digit.</p>
+<p><em>Disclosure: this post was written by AI (Anthropic’s Claude) under the direction of and with review by Alec Loudenback.</em></p>
+
+
+</section>
+
+
+<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>This closed form is special to CTE. For other measures — <code>VaR</code>, <code>WangTransform</code>, custom measures — <code>robustvalue</code> instead builds one concrete bad distribution inside the ball and evaluates the measure on it. That answers “at least this bad”: a floor under the worst case, not the worst case itself. If the number feeds capital, keep those two phrases straight.↩︎</p></li>
+</ol>
+</section></div> ]]></description>
+  <category>actuaryutilities</category>
+  <category>statistics</category>
+  <category>modeling</category>
+  <category>tutorial</category>
+  <guid>https://JuliaActuary.org/posts/optimal-transport-capital/</guid>
+  <pubDate>Fri, 07 Aug 2026 04:25:12 GMT</pubDate>
 </item>
 <item>
   <title>Interactive Cashflow Analysis with ActuaryUtilities.jl</title>
@@ -5862,7 +6191,7 @@ using Pluto; Pluto.run()</code></pre>
   <category>financemodels</category>
   <category>assets</category>
   <guid>https://JuliaActuary.org/posts/cashflow-interactive/</guid>
-  <pubDate>Sat, 01 Aug 2026 04:45:25 GMT</pubDate>
+  <pubDate>Fri, 07 Aug 2026 04:25:12 GMT</pubDate>
 </item>
 <item>
   <title>Universal Life Policy Account Mechanics as a Differential Equation</title>
@@ -6141,7 +6470,7 @@ end</code></pre>
   <category>actuaryutilities</category>
   <category>tutorial</category>
   <guid>https://JuliaActuary.org/posts/policy-diffeq/</guid>
-  <pubDate>Sat, 01 Aug 2026 04:45:25 GMT</pubDate>
+  <pubDate>Fri, 07 Aug 2026 04:25:12 GMT</pubDate>
 </item>
 <item>
   <title>US Treasury Comparison Tool</title>
@@ -6179,7 +6508,7 @@ using Pluto; Pluto.run()</code></pre>
   <category>financemodels</category>
   <category>tutorial</category>
   <guid>https://JuliaActuary.org/posts/treasury-interactive/</guid>
-  <pubDate>Sat, 01 Aug 2026 04:45:25 GMT</pubDate>
+  <pubDate>Fri, 07 Aug 2026 04:25:12 GMT</pubDate>
 </item>
 <item>
   <title>Bayesian Markov-Chain-Monte-Carlo and Claims Data</title>
@@ -8275,7 +8604,7 @@ Use `describe(chains)` for summary statistics and quantiles.</code></pre>
   <category>statistics</category>
   <category>bayesian</category>
   <guid>https://JuliaActuary.org/posts/bayesian-claims-demo/</guid>
-  <pubDate>Sat, 01 Aug 2026 04:45:25 GMT</pubDate>
+  <pubDate>Fri, 07 Aug 2026 04:25:12 GMT</pubDate>
 </item>
 <item>
   <title>Nested Projection Mechanics</title>
@@ -9490,7 +9819,7 @@ end</code></pre>
   <category>actuaryutilities</category>
   <category>tutorial</category>
   <guid>https://JuliaActuary.org/posts/nested-policy-projections/</guid>
-  <pubDate>Sat, 01 Aug 2026 04:45:25 GMT</pubDate>
+  <pubDate>Fri, 07 Aug 2026 04:25:12 GMT</pubDate>
 </item>
 <item>
   <title>Using MortaltiyTables.jl with DataFrames</title>
@@ -10111,7 +10440,7 @@ sample_data</code></pre>
   <category>dataframes</category>
   <category>tutorial</category>
   <guid>https://JuliaActuary.org/posts/mortalitytables-and-dataframes/</guid>
-  <pubDate>Sat, 01 Aug 2026 04:45:25 GMT</pubDate>
+  <pubDate>Fri, 07 Aug 2026 04:25:12 GMT</pubDate>
 </item>
 <item>
   <title>Poisson approximation to Binomial</title>
@@ -10339,7 +10668,7 @@ end</code></pre>
   <category>statistics</category>
   <category>experience-analysis</category>
   <guid>https://JuliaActuary.org/posts/poisson-approximation/</guid>
-  <pubDate>Sat, 01 Aug 2026 04:45:25 GMT</pubDate>
+  <pubDate>Fri, 07 Aug 2026 04:25:12 GMT</pubDate>
 </item>
 <item>
   <title>Bayesian vs Limited Fluctuation Experience Analysis</title>
@@ -11462,143 +11791,7 @@ end</code></pre>
   <category>experience-analysis</category>
   <category>bayesian</category>
   <guid>https://JuliaActuary.org/posts/bayes-vs-limited-fluctuation/</guid>
-  <pubDate>Sat, 01 Aug 2026 04:45:25 GMT</pubDate>
-</item>
-<item>
-  <title>Fitting Rate Data to Yield Curves</title>
-  <link>https://JuliaActuary.org/posts/fitting-yield-curves/</link>
-  <description><![CDATA[ 
-
-
-
-
-
-<p>Given rates and maturities, we can fit the yield curves with different techniques.</p>
-<p>Below, we specify that the rates should be interpreted as <code>Continuous</code>ly compounded zero rates:</p>
-<div id="4" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>using FinanceModels
-using CairoMakie
-
-include(joinpath(@__DIR__, "..", "..", "assets", "themes", "cassette_futurism.jl"))
-set_theme!(cassette_futurism_theme())</code></pre>
-</div>
-<div id="6" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>rates = Continuous.([0.01, 0.01, 0.03, 0.05, 0.07, 0.16, 0.35, 0.92, 1.40, 1.74, 2.31, 2.41] ./ 100)
-mats = [1 / 12, 2 / 12, 3 / 12, 6 / 12, 1, 2, 3, 5, 7, 10, 20, 30]</code></pre>
-<div class="cell-output cell-output-display" data-execution_count="1">
-<pre><code>12-element Vector{Float64}:
-  0.08333333333333333
-  0.16666666666666666
-  0.25
-  0.5
-  1.0
-  2.0
-  3.0
-  5.0
-  7.0
- 10.0
- 20.0
- 30.0</code></pre>
-</div>
-</div>
-<p>The above rates and associated maturities represent prices of zero coupon bonds, which we use as the financial instrument that we will fit the curve to:</p>
-<div id="8" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>quotes = ZCBYield.(rates, mats)</code></pre>
-<div class="cell-output cell-output-display" data-execution_count="1">
-<pre><code>12-element Vector{Quote{Float64, Cashflow{Float64, Float64}}}:
- Quote{Float64, Cashflow{Float64, Float64}}(0.9999916667013888, Cashflow{Float64, Float64}(1.0, 0.08333333333333333))
- Quote{Float64, Cashflow{Float64, Float64}}(0.9999833334722215, Cashflow{Float64, Float64}(1.0, 0.16666666666666666))
- Quote{Float64, Cashflow{Float64, Float64}}(0.9999250028124297, Cashflow{Float64, Float64}(1.0, 0.25))
- Quote{Float64, Cashflow{Float64, Float64}}(0.999750031247396, Cashflow{Float64, Float64}(1.0, 0.5))
- Quote{Float64, Cashflow{Float64, Float64}}(0.9993002449428433, Cashflow{Float64, Float64}(1.0, 1.0))
- Quote{Float64, Cashflow{Float64, Float64}}(0.9968051145430329, Cashflow{Float64, Float64}(1.0, 2.0))
- Quote{Float64, Cashflow{Float64, Float64}}(0.9895549325678993, Cashflow{Float64, Float64}(1.0, 3.0))
- Quote{Float64, Cashflow{Float64, Float64}}(0.9550419621907147, Cashflow{Float64, Float64}(1.0, 5.0))
- Quote{Float64, Cashflow{Float64, Float64}}(0.9066489037539209, Cashflow{Float64, Float64}(1.0, 7.0))
- Quote{Float64, Cashflow{Float64, Float64}}(0.8402968976584314, Cashflow{Float64, Float64}(1.0, 10.0))
- Quote{Float64, Cashflow{Float64, Float64}}(0.6300223399419124, Cashflow{Float64, Float64}(1.0, 20.0))
- Quote{Float64, Cashflow{Float64, Float64}}(0.4852941873885002, Cashflow{Float64, Float64}(1.0, 30.0))</code></pre>
-</div>
-</div>
-<p>Fitting is then calling <code>fit</code> along with the desired curve construction technique. Here are several variants:</p>
-<div id="10" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>ns = fit(Yield.NelsonSiegel(), quotes);
-nss = fit(Yield.NelsonSiegelSvensson(), quotes);
-sw = fit(Yield.SmithWilson(ufr=0.05, α=0.1), quotes);
-bl = fit(Spline.Linear(), quotes, Fit.Bootstrap());
-bq = fit(Spline.Quadratic(), quotes, Fit.Bootstrap());
-bc = fit(Spline.Cubic(), quotes, Fit.Bootstrap());</code></pre>
-</div>
-<p>That’s it! We’ve fit the rates using six different techniques. These can now be used in a variety of ways, such as calculating the <code>present_value</code>, <code>duration</code>, or <code>convexity</code> of different cashflows if you imported <a href="https://github.com/JuliaActuary/ActuaryUtilities.jl">ActuaryUtilities.jl</a>”</p>
-<section id="visualizing-the-results" class="level2">
-<h2 class="anchored" data-anchor-id="visualizing-the-results">Visualizing the results</h2>
-<div id="12" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>const CURVES = [
-    (bc,  "Bootstrap (Cubic)"),
-    (bq,  "Bootstrap (Quadratic)"),
-    (bl,  "Bootstrap (Linear)"),
-    (ns,  "NelsonSiegel"),
-    (nss, "NelsonSiegelSvensson"),
-    (sw,  "SmithWilson"),
-]
-
-function curveplot!(ax, curve, color; label="", alpha=1.0)
-    maturities = 0.25:0.25:40
-    f(x) = rate(zero(curve, x))
-    lines!(ax, maturities, f.(maturities);
-        label, linewidth=3, color=(color, alpha))
-end
-
-function build_axis!(ax, alpha=ones(length(CURVES)))
-    scatter!(ax, mats, rate.(Continuous().(rates));
-        label="Given zero rates", color=CF_INK, markersize=9)
-    for (i, (c, name)) in enumerate(CURVES)
-        curveplot!(ax, c, CASSETTE_PALETTE[i]; label=name, alpha=alpha[i])
-    end
-    return ax
-end
-
-let
-    fig = Figure(size=(760, 460))
-    ax = Axis(fig[1,1]; xlabel="Tenor", ylabel="Continuous yield")
-    build_axis!(ax)
-    axislegend(ax, position=:lt)
-    fig
-end</code></pre>
-<div class="cell-output cell-output-display" data-execution_count="1">
-<div>
-<figure class="figure">
-<p><img src="https://JuliaActuary.org/posts/fitting-yield-curves/index_files/figure-html/cell-7-output-1.svg" class="img-fluid figure-img"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>And an animated version that fades each fit in turn:</p>
-<div id="14" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>let
-    fig = Figure(size=(760, 460))
-    ax = Axis(fig[1,1]; xlabel="Tenor", ylabel="Continuous yield")
-    a = [1.0, 0.25, 0.25, 0.25, 0.25, 0.25]
-    record(fig, "anim_fps2.gif", 1:6; framerate=2) do _
-        a .= circshift(a, 1)
-        empty!(ax)
-        build_axis!(ax, a)
-        axislegend(ax, position=:lt)
-    end
-end</code></pre>
-</div>
-<p><img src="https://JuliaActuary.org/posts/fitting-yield-curves/anim_fps2.gif" class="img-fluid"></p>
-
-
-</section>
-
- ]]></description>
-  <category>market</category>
-  <category>yieldcurves</category>
-  <category>financemodels</category>
-  <category>tutorial</category>
-  <guid>https://JuliaActuary.org/posts/fitting-yield-curves/</guid>
-  <pubDate>Sat, 01 Aug 2026 04:45:25 GMT</pubDate>
+  <pubDate>Fri, 07 Aug 2026 04:25:12 GMT</pubDate>
 </item>
 </channel>
 </rss>

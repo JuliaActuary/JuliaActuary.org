@@ -17,6 +17,7 @@
     "listing": "/examples.html",
     "items": [
       "/posts/credibility-sparse-data/index.html",
+      "/posts/optimal-transport-capital/index.html",
       "/posts/cashflow-interactive/index.html",
       "/posts/policy-diffeq/index.html",
       "/posts/treasury-interactive/index.html",
@@ -25,6 +26,7 @@
       "/posts/mortalitytables-and-dataframes/index.html",
       "/posts/poisson-approximation/index.html",
       "/posts/bayes-vs-limited-fluctuation/index.html",
+      "/posts/optimal-transport/index.html",
       "/posts/fitting-yield-curves/index.html",
       "/posts/fitting-survival-data/index.html",
       "/posts/academy-generator-rates/index.html",
@@ -40,6 +42,7 @@
     "listing": "/all-posts.html",
     "items": [
       "/posts/credibility-sparse-data/index.html",
+      "/posts/optimal-transport-capital/index.html",
       "/posts/cashflow-interactive/index.html",
       "/posts/policy-diffeq/index.html",
       "/posts/treasury-interactive/index.html",
@@ -48,6 +51,7 @@
       "/posts/mortalitytables-and-dataframes/index.html",
       "/posts/poisson-approximation/index.html",
       "/posts/bayes-vs-limited-fluctuation/index.html",
+      "/posts/optimal-transport/index.html",
       "/posts/fitting-yield-curves/index.html",
       "/posts/fitting-survival-data/index.html",
       "/posts/academy-generator-rates/index.html",
