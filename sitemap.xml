@@ -41,28 +41,32 @@
     <lastmod>2026-07-18T01:25:22.983Z</lastmod>
   </url>
   <url>
-    <loc>https://JuliaActuary.org/posts/bayes-vs-limited-fluctuation/index.html</loc>
-    <lastmod>2026-07-18T01:25:22.981Z</lastmod>
+    <loc>https://JuliaActuary.org/posts/optimal-transport/index.html</loc>
+    <lastmod>2026-08-07T04:15:39.477Z</lastmod>
   </url>
   <url>
-    <loc>https://JuliaActuary.org/posts/mortalitytables-and-dataframes/index.html</loc>
-    <lastmod>2025-06-21T05:31:10.069Z</lastmod>
-  </url>
-  <url>
-    <loc>https://JuliaActuary.org/posts/nested-policy-projections/index.html</loc>
+    <loc>https://JuliaActuary.org/posts/poisson-approximation/index.html</loc>
     <lastmod>2026-07-18T01:25:22.985Z</lastmod>
   </url>
   <url>
-    <loc>https://JuliaActuary.org/posts/bayesian-claims-demo/index.html</loc>
-    <lastmod>2026-07-18T01:25:22.981Z</lastmod>
+    <loc>https://JuliaActuary.org/posts/julia-for-actuaries/index.html</loc>
+    <lastmod>2026-07-18T01:25:22.984Z</lastmod>
   </url>
   <url>
-    <loc>https://JuliaActuary.org/posts/treasury-interactive/index.html</loc>
-    <lastmod>2025-06-14T19:05:26.449Z</lastmod>
-  </url>
-  <url>
-    <loc>https://JuliaActuary.org/posts/cashflow-interactive/index.html</loc>
+    <loc>https://JuliaActuary.org/posts/bayesian-intro/index.html</loc>
     <lastmod>2026-07-18T01:25:22.982Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.org/posts/life-modeling-problem/index.html</loc>
+    <lastmod>2026-07-18T01:25:22.985Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.org/posts/policy-diffeq/index.html</loc>
+    <lastmod>2026-07-18T01:25:22.986Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.org/posts/optimal-transport-capital/index.html</loc>
+    <lastmod>2026-08-07T04:24:17.655Z</lastmod>
   </url>
   <url>
     <loc>https://JuliaActuary.org/posts/finance-models-announcement/index.html</loc>
@@ -81,24 +85,28 @@
     <lastmod>2026-07-26T14:15:51.398Z</lastmod>
   </url>
   <url>
-    <loc>https://JuliaActuary.org/posts/policy-diffeq/index.html</loc>
-    <lastmod>2026-07-18T01:25:22.986Z</lastmod>
-  </url>
-  <url>
-    <loc>https://JuliaActuary.org/posts/life-modeling-problem/index.html</loc>
-    <lastmod>2026-07-18T01:25:22.985Z</lastmod>
-  </url>
-  <url>
-    <loc>https://JuliaActuary.org/posts/bayesian-intro/index.html</loc>
+    <loc>https://JuliaActuary.org/posts/cashflow-interactive/index.html</loc>
     <lastmod>2026-07-18T01:25:22.982Z</lastmod>
   </url>
   <url>
-    <loc>https://JuliaActuary.org/posts/julia-for-actuaries/index.html</loc>
-    <lastmod>2026-07-18T01:25:22.984Z</lastmod>
+    <loc>https://JuliaActuary.org/posts/treasury-interactive/index.html</loc>
+    <lastmod>2025-06-14T19:05:26.449Z</lastmod>
   </url>
   <url>
-    <loc>https://JuliaActuary.org/posts/poisson-approximation/index.html</loc>
+    <loc>https://JuliaActuary.org/posts/bayesian-claims-demo/index.html</loc>
+    <lastmod>2026-07-18T01:25:22.981Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.org/posts/nested-policy-projections/index.html</loc>
     <lastmod>2026-07-18T01:25:22.985Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.org/posts/mortalitytables-and-dataframes/index.html</loc>
+    <lastmod>2025-06-21T05:31:10.069Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.org/posts/bayes-vs-limited-fluctuation/index.html</loc>
+    <lastmod>2026-07-18T01:25:22.981Z</lastmod>
   </url>
   <url>
     <loc>https://JuliaActuary.org/posts/nested-stochastic-va/index.html</loc>
@@ -139,13 +147,5 @@
   <url>
     <loc>https://JuliaActuary.org/learn.html</loc>
     <lastmod>2026-02-17T21:35:32.694Z</lastmod>
-  </url>
-  <url>
-    <loc>https://JuliaActuary.org/posts/optimal-transport/index.html</loc>
-    <lastmod>2026-08-07T04:15:39.477Z</lastmod>
-  </url>
-  <url>
-    <loc>https://JuliaActuary.org/posts/optimal-transport-capital/index.html</loc>
-    <lastmod>2026-08-07T04:24:17.655Z</lastmod>
   </url>
 </urlset>
