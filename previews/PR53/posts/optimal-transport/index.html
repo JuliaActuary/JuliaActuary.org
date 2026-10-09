@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.16">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.">
+
+<title>How Far Did the Book Move? – JuliaActuary</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../..//assets/favicon.ico" rel="icon">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-a0731b9a3a5d496010872d775e5d9bc3.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-98ac2d5361ef6f18cc0525d38bedc462.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&amp;family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/highlight/styles/github.min.css">
+<script src="../../assets/highlight/highlight.min.js"></script>
+<script src="../../assets/highlight/languages/julia.min.js"></script>
+<script src="../../assets/highlight/languages/julia-repl.min.js"></script>
+<script src="../../assets/highlight/languages/python.min.js"></script>
+<script src="../../assets/highlight/languages/r.min.js"></script>
+<script>hljs.highlightAll();</script>
+<script data-goatcounter="https://juliaactuary.goatcounter.com/count" async="" src="//gc.zgo.at/count.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed fullcontent quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../assets/logos/android-chrome-512x512.png" alt="JuliaActuary Logo" class="navbar-logo light-content">
+    <img src="../../assets/logos/android-chrome-512x512.png" alt="JuliaActuary Logo" class="navbar-logo dark-content">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">JuliaActuary</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../packages.html"> 
+<span class="menu-text">Packages</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://docs.juliaactuary.org"> 
+<span class="menu-text">Docs</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://modernfinancialmodeling.com"> 
+<span class="menu-text">Book</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../learn.html"> 
+<span class="menu-text">Learn</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../examples.html"> 
+<span class="menu-text">Examples</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../benchmarks.html"> 
+<span class="menu-text">Benchmarks</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../community.html"> 
+<span class="menu-text">Community</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/JuliaActuary"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="../../all-posts.xml"> <i class="bi bi-rss" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">How Far Did the Book Move?</h1>
+            <p class="subtitle lead">Optimal transport for actuaries: sort the claims, measure the drift in dollars, and be honest about how wrong the model is</p>
+                  <div>
+        <div class="description">
+          JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">actuaryutilities</div>
+                <div class="quarto-category">statistics</div>
+                <div class="quarto-category">modeling</div>
+                <div class="quarto-category">tutorial</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<p>Somewhere right now, an actuary is in a meeting about whether the book of business has changed. There is a slide with two means on it. Someone remembers a bad claim from March. Eventually the room settles on a trend factor, everyone agrees to believe it, and the meeting adjourns until next year.</p>
+<p>Strip away the slides and the meeting is asking four questions. How far did the book move? Is the move real, or just noise? What happens to us if it keeps moving? And how wrong can our model be before the capital number is wrong too? Four questions, usually answered with four unrelated gadgets: a trend factor, a goodness-of-fit test, a judgment stress, and a margin somebody defended in a memo years ago.</p>
+<p>It turns out one idea can answer all four, and the idea is nearly embarrassing in its simplicity: sort both distributions and measure how far each rank has to travel. That is <strong>optimal transport</strong>, and in one dimension it needs no solver — the distance itself has no bandwidth, kernel, or bin width to pick. (The tests and stresses we build on top of it do have knobs; I will point at each one as it appears.) <a href="https://github.com/JuliaActuary/ActuaryUtilities.jl">ActuaryUtilities.jl</a> v5.11.1 ships four functions built on it — <a href="https://juliaactuary.github.io/ActuaryUtilities.jl/stable/risk_measures/"><code>wasserstein</code></a>, <code>transportmap</code>, <code>pushforward</code>, and <code>robustvalue</code> — and this post works one book of business through the first three. The fourth prices model error itself, and the fourth question with it, so it gets <a href="../../posts/optimal-transport-capital/index.html">a post of its own</a>. You will notice there is no drift-<em>test</em> function in that list; that is deliberate, and the middle of this post is about what to do instead. The book here is a stop-loss portfolio, but nothing depends on that. The same moves work on surplus distributions, mortality margins, or the output of a scenario model.</p>
+<section id="the-distance-is-just-sorting" class="level2">
+<h2 class="anchored" data-anchor-id="the-distance-is-just-sorting">The distance is just sorting</h2>
+<p>Take two years of claims. Sort each list. Pair them up by rank: smallest with smallest, median with median, worst with worst. Each pair is some dollars apart. Average those gaps and you have a distance between the two years.</p>
+<p>That number has a grand name, the <strong>Wasserstein distance</strong>, and a literature full of deep theorems. The name is useful in meetings. The computation is <code>mean(abs.(sort(a) .- sort(b)))</code> for two equal-sized samples, and in general an integral of the gap between the two quantile functions:</p>
+<p><span class="math display">\[
+W_p(a, b) = \left( \int_0^1 \left| Q_a(u) - Q_b(u) \right|^p \, du \right)^{1/p}.
+\]</span></p>
+<p>The exponent <span class="math inline">\(p\)</span> says how much you care about long trips. <span class="math inline">\(p = 1\)</span> averages them — a natural pricing number. <span class="math inline">\(p = 2\)</span> punishes the long ones, so it notices when the movement is concentrated in a few ranks. <span class="math inline">\(p = \infty\)</span> reports only the single longest trip.</p>
+<blockquote class="blockquote">
+<p><em>Under the hood: why sorting is optimal.</em> Transport asks for the cheapest way to move one pile of probability onto another, and in general that is a genuine optimization problem. On the real line it isn’t. If two shipments cross — a low claim sent to a high destination and a high claim sent low — uncrossing them never costs more, for any convex cost. So the rank-preserving matching is already the cheapest plan, the theory collapses into quantile arithmetic, and the distances in this post are exact and fast. In more dimensions this collapse does not happen, a point we return to at the end.</p>
+</blockquote>
+<div id="4" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>setup: packages, plot theme, formatting helpers</summary>
+<pre class="julia cell-code"><code>using ActuaryUtilities, Distributions, DataFrames, StatsBase, Statistics, Random, Printf
+using CairoMakie
+
+# site plot theme (cassette futurism)
+include(joinpath(@__DIR__, "..", "..", "assets", "themes", "cassette_futurism.jl"))
+set_theme!(cassette_futurism_theme())
+
+# formatting helpers for prose and tables
+comma(x) = replace(@sprintf("%.0f", x), r"(?&lt;=[0-9])(?=(?:[0-9]{3})+$)" =&gt; ",")
+usd(x) = "\$" * comma(x)
+musd(x) = @sprintf("\$%.1fM", x / 1e6)
+pct1(x) = @sprintf("%+.1f%%", 100x)</code></pre>
+</details>
+</div>
+<div id="6" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>(
+    shift = wasserstein(Normal(0, 1), Normal(3, 1)),        # rigid shift: distance = 3
+    widen = wasserstein(Normal(0, 1), Normal(0, 2); p = 2), # same mean, σ 1 → 2
+    same_mean = wasserstein(Normal(0, 1), Normal(0, 2)),    # W₁ sees what Δmean can't
+)</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>(shift = 3.0, widen = 0.9999999247524948, same_mean = 0.797884446983869)</code></pre>
+</div>
+</div>
+<p>Three things to notice in that little demo, because they are the reasons to care.</p>
+<p>First, the distance has units. Shift a distribution $3 to the right and the distance is 3 — not a p-value, not a likelihood ratio. Dollars. You can put it next to a premium.</p>
+<p>Second, look at the third line. <code>Normal(0,1)</code> and <code>Normal(0,2)</code> have identical means, so a comparison of means reports that nothing happened. The transport distance reports about 0.8, because half the ranks moved up and half moved down, and moving risk around costs money even when the average sits still.</p>
+<p>Third, the distance respects the geometry of outcomes. Divergences like KL compare the <em>probabilities</em> assigned to each outcome and are blind to how far apart the outcomes sit. A $10k claim is closer to $11k than to $1M. Wasserstein knows that; KL does not.</p>
+</section>
+<section id="two-years-of-claims" class="level2">
+<h2 class="anchored" data-anchor-id="two-years-of-claims">Two years of claims</h2>
+<p>Our book is a stop-loss carrier’s claimant file: one row per claimant per policy year, each row the claimant’s ground-up claims for the year, with the carrier reimbursing whatever part of that total exceeds a $250,000 specific deductible. We will simulate two policy years of it.</p>
+<blockquote class="blockquote">
+<p><em>Aside: simulation is not cheating.</em> Working on simulated data sounds like a retreat from reality. It is the opposite. Simulation means we know the truth, and knowing the truth is the only way to grade a method. If a tool cannot recover facts we planted ourselves, there is no reason to trust it with facts nobody knows. Before you use any of the machinery below on a real book, do exactly what this post does: build a fake book where you know the answer, and check.</p>
+</blockquote>
+<p>Here is the generative story. Each year mixes a base population of ordinary claimants with a small catastrophic component — transplants, cell and gene therapy, the claims underwriters tell stories about. The current year carries an 8.5% cost trend <em>and</em> a heavier catastrophic share, because that is how severity deteriorates in practice: partly inflation, partly mix. The pricing model we will fit to this data is a single lognormal. So the model is wrong on purpose, and wrong in a known way — the most instructive kind of wrong, because we can measure it.</p>
+<div id="8" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>prior_law = MixtureModel(
+    [LogNormal(log(62_000), 0.95), LogNormal(log(650_000), 0.55)],
+    [0.960, 0.040])
+current_law = MixtureModel(
+    [LogNormal(log(62_000) + log(1.085), 0.97), LogNormal(log(650_000) + log(1.085), 0.55)],
+    [0.945, 0.055])
+
+claims_prior = rand(Xoshiro(1001), prior_law, 1620)     # prior policy year
+claims_current = rand(Xoshiro(2001), current_law, 1775) # current policy year
+ded = 250_000
+
+summarize(name, c) = (
+    year = name, n = length(c), mean = usd(mean(c)), median = usd(median(c)),
+    p95 = usd(quantile(c, 0.95)), p99 = usd(quantile(c, 0.99)), largest = usd(maximum(c)),
+)
+DataFrame([summarize("prior", claims_prior), summarize("current", claims_current)])</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div><div style="float: left;"><span>2×7 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
+<table class="data-frame caption-top table table-sm table-striped small">
+<thead>
+<tr class="columnLabelRow header">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">year</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">n</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">mean</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">median</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">p95</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">p99</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">largest</th>
+</tr>
+<tr class="columnLabelRow even">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String">String</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String">String</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String">String</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String">String</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String">String</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String">String</th>
+</tr>
+</thead>
+<tbody>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">1</td>
+<td style="text-align: left;">prior</td>
+<td style="text-align: right;">1620</td>
+<td style="text-align: left;">$125,986</td>
+<td style="text-align: left;">$66,823</td>
+<td style="text-align: left;">$457,542</td>
+<td style="text-align: left;">$1,022,278</td>
+<td style="text-align: left;">$1,925,285</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">2</td>
+<td style="text-align: left;">current</td>
+<td style="text-align: right;">1775</td>
+<td style="text-align: left;">$151,514</td>
+<td style="text-align: left;">$71,291</td>
+<td style="text-align: left;">$590,294</td>
+<td style="text-align: left;">$1,317,175</td>
+<td style="text-align: left;">$2,685,940</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p>The mean moved +20.3%. But look at where it moved. The median barely stirred (+6.7%), while the 95th percentile, the 99th, and the largest claim all jumped. FIG. 01 shows the two years on a log scale: the bodies nearly coincide, and the right tail thickens.</p>
+<div id="10" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>FIG. 01 plotting code</summary>
+<pre class="julia cell-code"><code>let
+    f = Figure(size = (860, 400))
+    ax = Axis(f[1, 1],
+        title = "FIG. 01 — TWO POLICY YEARS OF LARGE CLAIMS",
+        xlabel = "claim size (log scale)", ylabel = "density",
+        xticks = (log10.([10_000, 25_000, 50_000, 100_000, 250_000, 500_000, 1e6, 2.5e6]),
+            ["\$10k", "\$25k", "\$50k", "\$100k", "\$250k", "\$500k", "\$1M", "\$2.5M"]))
+    density!(ax, log10.(claims_prior); color = (CF_BLUE, 0.40), label = "prior year")
+    density!(ax, log10.(claims_current); color = (CF_RED, 0.40), label = "current year")
+    vlines!(ax, [log10(ded)]; color = CF_INK_SOFT, linestyle = :dash, linewidth = 1.2)
+    text!(ax, log10(ded), 0.62; text = " specific deductible", color = CF_INK_SOFT,
+        align = (:left, :top), fontsize = 11)
+    axislegend(ax; position = :rt)
+    f
+end</code></pre>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-6-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The two density bodies nearly coincide, and it is tempting to file the change as modest. Aggregate it before you do. FIG. 02 runs each year’s severity law through a full year of the book — claim counts held at the current volume of 1,775 claimants, so the comparison is pure severity — and cedes each claimant’s excess over the $250,000 deductible. Summing gives one year’s incurred loss; repeating the year forty thousand times gives the distribution of annual outcomes each severity regime implies.</p>
+<div id="12" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>function aggregate_incurred(rng, sev_law, λ, d, nsims)
+    map(1:nsims) do _
+        sum(max(rand(rng, sev_law) - d, 0.0) for _ in 1:rand(rng, Poisson(λ)); init = 0.0)
+    end
+end
+
+agg_prior = aggregate_incurred(Xoshiro(21), prior_law, length(claims_current), ded, 40_000)
+agg_current = aggregate_incurred(Xoshiro(22), current_law, length(claims_current), ded, 40_000)
+println("annual incurred (ceded) loss, mean: prior law ", musd(mean(agg_prior)),
+    " → current law ", musd(mean(agg_current)),
+    "  (", pct1(mean(agg_current) / mean(agg_prior) - 1), ")")</code></pre>
+<div class="cell-output cell-output-stdout">
+<pre><code>annual incurred (ceded) loss, mean: prior law $55.9M → current law $82.4M  (+47.3%)</code></pre>
+</div>
+</div>
+<div id="14" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>FIG. 02 plotting code</summary>
+<pre class="julia cell-code"><code>let
+    f = Figure(size = (860, 400))
+    ax = Axis(f[1, 1],
+        title = "FIG. 02 — THE SAME MOVE, IN ANNUAL AGGREGATE DOLLARS",
+        xlabel = "annual incurred (ceded) loss, \$ millions", ylabel = "density")
+    density!(ax, agg_prior ./ 1e6; color = (CF_BLUE, 0.40), label = "prior-year severity law")
+    density!(ax, agg_current ./ 1e6; color = (CF_RED, 0.40), label = "current-year severity law")
+    text!(ax, (mean(agg_prior) + mean(agg_current)) / 2e6, 0.005;
+        text = "means " * musd(mean(agg_prior)) * " → " * musd(mean(agg_current)),
+        align = (:center, :bottom), fontsize = 12, color = CF_INK)
+    axislegend(ax; position = :rt)
+    f
+end</code></pre>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-8-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Here is what FIG. 02 is saying. Claim by claim, the two years look like siblings; compounded across 1,775 claimants, they produce annual loss distributions that barely touch. The prior regime centers near $55.9M, the current one near $82.4M — a +47.3% move in the money the carrier actually books. Two things make the gap so much starker than FIG. 01 suggested. The deductible throws away the region where the two laws agree — the layer only sees the tail, which is exactly where the change lives. And a year of the book samples the drifted law 1,775 times, so a per-claimant shift too subtle to impress a density plot accumulates into tens of millions, reliably, year after year.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
+<p>Any actuary who has seen this pair of figures already suspects the excess layer is in trouble. The rest of the post is about replacing that suspicion with numbers.</p>
+</section>
+<section id="how-far-did-it-move" class="level2">
+<h2 class="anchored" data-anchor-id="how-far-did-it-move">How far did it move?</h2>
+<div id="16" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>w1 = wasserstein(claims_prior, claims_current)
+w2 = wasserstein(claims_prior, claims_current; p = 2)
+w∞ = wasserstein(claims_prior, claims_current; p = Inf)
+Δmean = mean(claims_current) - mean(claims_prior)
+ks = let F1 = ecdf(claims_prior), F2 = ecdf(claims_current)
+    maximum(x -&gt; abs(F1(x) - F2(x)), vcat(claims_prior, claims_current))
+end
+
+println("W₁ = ", usd(w1), "   W₂ = ", usd(w2), "   W∞ = ", usd(w∞))
+println("Δmean = ", usd(Δmean), "   KS statistic = ", @sprintf("%.3f", ks))</code></pre>
+<div class="cell-output cell-output-stdout">
+<pre><code>W₁ = $25,530   W₂ = $67,021   W∞ = $895,941
+Δmean = $25,527   KS statistic = 0.048</code></pre>
+</div>
+</div>
+<p>Start with <span class="math inline">\(W_1\)</span>: match the two years rank for rank, and the average gap between matched claims is $25,530. (Note the absolute value in the integral — <span class="math inline">\(W_1\)</span> is a size of movement, not a direction.) It lands within a few dollars of the plain difference in means, and that is not an accident. <span class="math inline">\(W_1\)</span> can never be smaller than <span class="math inline">\(|\Delta\text{mean}|\)</span>, and the two are equal exactly when the quantile curves never cross — when one year sits at or above the other at every rank. Here they very nearly don’t: the current year dips below the prior year only at a couple dozen of the lowest ranks, down where claims are small, by at most about $850. That sliver is why <span class="math inline">\(W_1\)</span> beats the mean change by $3 instead of by exactly zero. When the curves don’t cross, the mean pays the whole transport bill; what the mean cannot tell you is <em>who</em> paid it, and for an excess-of-loss writer that is the question that matters. Hold that thought for one figure.</p>
+<p><span class="math inline">\(W_2\)</span> is 2.6 times larger than <span class="math inline">\(W_1\)</span>. If every rank had moved the same $25,530, the two would be equal, so a large ratio is telling us the trips were very unequal: most ranks barely moved, a few moved enormously. <span class="math inline">\(W_\infty\)</span> says the single longest trip was about $895,941, up among the jumbo claims. Treat that one as an anecdote rather than an estimate: with heavy tails, <span class="math inline">\(W_\infty\)</span> is essentially the gap between the two years’ largest claims — an extreme order statistic that swings wildly from sample to sample.</p>
+<p>And then there is the Kolmogorov–Smirnov statistic, 0.048, which is how many of us were taught to compare two samples. A maximum CDF gap under 5% sounds like nothing. Here is the trouble: multiply every claim by ten and KS does not change, while <span class="math inline">\(W_1\)</span> multiplies by ten. KS lives on the probability scale — it reports the largest gap between the two CDFs and does not care whether that gap sits at $5,000 or $5 million. <span class="math inline">\(W_1\)</span> lives on the outcome scale, where premiums and deductibles do. An insurance company mostly needs the outcome scale.</p>
+<p>FIG. 03 plots the gap between the two quantile curves, rank by rank. The shaded area approximates <span class="math inline">\(W_1\)</span> — the drawing evaluates the step functions on a 2,000-point rank grid, which lands within a tenth of a percent of the exact sorted-sample value — so this figure is the transport bill, itemized.</p>
+<div id="18" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>FIG. 03 plotting code</summary>
+<pre class="julia cell-code"><code># step quantile (inverse ECDF), the same convention wasserstein uses internally
+stepq(c) = (s = sort(c); n = length(s); u -&gt; s[clamp(ceil(Int, u * n), 1, n)])
+Q_current, Q_prior = stepq(claims_current), stepq(claims_prior)
+us = range(0.00025, 0.99975; length = 2000)
+gap = [Q_current(u) - Q_prior(u) for u in us]
+share_above(q) = sum(abs.(gap[us .&gt; q])) / sum(abs.(gap))
+
+let
+    f = Figure(size = (860, 420))
+    ax = Axis(f[1, 1],
+        title = "FIG. 03 — WHERE THE MOVE LIVES",
+        xlabel = "rank u (share of claimants below)", ylabel = "quantile gap, \$ thousands")
+    band!(ax, us, zeros(length(us)), gap ./ 1000; color = (CF_AMBER, 0.55))
+    lines!(ax, us, gap ./ 1000; color = CF_INK)
+    vlines!(ax, [0.90]; color = CF_RED, linestyle = :dash, linewidth = 1.2)
+    text!(ax, 0.88, maximum(gap) / 1000 * 0.97;
+        text = @sprintf("%.0f%% of the transport\nlies right of u = 0.90", 100 * share_above(0.90)),
+        align = (:right, :top), color = CF_RED, fontsize = 12)
+    text!(ax, 0.06, maximum(gap) / 1000 * 0.55;
+        text = "shaded area = W₁ ≈ " * usd(w1) * " per claimant",
+        align = (:left, :top), color = CF_INK, fontsize = 12)
+    f
+end</code></pre>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-10-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>About 65% of the transport went to the top decile of claimants, and 18% to the top percentile alone. The book didn’t really drift. Its tail did.</p>
+<section id="grading-the-model-with-the-same-ruler" class="level3">
+<h3 class="anchored" data-anchor-id="grading-the-model-with-the-same-ruler">Grading the model with the same ruler</h3>
+<p><code>wasserstein</code> accepts distributions as well as samples, in any combination. That makes it a goodness-of-fit measure with units: fit a candidate model and ask by how many dollars per claimant it misplaces the book.</p>
+<div id="20" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>candidates = ["LogNormal" =&gt; LogNormal, "Gamma" =&gt; Gamma, "Weibull" =&gt; Weibull]
+DataFrame(map(candidates) do (name, D)
+    law = fit_mle(D, claims_current)
+    (model = name, W₁_misfit = usd(wasserstein(law, claims_current)), model_mean = usd(mean(law)))
+end)</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div><div style="float: left;"><span>3×3 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
+<table class="data-frame caption-top table table-sm table-striped small">
+<thead>
+<tr class="columnLabelRow header">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">model</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">W₁_misfit</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">model_mean</th>
+</tr>
+<tr class="columnLabelRow even">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String">String</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String">String</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String">String</th>
+</tr>
+</thead>
+<tbody>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">1</td>
+<td style="text-align: left;">LogNormal</td>
+<td style="text-align: left;">$20,039</td>
+<td style="text-align: left;">$141,428</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">2</td>
+<td style="text-align: left;">Gamma</td>
+<td style="text-align: left;">$45,909</td>
+<td style="text-align: left;">$151,514</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">3</td>
+<td style="text-align: left;">Weibull</td>
+<td style="text-align: left;">$38,741</td>
+<td style="text-align: left;">$148,188</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p>The lognormal is the least wrong of the three, by about a factor of two. Two cautions before a number like that goes into a report. It is an in-sample ranking — the same claims fit each model and then graded it, which flatters every candidate; on a real book, grade on claims the fit never saw. And none of the three is <em>right</em> — the data came from a mixture. “All models are wrong” is where that conversation usually ends. A distance in dollars is how you continue it: wrong by how much, and compared to what? Compared to this: the best candidate misses the data by $20,039 per claimant, which is the same size as the year-over-year move we just measured. Our model error and our drift are comparable. File that away; it comes back in <a href="../../posts/optimal-transport-capital/index.html">the capital post</a>.</p>
+<div id="22" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>fit_prior = fit_mle(LogNormal, claims_prior)
+fit_current = fit_mle(LogNormal, claims_current)
+basis_move = wasserstein(fit_prior, fit_current)
+scale_trend = exp(fit_current.μ - fit_prior.μ) - 1
+println("fitted prior:   LogNormal(μ = ", @sprintf("%.3f", fit_prior.μ), ", σ = ", @sprintf("%.3f", fit_prior.σ), ")")
+println("fitted current: LogNormal(μ = ", @sprintf("%.3f", fit_current.μ), ", σ = ", @sprintf("%.3f", fit_current.σ), ")")
+println("W₁ between fitted bases = ", usd(basis_move), "; implied scale trend = ", @sprintf("%.1f%%", 100scale_trend))</code></pre>
+<div class="cell-output cell-output-stdout">
+<pre><code>fitted prior:   LogNormal(μ = 11.155, σ = 1.036)
+fitted current: LogNormal(μ = 11.262, σ = 1.094)
+W₁ between fitted bases = $21,776; implied scale trend = 11.2%</code></pre>
+</div>
+</div>
+<p>Fitting both years also gives the drift a parametric summary. The scale grew 11.2% — more than the 8.5% trend we planted, because the fit also absorbs the shift toward catastrophic claims — and <span class="math inline">\(\sigma\)</span> widened from 1.036 to 1.094. Two numbers, one for level and one for shape. Keep them; the stress section is built from them.</p>
+</section>
+</section>
+<section id="real-or-noise" class="level2">
+<h2 class="anchored" data-anchor-id="real-or-noise">Real, or noise?</h2>
+<p>Here is an awkward fact about measuring this distance between two finite samples: the measurement is biased upward. Draw two samples from the <em>same</em> distribution and the distance between them is not zero — sorting lines up the accidents of sampling along with the signal, and with heavy-tailed claims those accidents are large. So a raw $25,530 means nothing until we know what distance pure noise would produce.</p>
+<p>The toolkit deliberately ships no drift-test function. Deciding whether a move is real involves a false-alarm rate, a materiality threshold, and — in a moment — a prior, and those judgment calls belong in your code, stated out loud, not behind a <code>significant::Bool</code> in somebody’s library. So we build the check ourselves, in two passes: a quick screen, then the real answer.</p>
+<p>The screen is a permutation test, and it fits in ten lines. Pool the two years, deal the pooled claims into two random piles, measure the distance, repeat two thousand times: that is what “no drift” looks like at our sample sizes. We put the noise floor at the 95th percentile of those re-splits — a 5% false-alarm rate, our choice, in our code — and we also hand the screen a control it <em>should</em> wave through: the current year split into its first and second halves, which share one law by construction. Call that a <em>simulated</em> null — our draws are exchangeable by design. A real file split mid-year could hide seasonality, enrollment shifts, or trend inside the supposed null, one more reason the aside at the end of this section exists.</p>
+<div id="24" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>function drift_permutation(a, b; nperm = 2000, level = 0.95, rng)
+    observed = wasserstein(a, b)
+    pool, na = vcat(a, b), length(a)
+    resplit = map(1:nperm) do _
+        s = shuffle(rng, pool)
+        wasserstein(view(s, 1:na), view(s, na+1:lastindex(s)))
+    end
+    (; observed, threshold = quantile(resplit, level),   # threshold = the noise floor
+        pvalue = (count(&gt;=(observed), resplit) + 1) / (nperm + 1), resplit)
+end
+
+half1, half2 = claims_current[1:888], claims_current[889:end]
+screen_year = drift_permutation(claims_prior, claims_current; rng = Xoshiro(42))
+screen_half = drift_permutation(half1, half2; rng = Xoshiro(43))
+
+println("prior vs current:  distance = ", usd(screen_year.observed),
+    "   floor = ", usd(screen_year.threshold), "   p ≈ ", @sprintf("%.4f", screen_year.pvalue))
+println("half vs half:      distance = ", usd(screen_half.observed),
+    "   floor = ", usd(screen_half.threshold), "   p ≈ ", @sprintf("%.4f", screen_half.pvalue))</code></pre>
+<div class="cell-output cell-output-stdout">
+<pre><code>prior vs current:  distance = $25,530   floor = $16,116   p ≈ 0.0005
+half vs half:      distance = $11,777   floor = $24,511   p ≈ 0.6197</code></pre>
+</div>
+</div>
+<p>The year-over-year move clears its floor with room to spare — none of the two thousand re-splits came close. The halves sit $11,777 apart, which sounds alarming (it is half the size of the real move!) and is exactly what shuffling produces on its own. Anyone eyeballing raw distances would have declared a mid-year severity emergency. FIG. 04 shows both comparisons against their nulls.</p>
+<div id="26" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>FIG. 04 plotting code</summary>
+<pre class="julia cell-code"><code>let
+    f = Figure(size = (900, 380))
+    for (i, (scr, ttl)) in enumerate([
+        (screen_year, "PRIOR VS CURRENT YEAR"),
+        (screen_half, "FIRST VS SECOND HALF, CURRENT YEAR")])
+        ax = Axis(f[1, i], title = ttl, xlabel = "W₁ under random re-splits, \$ thousands",
+            ylabel = i == 1 ? "count" : "")
+        hist!(ax, scr.resplit ./ 1000; bins = 36, color = (CF_BLUE, 0.55))
+        vlines!(ax, [scr.threshold / 1000]; color = CF_AMBER, linestyle = :dash, linewidth = 2)
+        vlines!(ax, [scr.observed / 1000]; color = CF_RED, linewidth = 2.5)
+        text!(ax, scr.observed / 1000, 0.0; text = " observed", color = CF_RED,
+            align = (:left, :bottom), fontsize = 11, rotation = π / 2)
+    end
+    Label(f[0, :], "FIG. 04 — DRIFT VS THE PERMUTATION NULL (red = observed, amber = noise floor)";
+        font = :bold, fontsize = 15, color = CF_INK, halign = :left)
+    f
+end</code></pre>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-14-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<section id="how-big-and-why" class="level3">
+<h3 class="anchored" data-anchor-id="how-big-and-why">How big, and why?</h3>
+<p>The screen answers exactly one question — could this be nothing? — and for the year-over-year move the answer is no. The meeting does not adjourn there, because the committee question is different: how big is the drift, what is driving it, and is it past the point where we reprice? That is a question about effect size with uncertainty, and the honest way to answer it is to write down a generative story for the claims and condition on the data.</p>
+<p>Ours is short. Each year’s claims are lognormal — the same lens the pricing basis uses — with a shared baseline location, a drift <span class="math inline">\(\delta\)</span> between the years (so <span class="math inline">\(e^\delta - 1\)</span> is the severity trend), and each year its own dispersion. The priors are wide, but they are in the units of this book, and they are printed in the model rather than defaulted somewhere out of sight. Then we push every posterior draw through the same <code>wasserstein</code> verb as before — only now between <em>fitted laws</em> rather than raw samples. That replaces the raw sample-to-sample distance with posterior inference about the two latent lognormal lenses: parameter uncertainty is integrated, instead of every sampling accident being sorted in as if it were signal. It softens, rather than solves, the bias problem this section opened with — the statement is about the fitted lenses, not the true laws, and it is only as good as the lens. The aside below returns to that.</p>
+<div id="28" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>using Turing, Logging
+Turing.setprogress!(false)
+
+@model function severity_drift(x1, x2)
+    μ  ~ Normal(log(60_000), 1)                  # baseline log-severity location
+    δ  ~ Normal(0, 0.25)                         # location drift: e^δ − 1 ≈ severity trend
+    σ1 ~ truncated(Normal(1.0, 0.4); lower = 0)  # prior-year dispersion
+    σ2 ~ truncated(Normal(1.0, 0.4); lower = 0)  # current-year dispersion
+    x1 ~ filldist(LogNormal(μ, σ1), length(x1))
+    x2 ~ filldist(LogNormal(μ + δ, σ2), length(x2))
+end
+
+function drift_posterior(x1, x2; rng, ndraws = 1000)
+    chain = with_logger(NullLogger()) do
+        sample(rng, severity_drift(x1, x2), NUTS(), ndraws)
+    end
+    μs, δs = vec(collect(chain[@varname(μ)])), vec(collect(chain[@varname(δ)]))
+    σ1s, σ2s = vec(collect(chain[@varname(σ1)])), vec(collect(chain[@varname(σ2)]))
+    W = [wasserstein(LogNormal(m, s1), LogNormal(m + d, s2))
+         for (m, d, s1, s2) in zip(μs, δs, σ1s, σ2s)]
+    (; W, trend = exp.(δs) .- 1, widen = σ2s .- σ1s)
+end
+
+post_year = drift_posterior(claims_prior, claims_current; rng = Xoshiro(46))
+post_half = drift_posterior(half1, half2; rng = Xoshiro(47))</code></pre>
+</div>
+<div id="30" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>band(v, fmt) = fmt(quantile(v, 0.5)) * "  [" * fmt(quantile(v, 0.05)) * ", " * fmt(quantile(v, 0.95)) * "]"
+DataFrame(
+    quantity = ["drift between laws (W₁)", "severity trend (e^δ − 1)", "dispersion change (σ₂ − σ₁)", "P(drift &gt; \$10,000)"],
+    var"prior vs current" = [band(post_year.W, usd), band(post_year.trend, pct1),
+        band(post_year.widen, x -&gt; @sprintf("%+.3f", x)), @sprintf("%.2f", mean(post_year.W .&gt; 10_000))],
+    var"halves (simulated null)" = [band(post_half.W, usd), band(post_half.trend, pct1),
+        band(post_half.widen, x -&gt; @sprintf("%+.3f", x)), @sprintf("%.2f", mean(post_half.W .&gt; 10_000))],
+)</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div><div style="float: left;"><span>4×3 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
+<table class="data-frame caption-top table table-sm table-striped small">
+<thead>
+<tr class="columnLabelRow header">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">quantity</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">prior vs current</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">halves (simulated null)</th>
+</tr>
+<tr class="columnLabelRow even">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String">String</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String">String</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String">String</th>
+</tr>
+</thead>
+<tbody>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">1</td>
+<td style="text-align: left;">drift between laws (W₁)</td>
+<td style="text-align: left;">$21,806 [$11,892, $31,726]</td>
+<td style="text-align: left;">$7,977 [$2,045, $20,962]</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">2</td>
+<td style="text-align: left;">severity trend (e^δ − 1)</td>
+<td style="text-align: left;">+11.1% [+4.9%, +17.9%]</td>
+<td style="text-align: left;">+3.3% [-4.8%, +12.0%]</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">3</td>
+<td style="text-align: left;">dispersion change (σ₂ − σ₁)</td>
+<td style="text-align: left;">+0.056 [+0.013, +0.098]</td>
+<td style="text-align: left;">+0.010 [-0.051, +0.067]</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">4</td>
+<td style="text-align: left;">P(drift &gt; $10,000)</td>
+<td style="text-align: left;">0.97</td>
+<td style="text-align: left;">0.38</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p>Read the first column of results top to bottom. The drift between laws is $21,806, with a 90% band that stays well away from zero, and the posterior puts 0.97 probability on the drift exceeding a $10,000-per-claimant repricing trigger — a materiality line we chose out loud, the same way the screen’s 5% was chosen. Notice the median lands almost exactly on the $21,776 distance between the two point-fitted bases: the model is doing the same fit, but carrying its uncertainty honestly. And it says <em>why</em> the book moved, which no distance alone can: a severity trend near +11% <em>and</em> a widening of the dispersion, each with an interval clear of zero. Trend and shape, both real — exactly the two ingredients the stress section reuses next.</p>
+<p>The halves column is the control, and it teaches this section’s last lesson. Both components straddle zero: the model finds no direction to the mid-year difference, which is the right answer. But the distance row is <em>not</em> zero — it cannot be, because a distance is nonnegative, so even pure parameter wiggle keeps its posterior positive. That is not a flaw; it is a reminder to read the decomposition and the materiality probability (0.38 here, against 0.97 for the real move) rather than staring at the distance alone. FIG. 05 draws both posteriors against the trigger.</p>
+<div id="32" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>FIG. 05 plotting code</summary>
+<pre class="julia cell-code"><code>let
+    f = Figure(size = (860, 400))
+    ax = Axis(f[1, 1],
+        title = "FIG. 05 — HOW BIG IS THE DRIFT? TWO POSTERIORS",
+        xlabel = "drift between fitted laws (W₁), \$ thousands", ylabel = "posterior density")
+    wmax = maximum(vcat(post_year.W, post_half.W)) / 1000
+    bnd = (0, 2wmax)   # a distance cannot be negative; far upper bound avoids edge artifacts
+    density!(ax, post_half.W ./ 1000; color = (CF_BLUE, 0.40), boundary = bnd, label = "halves (simulated null)")
+    density!(ax, post_year.W ./ 1000; color = (CF_RED, 0.40), boundary = bnd, label = "prior vs current year")
+    xlims!(ax, -0.5, 1.06wmax)
+    vlines!(ax, [10]; color = CF_INK_SOFT, linestyle = :dash, linewidth = 1.4)
+    text!(ax, 10.3, 0.0; text = " repricing trigger \$10k", color = CF_INK_SOFT,
+        align = (:left, :bottom), fontsize = 11, rotation = π / 2)
+    axislegend(ax; position = :rt)
+    f
+end</code></pre>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-17-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<blockquote class="blockquote">
+<p><em>Aside: what the screen buys, and what the posterior buys.</em> The screen’s p ≈ 0.0005 is the probability of a distance this large <em>given that nothing changed</em>. It is not the probability that something changed — no amount of squinting converts one into the other — and with a big enough book, immaterial drift will eventually earn a tiny p-value, because “exactly zero drift” is never literally true. So the screen is a calibration: could this be noise? The posterior answers the committee’s question — how big, why, and with what probability past materiality — but every one of its answers is conditional on the generative story. Ours assumes lognormal years and independent, exchangeable claims; calendar trend inside a year, exposure growth, a plan-design change, or the same claimant in both years would mislead the model and the permutation floor alike. Check the story before trusting it — we graded this very lens a section ago and it misses the data by $20,039 per claimant, a misfit the posterior inherits. A misspecified likelihood will confidently describe a book that does not exist. And seed everything, floors and chains alike, so the number in the report is the number a reviewer gets back.</p>
+</blockquote>
+</section>
+</section>
+<section id="if-the-drift-continues" class="level2">
+<h2 class="anchored" data-anchor-id="if-the-drift-continues">If the drift continues</h2>
+<p>The traditional severity stress is a uniform multiplier: claims × 1.15, rerun everything. Its virtue is that you can explain it. Its vice is that it assumes the book inflates proportionally, and this book just told us otherwise. Under proportional inflation the median and the 99th percentile grow by the same factor. Here the median moved +6.7% while the 99th percentile moved +28.8%. The tail is outrunning the body, and a stress that claims to <em>continue</em> the drift ought to keep doing that.</p>
+<p>Transport gives us the stress that does. Take the fitted current basis. Push it one more repricing cycle at the pace we measured — scale up by the fitted 11.2%, widen <span class="math inline">\(\sigma\)</span> by the fitted increment; these are the point versions of exactly the trend-and-widening pair the posterior just put intervals around. Then <code>transportmap</code> returns the map <span class="math inline">\(T\)</span> that carries the base law onto the stressed law while preserving every rank:</p>
+<div id="34" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>Δμ = fit_current.μ - fit_prior.μ
+Δσ = fit_current.σ - fit_prior.σ
+stress_law = LogNormal(fit_current.μ + Δμ, fit_current.σ + Δσ)   # one more cycle of measured drift
+
+T = transportmap(fit_current, stress_law)       # x ↦ Q_stress(F_base(x)): same rank, stressed dollars
+stressed = pushforward(claims_current, T)       # the claimant file, revalued
+unif = mean(stressed) / mean(claims_current)    # uniform factor matching the file's stressed cost exactly
+unif_law = mean(stress_law) / mean(fit_current) # its law-level twin, for the closed-form curves below
+
+println("ground-up mean: ", usd(mean(claims_current)), " → ", usd(mean(stressed)),
+    "  (", pct1(mean(stressed) / mean(claims_current) - 1), ")")</code></pre>
+<div class="cell-output cell-output-stdout">
+<pre><code>ground-up mean: $151,514 → $181,432  (+19.7%)</code></pre>
+</div>
+</div>
+<p>No claimant changes place in line. Each one is revalued at the stressed law’s quantile for their own rank.<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> That means you can audit the stress claim by claim:</p>
+<div id="36" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>let s = sort(claims_current), n = length(s)
+    rows = map([(0.10, "p10"), (0.50, "median"), (0.90, "p90"), (0.99, "p99"), (1.00, "largest")]) do (p, nm)
+        x = s[clamp(round(Int, p * n), 1, n)]
+        (rank = nm, base = usd(x), stressed = usd(T(x)), change = pct1(T(x) / x - 1))
+    end
+    DataFrame(rows)
+end</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div><div style="float: left;"><span>5×4 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
+<table class="data-frame caption-top table table-sm table-striped small">
+<thead>
+<tr class="columnLabelRow header">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">rank</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">base</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">stressed</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">change</th>
+</tr>
+<tr class="columnLabelRow even">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String">String</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String">String</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String">String</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String">String</th>
+</tr>
+</thead>
+<tbody>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">1</td>
+<td style="text-align: left;">p10</td>
+<td style="text-align: left;">$20,488</td>
+<td style="text-align: left;">$21,245</td>
+<td style="text-align: left;">+3.7%</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">2</td>
+<td style="text-align: left;">median</td>
+<td style="text-align: left;">$71,291</td>
+<td style="text-align: left;">$78,913</td>
+<td style="text-align: left;">+10.7%</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">3</td>
+<td style="text-align: left;">p90</td>
+<td style="text-align: left;">$337,148</td>
+<td style="text-align: left;">$404,835</td>
+<td style="text-align: left;">+20.1%</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">4</td>
+<td style="text-align: left;">p99</td>
+<td style="text-align: left;">$1,312,957</td>
+<td style="text-align: left;">$1,692,902</td>
+<td style="text-align: left;">+28.9%</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">5</td>
+<td style="text-align: left;">largest</td>
+<td style="text-align: left;">$2,685,940</td>
+<td style="text-align: left;">$3,595,490</td>
+<td style="text-align: left;">+33.9%</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p>Read down the last column. The multiplier climbs with the rank — a few percent at the 10th percentile, a third at the top — because the drift we measured included tail-thickening, and a rank-preserving map is the only honest way to continue that. FIG. 06 draws the map as the multiplier it applies at each claim size, next to the flat line a uniform factor would draw for the same total ground-up cost.</p>
+<div id="38" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>FIG. 06 plotting code</summary>
+<pre class="julia cell-code"><code>let
+    xs = 10 .^ range(log10(10_000), log10(3.0e6); length = 300)
+    f = Figure(size = (860, 420))
+    ax = Axis(f[1, 1],
+        title = "FIG. 06 — THE STRESS IS A MAP, NOT A MULTIPLIER",
+        xlabel = "base claim size (log scale)", ylabel = "stressed ÷ base claim",
+        xticks = (log10.([10_000, 25_000, 50_000, 100_000, 250_000, 500_000, 1e6, 2.5e6]),
+            ["\$10k", "\$25k", "\$50k", "\$100k", "\$250k", "\$500k", "\$1M", "\$2.5M"]))
+    lines!(ax, log10.(xs), T.(xs) ./ xs; color = CF_RED, linewidth = 2.2,
+        label = "transport map (measured drift, continued)")
+    hlines!(ax, [unif]; color = CF_BLUE, linestyle = :dash, linewidth = 1.8,
+        label = "uniform trend, same ground-up cost")
+    hlines!(ax, [1.0]; color = CF_INK_SOFT, linestyle = :dot, linewidth = 1.2, label = "no stress")
+    let s = sort(claims_current), n = length(s)
+        pts = [s[clamp(round(Int, p * n), 1, n)] for p in (0.10, 0.50, 0.90, 0.99, 1.00)]
+        scatter!(ax, log10.(pts), T.(pts) ./ pts; color = CF_AMBER, markersize = 11)
+    end
+    axislegend(ax; position = :lt)
+    f
+end</code></pre>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-20-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<section id="the-layer-feels-it-first" class="level3">
+<h3 class="anchored" data-anchor-id="the-layer-feels-it-first">The layer feels it first</h3>
+<p>Why fuss about shape? Because an excess layer is a convex function of the claim: the reimbursement is <span class="math inline">\(\max(X - d, 0)\)</span>. Convexity means growth concentrated in the tail hits the layer much harder than the ground-up average suggests — actuaries call this leveraged trend. And it is why the uniform factor loses here: this particular drift spreads claims out around the growing mean, so the transport stress is, in effect, the uniform stress plus a mean-preserving spread, and a convex payoff can only get more expensive under a spread — at every attachment point. That ordering is a fact about <em>this</em> drift, not a law of nature. A drift that raised the mean while tightening the spread would flip it, which is exactly why you measure the shape of the movement instead of assuming one.</p>
+<p>The leverage is easiest to see in the losses the carrier actually incurs. Apply the $250,000 deductible to every claimant and you get the layer’s incurred-loss distribution: mostly zeros, then a thick-tailed remainder. FIG. 07 draws it for all three files — prior year, current year, and the stressed file we just built — as exceedance curves: the share of claimants whose incurred loss reaches at least a given size.</p>
+<div id="40" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>layer_cost(c) = mean(max.(c .- ded, 0))   # expected incurred (ceded) loss per claimant, zeros included
+pierce(c) = mean(c .&gt; ded)                # share of claimants reaching the layer
+
+println("claimants reaching the layer:  prior ", @sprintf("%.1f%%", 100pierce(claims_prior)),
+    "   current ", @sprintf("%.1f%%", 100pierce(claims_current)),
+    "   stressed ", @sprintf("%.1f%%", 100pierce(stressed)))
+println("incurred loss per claimant:    prior ", usd(layer_cost(claims_prior)),
+    "   current ", usd(layer_cost(claims_current)),
+    "   stressed ", usd(layer_cost(stressed)))</code></pre>
+<div class="cell-output cell-output-stdout">
+<pre><code>claimants reaching the layer:  prior 10.4%   current 13.8%   stressed 16.8%
+incurred loss per claimant:    prior $32,495   current $50,511   stressed $72,673</code></pre>
+</div>
+</div>
+<div id="42" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>FIG. 07 plotting code</summary>
+<pre class="julia cell-code"><code>let
+    xs = 10 .^ range(log10(5_000), log10(3.5e6); length = 400)
+    exceed(c) = [100 * mean(max.(c .- ded, 0) .&gt;= x) for x in xs]
+    f = Figure(size = (860, 420))
+    ax = Axis(f[1, 1],
+        title = "FIG. 07 — INCURRED LOSSES: WHAT THE LAYER ABSORBS",
+        xlabel = "incurred (ceded) loss per claimant (log scale)",
+        ylabel = "share of claimants incurring ≥ x, %",
+        xticks = (log10.([5_000, 25_000, 100_000, 250_000, 1e6, 3e6]),
+            ["\$5k", "\$25k", "\$100k", "\$250k", "\$1M", "\$3M"]))
+    lines!(ax, log10.(xs), exceed(claims_prior); color = CF_BLUE, linewidth = 2.2, label = "prior year")
+    lines!(ax, log10.(xs), exceed(claims_current); color = CF_RED, linewidth = 2.2, label = "current year")
+    lines!(ax, log10.(xs), exceed(stressed); color = CF_AMBER, linewidth = 2.2,
+        label = "stressed (drift continued)")
+    axislegend(ax; position = :rt)
+    f
+end</code></pre>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-22-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Read the realized drift first — the move from the prior year to the current one, before any stress. Ground-up, the book moved +20.3%. At the layer, incurred loss per claimant moved +55.4%: the share of claimants reaching the layer rose from 10.4% to 13.8%, and the average excess among those who reached it grew as well. The drift did not wait for our stress to show leverage; the stress just continues the pattern. On the claimant file:</p>
+<div id="44" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>println("per-claimant layer cost @ \$250k deductible")
+println("  base:            ", usd(layer_cost(claims_current)))
+println("  uniform stress:  ", usd(layer_cost(claims_current .* unif)),
+    "  (", pct1(layer_cost(claims_current .* unif) / layer_cost(claims_current) - 1), ")")
+println("  transport stress:", usd(layer_cost(stressed)),
+    "  (", pct1(layer_cost(stressed) / layer_cost(claims_current) - 1), ")")</code></pre>
+<div class="cell-output cell-output-stdout">
+<pre><code>per-claimant layer cost @ $250k deductible
+  base:            $50,511
+  uniform stress:  $68,158  (+34.9%)
+  transport stress:$72,673  (+43.9%)</code></pre>
+</div>
+</div>
+<p>Both stresses cost the same +19.7% ground-up on the file — that is forced, because we calibrated the uniform factor to the transport stress dollar for dollar. The transport stress still prices the layer up +43.9% against the uniform stress’s +34.9%, and the gap widens as the layer rises. FIG. 08 makes the comparison one step cleaner — law against law: the fitted basis, its transported stress, and a uniform factor matched to the same <em>law-level</em> ground-up cost of +18.6%, all through the exact lognormal formula for expected excess cost, so the curves carry no simulation noise and no model misfit.</p>
+<div id="46" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>FIG. 08 plotting code</summary>
+<pre class="julia cell-code"><code># E[(X − a)⁺] for X ~ LogNormal(μ, σ), closed form
+excess_cost(law::LogNormal, a) =
+    mean(law) * cdf(Normal(), (law.μ + law.σ^2 - log(a)) / law.σ) -
+    a * (1 - cdf(Normal(), (log(a) - law.μ) / law.σ))
+
+let
+    uniform_law = LogNormal(fit_current.μ + log(unif_law), fit_current.σ)
+    as = 10 .^ range(log10(50_000), log10(2.0e6); length = 220)
+    trend(stressed_law) = [100 * (excess_cost(stressed_law, a) / excess_cost(fit_current, a) - 1) for a in as]
+    f = Figure(size = (860, 430))
+    ax = Axis(f[1, 1],
+        title = "FIG. 08 — LEVERAGED TREND BY ATTACHMENT POINT",
+        xlabel = "attachment point (log scale)", ylabel = "layer cost trend, %",
+        xticks = (log10.([50_000, 100_000, 250_000, 500_000, 1e6, 2e6]),
+            ["\$50k", "\$100k", "\$250k", "\$500k", "\$1M", "\$2M"]))
+    lines!(ax, log10.(as), trend(stress_law); color = CF_RED, linewidth = 2.2,
+        label = "transport stress (drift, continued)")
+    lines!(ax, log10.(as), trend(uniform_law); color = CF_BLUE, linewidth = 2.0,
+        label = "uniform stress, same ground-up cost")
+    hlines!(ax, [100 * (unif_law - 1)]; color = CF_INK_SOFT, linestyle = :dash, linewidth = 1.4,
+        label = "ground-up trend")
+    vlines!(ax, [log10(ded)]; color = CF_INK_SOFT, linestyle = :dot, linewidth = 1.0)
+    axislegend(ax; position = :lt)
+    f
+end</code></pre>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-24-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>At a $1M attachment the transport stress says layer costs rise about 102%; the uniform factor says 60%. Same ground-up cost, very different reinsurance conversation. And when the auditor asks what exactly the stress did to each claim, the answer is one sentence: every claimant kept their rank and moved to the stressed distribution’s quantile.</p>
+</section>
+</section>
+<section id="how-wrong-can-we-afford-to-be" class="level2">
+<h2 class="anchored" data-anchor-id="how-wrong-can-we-afford-to-be">How wrong can we afford to be?</h2>
+<p>That was the fourth question on the whiteboard, and it is the expensive one. Put two of our measurements side by side. The fitted basis misses the data it was fitted to by about $20,039 per claimant. One year of real drift moved the basis $21,776 per claimant. Model error and drift are the same size — whatever loss model sits under the capital number is wrong by roughly a year’s worth of movement, and we just measured what a year’s worth of movement is.</p>
+<p>The fifth transport function, <code>robustvalue</code>, turns that measurement into a capital charge: the exact worst value of a tail measure over <em>every</em> distribution within a chosen transport distance of yours. There is a clean theorem in it, a closed form for CTE, and a genuinely uncomfortable factor of <span class="math inline">\((1-\alpha)^{-1/2}\)</span> — along with the part no theorem does for you, which is choosing the radius and deciding whether the truth is inside the ball. That story deserves more than a section at the end of a long post, so it runs the same book through an aggregate loss model in a post of its own: <a href="../../posts/optimal-transport-capital/index.html"><em>How Much Capital Does Model Error Cost?</em></a></p>
+</section>
+<section id="what-this-doesnt-do" class="level2">
+<h2 class="anchored" data-anchor-id="what-this-doesnt-do">What this doesn’t do</h2>
+<p>Everything above is sorting and quantile arithmetic, explainable line by line — and, because every random draw is seeded, reproducible to the last digit. (Reproducible is the honest word, not deterministic: the permutation floor, the posterior chains, the simulated book, and the aggregate simulation behind FIG. 02 are Monte Carlo. Seeds make them repeatable, which is the property an audit actually needs.) Two limits are worth stating plainly.</p>
+<p>Ties and atoms need a convention. These functions use the inverse empirical CDF — a step function — which is the same convention <code>VaR</code> and <code>CTE</code> use on samples, so the transport tools and the risk measures agree at ties. A tool that interpolates quantiles will give slightly different numbers on discrete data. Neither is wrong; only one matches your risk measures.</p>
+<p>And it is all strictly one-dimensional. Joint risks — mortality with lapse, equity with rates, several lines moving together — break the sorting trick, and genuinely multivariate transport needs an actual solver. The easy exactness of this post ends where copulas begin.</p>
+</section>
+<section id="the-meeting-revisited" class="level2">
+<h2 class="anchored" data-anchor-id="the-meeting-revisited">The meeting, revisited</h2>
+<p>Back to the questions, now with answers attached. The book moved $25,530 per claimant, about 65% of it in the top decile — the tail moved, not the book. The move is real twice over: it clears a $16,116 permutation floor, and the posterior puts 0.97 probability on drift past the $10,000 repricing trigger — a trend and a widening, each credibly nonzero — while a mid-year wobble half its size showed neither a trend nor a widening: noise, correctly identified. If the drift continues one more cycle, the $250k layer costs +43.9% more on +19.7% ground-up trend, where a uniform multiplier with the same ground-up cost would have booked +34.9%. The fourth question — how wrong can the model be before the capital number is — has an exact answer with an unpleasant multiplier inside it, and it is <a href="../../posts/optimal-transport-capital/index.html">the next post</a>.</p>
+<p>None of it required a solver, and the only priors were the four printed in the model. It required sorted lists, clear questions, and a handful of choices made in the open: a 5% screen level, a $10,000 materiality line, wide priors in the book’s own units, a lognormal basis, a stress that continues the measured drift rather than assuming a shape for it. The sorting is the easy part. The questions and the choices are still yours — and if you want to trust these tools before pointing them at a real book, do what this post did: build a book where you already know the answer, and make them find it.</p>
+</section>
+<section id="further-reading" class="level2">
+<h2 class="anchored" data-anchor-id="further-reading">Further reading</h2>
+<ul>
+<li>Arthur Charpentier (2026), <a href="https://hal.science/hal-05684645"><em>Optimal Transport for Actuarial Science</em></a> ⟨hal-05684645⟩ — a survey of transport ideas across actuarial problems; the package documentation follows it.</li>
+<li><a href="https://juliaactuary.github.io/ActuaryUtilities.jl/stable/risk_measures/">ActuaryUtilities.jl risk measures documentation</a> — the API used here, plus the worked drift-check recipes (a permutation screen and a generative model) that this post’s middle section follows.</li>
+<li>Richard McElreath (2020), <a href="https://xcelab.net/rm/statistical-rethinking/"><em>Statistical Rethinking</em></a> (2nd ed.) — the habit of mind behind the drift model: write the generative story, condition on the data, and read effect sizes instead of verdicts.</li>
+<li>Gabriel Peyré &amp; Marco Cuturi (2019), <a href="https://arxiv.org/abs/1803.00567"><em>Computational Optimal Transport</em></a> — what transport looks like beyond one dimension, where the solver comes back.</li>
+<li><a href="../../posts/optimal-transport-capital/index.html"><em>How Much Capital Does Model Error Cost?</em></a> — the sequel: <code>robustvalue</code>, Wasserstein balls around your loss model, and why deep-tail promises multiply the price of model error.</li>
+<li><a href="../../posts/bayes-vs-limited-fluctuation/index.html">Bayesian vs Limited Fluctuation Experience Analysis</a> — the same underlying problem, separating signal from noise in experience data, with different machinery.</li>
+</ul>
+</section>
+<section id="footnotes-and-colophon" class="level2">
+<h2 class="anchored" data-anchor-id="footnotes-and-colophon">Footnotes and colophon</h2>
+<p>Everything on this page — data, fits, tests, stresses, figures — comes from the code shown, run at render time, in Julia with <a href="https://github.com/JuliaActuary/ActuaryUtilities.jl">ActuaryUtilities.jl</a>, <a href="https://github.com/JuliaStats/Distributions.jl">Distributions.jl</a>, <a href="https://turinglang.org">Turing.jl</a>, and <a href="https://makie.org">Makie.jl</a>. The whole pipeline — four thousand permutation re-splits, two NUTS posteriors, eighty thousand simulated aggregate years — runs in well under a minute on a laptop. The transport calls themselves are sorting.</p>
+<p><em>Disclosure: this post was written by AI (Anthropic’s Claude) under the direction of and with review by Alec Loudenback.</em></p>
+
+
+</section>
+
+
+<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>These aggregates come from the true mixture laws we just wrote down, so they are the book’s own arithmetic, not a model’s. The <a href="../../posts/optimal-transport-capital/index.html">capital post</a> rebuilds the same picture through a fitted lognormal basis — the model’s version of the book — and gets visibly smaller numbers. That gap is the model error this post measures per claimant a few sections from now.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>Why build the map from the <em>fitted</em> law rather than straight from the sample? <code>transportmap(claims_current, stress_law)</code> is perfectly legal code, but it would quietly iron the sample’s quirks onto the smooth target — folding model misfit into what is supposed to be a pure stress. Fitted law to stressed law keeps the two kinds of wrongness separate, which is the whole reason we measured them separately.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/JuliaActuary\.org");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

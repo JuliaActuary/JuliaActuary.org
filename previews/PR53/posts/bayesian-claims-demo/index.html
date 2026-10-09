@@ -1,0 +1,2715 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.16">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.">
+
+<title>Bayesian Markov-Chain-Monte-Carlo and Claims Data – JuliaActuary</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../..//assets/favicon.ico" rel="icon">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-a0731b9a3a5d496010872d775e5d9bc3.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-98ac2d5361ef6f18cc0525d38bedc462.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&amp;family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/highlight/styles/github.min.css">
+<script src="../../assets/highlight/highlight.min.js"></script>
+<script src="../../assets/highlight/languages/julia.min.js"></script>
+<script src="../../assets/highlight/languages/julia-repl.min.js"></script>
+<script src="../../assets/highlight/languages/python.min.js"></script>
+<script src="../../assets/highlight/languages/r.min.js"></script>
+<script>hljs.highlightAll();</script>
+<script data-goatcounter="https://juliaactuary.goatcounter.com/count" async="" src="//gc.zgo.at/count.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed fullcontent quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../assets/logos/android-chrome-512x512.png" alt="JuliaActuary Logo" class="navbar-logo light-content">
+    <img src="../../assets/logos/android-chrome-512x512.png" alt="JuliaActuary Logo" class="navbar-logo dark-content">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">JuliaActuary</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../packages.html"> 
+<span class="menu-text">Packages</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://docs.juliaactuary.org"> 
+<span class="menu-text">Docs</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://modernfinancialmodeling.com"> 
+<span class="menu-text">Book</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../learn.html"> 
+<span class="menu-text">Learn</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../examples.html"> 
+<span class="menu-text">Examples</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../benchmarks.html"> 
+<span class="menu-text">Benchmarks</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../community.html"> 
+<span class="menu-text">Community</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/JuliaActuary"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="../../all-posts.xml"> <i class="bi bi-rss" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Bayesian Markov-Chain-Monte-Carlo and Claims Data</h1>
+                  <div>
+        <div class="description">
+          JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">mortalitytables</div>
+                <div class="quarto-category">exposures</div>
+                <div class="quarto-category">experience-analysis</div>
+                <div class="quarto-category">dataframes</div>
+                <div class="quarto-category">tutorial</div>
+                <div class="quarto-category">statistics</div>
+                <div class="quarto-category">bayesian</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content quarto-banner-title-block page-columns page-full" id="quarto-document-content">
+
+
+
+
+
+<div id="4" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>using MortalityTables
+using Turing
+using UUIDs
+using DataFramesMeta
+using MCMCChains
+using CairoMakie
+using LinearAlgebra
+using Pipe
+using StatsFuns
+
+include(joinpath(@__DIR__, "..", "..", "assets", "themes", "cassette_futurism.jl"))
+set_theme!(cassette_futurism_theme())
+
+# Small Makie equivalent of StatsPlots' plot(chain): trace + density per
+# parameter, one row per parameter, chains overlaid in palette colors.
+function chainplot(ch::Chains)
+    params = names(ch, :parameters)
+    nchains = size(ch, 3)
+    fig = Figure(size=(900, 160 * length(params)))
+    for (i, p) in enumerate(params)
+        ax_t = Axis(fig[i, 1]; title=string(p), xlabel="iteration")
+        ax_d = Axis(fig[i, 2]; title="density")
+        for c in 1:nchains
+            col = CASSETTE_PALETTE[mod1(c, length(CASSETTE_PALETTE))]
+            v = vec(Array(ch[:, p, c]))
+            lines!(ax_t, v; color=(col, 0.7), linewidth=0.8)
+            density!(ax_d, v; color=(col, 0.0),
+                strokecolor=col, strokewidth=1.5)
+        end
+    end
+    return fig
+end</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>chainplot (generic function with 1 method)</code></pre>
+</div>
+</div>
+<section id="generating-fake-data" class="level2">
+<h2 class="anchored" data-anchor-id="generating-fake-data">Generating fake data</h2>
+<p>The problem of interest is to look at mortality rates, which are given in terms of exposures (whether or not a life experienced a death in a given year).</p>
+<p>We’ll grab some example rates from an insurance table, which has a “selection” component: When someone enters observation, say at age 50, their mortality is path dependent (so for someone who started being observed at 50 will have a different risk/mortality rate at age 55 than someone who started being observed at 45).</p>
+<p>Addtionally, there may be additional groups of interest, such as: - high/medium/low risk classification - sex - group (e.g.&nbsp;company, data source, etc.) - type of insurance product offered</p>
+<p>The example data will start with only the risk classification above</p>
+<div id="6" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>src = MortalityTables.table("2001 VBT Residual Standard Select and Ultimate - Male Nonsmoker, ANB")</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>MortalityTable (Insured Lives Mortality):
+   Name:
+       2001 VBT Residual Standard Select and Ultimate - Male Nonsmoker, ANB
+   Fields: 
+       (:select, :ultimate, :metadata)
+   Provider:
+       Society of Actuaries
+   mort.SOA.org ID:
+       1118
+   mort.SOA.org link:
+       https://mort.soa.org/ViewTable.aspx?&amp;TableIdentity=1118
+   Description:
+       2001 Valuation Basic Table (VBT) Residual Standard Select and Ultimate Table -  Male Nonsmoker. Basis: Age Nearest Birthday. Minimum Select Age: 0. Maximum Select Age: 99. Minimum Ultimate Age: 25. Maximum Ultimate Age: 120</code></pre>
+</div>
+</div>
+<div id="8" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>n = 10_000
+
+function generate_data_individual(tbl, issue_age=rand(50:55), inforce_years=rand(1:30), risklevel=rand(1:3))
+    # risk_factors will scale the "true" parameter up or down
+    # we observe the assigned risklevel, but not risk_factor
+    risk_factors = [0.7, 1.0, 1.5]
+    rf = risk_factors[risklevel]
+    deaths = rand(inforce_years) .&lt; (tbl.select[issue_age][issue_age.+inforce_years.-1] .* rf)
+
+    endpoint = if sum(deaths) == 0
+        last(inforce_years)
+    else
+        findfirst(deaths)
+    end
+    id = uuid1()
+    map(1:endpoint) do i
+        (
+            issue_age=issue_age,
+            risklevel=risklevel,
+            att_age=issue_age + i - 1,
+            death=deaths[i],
+            id=id,
+        )
+    end
+
+end
+
+exposures = vcat([generate_data_individual(src) for _ in 1:n]...) |&gt; DataFrame</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div><div style="float: left;"><span>109200×5 DataFrame</span></div><div style="float: right; font-style: italic;"><span>109175 rows omitted</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
+<table class="data-frame caption-top table table-sm table-striped small">
+<thead>
+<tr class="columnLabelRow header">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">issue_age</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">risklevel</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">att_age</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">death</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">id</th>
+</tr>
+<tr class="columnLabelRow even">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Bool">Bool</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Base.UUID">Base.UUID</th>
+</tr>
+</thead>
+<tbody>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">1</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">false</td>
+<td style="text-align: left;">fa8de42e-5a49-11f1-813b-a1a80a905a2e</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">2</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">56</td>
+<td style="text-align: right;">false</td>
+<td style="text-align: left;">fa8de42e-5a49-11f1-813b-a1a80a905a2e</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">3</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">57</td>
+<td style="text-align: right;">false</td>
+<td style="text-align: left;">fa8de42e-5a49-11f1-813b-a1a80a905a2e</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">4</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">58</td>
+<td style="text-align: right;">false</td>
+<td style="text-align: left;">fa8de42e-5a49-11f1-813b-a1a80a905a2e</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">5</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">59</td>
+<td style="text-align: right;">false</td>
+<td style="text-align: left;">fa8de42e-5a49-11f1-813b-a1a80a905a2e</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">6</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">60</td>
+<td style="text-align: right;">false</td>
+<td style="text-align: left;">fa8de42e-5a49-11f1-813b-a1a80a905a2e</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">7</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">61</td>
+<td style="text-align: right;">false</td>
+<td style="text-align: left;">fa8de42e-5a49-11f1-813b-a1a80a905a2e</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">8</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">62</td>
+<td style="text-align: right;">false</td>
+<td style="text-align: left;">fa8de42e-5a49-11f1-813b-a1a80a905a2e</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">9</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">false</td>
+<td style="text-align: left;">fa8de42e-5a49-11f1-813b-a1a80a905a2e</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">10</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">64</td>
+<td style="text-align: right;">false</td>
+<td style="text-align: left;">fa8de42e-5a49-11f1-813b-a1a80a905a2e</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">11</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">65</td>
+<td style="text-align: right;">false</td>
+<td style="text-align: left;">fa8de42e-5a49-11f1-813b-a1a80a905a2e</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">12</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">66</td>
+<td style="text-align: right;">false</td>
+<td style="text-align: left;">fa8de42e-5a49-11f1-813b-a1a80a905a2e</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">13</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">67</td>
+<td style="text-align: right;">false</td>
+<td style="text-align: left;">fa8de42e-5a49-11f1-813b-a1a80a905a2e</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">⋮</td>
+<td style="text-align: right;">⋮</td>
+<td style="text-align: right;">⋮</td>
+<td style="text-align: right;">⋮</td>
+<td style="text-align: right;">⋮</td>
+<td style="text-align: left;">⋮</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">109189</td>
+<td style="text-align: right;">51</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">53</td>
+<td style="text-align: right;">false</td>
+<td style="text-align: left;">fa942dcc-5a49-11f1-9429-7b93bbb44c59</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">109190</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">false</td>
+<td style="text-align: left;">fa942dd4-5a49-11f1-86b9-4553439b0ca5</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">109191</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">51</td>
+<td style="text-align: right;">false</td>
+<td style="text-align: left;">fa942dd4-5a49-11f1-86b9-4553439b0ca5</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">109192</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">52</td>
+<td style="text-align: right;">false</td>
+<td style="text-align: left;">fa942dd4-5a49-11f1-86b9-4553439b0ca5</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">109193</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">53</td>
+<td style="text-align: right;">false</td>
+<td style="text-align: left;">fa942dd4-5a49-11f1-86b9-4553439b0ca5</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">109194</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">54</td>
+<td style="text-align: right;">false</td>
+<td style="text-align: left;">fa942dd4-5a49-11f1-86b9-4553439b0ca5</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">109195</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">false</td>
+<td style="text-align: left;">fa942dd4-5a49-11f1-86b9-4553439b0ca5</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">109196</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">56</td>
+<td style="text-align: right;">false</td>
+<td style="text-align: left;">fa942dd4-5a49-11f1-86b9-4553439b0ca5</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">109197</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">57</td>
+<td style="text-align: right;">false</td>
+<td style="text-align: left;">fa942dd4-5a49-11f1-86b9-4553439b0ca5</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">109198</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">false</td>
+<td style="text-align: left;">fa942de8-5a49-11f1-a5e3-8f2a2bfadbfe</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">109199</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">51</td>
+<td style="text-align: right;">false</td>
+<td style="text-align: left;">fa942de8-5a49-11f1-a5e3-8f2a2bfadbfe</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">109200</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">52</td>
+<td style="text-align: right;">false</td>
+<td style="text-align: left;">fa942de8-5a49-11f1-a5e3-8f2a2bfadbfe</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p>Two groupings, one with and without the risk level:</p>
+<div id="10" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>data = combine(groupby(exposures, [:issue_age, :att_age])) do subdf
+    (exposures=nrow(subdf),
+        deaths=sum(subdf.death),
+        fraction=sum(subdf.death) / nrow(subdf))
+end</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div><div style="float: left;"><span>180×5 DataFrame</span></div><div style="float: right; font-style: italic;"><span>155 rows omitted</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
+<table class="data-frame caption-top table table-sm table-striped small">
+<thead>
+<tr class="columnLabelRow header">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">issue_age</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">att_age</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">exposures</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">deaths</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">fraction</th>
+</tr>
+<tr class="columnLabelRow even">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
+</tr>
+</thead>
+<tbody>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">1</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">1643</td>
+<td style="text-align: right;">34</td>
+<td style="text-align: right;">0.0206939</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">2</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">51</td>
+<td style="text-align: right;">1547</td>
+<td style="text-align: right;">31</td>
+<td style="text-align: right;">0.0200388</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">3</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">52</td>
+<td style="text-align: right;">1462</td>
+<td style="text-align: right;">40</td>
+<td style="text-align: right;">0.0273598</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">4</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">53</td>
+<td style="text-align: right;">1380</td>
+<td style="text-align: right;">37</td>
+<td style="text-align: right;">0.0268116</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">5</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">54</td>
+<td style="text-align: right;">1292</td>
+<td style="text-align: right;">25</td>
+<td style="text-align: right;">0.0193498</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">6</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">1196</td>
+<td style="text-align: right;">25</td>
+<td style="text-align: right;">0.020903</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">7</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">56</td>
+<td style="text-align: right;">1117</td>
+<td style="text-align: right;">30</td>
+<td style="text-align: right;">0.0268577</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">8</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">57</td>
+<td style="text-align: right;">1034</td>
+<td style="text-align: right;">29</td>
+<td style="text-align: right;">0.0280464</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">9</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">58</td>
+<td style="text-align: right;">942</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">0.0201699</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">10</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">59</td>
+<td style="text-align: right;">871</td>
+<td style="text-align: right;">28</td>
+<td style="text-align: right;">0.032147</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">11</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">60</td>
+<td style="text-align: right;">800</td>
+<td style="text-align: right;">25</td>
+<td style="text-align: right;">0.03125</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">12</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">61</td>
+<td style="text-align: right;">721</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">0.0110957</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">13</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">62</td>
+<td style="text-align: right;">673</td>
+<td style="text-align: right;">26</td>
+<td style="text-align: right;">0.038633</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">⋮</td>
+<td style="text-align: right;">⋮</td>
+<td style="text-align: right;">⋮</td>
+<td style="text-align: right;">⋮</td>
+<td style="text-align: right;">⋮</td>
+<td style="text-align: right;">⋮</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">169</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">73</td>
+<td style="text-align: right;">209</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">0.0574163</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">170</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">74</td>
+<td style="text-align: right;">168</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">0.0357143</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">171</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">75</td>
+<td style="text-align: right;">142</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">0.0492958</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">172</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">76</td>
+<td style="text-align: right;">105</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">0.0952381</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">173</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">77</td>
+<td style="text-align: right;">68</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">0.0735294</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">174</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">78</td>
+<td style="text-align: right;">51</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">0.0980392</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">175</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">79</td>
+<td style="text-align: right;">41</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.0243902</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">176</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">80</td>
+<td style="text-align: right;">31</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">0.0967742</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">177</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">81</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">0.157895</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">178</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">82</td>
+<td style="text-align: right;">14</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">0.142857</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">179</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">83</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.0</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">180</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">84</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.25</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div id="12" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>data2 = combine(groupby(exposures, [:issue_age, :att_age, :risklevel])) do subdf
+    (exposures=nrow(subdf),
+        deaths=sum(subdf.death),
+        fraction=sum(subdf.death) / nrow(subdf))
+end</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div><div style="float: left;"><span>532×6 DataFrame</span></div><div style="float: right; font-style: italic;"><span>507 rows omitted</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
+<table class="data-frame caption-top table table-sm table-striped small">
+<thead>
+<tr class="columnLabelRow header">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">issue_age</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">att_age</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">risklevel</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">exposures</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">deaths</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">fraction</th>
+</tr>
+<tr class="columnLabelRow even">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
+</tr>
+</thead>
+<tbody>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">1</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">547</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">0.00365631</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">2</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">516</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">0.0193798</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">3</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">580</td>
+<td style="text-align: right;">22</td>
+<td style="text-align: right;">0.037931</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">4</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">51</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">520</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">0.0115385</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">5</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">51</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">493</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">0.0121704</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">6</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">51</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">534</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">0.0355805</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">7</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">52</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">492</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">0.00609756</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">8</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">52</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">470</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">0.0382979</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">9</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">52</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">500</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">0.038</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">10</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">53</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">476</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">0.0168067</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">11</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">53</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">439</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">0.0273349</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">12</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">53</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">465</td>
+<td style="text-align: right;">17</td>
+<td style="text-align: right;">0.0365591</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">13</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">54</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">455</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">0.0241758</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">⋮</td>
+<td style="text-align: right;">⋮</td>
+<td style="text-align: right;">⋮</td>
+<td style="text-align: right;">⋮</td>
+<td style="text-align: right;">⋮</td>
+<td style="text-align: right;">⋮</td>
+<td style="text-align: right;">⋮</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">521</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">80</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.0</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">522</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">81</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">0.166667</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">523</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">81</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.0</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">524</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">81</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.5</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">525</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">82</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.125</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">526</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">82</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.2</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">527</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">82</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.0</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">528</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">83</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.0</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">529</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">83</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.0</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">530</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">83</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.0</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">531</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">84</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.0</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">532</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">84</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.333333</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+<section id="a-single-binomial-parameter-model" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="a-single-binomial-parameter-model">1: A single binomial parameter model</h2>
+<p>Estimate <span class="math inline">\(p\)</span>, the average mortality rate, not accounting for any variation within the population/sample:</p>
+<div id="14" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>@model function mortality(data, deaths)
+    p ~ Beta(1, 1)
+    for i = 1:nrow(data)
+        deaths[i] ~ Binomial(data.exposures[i], p)
+    end
+end
+
+
+m1 = mortality(data, data.deaths)
+
+num_chains = 4</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>4</code></pre>
+</div>
+</div>
+<section id="sampling-from-the-posterior" class="level3 page-columns page-full">
+<h3 class="anchored" data-anchor-id="sampling-from-the-posterior">Sampling from the posterior</h3>
+<p>We use a No-U-Turn-Sampler (NUTS) technique to sample multiple chains at once:</p>
+<div id="16" class="cell page-columns page-full" data-execution_count="1">
+<pre class="julia cell-code"><code>chain = MCMCChains.Chains(sample(m1, NUTS(), 1000))
+
+chainplot(chain)</code></pre>
+<div class="cell-output cell-output-stdout">
+<div class="ansi-escaped-output">
+<pre><span class="ansi-green-fg">Sampling   0%|                                          |  ETA: N/A</span>
+<span class="ansi-cyan-fg ansi-bold">┌ </span><span class="ansi-cyan-fg ansi-bold">Info: </span>Found initial step size
+<span class="ansi-cyan-fg ansi-bold">└ </span>  ϵ = 0.0125
+<span class="ansi-green-fg">Sampling   1%|▎                                         |  ETA: 0:04:59</span>
+<span class="ansi-green-fg">Sampling   1%|▍                                         |  ETA: 0:02:39</span>
+<span class="ansi-green-fg">Sampling   2%|▋                                         |  ETA: 0:01:43</span>
+<span class="ansi-green-fg">Sampling   2%|▉                                         |  ETA: 0:01:19</span>
+<span class="ansi-green-fg">Sampling   3%|█▏                                        |  ETA: 0:01:02</span>
+<span class="ansi-green-fg">Sampling   3%|█▎                                        |  ETA: 0:00:52</span>
+<span class="ansi-green-fg">Sampling   4%|█▌                                        |  ETA: 0:00:44</span>
+<span class="ansi-green-fg">Sampling   4%|█▋                                        |  ETA: 0:00:39</span>
+<span class="ansi-green-fg">Sampling   5%|█▉                                        |  ETA: 0:00:34</span>
+<span class="ansi-green-fg">Sampling   5%|██▏                                       |  ETA: 0:00:31</span>
+<span class="ansi-green-fg">Sampling   6%|██▍                                       |  ETA: 0:00:28</span>
+<span class="ansi-green-fg">Sampling   6%|██▌                                       |  ETA: 0:00:25</span>
+<span class="ansi-green-fg">Sampling   7%|██▊                                       |  ETA: 0:00:23</span>
+<span class="ansi-green-fg">Sampling   7%|███                                       |  ETA: 0:00:22</span>
+<span class="ansi-green-fg">Sampling   8%|███▏                                      |  ETA: 0:00:20</span>
+<span class="ansi-green-fg">Sampling   8%|███▍                                      |  ETA: 0:00:19</span>
+<span class="ansi-green-fg">Sampling   9%|███▋                                      |  ETA: 0:00:18</span>
+<span class="ansi-green-fg">Sampling   9%|███▊                                      |  ETA: 0:00:17</span>
+<span class="ansi-green-fg">Sampling  10%|████                                      |  ETA: 0:00:16</span>
+<span class="ansi-green-fg">Sampling  10%|████▎                                     |  ETA: 0:00:15</span>
+<span class="ansi-green-fg">Sampling  11%|████▍                                     |  ETA: 0:00:14</span>
+<span class="ansi-green-fg">Sampling  11%|████▋                                     |  ETA: 0:00:13</span>
+<span class="ansi-green-fg">Sampling  12%|████▉                                     |  ETA: 0:00:13</span>
+<span class="ansi-green-fg">Sampling  12%|█████                                     |  ETA: 0:00:12</span>
+<span class="ansi-green-fg">Sampling  13%|█████▎                                    |  ETA: 0:00:11</span>
+<span class="ansi-green-fg">Sampling  13%|█████▌                                    |  ETA: 0:00:11</span>
+<span class="ansi-green-fg">Sampling  14%|█████▋                                    |  ETA: 0:00:11</span>
+<span class="ansi-green-fg">Sampling  14%|█████▉                                    |  ETA: 0:00:10</span>
+<span class="ansi-green-fg">Sampling  15%|██████▏                                   |  ETA: 0:00:10</span>
+<span class="ansi-green-fg">Sampling  15%|██████▎                                   |  ETA: 0:00:09</span>
+<span class="ansi-green-fg">Sampling  16%|██████▌                                   |  ETA: 0:00:09</span>
+<span class="ansi-green-fg">Sampling  16%|██████▊                                   |  ETA: 0:00:09</span>
+<span class="ansi-green-fg">Sampling  17%|███████                                   |  ETA: 0:00:08</span>
+<span class="ansi-green-fg">Sampling  17%|███████▏                                  |  ETA: 0:00:08</span>
+<span class="ansi-green-fg">Sampling  18%|███████▍                                  |  ETA: 0:00:08</span>
+<span class="ansi-green-fg">Sampling  18%|███████▌                                  |  ETA: 0:00:08</span>
+<span class="ansi-green-fg">Sampling  19%|███████▊                                  |  ETA: 0:00:07</span>
+<span class="ansi-green-fg">Sampling  19%|████████                                  |  ETA: 0:00:07</span>
+<span class="ansi-green-fg">Sampling  20%|████████▎                                 |  ETA: 0:00:07</span>
+<span class="ansi-green-fg">Sampling  20%|████████▍                                 |  ETA: 0:00:07</span>
+<span class="ansi-green-fg">Sampling  21%|████████▋                                 |  ETA: 0:00:06</span>
+<span class="ansi-green-fg">Sampling  21%|████████▉                                 |  ETA: 0:00:06</span>
+<span class="ansi-green-fg">Sampling  22%|█████████                                 |  ETA: 0:00:06</span>
+<span class="ansi-green-fg">Sampling  22%|█████████▎                                |  ETA: 0:00:06</span>
+<span class="ansi-green-fg">Sampling  23%|█████████▌                                |  ETA: 0:00:06</span>
+<span class="ansi-green-fg">Sampling  23%|█████████▋                                |  ETA: 0:00:06</span>
+<span class="ansi-green-fg">Sampling  24%|█████████▉                                |  ETA: 0:00:05</span>
+<span class="ansi-green-fg">Sampling  24%|██████████▏                               |  ETA: 0:00:05</span>
+<span class="ansi-green-fg">Sampling  25%|██████████▎                               |  ETA: 0:00:05</span>
+<span class="ansi-green-fg">Sampling  25%|██████████▌                               |  ETA: 0:00:05</span>
+<span class="ansi-green-fg">Sampling  26%|██████████▊                               |  ETA: 0:00:05</span>
+<span class="ansi-green-fg">Sampling  26%|██████████▉                               |  ETA: 0:00:05</span>
+<span class="ansi-green-fg">Sampling  27%|███████████▏                              |  ETA: 0:00:05</span>
+<span class="ansi-green-fg">Sampling  27%|███████████▍                              |  ETA: 0:00:05</span>
+<span class="ansi-green-fg">Sampling  28%|███████████▋                              |  ETA: 0:00:04</span>
+<span class="ansi-green-fg">Sampling  28%|███████████▊                              |  ETA: 0:00:04</span>
+<span class="ansi-green-fg">Sampling  29%|████████████                              |  ETA: 0:00:04</span>
+<span class="ansi-green-fg">Sampling  29%|████████████▏                             |  ETA: 0:00:04</span>
+<span class="ansi-green-fg">Sampling  30%|████████████▍                             |  ETA: 0:00:04</span>
+<span class="ansi-green-fg">Sampling  30%|████████████▋                             |  ETA: 0:00:04</span>
+<span class="ansi-green-fg">Sampling  31%|████████████▉                             |  ETA: 0:00:04</span>
+<span class="ansi-green-fg">Sampling  31%|█████████████                             |  ETA: 0:00:04</span>
+<span class="ansi-green-fg">Sampling  32%|█████████████▎                            |  ETA: 0:00:04</span>
+<span class="ansi-green-fg">Sampling  32%|█████████████▌                            |  ETA: 0:00:04</span>
+<span class="ansi-green-fg">Sampling  33%|█████████████▋                            |  ETA: 0:00:03</span>
+<span class="ansi-green-fg">Sampling  33%|█████████████▉                            |  ETA: 0:00:03</span>
+<span class="ansi-green-fg">Sampling  34%|██████████████▏                           |  ETA: 0:00:03</span>
+<span class="ansi-green-fg">Sampling  34%|██████████████▎                           |  ETA: 0:00:03</span>
+<span class="ansi-green-fg">Sampling  35%|██████████████▌                           |  ETA: 0:00:03</span>
+<span class="ansi-green-fg">Sampling  35%|██████████████▊                           |  ETA: 0:00:03</span>
+<span class="ansi-green-fg">Sampling  36%|██████████████▉                           |  ETA: 0:00:03</span>
+<span class="ansi-green-fg">Sampling  36%|███████████████▏                          |  ETA: 0:00:03</span>
+<span class="ansi-green-fg">Sampling  37%|███████████████▍                          |  ETA: 0:00:03</span>
+<span class="ansi-green-fg">Sampling  37%|███████████████▌                          |  ETA: 0:00:03</span>
+<span class="ansi-green-fg">Sampling  38%|███████████████▊                          |  ETA: 0:00:03</span>
+<span class="ansi-green-fg">Sampling  38%|████████████████                          |  ETA: 0:00:03</span>
+<span class="ansi-green-fg">Sampling  39%|████████████████▏                         |  ETA: 0:00:03</span>
+<span class="ansi-green-fg">Sampling  39%|████████████████▍                         |  ETA: 0:00:03</span>
+<span class="ansi-green-fg">Sampling  40%|████████████████▋                         |  ETA: 0:00:03</span>
+<span class="ansi-green-fg">Sampling  40%|████████████████▊                         |  ETA: 0:00:03</span>
+<span class="ansi-green-fg">Sampling  41%|█████████████████                         |  ETA: 0:00:03</span>
+<span class="ansi-green-fg">Sampling  41%|█████████████████▎                        |  ETA: 0:00:03</span>
+<span class="ansi-green-fg">Sampling  42%|█████████████████▌                        |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  42%|█████████████████▋                        |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  43%|█████████████████▉                        |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  43%|██████████████████                        |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  44%|██████████████████▎                       |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  44%|██████████████████▌                       |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  45%|██████████████████▊                       |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  45%|██████████████████▉                       |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  46%|███████████████████▏                      |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  46%|███████████████████▍                      |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  47%|███████████████████▌                      |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  47%|███████████████████▊                      |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  48%|████████████████████                      |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  48%|████████████████████▏                     |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  49%|████████████████████▍                     |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  49%|████████████████████▋                     |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  50%|████████████████████▊                     |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  50%|█████████████████████                     |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  51%|█████████████████████▎                    |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  51%|█████████████████████▍                    |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  52%|█████████████████████▋                    |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  52%|█████████████████████▉                    |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  53%|██████████████████████▏                   |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  53%|██████████████████████▎                   |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  54%|██████████████████████▌                   |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  54%|██████████████████████▋                   |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  55%|██████████████████████▉                   |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  55%|███████████████████████▏                  |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  56%|███████████████████████▍                  |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  56%|███████████████████████▌                  |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  57%|███████████████████████▊                  |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  57%|████████████████████████                  |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  58%|████████████████████████▏                 |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  58%|████████████████████████▍                 |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  59%|████████████████████████▋                 |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  59%|████████████████████████▊                 |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  60%|█████████████████████████                 |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  60%|█████████████████████████▎                |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  61%|█████████████████████████▍                |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  61%|█████████████████████████▋                |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  62%|█████████████████████████▉                |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  62%|██████████████████████████                |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  63%|██████████████████████████▎               |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  63%|██████████████████████████▌               |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  64%|██████████████████████████▋               |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  64%|██████████████████████████▉               |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  65%|███████████████████████████▏              |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  65%|███████████████████████████▎              |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  66%|███████████████████████████▌              |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  66%|███████████████████████████▊              |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  67%|████████████████████████████              |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  67%|████████████████████████████▏             |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  68%|████████████████████████████▍             |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  68%|████████████████████████████▌             |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  69%|████████████████████████████▊             |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  69%|█████████████████████████████             |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  70%|█████████████████████████████▎            |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  70%|█████████████████████████████▍            |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  71%|█████████████████████████████▋            |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  71%|█████████████████████████████▉            |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  72%|██████████████████████████████            |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  72%|██████████████████████████████▎           |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  73%|██████████████████████████████▌           |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  73%|██████████████████████████████▋           |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  74%|██████████████████████████████▉           |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  74%|███████████████████████████████▏          |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  75%|███████████████████████████████▎          |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  75%|███████████████████████████████▌          |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  76%|███████████████████████████████▊          |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  76%|███████████████████████████████▉          |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  77%|████████████████████████████████▏         |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  77%|████████████████████████████████▍         |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  78%|████████████████████████████████▋         |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  78%|████████████████████████████████▊         |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  79%|█████████████████████████████████         |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  79%|█████████████████████████████████▏        |  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling  80%|█████████████████████████████████▍        |  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling  80%|█████████████████████████████████▋        |  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling  81%|█████████████████████████████████▉        |  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling  81%|██████████████████████████████████        |  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling  82%|██████████████████████████████████▎       |  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling  82%|██████████████████████████████████▌       |  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling  83%|██████████████████████████████████▋       |  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling  83%|██████████████████████████████████▉       |  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling  84%|███████████████████████████████████▏      |  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling  84%|███████████████████████████████████▎      |  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling  85%|███████████████████████████████████▌      |  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling  85%|███████████████████████████████████▊      |  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling  86%|███████████████████████████████████▉      |  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling  86%|████████████████████████████████████▏     |  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling  87%|████████████████████████████████████▍     |  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling  87%|████████████████████████████████████▌     |  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling  88%|████████████████████████████████████▊     |  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling  88%|█████████████████████████████████████     |  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling  89%|█████████████████████████████████████▏    |  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling  89%|█████████████████████████████████████▍    |  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling  90%|█████████████████████████████████████▋    |  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling  90%|█████████████████████████████████████▊    |  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling  91%|██████████████████████████████████████    |  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling  91%|██████████████████████████████████████▎   |  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling  92%|██████████████████████████████████████▌   |  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling  92%|██████████████████████████████████████▋   |  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling  93%|██████████████████████████████████████▉   |  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling  93%|███████████████████████████████████████   |  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling  94%|███████████████████████████████████████▎  |  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling  94%|███████████████████████████████████████▌  |  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling  95%|███████████████████████████████████████▊  |  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling  95%|███████████████████████████████████████▉  |  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling  96%|████████████████████████████████████████▏ |  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling  96%|████████████████████████████████████████▍ |  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling  97%|████████████████████████████████████████▌ |  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling  97%|████████████████████████████████████████▊ |  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling  98%|█████████████████████████████████████████ |  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling  98%|█████████████████████████████████████████▏|  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling  99%|█████████████████████████████████████████▍|  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling  99%|█████████████████████████████████████████▋|  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling 100%|█████████████████████████████████████████▊|  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling 100%|██████████████████████████████████████████| Time: 0:00:01</span>
+<span class="ansi-bright-black-fg">Sampling 100%|██████████████████████████████████████████| Time: 0:00:02</span>
+</pre>
+</div>
+</div>
+<div class="cell-output cell-output-display page-columns page-full" data-execution_count="1">
+<div class="page-columns page-full">
+<figure class="figure page-columns page-full">
+<p class="page-columns page-full"><img src="index_files/figure-html/cell-9-output-2.svg" class="img-fluid figure-img column-page-inset"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="plotting-samples-from-the-posterior" class="level3">
+<h3 class="anchored" data-anchor-id="plotting-samples-from-the-posterior">Plotting samples from the posterior</h3>
+<p>We can see that the sampling of possible posterior parameters doesn’t really fit the data very well since our model was so simplified. The lines represent the posterior binomial probability.</p>
+<p>This is saying that for the observed data, if there really is just a single probability <code>p</code> that governs the true process that came up with the data, there’s a pretty narrow range of values it could possibly be:</p>
+<div id="18" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>let
+    data_weight = data.exposures ./ sum(data.exposures)
+    data_weight = .√(data_weight ./ maximum(data_weight) .* 20) .* 4  # Makie markersize ≈ 4× Plots
+
+    fig = Figure()
+    ax = Axis(fig[1,1]; xlabel="age", ylabel="mortality rate",
+        title="Parametric Bayesian Mortality")
+
+    # show n samples from the posterior plotted on the graph
+    n = 300
+    for _ in 1:n
+        p_posterior = sample(chain, 1)[:p][1]
+        hlines!(ax, [p_posterior]; color=(CASSETTE_PALETTE[3], 0.08))
+    end
+
+    scatter!(ax, data.att_age, data.fraction;
+        markersize=data_weight,
+        color=(CASSETTE_PALETTE[1], 0.5),
+        strokewidth=0,
+        label="Experience data point (size = relative exposure)")
+
+    ylims!(ax, 0.0, 0.25)
+    axislegend(ax, position=:rt)
+    fig
+end</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-10-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The posterior mean of <code>p</code> is of course very close to the simple proportoin of claims to exposures:</p>
+<div id="20" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>let
+    a = mean(chain, :p)
+    b = sum(data.deaths) / sum(data.exposures)
+    a, b
+end</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>(0.030734881157743216, 0.030695970695970697)</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="parametric-model" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="parametric-model">2. Parametric model</h2>
+<p>In this example, we utilize a <a href="https://juliaactuary.github.io/MortalityTables.jl/stable/ParametricMortalityModels/#MortalityTables.MakehamBeard">MakehamBeard</a> parameterization because it’s already very similar in form to a <a href="https://en.wikipedia.org/wiki/Logistic_function">logistic function</a>. This is important because our desired output is a probability (ie the probablity of a death at a given age), so the value must be constrained to be in the interval between zero and one.</p>
+<p>The <strong>prior</strong> values for <code>a</code>,<code>b</code>,<code>c</code>, and <code>k</code> are chosen to constrain the hazard (mortality) rate to be between zero and one.</p>
+<p>This isn’t an ideal parameterization (e.g.&nbsp;we aren’t including information about the select underwriting period), but is an example of utilizing Bayesian techniques on life experience data.</p>
+<div id="22" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>@model function mortality2(data, deaths)
+    a ~ Exponential(0.1)
+    b ~ Exponential(0.1)
+    c = 0.0
+    k ~ truncated(Exponential(1), 1, Inf)
+
+    # use the variables to create a parametric mortality model
+    m = MortalityTables.MakehamBeard(; a, b, c, k)
+
+    # loop through the rows of the dataframe to let Turing observe the data
+    # and how consistent the parameters are with the data
+    for i = 1:nrow(data)
+        age = data.att_age[i]
+        q = clamp(MortalityTables.hazard(m, age), 1e-10, 1 - 1e-10)
+        deaths[i] ~ Binomial(data.exposures[i], q)
+    end
+end</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>mortality2 (generic function with 2 methods)</code></pre>
+</div>
+</div>
+<section id="sampling-from-the-posterior-1" class="level3 page-columns page-full">
+<h3 class="anchored" data-anchor-id="sampling-from-the-posterior-1">Sampling from the posterior</h3>
+<p>We combine the model with the data and a use use a No-U-Turn-Sampler (NUTS) technique to sample:</p>
+<div id="24" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>m2 = mortality2(data, data.deaths)
+chain2 = MCMCChains.Chains(sample(m2, NUTS(), 1000))
+summarize(chain2)</code></pre>
+<div class="cell-output cell-output-stdout">
+<div class="ansi-escaped-output">
+<pre><span class="ansi-green-fg">Sampling   0%|                                          |  ETA: N/A</span>
+<span class="ansi-cyan-fg ansi-bold">┌ </span><span class="ansi-cyan-fg ansi-bold">Info: </span>Found initial step size
+<span class="ansi-cyan-fg ansi-bold">└ </span>  ϵ = 0.0125
+<span class="ansi-green-fg">Sampling   1%|▎                                         |  ETA: 0:01:54</span>
+<span class="ansi-green-fg">Sampling   1%|▍                                         |  ETA: 0:01:06</span>
+<span class="ansi-green-fg">Sampling   2%|▋                                         |  ETA: 0:00:47</span>
+<span class="ansi-green-fg">Sampling   2%|▉                                         |  ETA: 0:00:38</span>
+<span class="ansi-green-fg">Sampling   3%|█▏                                        |  ETA: 0:00:36</span>
+<span class="ansi-green-fg">Sampling   3%|█▎                                        |  ETA: 0:00:33</span>
+<span class="ansi-green-fg">Sampling   4%|█▌                                        |  ETA: 0:00:31</span>
+<span class="ansi-green-fg">Sampling   4%|█▋                                        |  ETA: 0:00:29</span>
+<span class="ansi-green-fg">Sampling   5%|█▉                                        |  ETA: 0:00:26</span>
+<span class="ansi-green-fg">Sampling   5%|██▏                                       |  ETA: 0:00:25</span>
+<span class="ansi-green-fg">Sampling   6%|██▍                                       |  ETA: 0:00:23</span>
+<span class="ansi-green-fg">Sampling   6%|██▌                                       |  ETA: 0:00:22</span>
+<span class="ansi-green-fg">Sampling   7%|██▊                                       |  ETA: 0:00:22</span>
+<span class="ansi-green-fg">Sampling   7%|███                                       |  ETA: 0:00:21</span>
+<span class="ansi-green-fg">Sampling   8%|███▏                                      |  ETA: 0:00:20</span>
+<span class="ansi-green-fg">Sampling   8%|███▍                                      |  ETA: 0:00:19</span>
+<span class="ansi-green-fg">Sampling   9%|███▋                                      |  ETA: 0:00:18</span>
+<span class="ansi-green-fg">Sampling   9%|███▊                                      |  ETA: 0:00:17</span>
+<span class="ansi-green-fg">Sampling  10%|████                                      |  ETA: 0:00:17</span>
+<span class="ansi-green-fg">Sampling  10%|████▎                                     |  ETA: 0:00:16</span>
+<span class="ansi-green-fg">Sampling  11%|████▍                                     |  ETA: 0:00:15</span>
+<span class="ansi-green-fg">Sampling  11%|████▋                                     |  ETA: 0:00:15</span>
+<span class="ansi-green-fg">Sampling  12%|████▉                                     |  ETA: 0:00:14</span>
+<span class="ansi-green-fg">Sampling  12%|█████                                     |  ETA: 0:00:14</span>
+<span class="ansi-green-fg">Sampling  13%|█████▎                                    |  ETA: 0:00:13</span>
+<span class="ansi-green-fg">Sampling  13%|█████▌                                    |  ETA: 0:00:13</span>
+<span class="ansi-green-fg">Sampling  14%|█████▋                                    |  ETA: 0:00:13</span>
+<span class="ansi-green-fg">Sampling  14%|█████▉                                    |  ETA: 0:00:12</span>
+<span class="ansi-green-fg">Sampling  15%|██████▏                                   |  ETA: 0:00:12</span>
+<span class="ansi-green-fg">Sampling  15%|██████▎                                   |  ETA: 0:00:12</span>
+<span class="ansi-green-fg">Sampling  16%|██████▌                                   |  ETA: 0:00:11</span>
+<span class="ansi-green-fg">Sampling  16%|██████▊                                   |  ETA: 0:00:11</span>
+<span class="ansi-green-fg">Sampling  17%|███████                                   |  ETA: 0:00:11</span>
+<span class="ansi-green-fg">Sampling  17%|███████▏                                  |  ETA: 0:00:11</span>
+<span class="ansi-green-fg">Sampling  18%|███████▍                                  |  ETA: 0:00:10</span>
+<span class="ansi-green-fg">Sampling  18%|███████▌                                  |  ETA: 0:00:10</span>
+<span class="ansi-green-fg">Sampling  19%|███████▊                                  |  ETA: 0:00:10</span>
+<span class="ansi-green-fg">Sampling  19%|████████                                  |  ETA: 0:00:10</span>
+<span class="ansi-green-fg">Sampling  20%|████████▎                                 |  ETA: 0:00:09</span>
+<span class="ansi-green-fg">Sampling  20%|████████▍                                 |  ETA: 0:00:09</span>
+<span class="ansi-green-fg">Sampling  21%|████████▋                                 |  ETA: 0:00:09</span>
+<span class="ansi-green-fg">Sampling  21%|████████▉                                 |  ETA: 0:00:09</span>
+<span class="ansi-green-fg">Sampling  22%|█████████                                 |  ETA: 0:00:09</span>
+<span class="ansi-green-fg">Sampling  22%|█████████▎                                |  ETA: 0:00:08</span>
+<span class="ansi-green-fg">Sampling  23%|█████████▌                                |  ETA: 0:00:08</span>
+<span class="ansi-green-fg">Sampling  23%|█████████▋                                |  ETA: 0:00:08</span>
+<span class="ansi-green-fg">Sampling  24%|█████████▉                                |  ETA: 0:00:08</span>
+<span class="ansi-green-fg">Sampling  24%|██████████▏                               |  ETA: 0:00:08</span>
+<span class="ansi-green-fg">Sampling  25%|██████████▎                               |  ETA: 0:00:08</span>
+<span class="ansi-green-fg">Sampling  25%|██████████▌                               |  ETA: 0:00:07</span>
+<span class="ansi-green-fg">Sampling  26%|██████████▊                               |  ETA: 0:00:07</span>
+<span class="ansi-green-fg">Sampling  26%|██████████▉                               |  ETA: 0:00:07</span>
+<span class="ansi-green-fg">Sampling  27%|███████████▏                              |  ETA: 0:00:07</span>
+<span class="ansi-green-fg">Sampling  27%|███████████▍                              |  ETA: 0:00:07</span>
+<span class="ansi-green-fg">Sampling  28%|███████████▋                              |  ETA: 0:00:07</span>
+<span class="ansi-green-fg">Sampling  28%|███████████▊                              |  ETA: 0:00:07</span>
+<span class="ansi-green-fg">Sampling  29%|████████████                              |  ETA: 0:00:07</span>
+<span class="ansi-green-fg">Sampling  29%|████████████▏                             |  ETA: 0:00:07</span>
+<span class="ansi-green-fg">Sampling  30%|████████████▍                             |  ETA: 0:00:06</span>
+<span class="ansi-green-fg">Sampling  30%|████████████▋                             |  ETA: 0:00:06</span>
+<span class="ansi-green-fg">Sampling  31%|████████████▉                             |  ETA: 0:00:06</span>
+<span class="ansi-green-fg">Sampling  31%|█████████████                             |  ETA: 0:00:06</span>
+<span class="ansi-green-fg">Sampling  32%|█████████████▎                            |  ETA: 0:00:06</span>
+<span class="ansi-green-fg">Sampling  32%|█████████████▌                            |  ETA: 0:00:06</span>
+<span class="ansi-green-fg">Sampling  33%|█████████████▋                            |  ETA: 0:00:06</span>
+<span class="ansi-green-fg">Sampling  33%|█████████████▉                            |  ETA: 0:00:06</span>
+<span class="ansi-green-fg">Sampling  34%|██████████████▏                           |  ETA: 0:00:06</span>
+<span class="ansi-green-fg">Sampling  34%|██████████████▎                           |  ETA: 0:00:06</span>
+<span class="ansi-green-fg">Sampling  35%|██████████████▌                           |  ETA: 0:00:06</span>
+<span class="ansi-green-fg">Sampling  35%|██████████████▊                           |  ETA: 0:00:05</span>
+<span class="ansi-green-fg">Sampling  36%|██████████████▉                           |  ETA: 0:00:05</span>
+<span class="ansi-green-fg">Sampling  36%|███████████████▏                          |  ETA: 0:00:05</span>
+<span class="ansi-green-fg">Sampling  37%|███████████████▍                          |  ETA: 0:00:05</span>
+<span class="ansi-green-fg">Sampling  37%|███████████████▌                          |  ETA: 0:00:05</span>
+<span class="ansi-green-fg">Sampling  38%|███████████████▊                          |  ETA: 0:00:05</span>
+<span class="ansi-green-fg">Sampling  38%|████████████████                          |  ETA: 0:00:05</span>
+<span class="ansi-green-fg">Sampling  39%|████████████████▏                         |  ETA: 0:00:05</span>
+<span class="ansi-green-fg">Sampling  39%|████████████████▍                         |  ETA: 0:00:05</span>
+<span class="ansi-green-fg">Sampling  40%|████████████████▋                         |  ETA: 0:00:05</span>
+<span class="ansi-green-fg">Sampling  40%|████████████████▊                         |  ETA: 0:00:05</span>
+<span class="ansi-green-fg">Sampling  41%|█████████████████                         |  ETA: 0:00:05</span>
+<span class="ansi-green-fg">Sampling  41%|█████████████████▎                        |  ETA: 0:00:05</span>
+<span class="ansi-green-fg">Sampling  42%|█████████████████▌                        |  ETA: 0:00:05</span>
+<span class="ansi-green-fg">Sampling  42%|█████████████████▋                        |  ETA: 0:00:04</span>
+<span class="ansi-green-fg">Sampling  43%|█████████████████▉                        |  ETA: 0:00:04</span>
+<span class="ansi-green-fg">Sampling  43%|██████████████████                        |  ETA: 0:00:04</span>
+<span class="ansi-green-fg">Sampling  44%|██████████████████▎                       |  ETA: 0:00:04</span>
+<span class="ansi-green-fg">Sampling  44%|██████████████████▌                       |  ETA: 0:00:04</span>
+<span class="ansi-green-fg">Sampling  45%|██████████████████▊                       |  ETA: 0:00:04</span>
+<span class="ansi-green-fg">Sampling  45%|██████████████████▉                       |  ETA: 0:00:04</span>
+<span class="ansi-green-fg">Sampling  46%|███████████████████▏                      |  ETA: 0:00:04</span>
+<span class="ansi-green-fg">Sampling  46%|███████████████████▍                      |  ETA: 0:00:04</span>
+<span class="ansi-green-fg">Sampling  47%|███████████████████▌                      |  ETA: 0:00:04</span>
+<span class="ansi-green-fg">Sampling  47%|███████████████████▊                      |  ETA: 0:00:04</span>
+<span class="ansi-green-fg">Sampling  48%|████████████████████                      |  ETA: 0:00:04</span>
+<span class="ansi-green-fg">Sampling  48%|████████████████████▏                     |  ETA: 0:00:04</span>
+<span class="ansi-green-fg">Sampling  49%|████████████████████▍                     |  ETA: 0:00:04</span>
+<span class="ansi-green-fg">Sampling  49%|████████████████████▋                     |  ETA: 0:00:04</span>
+<span class="ansi-green-fg">Sampling  50%|████████████████████▊                     |  ETA: 0:00:04</span>
+<span class="ansi-green-fg">Sampling  50%|█████████████████████                     |  ETA: 0:00:04</span>
+<span class="ansi-green-fg">Sampling  51%|█████████████████████▎                    |  ETA: 0:00:03</span>
+<span class="ansi-green-fg">Sampling  51%|█████████████████████▍                    |  ETA: 0:00:03</span>
+<span class="ansi-green-fg">Sampling  52%|█████████████████████▋                    |  ETA: 0:00:03</span>
+<span class="ansi-green-fg">Sampling  52%|█████████████████████▉                    |  ETA: 0:00:03</span>
+<span class="ansi-green-fg">Sampling  53%|██████████████████████▏                   |  ETA: 0:00:03</span>
+<span class="ansi-green-fg">Sampling  53%|██████████████████████▎                   |  ETA: 0:00:03</span>
+<span class="ansi-green-fg">Sampling  54%|██████████████████████▌                   |  ETA: 0:00:03</span>
+<span class="ansi-green-fg">Sampling  54%|██████████████████████▋                   |  ETA: 0:00:03</span>
+<span class="ansi-green-fg">Sampling  55%|██████████████████████▉                   |  ETA: 0:00:03</span>
+<span class="ansi-green-fg">Sampling  55%|███████████████████████▏                  |  ETA: 0:00:03</span>
+<span class="ansi-green-fg">Sampling  56%|███████████████████████▍                  |  ETA: 0:00:03</span>
+<span class="ansi-green-fg">Sampling  56%|███████████████████████▌                  |  ETA: 0:00:03</span>
+<span class="ansi-green-fg">Sampling  57%|███████████████████████▊                  |  ETA: 0:00:03</span>
+<span class="ansi-green-fg">Sampling  57%|████████████████████████                  |  ETA: 0:00:03</span>
+<span class="ansi-green-fg">Sampling  58%|████████████████████████▏                 |  ETA: 0:00:03</span>
+<span class="ansi-green-fg">Sampling  58%|████████████████████████▍                 |  ETA: 0:00:03</span>
+<span class="ansi-green-fg">Sampling  59%|████████████████████████▋                 |  ETA: 0:00:03</span>
+<span class="ansi-green-fg">Sampling  59%|████████████████████████▊                 |  ETA: 0:00:03</span>
+<span class="ansi-green-fg">Sampling  60%|█████████████████████████                 |  ETA: 0:00:03</span>
+<span class="ansi-green-fg">Sampling  60%|█████████████████████████▎                |  ETA: 0:00:03</span>
+<span class="ansi-green-fg">Sampling  61%|█████████████████████████▍                |  ETA: 0:00:03</span>
+<span class="ansi-green-fg">Sampling  61%|█████████████████████████▋                |  ETA: 0:00:03</span>
+<span class="ansi-green-fg">Sampling  62%|█████████████████████████▉                |  ETA: 0:00:03</span>
+<span class="ansi-green-fg">Sampling  62%|██████████████████████████                |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  63%|██████████████████████████▎               |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  63%|██████████████████████████▌               |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  64%|██████████████████████████▋               |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  64%|██████████████████████████▉               |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  65%|███████████████████████████▏              |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  65%|███████████████████████████▎              |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  66%|███████████████████████████▌              |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  66%|███████████████████████████▊              |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  67%|████████████████████████████              |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  67%|████████████████████████████▏             |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  68%|████████████████████████████▍             |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  68%|████████████████████████████▌             |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  69%|████████████████████████████▊             |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  69%|█████████████████████████████             |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  70%|█████████████████████████████▎            |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  70%|█████████████████████████████▍            |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  71%|█████████████████████████████▋            |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  71%|█████████████████████████████▉            |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  72%|██████████████████████████████            |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  72%|██████████████████████████████▎           |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  73%|██████████████████████████████▌           |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  73%|██████████████████████████████▋           |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  74%|██████████████████████████████▉           |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  74%|███████████████████████████████▏          |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  75%|███████████████████████████████▎          |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  75%|███████████████████████████████▌          |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  76%|███████████████████████████████▊          |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  76%|███████████████████████████████▉          |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  77%|████████████████████████████████▏         |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  77%|████████████████████████████████▍         |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  78%|████████████████████████████████▋         |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  78%|████████████████████████████████▊         |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  79%|█████████████████████████████████         |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  79%|█████████████████████████████████▏        |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  80%|█████████████████████████████████▍        |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  80%|█████████████████████████████████▋        |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  81%|█████████████████████████████████▉        |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  81%|██████████████████████████████████        |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  82%|██████████████████████████████████▎       |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  82%|██████████████████████████████████▌       |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  83%|██████████████████████████████████▋       |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  83%|██████████████████████████████████▉       |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  84%|███████████████████████████████████▏      |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  84%|███████████████████████████████████▎      |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  85%|███████████████████████████████████▌      |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  85%|███████████████████████████████████▊      |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  86%|███████████████████████████████████▉      |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  86%|████████████████████████████████████▏     |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  87%|████████████████████████████████████▍     |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  87%|████████████████████████████████████▌     |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  88%|████████████████████████████████████▊     |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  88%|█████████████████████████████████████     |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  89%|█████████████████████████████████████▏    |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  89%|█████████████████████████████████████▍    |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  90%|█████████████████████████████████████▋    |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  90%|█████████████████████████████████████▊    |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  91%|██████████████████████████████████████    |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  91%|██████████████████████████████████████▎   |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  92%|██████████████████████████████████████▌   |  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling  92%|██████████████████████████████████████▋   |  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling  93%|██████████████████████████████████████▉   |  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling  93%|███████████████████████████████████████   |  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling  94%|███████████████████████████████████████▎  |  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling  94%|███████████████████████████████████████▌  |  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling  95%|███████████████████████████████████████▊  |  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling  95%|███████████████████████████████████████▉  |  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling  96%|████████████████████████████████████████▏ |  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling  96%|████████████████████████████████████████▍ |  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling  97%|████████████████████████████████████████▌ |  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling  97%|████████████████████████████████████████▊ |  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling  98%|█████████████████████████████████████████ |  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling  98%|█████████████████████████████████████████▏|  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling  99%|█████████████████████████████████████████▍|  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling  99%|█████████████████████████████████████████▋|  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling 100%|█████████████████████████████████████████▊|  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling 100%|██████████████████████████████████████████| Time: 0:00:05</span>
+<span class="ansi-bright-black-fg">Sampling 100%|██████████████████████████████████████████| Time: 0:00:05</span>
+<span class="ansi-yellow-fg ansi-bold">┌ </span><span class="ansi-yellow-fg ansi-bold">Warning: </span>There were 4 divergent transitions. Consider reparameterising your model or using a smaller step size. For adaptive samplers such as NUTS and HMCDA, consider increasing `target_accept`.
+<span class="ansi-yellow-fg ansi-bold">└ </span><span class="ansi-bright-black-fg">@ Turing.Inference ~/.julia/packages/Turing/4hMHm/src/mcmc/hmc.jl:483</span>
+</pre>
+</div>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="ansi-escaped-output">
+<pre> <span class="ansi-bold"> parameters </span> <span class="ansi-bold">    mean </span> <span class="ansi-bold">     std </span> <span class="ansi-bold">    mcse </span> <span class="ansi-bold"> ess_bulk </span> <span class="ansi-bold"> ess_tail </span> <span class="ansi-bold">    rhat </span> <span class="ansi-bold"> e</span> ⋯
+ <span class="ansi-bright-black-fg">     Symbol </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg">  Float64 </span> <span class="ansi-bright-black-fg">  Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg">  </span> ⋯
+
+           a    0.0044    0.0008    0.0001   225.6766   220.7921    1.0105     ⋯
+           b    0.0334    0.0030    0.0002   214.9863   223.1450    1.0102     ⋯
+           k    1.8925    0.8653    0.0504   254.9528   257.2569    0.9997     ⋯
+
+<span class="ansi-cyan-fg">                                                                1 column omitted</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="26" class="cell page-columns page-full" data-execution_count="1">
+<pre class="julia cell-code"><code>chainplot(chain2)</code></pre>
+<div class="cell-output cell-output-display page-columns page-full" data-execution_count="1">
+<div class="page-columns page-full">
+<figure class="figure page-columns page-full">
+<p class="page-columns page-full"><img src="index_files/figure-html/cell-14-output-1.svg" class="img-fluid figure-img column-page-inset"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="plotting-samples-from-the-posterior-1" class="level3">
+<h3 class="anchored" data-anchor-id="plotting-samples-from-the-posterior-1">Plotting samples from the posterior</h3>
+<p>We can see that the sampling of possible posterior parameters fits the data well:</p>
+<div id="28" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>let
+    data_weight = data.exposures ./ sum(data.exposures)
+    data_weight = .√(data_weight ./ maximum(data_weight) .* 20) .* 4
+
+    fig = Figure()
+    ax = Axis(fig[1,1]; xlabel="age", ylabel="mortality rate",
+        title="Parametric Bayesian Mortality")
+
+    n = 300
+    ages = sort!(unique(data.att_age))
+    for _ in 1:n
+        s = sample(chain2, 1)
+        a = only(s[:a]); b = only(s[:b]); k = only(s[:k]); c = 0
+        m = MortalityTables.MakehamBeard(; a, b, c, k)
+        lines!(ax, ages, age -&gt; MortalityTables.hazard(m, age);
+            color=(CASSETTE_PALETTE[3], 0.08), linewidth=0.8)
+    end
+
+    scatter!(ax, data.att_age, data.fraction;
+        markersize=data_weight, color=(CASSETTE_PALETTE[1], 0.5),
+        strokewidth=0,
+        label="Experience data point (size = relative exposure)")
+
+    ylims!(ax, 0.0, 0.25)
+    axislegend(ax, position=:rt)
+    fig
+end</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-15-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="parametric-model-1" class="level2">
+<h2 class="anchored" data-anchor-id="parametric-model-1">3. Parametric model</h2>
+<p>This model extends the prior to create a multi-level model. Each risk class (<code>risklevel</code>) gets its own <span class="math inline">\(a\)</span> paramater in the <code>MakhamBeard</code> model. The prior for <span class="math inline">\(a_i\)</span> is determined by the hyperparameter <span class="math inline">\(\bar{a}\)</span>.</p>
+<div id="30" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>@model function mortality3(data, deaths)
+    risk_levels = length(levels(data.risklevel))
+    b ~ Exponential(0.1)
+    ā ~ Exponential(0.1)
+    a ~ filldist(Exponential(ā), risk_levels)
+    c = 0
+    k ~ truncated(Exponential(1), 1, Inf)
+
+    # use the variables to create a parametric mortality model
+
+    # loop through the rows of the dataframe to let Turing observe the data 
+    # and how consistent the parameters are with the data
+    for i = 1:nrow(data)
+        risk = data.risklevel[i]
+
+        m = MortalityTables.MakehamBeard(; a=a[risk], b, c, k)
+        age = data.att_age[i]
+        q = clamp(MortalityTables.hazard(m, age), 1e-10, 1 - 1e-10)
+        deaths[i] ~ Binomial(data.exposures[i], q)
+    end
+end</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>mortality3 (generic function with 2 methods)</code></pre>
+</div>
+</div>
+<p>Instantiate model with the data, sample, and summarize:</p>
+<div id="32" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>m3 = mortality3(data2, data2.deaths)
+chain3 = MCMCChains.Chains(sample(m3, NUTS(), 1000))
+summarize(chain3)</code></pre>
+<div class="cell-output cell-output-stdout">
+<div class="ansi-escaped-output">
+<pre><span class="ansi-green-fg">Sampling   0%|                                          |  ETA: N/A</span>
+<span class="ansi-cyan-fg ansi-bold">┌ </span><span class="ansi-cyan-fg ansi-bold">Info: </span>Found initial step size
+<span class="ansi-cyan-fg ansi-bold">└ </span>  ϵ = 0.0125
+<span class="ansi-green-fg">Sampling   1%|▎                                         |  ETA: 0:03:02</span>
+<span class="ansi-green-fg">Sampling   1%|▍                                         |  ETA: 0:02:06</span>
+<span class="ansi-green-fg">Sampling   2%|▋                                         |  ETA: 0:01:25</span>
+<span class="ansi-green-fg">Sampling   2%|▉                                         |  ETA: 0:01:10</span>
+<span class="ansi-green-fg">Sampling   3%|█▏                                        |  ETA: 0:01:13</span>
+<span class="ansi-green-fg">Sampling   3%|█▎                                        |  ETA: 0:01:17</span>
+<span class="ansi-green-fg">Sampling   4%|█▌                                        |  ETA: 0:01:19</span>
+<span class="ansi-green-fg">Sampling   4%|█▋                                        |  ETA: 0:01:22</span>
+<span class="ansi-green-fg">Sampling   5%|█▉                                        |  ETA: 0:01:24</span>
+<span class="ansi-green-fg">Sampling   5%|██▏                                       |  ETA: 0:01:21</span>
+<span class="ansi-green-fg">Sampling   6%|██▍                                       |  ETA: 0:01:30</span>
+<span class="ansi-green-fg">Sampling   6%|██▌                                       |  ETA: 0:01:27</span>
+<span class="ansi-green-fg">Sampling   7%|██▊                                       |  ETA: 0:01:30</span>
+<span class="ansi-green-fg">Sampling   7%|███                                       |  ETA: 0:01:27</span>
+<span class="ansi-green-fg">Sampling   8%|███▏                                      |  ETA: 0:01:23</span>
+<span class="ansi-green-fg">Sampling   8%|███▍                                      |  ETA: 0:01:18</span>
+<span class="ansi-green-fg">Sampling   9%|███▋                                      |  ETA: 0:01:15</span>
+<span class="ansi-green-fg">Sampling   9%|███▊                                      |  ETA: 0:01:12</span>
+<span class="ansi-green-fg">Sampling  10%|████                                      |  ETA: 0:01:08</span>
+<span class="ansi-green-fg">Sampling  10%|████▎                                     |  ETA: 0:01:05</span>
+<span class="ansi-green-fg">Sampling  11%|████▍                                     |  ETA: 0:01:03</span>
+<span class="ansi-green-fg">Sampling  11%|████▋                                     |  ETA: 0:01:01</span>
+<span class="ansi-green-fg">Sampling  12%|████▉                                     |  ETA: 0:00:59</span>
+<span class="ansi-green-fg">Sampling  12%|█████                                     |  ETA: 0:00:58</span>
+<span class="ansi-green-fg">Sampling  13%|█████▎                                    |  ETA: 0:00:56</span>
+<span class="ansi-green-fg">Sampling  13%|█████▌                                    |  ETA: 0:00:54</span>
+<span class="ansi-green-fg">Sampling  14%|█████▋                                    |  ETA: 0:00:52</span>
+<span class="ansi-green-fg">Sampling  14%|█████▉                                    |  ETA: 0:00:51</span>
+<span class="ansi-green-fg">Sampling  15%|██████▏                                   |  ETA: 0:00:50</span>
+<span class="ansi-green-fg">Sampling  15%|██████▎                                   |  ETA: 0:00:49</span>
+<span class="ansi-green-fg">Sampling  16%|██████▌                                   |  ETA: 0:00:47</span>
+<span class="ansi-green-fg">Sampling  16%|██████▊                                   |  ETA: 0:00:46</span>
+<span class="ansi-green-fg">Sampling  17%|███████                                   |  ETA: 0:00:45</span>
+<span class="ansi-green-fg">Sampling  17%|███████▏                                  |  ETA: 0:00:44</span>
+<span class="ansi-green-fg">Sampling  18%|███████▍                                  |  ETA: 0:00:43</span>
+<span class="ansi-green-fg">Sampling  18%|███████▌                                  |  ETA: 0:00:42</span>
+<span class="ansi-green-fg">Sampling  19%|███████▊                                  |  ETA: 0:00:41</span>
+<span class="ansi-green-fg">Sampling  19%|████████                                  |  ETA: 0:00:40</span>
+<span class="ansi-green-fg">Sampling  20%|████████▎                                 |  ETA: 0:00:39</span>
+<span class="ansi-green-fg">Sampling  20%|████████▍                                 |  ETA: 0:00:39</span>
+<span class="ansi-green-fg">Sampling  21%|████████▋                                 |  ETA: 0:00:38</span>
+<span class="ansi-green-fg">Sampling  21%|████████▉                                 |  ETA: 0:00:37</span>
+<span class="ansi-green-fg">Sampling  22%|█████████                                 |  ETA: 0:00:36</span>
+<span class="ansi-green-fg">Sampling  22%|█████████▎                                |  ETA: 0:00:35</span>
+<span class="ansi-green-fg">Sampling  23%|█████████▌                                |  ETA: 0:00:35</span>
+<span class="ansi-green-fg">Sampling  23%|█████████▋                                |  ETA: 0:00:34</span>
+<span class="ansi-green-fg">Sampling  24%|█████████▉                                |  ETA: 0:00:33</span>
+<span class="ansi-green-fg">Sampling  24%|██████████▏                               |  ETA: 0:00:33</span>
+<span class="ansi-green-fg">Sampling  25%|██████████▎                               |  ETA: 0:00:32</span>
+<span class="ansi-green-fg">Sampling  25%|██████████▌                               |  ETA: 0:00:31</span>
+<span class="ansi-green-fg">Sampling  26%|██████████▊                               |  ETA: 0:00:31</span>
+<span class="ansi-green-fg">Sampling  26%|██████████▉                               |  ETA: 0:00:30</span>
+<span class="ansi-green-fg">Sampling  27%|███████████▏                              |  ETA: 0:00:30</span>
+<span class="ansi-green-fg">Sampling  27%|███████████▍                              |  ETA: 0:00:29</span>
+<span class="ansi-green-fg">Sampling  28%|███████████▋                              |  ETA: 0:00:29</span>
+<span class="ansi-green-fg">Sampling  28%|███████████▊                              |  ETA: 0:00:28</span>
+<span class="ansi-green-fg">Sampling  29%|████████████                              |  ETA: 0:00:28</span>
+<span class="ansi-green-fg">Sampling  29%|████████████▏                             |  ETA: 0:00:27</span>
+<span class="ansi-green-fg">Sampling  30%|████████████▍                             |  ETA: 0:00:27</span>
+<span class="ansi-green-fg">Sampling  30%|████████████▋                             |  ETA: 0:00:26</span>
+<span class="ansi-green-fg">Sampling  31%|████████████▉                             |  ETA: 0:00:26</span>
+<span class="ansi-green-fg">Sampling  31%|█████████████                             |  ETA: 0:00:25</span>
+<span class="ansi-green-fg">Sampling  32%|█████████████▎                            |  ETA: 0:00:25</span>
+<span class="ansi-green-fg">Sampling  32%|█████████████▌                            |  ETA: 0:00:25</span>
+<span class="ansi-green-fg">Sampling  33%|█████████████▋                            |  ETA: 0:00:24</span>
+<span class="ansi-green-fg">Sampling  33%|█████████████▉                            |  ETA: 0:00:24</span>
+<span class="ansi-green-fg">Sampling  34%|██████████████▏                           |  ETA: 0:00:24</span>
+<span class="ansi-green-fg">Sampling  34%|██████████████▎                           |  ETA: 0:00:23</span>
+<span class="ansi-green-fg">Sampling  35%|██████████████▌                           |  ETA: 0:00:23</span>
+<span class="ansi-green-fg">Sampling  35%|██████████████▊                           |  ETA: 0:00:23</span>
+<span class="ansi-green-fg">Sampling  36%|██████████████▉                           |  ETA: 0:00:22</span>
+<span class="ansi-green-fg">Sampling  36%|███████████████▏                          |  ETA: 0:00:22</span>
+<span class="ansi-green-fg">Sampling  37%|███████████████▍                          |  ETA: 0:00:22</span>
+<span class="ansi-green-fg">Sampling  37%|███████████████▌                          |  ETA: 0:00:22</span>
+<span class="ansi-green-fg">Sampling  38%|███████████████▊                          |  ETA: 0:00:21</span>
+<span class="ansi-green-fg">Sampling  38%|████████████████                          |  ETA: 0:00:21</span>
+<span class="ansi-green-fg">Sampling  39%|████████████████▏                         |  ETA: 0:00:21</span>
+<span class="ansi-green-fg">Sampling  39%|████████████████▍                         |  ETA: 0:00:20</span>
+<span class="ansi-green-fg">Sampling  40%|████████████████▋                         |  ETA: 0:00:20</span>
+<span class="ansi-green-fg">Sampling  40%|████████████████▊                         |  ETA: 0:00:20</span>
+<span class="ansi-green-fg">Sampling  41%|█████████████████                         |  ETA: 0:00:20</span>
+<span class="ansi-green-fg">Sampling  41%|█████████████████▎                        |  ETA: 0:00:19</span>
+<span class="ansi-green-fg">Sampling  42%|█████████████████▌                        |  ETA: 0:00:19</span>
+<span class="ansi-green-fg">Sampling  42%|█████████████████▋                        |  ETA: 0:00:19</span>
+<span class="ansi-green-fg">Sampling  43%|█████████████████▉                        |  ETA: 0:00:18</span>
+<span class="ansi-green-fg">Sampling  43%|██████████████████                        |  ETA: 0:00:18</span>
+<span class="ansi-green-fg">Sampling  44%|██████████████████▎                       |  ETA: 0:00:18</span>
+<span class="ansi-green-fg">Sampling  44%|██████████████████▌                       |  ETA: 0:00:18</span>
+<span class="ansi-green-fg">Sampling  45%|██████████████████▊                       |  ETA: 0:00:18</span>
+<span class="ansi-green-fg">Sampling  45%|██████████████████▉                       |  ETA: 0:00:17</span>
+<span class="ansi-green-fg">Sampling  46%|███████████████████▏                      |  ETA: 0:00:17</span>
+<span class="ansi-green-fg">Sampling  46%|███████████████████▍                      |  ETA: 0:00:17</span>
+<span class="ansi-green-fg">Sampling  47%|███████████████████▌                      |  ETA: 0:00:17</span>
+<span class="ansi-green-fg">Sampling  47%|███████████████████▊                      |  ETA: 0:00:16</span>
+<span class="ansi-green-fg">Sampling  48%|████████████████████                      |  ETA: 0:00:16</span>
+<span class="ansi-green-fg">Sampling  48%|████████████████████▏                     |  ETA: 0:00:16</span>
+<span class="ansi-green-fg">Sampling  49%|████████████████████▍                     |  ETA: 0:00:16</span>
+<span class="ansi-green-fg">Sampling  49%|████████████████████▋                     |  ETA: 0:00:16</span>
+<span class="ansi-green-fg">Sampling  50%|████████████████████▊                     |  ETA: 0:00:15</span>
+<span class="ansi-green-fg">Sampling  50%|█████████████████████                     |  ETA: 0:00:15</span>
+<span class="ansi-green-fg">Sampling  51%|█████████████████████▎                    |  ETA: 0:00:15</span>
+<span class="ansi-green-fg">Sampling  51%|█████████████████████▍                    |  ETA: 0:00:15</span>
+<span class="ansi-green-fg">Sampling  52%|█████████████████████▋                    |  ETA: 0:00:15</span>
+<span class="ansi-green-fg">Sampling  52%|█████████████████████▉                    |  ETA: 0:00:14</span>
+<span class="ansi-green-fg">Sampling  53%|██████████████████████▏                   |  ETA: 0:00:14</span>
+<span class="ansi-green-fg">Sampling  53%|██████████████████████▎                   |  ETA: 0:00:14</span>
+<span class="ansi-green-fg">Sampling  54%|██████████████████████▌                   |  ETA: 0:00:14</span>
+<span class="ansi-green-fg">Sampling  54%|██████████████████████▋                   |  ETA: 0:00:14</span>
+<span class="ansi-green-fg">Sampling  55%|██████████████████████▉                   |  ETA: 0:00:13</span>
+<span class="ansi-green-fg">Sampling  55%|███████████████████████▏                  |  ETA: 0:00:13</span>
+<span class="ansi-green-fg">Sampling  56%|███████████████████████▍                  |  ETA: 0:00:13</span>
+<span class="ansi-green-fg">Sampling  56%|███████████████████████▌                  |  ETA: 0:00:13</span>
+<span class="ansi-green-fg">Sampling  57%|███████████████████████▊                  |  ETA: 0:00:13</span>
+<span class="ansi-green-fg">Sampling  57%|████████████████████████                  |  ETA: 0:00:13</span>
+<span class="ansi-green-fg">Sampling  58%|████████████████████████▏                 |  ETA: 0:00:12</span>
+<span class="ansi-green-fg">Sampling  58%|████████████████████████▍                 |  ETA: 0:00:12</span>
+<span class="ansi-green-fg">Sampling  59%|████████████████████████▋                 |  ETA: 0:00:12</span>
+<span class="ansi-green-fg">Sampling  59%|████████████████████████▊                 |  ETA: 0:00:12</span>
+<span class="ansi-green-fg">Sampling  60%|█████████████████████████                 |  ETA: 0:00:12</span>
+<span class="ansi-green-fg">Sampling  60%|█████████████████████████▎                |  ETA: 0:00:11</span>
+<span class="ansi-green-fg">Sampling  61%|█████████████████████████▍                |  ETA: 0:00:11</span>
+<span class="ansi-green-fg">Sampling  61%|█████████████████████████▋                |  ETA: 0:00:11</span>
+<span class="ansi-green-fg">Sampling  62%|█████████████████████████▉                |  ETA: 0:00:11</span>
+<span class="ansi-green-fg">Sampling  62%|██████████████████████████                |  ETA: 0:00:11</span>
+<span class="ansi-green-fg">Sampling  63%|██████████████████████████▎               |  ETA: 0:00:11</span>
+<span class="ansi-green-fg">Sampling  63%|██████████████████████████▌               |  ETA: 0:00:10</span>
+<span class="ansi-green-fg">Sampling  64%|██████████████████████████▋               |  ETA: 0:00:10</span>
+<span class="ansi-green-fg">Sampling  64%|██████████████████████████▉               |  ETA: 0:00:10</span>
+<span class="ansi-green-fg">Sampling  65%|███████████████████████████▏              |  ETA: 0:00:10</span>
+<span class="ansi-green-fg">Sampling  65%|███████████████████████████▎              |  ETA: 0:00:10</span>
+<span class="ansi-green-fg">Sampling  66%|███████████████████████████▌              |  ETA: 0:00:10</span>
+<span class="ansi-green-fg">Sampling  66%|███████████████████████████▊              |  ETA: 0:00:09</span>
+<span class="ansi-green-fg">Sampling  67%|████████████████████████████              |  ETA: 0:00:09</span>
+<span class="ansi-green-fg">Sampling  67%|████████████████████████████▏             |  ETA: 0:00:09</span>
+<span class="ansi-green-fg">Sampling  68%|████████████████████████████▍             |  ETA: 0:00:09</span>
+<span class="ansi-green-fg">Sampling  68%|████████████████████████████▌             |  ETA: 0:00:09</span>
+<span class="ansi-green-fg">Sampling  69%|████████████████████████████▊             |  ETA: 0:00:09</span>
+<span class="ansi-green-fg">Sampling  69%|█████████████████████████████             |  ETA: 0:00:09</span>
+<span class="ansi-green-fg">Sampling  70%|█████████████████████████████▎            |  ETA: 0:00:08</span>
+<span class="ansi-green-fg">Sampling  70%|█████████████████████████████▍            |  ETA: 0:00:08</span>
+<span class="ansi-green-fg">Sampling  71%|█████████████████████████████▋            |  ETA: 0:00:08</span>
+<span class="ansi-green-fg">Sampling  71%|█████████████████████████████▉            |  ETA: 0:00:08</span>
+<span class="ansi-green-fg">Sampling  72%|██████████████████████████████            |  ETA: 0:00:08</span>
+<span class="ansi-green-fg">Sampling  72%|██████████████████████████████▎           |  ETA: 0:00:08</span>
+<span class="ansi-green-fg">Sampling  73%|██████████████████████████████▌           |  ETA: 0:00:07</span>
+<span class="ansi-green-fg">Sampling  73%|██████████████████████████████▋           |  ETA: 0:00:07</span>
+<span class="ansi-green-fg">Sampling  74%|██████████████████████████████▉           |  ETA: 0:00:07</span>
+<span class="ansi-green-fg">Sampling  74%|███████████████████████████████▏          |  ETA: 0:00:07</span>
+<span class="ansi-green-fg">Sampling  75%|███████████████████████████████▎          |  ETA: 0:00:07</span>
+<span class="ansi-green-fg">Sampling  75%|███████████████████████████████▌          |  ETA: 0:00:07</span>
+<span class="ansi-green-fg">Sampling  76%|███████████████████████████████▊          |  ETA: 0:00:07</span>
+<span class="ansi-green-fg">Sampling  76%|███████████████████████████████▉          |  ETA: 0:00:06</span>
+<span class="ansi-green-fg">Sampling  77%|████████████████████████████████▏         |  ETA: 0:00:06</span>
+<span class="ansi-green-fg">Sampling  77%|████████████████████████████████▍         |  ETA: 0:00:06</span>
+<span class="ansi-green-fg">Sampling  78%|████████████████████████████████▋         |  ETA: 0:00:06</span>
+<span class="ansi-green-fg">Sampling  78%|████████████████████████████████▊         |  ETA: 0:00:06</span>
+<span class="ansi-green-fg">Sampling  79%|█████████████████████████████████         |  ETA: 0:00:06</span>
+<span class="ansi-green-fg">Sampling  79%|█████████████████████████████████▏        |  ETA: 0:00:06</span>
+<span class="ansi-green-fg">Sampling  80%|█████████████████████████████████▍        |  ETA: 0:00:05</span>
+<span class="ansi-green-fg">Sampling  80%|█████████████████████████████████▋        |  ETA: 0:00:05</span>
+<span class="ansi-green-fg">Sampling  81%|█████████████████████████████████▉        |  ETA: 0:00:05</span>
+<span class="ansi-green-fg">Sampling  81%|██████████████████████████████████        |  ETA: 0:00:05</span>
+<span class="ansi-green-fg">Sampling  82%|██████████████████████████████████▎       |  ETA: 0:00:05</span>
+<span class="ansi-green-fg">Sampling  82%|██████████████████████████████████▌       |  ETA: 0:00:05</span>
+<span class="ansi-green-fg">Sampling  83%|██████████████████████████████████▋       |  ETA: 0:00:05</span>
+<span class="ansi-green-fg">Sampling  83%|██████████████████████████████████▉       |  ETA: 0:00:04</span>
+<span class="ansi-green-fg">Sampling  84%|███████████████████████████████████▏      |  ETA: 0:00:04</span>
+<span class="ansi-green-fg">Sampling  84%|███████████████████████████████████▎      |  ETA: 0:00:04</span>
+<span class="ansi-green-fg">Sampling  85%|███████████████████████████████████▌      |  ETA: 0:00:04</span>
+<span class="ansi-green-fg">Sampling  85%|███████████████████████████████████▊      |  ETA: 0:00:04</span>
+<span class="ansi-green-fg">Sampling  86%|███████████████████████████████████▉      |  ETA: 0:00:04</span>
+<span class="ansi-green-fg">Sampling  86%|████████████████████████████████████▏     |  ETA: 0:00:04</span>
+<span class="ansi-green-fg">Sampling  87%|████████████████████████████████████▍     |  ETA: 0:00:03</span>
+<span class="ansi-green-fg">Sampling  87%|████████████████████████████████████▌     |  ETA: 0:00:03</span>
+<span class="ansi-green-fg">Sampling  88%|████████████████████████████████████▊     |  ETA: 0:00:03</span>
+<span class="ansi-green-fg">Sampling  88%|█████████████████████████████████████     |  ETA: 0:00:03</span>
+<span class="ansi-green-fg">Sampling  89%|█████████████████████████████████████▏    |  ETA: 0:00:03</span>
+<span class="ansi-green-fg">Sampling  89%|█████████████████████████████████████▍    |  ETA: 0:00:03</span>
+<span class="ansi-green-fg">Sampling  90%|█████████████████████████████████████▋    |  ETA: 0:00:03</span>
+<span class="ansi-green-fg">Sampling  90%|█████████████████████████████████████▊    |  ETA: 0:00:03</span>
+<span class="ansi-green-fg">Sampling  91%|██████████████████████████████████████    |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  91%|██████████████████████████████████████▎   |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  92%|██████████████████████████████████████▌   |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  92%|██████████████████████████████████████▋   |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  93%|██████████████████████████████████████▉   |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  93%|███████████████████████████████████████   |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  94%|███████████████████████████████████████▎  |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  94%|███████████████████████████████████████▌  |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  95%|███████████████████████████████████████▊  |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  95%|███████████████████████████████████████▉  |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  96%|████████████████████████████████████████▏ |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  96%|████████████████████████████████████████▍ |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  97%|████████████████████████████████████████▌ |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  97%|████████████████████████████████████████▊ |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  98%|█████████████████████████████████████████ |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  98%|█████████████████████████████████████████▏|  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  99%|█████████████████████████████████████████▍|  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling  99%|█████████████████████████████████████████▋|  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling 100%|█████████████████████████████████████████▊|  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling 100%|██████████████████████████████████████████| Time: 0:00:25</span>
+<span class="ansi-bright-black-fg">Sampling 100%|██████████████████████████████████████████| Time: 0:00:25</span>
+</pre>
+</div>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="ansi-escaped-output">
+<pre> <span class="ansi-bold"> parameters </span> <span class="ansi-bold">    mean </span> <span class="ansi-bold">     std </span> <span class="ansi-bold">    mcse </span> <span class="ansi-bold"> ess_bulk </span> <span class="ansi-bold"> ess_tail </span> <span class="ansi-bold">    rhat </span> <span class="ansi-bold"> e</span> ⋯
+ <span class="ansi-bright-black-fg">     Symbol </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg">  Float64 </span> <span class="ansi-bright-black-fg">  Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg">  </span> ⋯
+
+           b    0.0389    0.0030    0.0003    94.0725   206.8419    1.0396     ⋯
+           ā    0.0087    0.0109    0.0007   352.1930   392.6408    1.0083     ⋯
+        a[1]    0.0021    0.0004    0.0000   101.7623   200.0031    1.0370     ⋯
+        a[2]    0.0032    0.0006    0.0001   104.1115   176.4790    1.0361     ⋯
+        a[3]    0.0047    0.0008    0.0001   107.3696   301.4567    1.0332     ⋯
+           k    1.8321    0.7961    0.0370   304.3834   405.4566    1.0101     ⋯
+
+<span class="ansi-cyan-fg">                                                                1 column omitted</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="34" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>let data = data2
+    data_weight = data.exposures ./ sum(data.exposures)
+    data_weight = .√(data_weight ./ maximum(data_weight) .* 20) .* 4
+
+    risk_colors = CASSETTE_PALETTE[1:3]
+    point_colors = [risk_colors[r] for r in Int.(data.risklevel)]
+
+    fig = Figure()
+    ax = Axis(fig[1,1]; xlabel="age", ylabel="mortality rate",
+        title="Parametric Bayesian Mortality")
+
+    n = 100
+    ages = sort!(unique(data.att_age))
+    for r in 1:3, i in 1:n
+        s = sample(chain3, 1)
+        a = only(s[Symbol("a[$r]")])
+        b = only(s[:b]); k = only(s[:k]); c = 0
+        m = MortalityTables.MakehamBeard(; a, b, c, k)
+        lines!(ax, ages, age -&gt; MortalityTables.hazard(m, age);
+            color=(risk_colors[r], 0.12), linewidth=0.8,
+            label = (i == 1 ? "risk level $r" : nothing))
+    end
+
+    scatter!(ax, data.att_age, data.fraction;
+        markersize=data_weight, color=point_colors, strokewidth=0)
+
+    ylims!(ax, 0.0, 0.25)
+    axislegend(ax, position=:rt, unique=true)
+    fig
+end</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-18-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="handling-non-unit-exposures" class="level2">
+<h2 class="anchored" data-anchor-id="handling-non-unit-exposures">Handling non-unit exposures</h2>
+<p>The key is to use the Poisson distribution:</p>
+<div id="36" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>@model function mortality4(data, deaths)
+    risk_levels = length(levels(data.risklevel))
+    b ~ Exponential(0.1)
+    ā ~ Exponential(0.1)
+    a ~ filldist(Exponential(ā), risk_levels)
+    c ~ Beta(4, 18)
+    k ~ truncated(Exponential(1), 1, Inf)
+
+    # use the variables to create a parametric mortality model
+
+    # loop through the rows of the dataframe to let Turing observe the data 
+    # and how consistent the parameters are with the data
+    for i = 1:nrow(data)
+        risk = data.risklevel[i]
+
+        m = MortalityTables.MakehamBeard(; a=a[risk], b, c, k)
+        age = data.att_age[i]
+        q = MortalityTables.hazard(m, age)
+        deaths[i] ~ Poisson(data.exposures[i] * q)
+    end
+end</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>mortality4 (generic function with 2 methods)</code></pre>
+</div>
+</div>
+<p>Instantiate model with the data, sample, and summarize:</p>
+<div id="38" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>m4 = mortality4(data2, data2.deaths)
+chain4 = MCMCChains.Chains(sample(m4, NUTS(), 1000))
+summarize(chain4)</code></pre>
+<div class="cell-output cell-output-stdout">
+<div class="ansi-escaped-output">
+<pre><span class="ansi-green-fg">Sampling   0%|                                          |  ETA: N/A</span>
+<span class="ansi-cyan-fg ansi-bold">┌ </span><span class="ansi-cyan-fg ansi-bold">Info: </span>Found initial step size
+<span class="ansi-cyan-fg ansi-bold">└ </span>  ϵ = 0.025
+<span class="ansi-green-fg">Sampling   1%|▎                                         |  ETA: 0:02:37</span>
+<span class="ansi-green-fg">Sampling   1%|▍                                         |  ETA: 0:01:27</span>
+<span class="ansi-green-fg">Sampling   2%|▋                                         |  ETA: 0:01:17</span>
+<span class="ansi-green-fg">Sampling   2%|▉                                         |  ETA: 0:01:05</span>
+<span class="ansi-green-fg">Sampling   3%|█▏                                        |  ETA: 0:00:58</span>
+<span class="ansi-green-fg">Sampling   3%|█▎                                        |  ETA: 0:01:02</span>
+<span class="ansi-green-fg">Sampling   4%|█▌                                        |  ETA: 0:01:03</span>
+<span class="ansi-green-fg">Sampling   4%|█▋                                        |  ETA: 0:01:15</span>
+<span class="ansi-green-fg">Sampling   5%|█▉                                        |  ETA: 0:01:23</span>
+<span class="ansi-green-fg">Sampling   5%|██▏                                       |  ETA: 0:01:26</span>
+<span class="ansi-green-fg">Sampling   6%|██▍                                       |  ETA: 0:01:30</span>
+<span class="ansi-green-fg">Sampling   6%|██▌                                       |  ETA: 0:01:28</span>
+<span class="ansi-green-fg">Sampling   7%|██▊                                       |  ETA: 0:01:35</span>
+<span class="ansi-green-fg">Sampling   7%|███                                       |  ETA: 0:01:34</span>
+<span class="ansi-green-fg">Sampling   8%|███▏                                      |  ETA: 0:01:31</span>
+<span class="ansi-green-fg">Sampling   8%|███▍                                      |  ETA: 0:01:29</span>
+<span class="ansi-green-fg">Sampling   9%|███▋                                      |  ETA: 0:01:27</span>
+<span class="ansi-green-fg">Sampling   9%|███▊                                      |  ETA: 0:01:24</span>
+<span class="ansi-green-fg">Sampling  10%|████                                      |  ETA: 0:01:20</span>
+<span class="ansi-green-fg">Sampling  10%|████▎                                     |  ETA: 0:01:17</span>
+<span class="ansi-green-fg">Sampling  11%|████▍                                     |  ETA: 0:01:17</span>
+<span class="ansi-green-fg">Sampling  11%|████▋                                     |  ETA: 0:01:15</span>
+<span class="ansi-green-fg">Sampling  12%|████▉                                     |  ETA: 0:01:12</span>
+<span class="ansi-green-fg">Sampling  12%|█████                                     |  ETA: 0:01:11</span>
+<span class="ansi-green-fg">Sampling  13%|█████▎                                    |  ETA: 0:01:10</span>
+<span class="ansi-green-fg">Sampling  13%|█████▌                                    |  ETA: 0:01:09</span>
+<span class="ansi-green-fg">Sampling  14%|█████▋                                    |  ETA: 0:01:07</span>
+<span class="ansi-green-fg">Sampling  14%|█████▉                                    |  ETA: 0:01:06</span>
+<span class="ansi-green-fg">Sampling  15%|██████▏                                   |  ETA: 0:01:04</span>
+<span class="ansi-green-fg">Sampling  15%|██████▎                                   |  ETA: 0:01:03</span>
+<span class="ansi-green-fg">Sampling  16%|██████▌                                   |  ETA: 0:01:01</span>
+<span class="ansi-green-fg">Sampling  16%|██████▊                                   |  ETA: 0:01:00</span>
+<span class="ansi-green-fg">Sampling  17%|███████                                   |  ETA: 0:00:59</span>
+<span class="ansi-green-fg">Sampling  17%|███████▏                                  |  ETA: 0:00:57</span>
+<span class="ansi-green-fg">Sampling  18%|███████▍                                  |  ETA: 0:00:56</span>
+<span class="ansi-green-fg">Sampling  18%|███████▌                                  |  ETA: 0:00:55</span>
+<span class="ansi-green-fg">Sampling  19%|███████▊                                  |  ETA: 0:00:54</span>
+<span class="ansi-green-fg">Sampling  19%|████████                                  |  ETA: 0:00:53</span>
+<span class="ansi-green-fg">Sampling  20%|████████▎                                 |  ETA: 0:00:52</span>
+<span class="ansi-green-fg">Sampling  20%|████████▍                                 |  ETA: 0:00:51</span>
+<span class="ansi-green-fg">Sampling  21%|████████▋                                 |  ETA: 0:00:50</span>
+<span class="ansi-green-fg">Sampling  21%|████████▉                                 |  ETA: 0:00:49</span>
+<span class="ansi-green-fg">Sampling  22%|█████████                                 |  ETA: 0:00:48</span>
+<span class="ansi-green-fg">Sampling  22%|█████████▎                                |  ETA: 0:00:48</span>
+<span class="ansi-green-fg">Sampling  23%|█████████▌                                |  ETA: 0:00:47</span>
+<span class="ansi-green-fg">Sampling  23%|█████████▋                                |  ETA: 0:00:46</span>
+<span class="ansi-green-fg">Sampling  24%|█████████▉                                |  ETA: 0:00:45</span>
+<span class="ansi-green-fg">Sampling  24%|██████████▏                               |  ETA: 0:00:45</span>
+<span class="ansi-green-fg">Sampling  25%|██████████▎                               |  ETA: 0:00:44</span>
+<span class="ansi-green-fg">Sampling  25%|██████████▌                               |  ETA: 0:00:43</span>
+<span class="ansi-green-fg">Sampling  26%|██████████▊                               |  ETA: 0:00:42</span>
+<span class="ansi-green-fg">Sampling  26%|██████████▉                               |  ETA: 0:00:42</span>
+<span class="ansi-green-fg">Sampling  27%|███████████▏                              |  ETA: 0:00:41</span>
+<span class="ansi-green-fg">Sampling  27%|███████████▍                              |  ETA: 0:00:40</span>
+<span class="ansi-green-fg">Sampling  28%|███████████▋                              |  ETA: 0:00:40</span>
+<span class="ansi-green-fg">Sampling  28%|███████████▊                              |  ETA: 0:00:39</span>
+<span class="ansi-green-fg">Sampling  29%|████████████                              |  ETA: 0:00:38</span>
+<span class="ansi-green-fg">Sampling  29%|████████████▏                             |  ETA: 0:00:38</span>
+<span class="ansi-green-fg">Sampling  30%|████████████▍                             |  ETA: 0:00:37</span>
+<span class="ansi-green-fg">Sampling  30%|████████████▋                             |  ETA: 0:00:37</span>
+<span class="ansi-green-fg">Sampling  31%|████████████▉                             |  ETA: 0:00:36</span>
+<span class="ansi-green-fg">Sampling  31%|█████████████                             |  ETA: 0:00:36</span>
+<span class="ansi-green-fg">Sampling  32%|█████████████▎                            |  ETA: 0:00:36</span>
+<span class="ansi-green-fg">Sampling  32%|█████████████▌                            |  ETA: 0:00:35</span>
+<span class="ansi-green-fg">Sampling  33%|█████████████▋                            |  ETA: 0:00:35</span>
+<span class="ansi-green-fg">Sampling  33%|█████████████▉                            |  ETA: 0:00:35</span>
+<span class="ansi-green-fg">Sampling  34%|██████████████▏                           |  ETA: 0:00:34</span>
+<span class="ansi-green-fg">Sampling  34%|██████████████▎                           |  ETA: 0:00:34</span>
+<span class="ansi-green-fg">Sampling  35%|██████████████▌                           |  ETA: 0:00:34</span>
+<span class="ansi-green-fg">Sampling  35%|██████████████▊                           |  ETA: 0:00:33</span>
+<span class="ansi-green-fg">Sampling  36%|██████████████▉                           |  ETA: 0:00:33</span>
+<span class="ansi-green-fg">Sampling  36%|███████████████▏                          |  ETA: 0:00:33</span>
+<span class="ansi-green-fg">Sampling  37%|███████████████▍                          |  ETA: 0:00:32</span>
+<span class="ansi-green-fg">Sampling  37%|███████████████▌                          |  ETA: 0:00:32</span>
+<span class="ansi-green-fg">Sampling  38%|███████████████▊                          |  ETA: 0:00:31</span>
+<span class="ansi-green-fg">Sampling  38%|████████████████                          |  ETA: 0:00:31</span>
+<span class="ansi-green-fg">Sampling  39%|████████████████▏                         |  ETA: 0:00:31</span>
+<span class="ansi-green-fg">Sampling  39%|████████████████▍                         |  ETA: 0:00:30</span>
+<span class="ansi-green-fg">Sampling  40%|████████████████▋                         |  ETA: 0:00:30</span>
+<span class="ansi-green-fg">Sampling  40%|████████████████▊                         |  ETA: 0:00:29</span>
+<span class="ansi-green-fg">Sampling  41%|█████████████████                         |  ETA: 0:00:29</span>
+<span class="ansi-green-fg">Sampling  41%|█████████████████▎                        |  ETA: 0:00:29</span>
+<span class="ansi-green-fg">Sampling  42%|█████████████████▌                        |  ETA: 0:00:28</span>
+<span class="ansi-green-fg">Sampling  42%|█████████████████▋                        |  ETA: 0:00:28</span>
+<span class="ansi-green-fg">Sampling  43%|█████████████████▉                        |  ETA: 0:00:28</span>
+<span class="ansi-green-fg">Sampling  43%|██████████████████                        |  ETA: 0:00:28</span>
+<span class="ansi-green-fg">Sampling  44%|██████████████████▎                       |  ETA: 0:00:27</span>
+<span class="ansi-green-fg">Sampling  44%|██████████████████▌                       |  ETA: 0:00:27</span>
+<span class="ansi-green-fg">Sampling  45%|██████████████████▊                       |  ETA: 0:00:27</span>
+<span class="ansi-green-fg">Sampling  45%|██████████████████▉                       |  ETA: 0:00:26</span>
+<span class="ansi-green-fg">Sampling  46%|███████████████████▏                      |  ETA: 0:00:26</span>
+<span class="ansi-green-fg">Sampling  46%|███████████████████▍                      |  ETA: 0:00:26</span>
+<span class="ansi-green-fg">Sampling  47%|███████████████████▌                      |  ETA: 0:00:25</span>
+<span class="ansi-green-fg">Sampling  47%|███████████████████▊                      |  ETA: 0:00:25</span>
+<span class="ansi-green-fg">Sampling  48%|████████████████████                      |  ETA: 0:00:25</span>
+<span class="ansi-green-fg">Sampling  48%|████████████████████▏                     |  ETA: 0:00:24</span>
+<span class="ansi-green-fg">Sampling  49%|████████████████████▍                     |  ETA: 0:00:24</span>
+<span class="ansi-green-fg">Sampling  49%|████████████████████▋                     |  ETA: 0:00:24</span>
+<span class="ansi-green-fg">Sampling  50%|████████████████████▊                     |  ETA: 0:00:23</span>
+<span class="ansi-green-fg">Sampling  50%|█████████████████████                     |  ETA: 0:00:23</span>
+<span class="ansi-green-fg">Sampling  51%|█████████████████████▎                    |  ETA: 0:00:23</span>
+<span class="ansi-green-fg">Sampling  51%|█████████████████████▍                    |  ETA: 0:00:23</span>
+<span class="ansi-green-fg">Sampling  52%|█████████████████████▋                    |  ETA: 0:00:22</span>
+<span class="ansi-green-fg">Sampling  52%|█████████████████████▉                    |  ETA: 0:00:22</span>
+<span class="ansi-green-fg">Sampling  53%|██████████████████████▏                   |  ETA: 0:00:22</span>
+<span class="ansi-green-fg">Sampling  53%|██████████████████████▎                   |  ETA: 0:00:21</span>
+<span class="ansi-green-fg">Sampling  54%|██████████████████████▌                   |  ETA: 0:00:21</span>
+<span class="ansi-green-fg">Sampling  54%|██████████████████████▋                   |  ETA: 0:00:21</span>
+<span class="ansi-green-fg">Sampling  55%|██████████████████████▉                   |  ETA: 0:00:21</span>
+<span class="ansi-green-fg">Sampling  55%|███████████████████████▏                  |  ETA: 0:00:20</span>
+<span class="ansi-green-fg">Sampling  56%|███████████████████████▍                  |  ETA: 0:00:20</span>
+<span class="ansi-green-fg">Sampling  56%|███████████████████████▌                  |  ETA: 0:00:20</span>
+<span class="ansi-green-fg">Sampling  57%|███████████████████████▊                  |  ETA: 0:00:19</span>
+<span class="ansi-green-fg">Sampling  57%|████████████████████████                  |  ETA: 0:00:19</span>
+<span class="ansi-green-fg">Sampling  58%|████████████████████████▏                 |  ETA: 0:00:19</span>
+<span class="ansi-green-fg">Sampling  58%|████████████████████████▍                 |  ETA: 0:00:19</span>
+<span class="ansi-green-fg">Sampling  59%|████████████████████████▋                 |  ETA: 0:00:18</span>
+<span class="ansi-green-fg">Sampling  59%|████████████████████████▊                 |  ETA: 0:00:18</span>
+<span class="ansi-green-fg">Sampling  60%|█████████████████████████                 |  ETA: 0:00:18</span>
+<span class="ansi-green-fg">Sampling  60%|█████████████████████████▎                |  ETA: 0:00:18</span>
+<span class="ansi-green-fg">Sampling  61%|█████████████████████████▍                |  ETA: 0:00:17</span>
+<span class="ansi-green-fg">Sampling  61%|█████████████████████████▋                |  ETA: 0:00:17</span>
+<span class="ansi-green-fg">Sampling  62%|█████████████████████████▉                |  ETA: 0:00:17</span>
+<span class="ansi-green-fg">Sampling  62%|██████████████████████████                |  ETA: 0:00:17</span>
+<span class="ansi-green-fg">Sampling  63%|██████████████████████████▎               |  ETA: 0:00:16</span>
+<span class="ansi-green-fg">Sampling  63%|██████████████████████████▌               |  ETA: 0:00:16</span>
+<span class="ansi-green-fg">Sampling  64%|██████████████████████████▋               |  ETA: 0:00:16</span>
+<span class="ansi-green-fg">Sampling  64%|██████████████████████████▉               |  ETA: 0:00:16</span>
+<span class="ansi-green-fg">Sampling  65%|███████████████████████████▏              |  ETA: 0:00:16</span>
+<span class="ansi-green-fg">Sampling  65%|███████████████████████████▎              |  ETA: 0:00:15</span>
+<span class="ansi-green-fg">Sampling  66%|███████████████████████████▌              |  ETA: 0:00:15</span>
+<span class="ansi-green-fg">Sampling  66%|███████████████████████████▊              |  ETA: 0:00:15</span>
+<span class="ansi-green-fg">Sampling  67%|████████████████████████████              |  ETA: 0:00:15</span>
+<span class="ansi-green-fg">Sampling  67%|████████████████████████████▏             |  ETA: 0:00:14</span>
+<span class="ansi-green-fg">Sampling  68%|████████████████████████████▍             |  ETA: 0:00:14</span>
+<span class="ansi-green-fg">Sampling  68%|████████████████████████████▌             |  ETA: 0:00:14</span>
+<span class="ansi-green-fg">Sampling  69%|████████████████████████████▊             |  ETA: 0:00:14</span>
+<span class="ansi-green-fg">Sampling  69%|█████████████████████████████             |  ETA: 0:00:13</span>
+<span class="ansi-green-fg">Sampling  70%|█████████████████████████████▎            |  ETA: 0:00:13</span>
+<span class="ansi-green-fg">Sampling  70%|█████████████████████████████▍            |  ETA: 0:00:13</span>
+<span class="ansi-green-fg">Sampling  71%|█████████████████████████████▋            |  ETA: 0:00:13</span>
+<span class="ansi-green-fg">Sampling  71%|█████████████████████████████▉            |  ETA: 0:00:12</span>
+<span class="ansi-green-fg">Sampling  72%|██████████████████████████████            |  ETA: 0:00:12</span>
+<span class="ansi-green-fg">Sampling  72%|██████████████████████████████▎           |  ETA: 0:00:12</span>
+<span class="ansi-green-fg">Sampling  73%|██████████████████████████████▌           |  ETA: 0:00:12</span>
+<span class="ansi-green-fg">Sampling  73%|██████████████████████████████▋           |  ETA: 0:00:12</span>
+<span class="ansi-green-fg">Sampling  74%|██████████████████████████████▉           |  ETA: 0:00:11</span>
+<span class="ansi-green-fg">Sampling  74%|███████████████████████████████▏          |  ETA: 0:00:11</span>
+<span class="ansi-green-fg">Sampling  75%|███████████████████████████████▎          |  ETA: 0:00:11</span>
+<span class="ansi-green-fg">Sampling  75%|███████████████████████████████▌          |  ETA: 0:00:11</span>
+<span class="ansi-green-fg">Sampling  76%|███████████████████████████████▊          |  ETA: 0:00:10</span>
+<span class="ansi-green-fg">Sampling  76%|███████████████████████████████▉          |  ETA: 0:00:10</span>
+<span class="ansi-green-fg">Sampling  77%|████████████████████████████████▏         |  ETA: 0:00:10</span>
+<span class="ansi-green-fg">Sampling  77%|████████████████████████████████▍         |  ETA: 0:00:10</span>
+<span class="ansi-green-fg">Sampling  78%|████████████████████████████████▋         |  ETA: 0:00:09</span>
+<span class="ansi-green-fg">Sampling  78%|████████████████████████████████▊         |  ETA: 0:00:09</span>
+<span class="ansi-green-fg">Sampling  79%|█████████████████████████████████         |  ETA: 0:00:09</span>
+<span class="ansi-green-fg">Sampling  79%|█████████████████████████████████▏        |  ETA: 0:00:09</span>
+<span class="ansi-green-fg">Sampling  80%|█████████████████████████████████▍        |  ETA: 0:00:09</span>
+<span class="ansi-green-fg">Sampling  80%|█████████████████████████████████▋        |  ETA: 0:00:08</span>
+<span class="ansi-green-fg">Sampling  81%|█████████████████████████████████▉        |  ETA: 0:00:08</span>
+<span class="ansi-green-fg">Sampling  81%|██████████████████████████████████        |  ETA: 0:00:08</span>
+<span class="ansi-green-fg">Sampling  82%|██████████████████████████████████▎       |  ETA: 0:00:08</span>
+<span class="ansi-green-fg">Sampling  82%|██████████████████████████████████▌       |  ETA: 0:00:08</span>
+<span class="ansi-green-fg">Sampling  83%|██████████████████████████████████▋       |  ETA: 0:00:07</span>
+<span class="ansi-green-fg">Sampling  83%|██████████████████████████████████▉       |  ETA: 0:00:07</span>
+<span class="ansi-green-fg">Sampling  84%|███████████████████████████████████▏      |  ETA: 0:00:07</span>
+<span class="ansi-green-fg">Sampling  84%|███████████████████████████████████▎      |  ETA: 0:00:07</span>
+<span class="ansi-green-fg">Sampling  85%|███████████████████████████████████▌      |  ETA: 0:00:06</span>
+<span class="ansi-green-fg">Sampling  85%|███████████████████████████████████▊      |  ETA: 0:00:06</span>
+<span class="ansi-green-fg">Sampling  86%|███████████████████████████████████▉      |  ETA: 0:00:06</span>
+<span class="ansi-green-fg">Sampling  86%|████████████████████████████████████▏     |  ETA: 0:00:06</span>
+<span class="ansi-green-fg">Sampling  87%|████████████████████████████████████▍     |  ETA: 0:00:06</span>
+<span class="ansi-green-fg">Sampling  87%|████████████████████████████████████▌     |  ETA: 0:00:05</span>
+<span class="ansi-green-fg">Sampling  88%|████████████████████████████████████▊     |  ETA: 0:00:05</span>
+<span class="ansi-green-fg">Sampling  88%|█████████████████████████████████████     |  ETA: 0:00:05</span>
+<span class="ansi-green-fg">Sampling  89%|█████████████████████████████████████▏    |  ETA: 0:00:05</span>
+<span class="ansi-green-fg">Sampling  89%|█████████████████████████████████████▍    |  ETA: 0:00:04</span>
+<span class="ansi-green-fg">Sampling  90%|█████████████████████████████████████▋    |  ETA: 0:00:04</span>
+<span class="ansi-green-fg">Sampling  90%|█████████████████████████████████████▊    |  ETA: 0:00:04</span>
+<span class="ansi-green-fg">Sampling  91%|██████████████████████████████████████    |  ETA: 0:00:04</span>
+<span class="ansi-green-fg">Sampling  91%|██████████████████████████████████████▎   |  ETA: 0:00:04</span>
+<span class="ansi-green-fg">Sampling  92%|██████████████████████████████████████▌   |  ETA: 0:00:03</span>
+<span class="ansi-green-fg">Sampling  92%|██████████████████████████████████████▋   |  ETA: 0:00:03</span>
+<span class="ansi-green-fg">Sampling  93%|██████████████████████████████████████▉   |  ETA: 0:00:03</span>
+<span class="ansi-green-fg">Sampling  93%|███████████████████████████████████████   |  ETA: 0:00:03</span>
+<span class="ansi-green-fg">Sampling  94%|███████████████████████████████████████▎  |  ETA: 0:00:03</span>
+<span class="ansi-green-fg">Sampling  94%|███████████████████████████████████████▌  |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  95%|███████████████████████████████████████▊  |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  95%|███████████████████████████████████████▉  |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  96%|████████████████████████████████████████▏ |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  96%|████████████████████████████████████████▍ |  ETA: 0:00:02</span>
+<span class="ansi-green-fg">Sampling  97%|████████████████████████████████████████▌ |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  97%|████████████████████████████████████████▊ |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  98%|█████████████████████████████████████████ |  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  98%|█████████████████████████████████████████▏|  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  99%|█████████████████████████████████████████▍|  ETA: 0:00:01</span>
+<span class="ansi-green-fg">Sampling  99%|█████████████████████████████████████████▋|  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling 100%|█████████████████████████████████████████▊|  ETA: 0:00:00</span>
+<span class="ansi-green-fg">Sampling 100%|██████████████████████████████████████████| Time: 0:00:40</span>
+<span class="ansi-bright-black-fg">Sampling 100%|██████████████████████████████████████████| Time: 0:00:40</span>
+</pre>
+</div>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="ansi-escaped-output">
+<pre> <span class="ansi-bold"> parameters </span> <span class="ansi-bold">    mean </span> <span class="ansi-bold">     std </span> <span class="ansi-bold">    mcse </span> <span class="ansi-bold"> ess_bulk </span> <span class="ansi-bold"> ess_tail </span> <span class="ansi-bold">    rhat </span> <span class="ansi-bold"> e</span> ⋯
+ <span class="ansi-bright-black-fg">     Symbol </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg">  Float64 </span> <span class="ansi-bright-black-fg">  Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg">  </span> ⋯
+
+           b    0.0534    0.0064    0.0004   222.7271   283.9426    0.9994     ⋯
+           ā    0.0028    0.0039    0.0002   311.7625   364.4385    1.0041     ⋯
+        a[1]    0.0006    0.0003    0.0000   207.0352   221.0552    1.0000     ⋯
+        a[2]    0.0010    0.0005    0.0000   211.3546   236.8692    1.0003     ⋯
+        a[3]    0.0017    0.0007    0.0001   212.0192   227.7851    0.9995     ⋯
+           c    0.0087    0.0025    0.0002   221.7056   227.3546    0.9995     ⋯
+           k    2.0726    0.9709    0.0352   434.0296   292.7296    1.0005     ⋯
+
+<span class="ansi-cyan-fg">                                                                1 column omitted</span>
+</pre>
+</div>
+</div>
+</div>
+<p>PRECIS(DataFrame(chain4))</p>
+<div id="40" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>risk_factors4 = [mean(chain4[Symbol("a[$f]")]) for f in 1:3]</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>3-element Vector{Float64}:
+ 0.0005616444562408539
+ 0.001007199288486119
+ 0.0016566745095824135</code></pre>
+</div>
+</div>
+<div id="42" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>let data = data2
+    data_weight = data.exposures ./ sum(data.exposures)
+    data_weight = .√(data_weight ./ maximum(data_weight) .* 20) .* 4
+
+    risk_colors = CASSETTE_PALETTE[1:3]
+    point_colors = [risk_colors[r] for r in Int.(data.risklevel)]
+
+    fig = Figure()
+    ax = Axis(fig[1,1]; xlabel="age", ylabel="mortality rate",
+        title="Parametric Bayesian Mortality")
+
+    n = 100
+    ages = sort!(unique(data.att_age))
+    for r in 1:3, i in 1:n
+        s = sample(chain4, 1)
+        a = only(s[Symbol("a[$r]")])
+        b = only(s[:b]); k = only(s[:k]); c = 0
+        m = MortalityTables.MakehamBeard(; a, b, c, k)
+        lines!(ax, ages, age -&gt; MortalityTables.hazard(m, age);
+            color=(risk_colors[r], 0.12), linewidth=0.8,
+            label = (i == 1 ? "risk level $r" : nothing))
+    end
+
+    scatter!(ax, data.att_age, data.fraction;
+        markersize=data_weight, color=point_colors, strokewidth=0)
+
+    ylims!(ax, 0.0, 0.25)
+    axislegend(ax, position=:rt, unique=true)
+    fig
+end</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-22-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="predictions" class="level2">
+<h2 class="anchored" data-anchor-id="predictions">Predictions</h2>
+<p>We can generate predictive estimates by passing a vector of <code>missing</code> in place of the outcome variables and then calling <code>predict</code>.</p>
+<p>We get a table of values where each row is the the prediction implied by the corresponding chain sample, and the columns are the predicted value for each of the outcomes in our original dataset.</p>
+<div id="44" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>preds = predict(mortality4(data2, fill(missing, length(data2.deaths))), chain4)</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>Chains MCMC chain (1000×532×1 Array{Float64, 3}):
+
+Iterations        = 1:1:1000
+Number of chains  = 1
+Samples per chain = 1000
+parameters        = deaths[1], deaths[2], deaths[3], deaths[4], deaths[5], deaths[6], deaths[7], deaths[8], deaths[9], deaths[10], deaths[11], deaths[12], deaths[13], deaths[14], deaths[15], deaths[16], deaths[17], deaths[18], deaths[19], deaths[20], deaths[21], deaths[22], deaths[23], deaths[24], deaths[25], deaths[26], deaths[27], deaths[28], deaths[29], deaths[30], deaths[31], deaths[32], deaths[33], deaths[34], deaths[35], deaths[36], deaths[37], deaths[38], deaths[39], deaths[40], deaths[41], deaths[42], deaths[43], deaths[44], deaths[45], deaths[46], deaths[47], deaths[48], deaths[49], deaths[50], deaths[51], deaths[52], deaths[53], deaths[54], deaths[55], deaths[56], deaths[57], deaths[58], deaths[59], deaths[60], deaths[61], deaths[62], deaths[63], deaths[64], deaths[65], deaths[66], deaths[67], deaths[68], deaths[69], deaths[70], deaths[71], deaths[72], deaths[73], deaths[74], deaths[75], deaths[76], deaths[77], deaths[78], deaths[79], deaths[80], deaths[81], deaths[82], deaths[83], deaths[84], deaths[85], deaths[86], deaths[87], deaths[88], deaths[89], deaths[90], deaths[91], deaths[92], deaths[93], deaths[94], deaths[95], deaths[96], deaths[97], deaths[98], deaths[99], deaths[100], deaths[101], deaths[102], deaths[103], deaths[104], deaths[105], deaths[106], deaths[107], deaths[108], deaths[109], deaths[110], deaths[111], deaths[112], deaths[113], deaths[114], deaths[115], deaths[116], deaths[117], deaths[118], deaths[119], deaths[120], deaths[121], deaths[122], deaths[123], deaths[124], deaths[125], deaths[126], deaths[127], deaths[128], deaths[129], deaths[130], deaths[131], deaths[132], deaths[133], deaths[134], deaths[135], deaths[136], deaths[137], deaths[138], deaths[139], deaths[140], deaths[141], deaths[142], deaths[143], deaths[144], deaths[145], deaths[146], deaths[147], deaths[148], deaths[149], deaths[150], deaths[151], deaths[152], deaths[153], deaths[154], deaths[155], deaths[156], deaths[157], deaths[158], deaths[159], deaths[160], deaths[161], deaths[162], deaths[163], deaths[164], deaths[165], deaths[166], deaths[167], deaths[168], deaths[169], deaths[170], deaths[171], deaths[172], deaths[173], deaths[174], deaths[175], deaths[176], deaths[177], deaths[178], deaths[179], deaths[180], deaths[181], deaths[182], deaths[183], deaths[184], deaths[185], deaths[186], deaths[187], deaths[188], deaths[189], deaths[190], deaths[191], deaths[192], deaths[193], deaths[194], deaths[195], deaths[196], deaths[197], deaths[198], deaths[199], deaths[200], deaths[201], deaths[202], deaths[203], deaths[204], deaths[205], deaths[206], deaths[207], deaths[208], deaths[209], deaths[210], deaths[211], deaths[212], deaths[213], deaths[214], deaths[215], deaths[216], deaths[217], deaths[218], deaths[219], deaths[220], deaths[221], deaths[222], deaths[223], deaths[224], deaths[225], deaths[226], deaths[227], deaths[228], deaths[229], deaths[230], deaths[231], deaths[232], deaths[233], deaths[234], deaths[235], deaths[236], deaths[237], deaths[238], deaths[239], deaths[240], deaths[241], deaths[242], deaths[243], deaths[244], deaths[245], deaths[246], deaths[247], deaths[248], deaths[249], deaths[250], deaths[251], deaths[252], deaths[253], deaths[254], deaths[255], deaths[256], deaths[257], deaths[258], deaths[259], deaths[260], deaths[261], deaths[262], deaths[263], deaths[264], deaths[265], deaths[266], deaths[267], deaths[268], deaths[269], deaths[270], deaths[271], deaths[272], deaths[273], deaths[274], deaths[275], deaths[276], deaths[277], deaths[278], deaths[279], deaths[280], deaths[281], deaths[282], deaths[283], deaths[284], deaths[285], deaths[286], deaths[287], deaths[288], deaths[289], deaths[290], deaths[291], deaths[292], deaths[293], deaths[294], deaths[295], deaths[296], deaths[297], deaths[298], deaths[299], deaths[300], deaths[301], deaths[302], deaths[303], deaths[304], deaths[305], deaths[306], deaths[307], deaths[308], deaths[309], deaths[310], deaths[311], deaths[312], deaths[313], deaths[314], deaths[315], deaths[316], deaths[317], deaths[318], deaths[319], deaths[320], deaths[321], deaths[322], deaths[323], deaths[324], deaths[325], deaths[326], deaths[327], deaths[328], deaths[329], deaths[330], deaths[331], deaths[332], deaths[333], deaths[334], deaths[335], deaths[336], deaths[337], deaths[338], deaths[339], deaths[340], deaths[341], deaths[342], deaths[343], deaths[344], deaths[345], deaths[346], deaths[347], deaths[348], deaths[349], deaths[350], deaths[351], deaths[352], deaths[353], deaths[354], deaths[355], deaths[356], deaths[357], deaths[358], deaths[359], deaths[360], deaths[361], deaths[362], deaths[363], deaths[364], deaths[365], deaths[366], deaths[367], deaths[368], deaths[369], deaths[370], deaths[371], deaths[372], deaths[373], deaths[374], deaths[375], deaths[376], deaths[377], deaths[378], deaths[379], deaths[380], deaths[381], deaths[382], deaths[383], deaths[384], deaths[385], deaths[386], deaths[387], deaths[388], deaths[389], deaths[390], deaths[391], deaths[392], deaths[393], deaths[394], deaths[395], deaths[396], deaths[397], deaths[398], deaths[399], deaths[400], deaths[401], deaths[402], deaths[403], deaths[404], deaths[405], deaths[406], deaths[407], deaths[408], deaths[409], deaths[410], deaths[411], deaths[412], deaths[413], deaths[414], deaths[415], deaths[416], deaths[417], deaths[418], deaths[419], deaths[420], deaths[421], deaths[422], deaths[423], deaths[424], deaths[425], deaths[426], deaths[427], deaths[428], deaths[429], deaths[430], deaths[431], deaths[432], deaths[433], deaths[434], deaths[435], deaths[436], deaths[437], deaths[438], deaths[439], deaths[440], deaths[441], deaths[442], deaths[443], deaths[444], deaths[445], deaths[446], deaths[447], deaths[448], deaths[449], deaths[450], deaths[451], deaths[452], deaths[453], deaths[454], deaths[455], deaths[456], deaths[457], deaths[458], deaths[459], deaths[460], deaths[461], deaths[462], deaths[463], deaths[464], deaths[465], deaths[466], deaths[467], deaths[468], deaths[469], deaths[470], deaths[471], deaths[472], deaths[473], deaths[474], deaths[475], deaths[476], deaths[477], deaths[478], deaths[479], deaths[480], deaths[481], deaths[482], deaths[483], deaths[484], deaths[485], deaths[486], deaths[487], deaths[488], deaths[489], deaths[490], deaths[491], deaths[492], deaths[493], deaths[494], deaths[495], deaths[496], deaths[497], deaths[498], deaths[499], deaths[500], deaths[501], deaths[502], deaths[503], deaths[504], deaths[505], deaths[506], deaths[507], deaths[508], deaths[509], deaths[510], deaths[511], deaths[512], deaths[513], deaths[514], deaths[515], deaths[516], deaths[517], deaths[518], deaths[519], deaths[520], deaths[521], deaths[522], deaths[523], deaths[524], deaths[525], deaths[526], deaths[527], deaths[528], deaths[529], deaths[530], deaths[531], deaths[532]
+internals         = 
+
+Use `describe(chains)` for summary statistics and quantiles.</code></pre>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/JuliaActuary\.org");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
