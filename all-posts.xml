@@ -10,7 +10,1303 @@
 <atom:link href="https://JuliaActuary.org/all-posts.xml" rel="self" type="application/rss+xml"/>
 <description>JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.</description>
 <generator>quarto-1.9.16</generator>
-<lastBuildDate>Fri, 31 Jul 2026 06:00:00 GMT</lastBuildDate>
+<lastBuildDate>Wed, 30 Sep 2026 04:00:00 GMT</lastBuildDate>
+<item>
+  <title>FinanceModels 7, ActuaryUtilities 6, MortalityTables 3 and FinanceCore 3</title>
+  <dc:creator>Alec Loudenback</dc:creator>
+  <link>https://JuliaActuary.org/posts/2026-fall-releases/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<!--
+DRAFT: to do before publishing
+- Confirm release status once FinanceModels 7.0.0, ActuaryUtilities 6.0.0, MortalityTables 3.0.0
+and EconomicScenarioGenerators 0.7.1 are registered, and update the date. FinanceCore 3.0.0 is
+registered (2026-10-08).
+- 2026-10-02: the FinanceCore 3.0, valuation-context, callback-order, `Scenarios`, `wasserstein`
+and bounded-law edits were checked in a scratch environment (FinanceCore f6ee618, FinanceModels
+1a7e5ed, ActuaryUtilities a7422e3; the bounded-law claim against MortalityTables 2.6.0 and e69b660).
+After the third review the heads are FinanceCore feb655e, FinanceModels 3795ce2 and
+ActuaryUtilities 916bb89; the chunks changed for that review (`wasserstein`, as-of, Black–Scholes
+composite, FinanceCore laws, IRR) were rerun on them. `pv(…, times)` can now differ in the last
+digits. 2026-10-03, after the final review: FinanceCore 60fad7f, FinanceModels 625de99,
+ActuaryUtilities 09c68d1, MortalityTables 9803be9; every non-plot chunk was rerun on them, with
+unchanged outputs. Then the explicit rate conventions (FinanceModels 8242994 with
+`feat/explicit-rate-conventions` 5b446e7 below #336, ActuaryUtilities 3e93a9a): every chunk was
+rerun, with the same values (the steepener and the gradient seed are now typed). After the
+2026-10-03 review fixes: FinanceCore 183352b, FinanceModels 3630130 (rate PR 1d8ee46). 2026-10-04, after
+the ergonomics review and review 8 (pushed): FinanceCore ad90877, FinanceModels b22f39b (rate PR
+453cd5a), ActuaryUtilities 387ef5c, MortalityTables f4fcfba (rebased on master, so it includes the
+age-basis PR #154); every non-plot chunk was rerun on them, with unchanged outputs apart from the
+renamed `UniformDeaths()`, the new life-expectancy chunk and the two-curve convexity blocks, now
+keyed by role. 2026-10-05 (pushed): ActuaryUtilities 2661464 (`dv01` removed, dollar convexity
+added) and MortalityTables 294dd91; the post is rendered in its own environment on these heads.
+2026-10-09: added curve blends (FinanceModels #343) and Vasicek under negative mean reversion
+(#341/#342; the 6.x numbers were measured on FinanceModels 6.5.0). The environment now uses the
+registered FinanceCore 3.0.0 and FinanceModels master 607261c2 (#336–#344 merged); MortalityTables
+is d8e8351 (#153 merged). The post was re-rendered on Julia 1.13.1.
+- This post's environment (Project.toml/Manifest.toml beside this file) develops the release
+worktrees ~/.julia/dev/pr-FinanceModels-v7-master (a detached checkout of master),
+pr-ActuaryUtilities-sensitivity-engine and pr-MortalityTables-life-expectancy; FinanceCore is the
+registered 3.0.0 (the previous Project/Manifest are in the evidence folder's backups). Before
+publishing: `Pkg.free` those three, add the registered versions, re-render, and commit the new
+Manifest and `_freeze/posts/2026-fall-releases/`.
+- Performance numbers come from the 2026-10-02 benchmarks against the latest tagged releases (FC 2.8.0,
+FM 6.5.0, MT 2.6.0, AU 5.12.0): `2026-master-plan-drafts/evidence/2026-10-01/next-version/perf/`
+(`RELEASE.md`, `release/summary.md`, `fc-sum/`, and `mt-parse/` for the uncached XTbML parse), taken
+before the third review's fixes. Re-run them against the registered releases and publish the benchmark Manifest.
+The "Two-curve IR01 and convexity" row (1.7–3.2×) was dropped on 2026-10-05: its fixed-cashflow forms
+are removed; benchmark their replacements (`duration(DV01(), base + credit, …)` and the two-curve
+callbacks) in the refresh.
+Include unchanged-quote and updated-quote refits, and zero-volatility CIR. Compare every workload
+against the same tagged-release baseline; recheck the slowdown explanations as well as the timings.
+Replace the provisional performance paragraph with the final benchmark date and evidence link.
+- Check that the linked migration guides, API docs and NEWS contain these releases once deployed;
+  a successful HTTP response alone is not enough. Confirm the version table against registered Project.toml files.
+-->
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>Draft: these releases are not yet available
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>FinanceModels 7.0, ActuaryUtilities 6.0, MortalityTables 3.0 and EconomicScenarioGenerators 0.7.1 are not yet released, so installing the packages today gives the previous versions (only FinanceCore 3.0 is released). The code in this post ran on the release candidates, and details may change before release.</p>
+</div>
+</div>
+<p>Four major JuliaActuary releases bring sensitivities through curve calibration, curve blending, more consistent risk measures, and corrections to discounting and mortality calculations. Some changes alter the numbers existing models produce: portfolio values, the sign of DV01, zero rates beyond a curve’s last knot, and the rates of eight SOA tables. Others simplify the APIs or improve performance. This post explains what changes, why, and how to migrate.</p>
+<p><strong>FinanceModels 7.0</strong>, <strong>ActuaryUtilities 6.0</strong>, <strong>MortalityTables 3.0</strong> and <strong>FinanceCore 3.0</strong> are major releases with breaking changes; FinanceCore 3.0 includes the fixes of FinanceCore 2.8. Migration guides and release notes are linked under Upgrading.</p>
+<ol type="1">
+<li>New capabilities</li>
+<li>Changes affecting existing models</li>
+<li>Performance and tradeoffs</li>
+<li>Upgrading</li>
+</ol>
+<p>All the code below runs as part of this post.</p>
+<div id="4" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>using FinanceModels, FinanceCore, ActuaryUtilities, MortalityTables, ForwardDiff</code></pre>
+</div>
+<section id="new-capabilities" class="level2">
+<h2 class="anchored" data-anchor-id="new-capabilities">New capabilities</h2>
+<section id="sensitivities-through-calibration-financemodels" class="level3">
+<h3 class="anchored" data-anchor-id="sensitivities-through-calibration-financemodels">Sensitivities through calibration (FinanceModels)</h3>
+<p>You can now measure how a valuation changes when the <em>market quotes</em> used to calibrate its curve change. Spline fits support <a href="https://github.com/JuliaDiff/ForwardDiff.jl">ForwardDiff</a> differentiation through those quotes. Here is a 20-year level liability valued on a curve fitted to five zero-coupon yields:</p>
+<div id="8" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>tenors = [1.0, 2.0, 5.0, 10.0, 30.0]
+rates = [0.040, 0.042, 0.045, 0.047, 0.050]
+cfs, times = fill(10.0, 20), 1.0:20.0
+
+liability(r) = pv(fit(Spline.Linear(), ZCBYield.(Continuous.(r), tenors)), cfs, times)
+
+liability(rates)</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>126.65633549555342</code></pre>
+</div>
+</div>
+<p>Its gradient with respect to the five quotes:</p>
+<div id="10" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>∂pv = ForwardDiff.gradient(liability, rates)</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>5-element Vector{Float64}:
+   -9.607894391523232
+  -47.14967754400351
+ -172.05932550264362
+ -693.8427485681342
+ -204.15905202464222</code></pre>
+</div>
+</div>
+<p>These first-order sensitivities come from the fitted pricing equations through the implicit function theorem. They require no finite-difference bump size and preserve the ordinary fit’s value.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>The implicit function theorem, in actuarial terms
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>A bond’s yield to maturity is defined implicitly, as the rate at which present value equals price. To see how the yield moves with the price, you don’t rerun the root-finder: differentiating <code>PV(y) = P</code> at the answer gives <code>dy/dP = 1 / PV′(y)</code>, the familiar duration relationship. A curve fit is the same idea with many quotes at once. After fitting, FinanceModels differentiates the repricing equations and solves for the quote sensitivities, avoiding a separate refit for each bumped quote. Their accuracy depends on the fit’s tolerance and conditioning, which FinanceModels checks.</p>
+</div>
+</div>
+</div>
+<p>A central finite difference agrees closely:</p>
+<div id="12" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>bump(i, h) = rates .+ h .* (eachindex(rates) .== i)
+fd = [(liability(bump(i, 1e-6)) - liability(bump(i, -1e-6))) / 2e-6 for i in eachindex(rates)]
+maximum(abs, fd .- ∂pv)</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>7.723339763288095e-6</code></pre>
+</div>
+</div>
+<div id="14" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>Plotting code</summary>
+<pre class="julia cell-code"><code>fig = Figure(size = (720, 380))
+ax = Axis(fig[1, 1];
+    title = "Change in the liability's value per +1bp in each quote",
+    xlabel = "Quoted maturity (years)", ylabel = "Δ value",
+    xticks = (eachindex(tenors), string.(Int.(tenors))))
+barplot!(ax, eachindex(tenors), ∂pv .* 1e-4)
+fig</code></pre>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div>
+<figure class="figure">
+<p><img src="https://JuliaActuary.org/posts/2026-fall-releases/index_files/figure-html/cell-8-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The liability’s cashflows end at 20 years, yet the 30-year quote matters: the linear curve between the 10- and 30-year knots depends on both.</p>
+<p>Calibration sensitivities support loss fits with each spline interpolation method, linear bootstraps, and FX forward curves with a spline foreign curve. The fit must pass repricing and conditioning checks, and its derivative must exist. Higher-order calibration derivatives and derivatives with respect to quote maturities or cashflow times are not supported. The <a href="https://docs.juliaactuary.org/FinanceModels/stable/calibration_sensitivities/">Sensitivities Through Calibration guide</a> explains the restrictions, including interpolation kinks.</p>
+</section>
+<section id="implied_quote-financemodels" class="level3">
+<h3 class="anchored" data-anchor-id="implied_quote-financemodels"><code>implied_quote</code> (FinanceModels)</h3>
+<p><code>implied_quote(curve, family, maturity)</code> returns the rate or price a curve implies for an instrument of the requested maturity. It also supports derivatives with respect to the curve:</p>
+<div id="16" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>curve = ZeroRateCurve(rates, tenors)
+implied_quote(curve, CMTYield, 7.0)</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>0.04626336826742401</code></pre>
+</div>
+</div>
+<p>The family can be a quote constructor such as <code>CMTYield</code>, <code>OISYield</code>, <code>ZCBYield</code> or <code>ZCBPrice</code>, or a closure such as <code>(r, t) -&gt; ParYield(r, t; frequency = 1)</code>.</p>
+</section>
+<section id="extrapolation-policies-financemodels" class="level3">
+<h3 class="anchored" data-anchor-id="extrapolation-policies-financemodels">Extrapolation policies (FinanceModels)</h3>
+<p>Curves built on DataInterpolations (<code>Spline.Linear()</code>, <code>Quadratic()</code>, <code>Cubic()</code>, <code>PCHIP()</code>, <code>Akima()</code>, <code>BSpline(d)</code>) take an <code>extrapolation</code> policy for the long end:</p>
+<ul>
+<li><strong><code>:flat_forward</code></strong> (the default) holds the last discrete forward constant;</li>
+<li><strong><code>:flat_zero</code></strong> holds the last zero rate;</li>
+<li><strong><code>:linear</code></strong> extends the zero rate linearly;</li>
+<li><strong><code>Yield.FlatForwardAt(rate)</code></strong> holds a forward you choose;</li>
+<li><strong><code>:extension</code></strong> continues the last interpolation piece, as 6.x did.</li>
+</ul>
+<div id="18" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>c = ZeroRateCurve(rates, tenors, Spline.Cubic(); extrapolation = Yield.FlatForwardAt(Continuous(0.035)))
+forward(c, 40.0, 60.0)</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>Continuous(0.03500000000000001)</code></pre>
+</div>
+</div>
+<p>Here are the one-year forwards of the same cubic curve under each policy, by the start of each year. The curves agree through the 30-year knot; one-year forwards begin to differ when their end date passes it. Beyond it, 6.x’s <code>:extension</code> keeps climbing:</p>
+<div id="20" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>Plotting code</summary>
+<pre class="julia cell-code"><code>policies = [
+    ":flat_forward (default)" =&gt; :flat_forward,
+    ":flat_zero" =&gt; :flat_zero,
+    ":linear" =&gt; :linear,
+    "FlatForwardAt(3.5%)" =&gt; Yield.FlatForwardAt(Continuous(0.035)),
+    ":extension (6.x)" =&gt; :extension,
+]
+starts = 0.0:0.25:59.0
+fig = Figure(size = (720, 420))
+ax = Axis(fig[1, 1]; title = "One-year forward rates beyond the last knot",
+    xlabel = "Start of the one-year period (years)", ylabel = "Forward rate")
+for (label, policy) in policies
+    ci = ZeroRateCurve(rates, tenors, Spline.Cubic(); extrapolation = policy)
+    lines!(ax, starts, [rate(forward(ci, s, s + 1)) for s in starts]; label)
+end
+vlines!(ax, [30.0]; color = :gray, linestyle = :dash)
+axislegend(ax; position = :lt)
+fig</code></pre>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div>
+<figure class="figure">
+<p><img src="https://JuliaActuary.org/posts/2026-fall-releases/index_files/figure-html/cell-11-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="one-interface-for-knot-curves-financemodels" class="level3">
+<h3 class="anchored" data-anchor-id="one-interface-for-knot-curves-financemodels">One interface for knot curves (FinanceModels)</h3>
+<p>Knot curves now share an interface for inspecting and updating their rates and tenors. <code>ZeroRateCurve</code> returns the concrete curve it builds: a <code>Yield.MonotoneConvex</code> for the default interpolation, a <code>Yield.Spline</code> otherwise. Use <code>knot_rates</code> (the knot zero rates, as <code>Continuous</code> rates) and <code>knot_tenors</code> to inspect it, and <code>reconstruct(curve; rates, tenors, spline, extrapolation)</code> to build a modified copy.</p>
+<p>This matters when you start from a curve someone else built, such as a vendor’s valuation-date curve, a scenario generator’s or another team’s, and need variations of it: stress tests, sensitivity runs, or a roll-forward to new rates. Rebuilding the curve by hand from its rates can drop settings the rates don’t show. A different interpolation method moves values between the knots, and a default tail moves every value beyond the last knot. <code>reconstruct</code> changes only what you pass and keeps everything else.</p>
+<p>For example, here is a steepening stress on a curve delivered with cubic interpolation and its long end held at a 3.5% forward:</p>
+<div id="22" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>delivered = ZeroRateCurve(rates, tenors, Spline.Cubic(); extrapolation = Yield.FlatForwardAt(Continuous(0.035)))
+steepener = Continuous.([0.0, 0.001, 0.0025, 0.004, 0.005])   # +0bp at 1 year, rising to +50bp at 30 years
+stressed = reconstruct(delivered; rates = knot_rates(delivered) .+ steepener)</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>ZeroRateCurve([0.04, 0.043000000000000003, 0.0475, 0.051000000000000004, 0.055], [1.0, 2.0, 5.0, 10.0, 30.0], FinanceModels.Spline.PolynomialSpline(3); extrapolation = Yield.FlatForwardAt(Continuous(0.035)))</code></pre>
+</div>
+</div>
+<p>The stressed curve prints as the call that rebuilds it, so the interpolation and tail it kept are visible, and the printout can go straight into a report, a test or a bug report. Knot curves also compare by value, so <code>stressed == delivered</code> tells you whether a curve changed between runs. The stress lowers the liability’s value:</p>
+<div id="24" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>(delivered = pv(delivered, cfs, times), stressed = pv(stressed, cfs, times))</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>(delivered = 126.2883461617498, stressed = 121.72597237984294)</code></pre>
+</div>
+</div>
+<p><code>reconstruct</code> also accepts dual numbers, so sensitivities to a curve’s own knot rates are a one-liner. These are the exposures to hedge when your inputs are the knots themselves. Here they are for the monotone convex <code>curve</code> from earlier:</p>
+<div id="26" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>ForwardDiff.gradient(z -&gt; pv(reconstruct(curve; rates = z), cfs, times), rate.(knot_rates(curve)))</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>5-element Vector{Float64}:
+   -7.419928800250587
+  -33.95067280823388
+  -67.64308450097408
+ -820.0414473970203
+ -193.95053909993328</code></pre>
+</div>
+</div>
+<p>(On a cubic spline like <code>delivered</code>, the same sensitivities swing between positive and negative, because moving one knot reshapes the whole curve. That’s one reason local interpolants such as <code>Spline.Linear()</code> or the monotone convex default are easier to hedge against.)</p>
+</section>
+<section id="blending-curves-financemodels" class="level3">
+<h3 class="anchored" data-anchor-id="blending-curves-financemodels">Blending curves (FinanceModels)</h3>
+<p><code>Yield.Blend</code> combines curves with weights that sum to 1. The space you choose says what is averaged:</p>
+<ul>
+<li><code>Yield.DiscountFactors()</code> averages discount factors, <code>D(t) = Σ wᵢ Dᵢ(t)</code>. This is a mixture of scenarios: with constant weights, its present value is the weighted average of the curves’ present values.</li>
+<li><code>Yield.ZeroRates()</code> averages zero rates. With constant weights it is the same curve as <code>w * a + (1 - w) * b</code>.</li>
+<li><code>Yield.ForwardRates(period)</code> averages forward rates period by period, reading a weight that varies with tenor at the start of each period.</li>
+</ul>
+<p><code>Yield.Blend(a, b, w, space)</code> weights <code>a</code> by <code>w</code> and <code>b</code> by <code>1 - w</code>, and <code>Yield.Blend(curves, weights, space)</code> takes any number of curves. A weight is a number or a function of tenor.</p>
+<p>Grading a market curve into an ultimate rate is a forward-rate blend. Here the monotone convex <code>curve</code> from earlier applies to 30 years. Its annual forwards then move linearly to a 3.5% ultimate rate at 60 years, and the ultimate rate applies after that:</p>
+<div id="28" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>ultimate = Yield.Constant(Continuous(0.035))
+grade(t) = clamp((60 - t) / 30, 0, 1)   # the market curve's weight
+graded = Yield.Blend(curve, ultimate, grade, Yield.ForwardRates(1.0))
+[rate(forward(graded, s, s + 1)) for s in (30, 45, 60)]</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>3-element Vector{Float64}:
+ 0.05250000000000021
+ 0.043749999999999845
+ 0.03500000000000014</code></pre>
+</div>
+</div>
+<p>The grading starts after the first example’s liability ends, at 20 years, so the liability’s value is unchanged:</p>
+<div id="30" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>(market = pv(curve, cfs, times), graded = pv(graded, cfs, times))</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>(market = 126.39304481426217, graded = 126.39304481426217)</code></pre>
+</div>
+</div>
+<p>Grading the zero rates with the same weights gives a different curve. A zero rate averages its curve’s forwards from time 0, so shifting weight between the curves as the tenor grows shifts that whole history at once. The forward rate absorbs the shift: a weight that varies with tenor adds <code>w′(t) (Lₐ(t) − L_b(t))</code> to it, where <code>L = −log D</code>. Here that term pulls the forwards far below both curves:</p>
+<div id="32" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>zero_graded = Yield.Blend(curve, ultimate, grade, Yield.ZeroRates())
+[rate(forward(zero_graded, s, s + 1)) for s in (30, 45, 59)]</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>3-element Vector{Float64}:
+ 0.03691666666666693
+ 0.019416666666666416
+ 0.0030833333333331048</code></pre>
+</div>
+</div>
+<div id="34" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>Plotting code</summary>
+<pre class="julia cell-code"><code>years = 0:79
+fig = Figure(size = (720, 420))
+ax = Axis(fig[1, 1]; title = "Grading one-year forwards into a 3.5% ultimate rate",
+    xlabel = "Start of the one-year period (years)", ylabel = "Forward rate")
+vspan!(ax, [30.0], [60.0]; color = (CF_INK_SOFT, 0.12))
+for (label, c) in ["Market curve" =&gt; curve, "Forward-rate blend" =&gt; graded, "Zero-rate blend, same weights" =&gt; zero_graded]
+    lines!(ax, years, [rate(forward(c, s, s + 1)) for s in years]; label)
+end
+hlines!(ax, [0.035]; color = :gray, linestyle = :dash, label = "Ultimate rate")
+axislegend(ax; position = :lb)
+fig</code></pre>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div>
+<figure class="figure">
+<p><img src="https://JuliaActuary.org/posts/2026-fall-releases/index_files/figure-html/cell-18-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>A discount-factor blend is a mixture. A 50/50 mixture of a 2% and a 6% scenario values cashflows at the average of the two present values. That is more than discounting at the average rate, 4%:</p>
+<div id="36" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>low, high = Yield.Constant(Continuous(0.02)), Yield.Constant(Continuous(0.06))
+mixture = Yield.Blend(low, high, 0.5, Yield.DiscountFactors())
+average = Yield.Blend(low, high, 0.5, Yield.ZeroRates())
+(mixture = pv(mixture, cfs, times),
+ mean_of_pvs = (pv(low, cfs, times) + pv(high, cfs, times)) / 2,
+ average_rate = pv(average, cfs, times))</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>(mixture = 138.10280622116062, mean_of_pvs = 138.1028062211606, average_rate = 134.93275900301012)</code></pre>
+</div>
+</div>
+<p>The mixture’s zero rate starts near 4% and falls toward the low scenario’s 2%, because the high scenario’s discount factors become negligible at long tenors:</p>
+<div id="38" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>[rate(zero(mixture, t)) for t in (1, 10, 30, 100, 1000)]</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>5-element Vector{Float64}:
+ 0.03980001333191128
+ 0.03801319281599927
+ 0.0343288237740638
+ 0.026749972526421355
+ 0.020693147180559944</code></pre>
+</div>
+</div>
+<p>The same mixture over simulated short-rate paths, <code>Yield.Blend(collect(paths), fill(1 / n, n), Yield.DiscountFactors())</code>, is their expected discount factor. It gives the expected present value of cashflows that don’t vary by scenario. Weights that don’t sum to 1 throw an <code>ArgumentError</code>, and discount-factor weights must lie in [0, 1]. The <a href="https://docs.juliaactuary.org/FinanceModels/stable/yield_arithmetic/#Blending-curves">blending guide</a> covers each space, including a mixture rebased to a later date.</p>
+</section>
+<section id="parallel-risk-without-tenor-grids-actuaryutilities" class="level3">
+<h3 class="anchored" data-anchor-id="parallel-risk-without-tenor-grids-actuaryutilities">Parallel risk without tenor grids (ActuaryUtilities)</h3>
+<p>ActuaryUtilities 6 measures parallel risk directly, with new forms that need no key-rate grid:</p>
+<ul>
+<li>a <code>DV01</code> do-block for any valuation;</li>
+<li>two-curve callbacks for <code>IR01</code> and <code>CS01</code>;</li>
+<li>two-curve convexity, returned as blocks keyed by role, such as <code>base.credit</code>;</li>
+<li><code>sensitivities(valuation, curve)</code>, the value with its duration and DV01 from one derivative pass (<code>SecondOrder()</code> adds convexity and dollar convexity);</li>
+<li>dollar convexity, <code>convexity(DollarConvexity(), curve, cfs, times)</code>: the second derivative of value, not divided by it, so it is defined at zero value and adds across positions.</li>
+</ul>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>What is a valuation callback?
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>A valuation callback is a function you write that takes a curve (or a rate) and returns a value. ActuaryUtilities shifts the curve, calls your function with each shifted curve, and differentiates the result with ForwardDiff. Because the callback recomputes the whole valuation under each shift, it captures cashflows that depend on rates. Here a five-year floater pays the one-year forward rate plus 1%, so its coupons reset on whatever curve it receives. Treating today’s projected coupons as fixed cashflows misses the reset and gives a bond-like duration:</p>
+<div id="40" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>frn_value(c) = sum(1:5) do t
+    coupon = 100 * (1 / discount(c, t - 1, t) - 1 + 0.01)   # resets on the shifted curve
+    (coupon + (t == 5 ? 100 : 0)) * discount(c, t)
+end
+frozen = [100 * (1 / discount(curve, t - 1, t) - 1 + 0.01) + (t == 5 ? 100 : 0) for t in 1:5]
+
+(callback = duration(frn_value, curve), frozen = duration(curve, frozen, 1:5))</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>(callback = 0.12239237945330604, frozen = 4.524908001390014)</code></pre>
+</div>
+</div>
+<p>Only the fixed 1% margin has rate risk, so the floater’s duration is small. These are the effective and spread durations of the floater contract in One call shape for every sensitivity, which needs no callback: fixed cashflows and contracts go after the curve, and ActuaryUtilities values them itself.</p>
+<p>The callback comes first, so it can be a named function, an anonymous function, a callable struct, or a <code>do</code> block, which Julia passes as the first argument: <code>duration(DV01(), curve) do c ... end</code>. It must accept ForwardDiff’s dual numbers, so avoid converting values to <code>Float64</code> inside it. With two curves it takes both, as in <code>(base, credit) -&gt; …</code>, and with a <code>NamedTuple</code> of curves it takes the named tuple.</p>
+</div>
+</div>
+</div>
+<p>Take a 10-year 4.5% bond held against a 25-year annuity liability:</p>
+<div id="42" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>bond, bond_times = [fill(4.5, 9); 104.5], 1.0:10.0
+annuity, annuity_times = fill(-7.0, 25), 1.0:25.0
+
+duration(DV01(), curve) do c
+    pv(c, bond, bond_times) + pv(c, annuity, annuity_times)
+end</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>-0.023933625584342588</code></pre>
+</div>
+</div>
+<p>Rate and credit sensitivities differ only when a valuation uses the two curves differently. Compare the bond, whose fixed cashflows are discounted at rate + credit, with a five-year floater paying the one-year forward rate plus 150bp. The floater’s coupons reset on the rate curve, while every payment is discounted at rate + credit:</p>
+<div id="44" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>credit = Yield.Constant(Continuous(0.01))
+margin = 0.015
+
+bond_value(rate, credit) = pv(rate + credit, bond, bond_times)
+floater_value(rate, credit) = sum(1:5) do t
+    coupon = 100 * (1 / discount(rate, t - 1, t) - 1 + margin)   # resets on the rate curve
+    (coupon + (t == 5 ? 100 : 0)) * discount(rate + credit, t)  # discounted at rate + credit
+end
+
+(bond = (ir01 = duration(bond_value, IR01(), curve, credit), cs01 = duration(bond_value, CS01(), curve, credit)),
+ floater = (ir01 = duration(floater_value, IR01(), curve, credit), cs01 = duration(floater_value, CS01(), curve, credit)))</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>(bond = (ir01 = 0.0734321958187586, cs01 = 0.0734321958187586), floater = (ir01 = 0.0010003949893000992, cs01 = 0.04564592106665357))</code></pre>
+</div>
+</div>
+<p>The floater’s IR01 is small: a rate rise raises its projected coupons by almost as much as it lowers their discounted value. Its CS01 is close to that of a five-year bond, because the credit curve discounts every payment. The two-curve convexity blocks show the same split:</p>
+<div id="46" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>(bond = convexity(bond_value, curve, credit), floater = convexity(floater_value, curve, credit))</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>(bond = (base = (base = 75.16521133538198, credit = 75.16521133538198), credit = (base = 75.16521133538198, credit = 75.16521133538198)), floater = (base = (base = 0.403859931498768, credit = 8.68950257849735), credit = (base = 8.68950257849735, credit = 21.355741885569508)))</code></pre>
+</div>
+</div>
+<div id="48" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>Plotting code</summary>
+<pre class="julia cell-code"><code>instruments = ["10-year fixed bond", "5-year floater"]
+ir01s = [duration(v, IR01(), curve, credit) for v in (bond_value, floater_value)]
+cs01s = [duration(v, CS01(), curve, credit) for v in (bond_value, floater_value)]
+fig = Figure(size = (720, 380))
+ax = Axis(fig[1, 1]; title = "Rate vs credit sensitivity",
+    ylabel = "Value lost per +1bp", xticks = (1:2, instruments))
+colors = [CF_BLUE, CF_AMBER]
+barplot!(ax, [1, 2, 1, 2], [ir01s; cs01s]; dodge = [1, 1, 2, 2], color = colors[[1, 1, 2, 2]])
+Legend(fig[1, 2], [PolyElement(polycolor = c) for c in colors], ["IR01 (rate curve)", "CS01 (credit curve)"])
+fig</code></pre>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div>
+<figure class="figure">
+<p><img src="https://JuliaActuary.org/posts/2026-fall-releases/index_files/figure-html/cell-25-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Equal rate and credit sensitivities are the usual case
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>When a valuation depends only on the combined rate, as fixed cashflows discounted at <code>base + credit</code> do, its IR01, CS01 and combined-curve DV01 are equal, and so are its four convexity blocks. A one-basis-point move in either curve is a one-basis-point move in the rate the cashflows are discounted at. Fixed cashflows are always in this case, so their two-curve forms are removed: use <code>duration(DV01(), base + credit, cfs, times)</code> and <code>convexity(base + credit, cfs, times)</code>.</p>
+</div>
+</div>
+<p>Key-rate results still use a grid, now given as a <code>KeyRates(tenors)</code> marker before the curve argument. These sensitivities differentiate prescribed changes to the curve’s continuous zero rates; calibration sensitivities instead change market quotes and refit the curve. Dollar measures retain the position’s sign:</p>
+<div id="50" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>grid = [1.0, 2.0, 5.0, 10.0, 20.0, 30.0]
+asset_kr = duration(DV01(), KeyRates(grid), curve, bond, bond_times)
+liability_kr = duration(DV01(), KeyRates(grid), curve, annuity, annuity_times)</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>6-element Vector{Float64}:
+ -0.0006725526074066262
+ -0.003298407685321483
+ -0.012033880313419369
+ -0.03419136433575766
+ -0.04656535699752384
+ -0.0077159551285951936</code></pre>
+</div>
+</div>
+<div id="52" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>Plotting code</summary>
+<pre class="julia cell-code"><code>fig = Figure(size = (720, 400))
+ax = Axis(fig[1, 1]; title = "Key-rate DV01: a 10-year bond against a 25-year annuity",
+    xlabel = "Key rate (years)", ylabel = "DV01",
+    xticks = (eachindex(grid), string.(Int.(grid))))
+n = length(grid)
+xs = repeat(eachindex(grid), 3)
+group = repeat(1:3; inner = n)
+colors = [CF_BLUE, CF_RED, CF_AMBER]
+barplot!(ax, xs, [asset_kr; liability_kr; asset_kr .+ liability_kr]; dodge = group, color = colors[group])
+elements = [PolyElement(polycolor = c) for c in colors]
+Legend(fig[1, 2], elements, ["Bond (asset)", "Annuity (liability)", "Net"])
+hlines!(ax, [0.0]; color = :gray)
+fig</code></pre>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div>
+<figure class="figure">
+<p><img src="https://JuliaActuary.org/posts/2026-fall-releases/index_files/figure-html/cell-27-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Valuation callbacks can be callable structs, and the parallel measures accept cashflow amounts as arrays, tuples or finite generators.</p>
+</section>
+<section id="one-call-shape-for-every-sensitivity-actuaryutilities" class="level3">
+<h3 class="anchored" data-anchor-id="one-call-shape-for-every-sensitivity-actuaryutilities">One call shape for every sensitivity (ActuaryUtilities)</h3>
+<p>ActuaryUtilities 6 takes arguments in one order: the valuation callback (if any), the order marker of <code>sensitivities</code>, a measure marker such as <code>DV01()</code> or <code>KeyRates(tenors)</code>, the curve or curves, then the cashflows or the contract. A contract’s index curve is the keyword <code>index</code>, which defaults to the discount curve:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Measure</th>
+<th style="text-align: left;">Fixed cashflows</th>
+<th style="text-align: left;">Valuation callback</th>
+<th style="text-align: left;">Contract or portfolio</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">duration</td>
+<td style="text-align: left;"><code>duration(curve, cfs, times)</code></td>
+<td style="text-align: left;"><code>duration(valuation, curve)</code></td>
+<td style="text-align: left;"><code>duration(discount, contract; index)</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">DV01</td>
+<td style="text-align: left;"><code>duration(DV01(), curve, cfs, times)</code></td>
+<td style="text-align: left;"><code>duration(valuation, DV01(), curve)</code></td>
+<td style="text-align: left;"><code>duration(DV01(), discount, contract; index)</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">convexity</td>
+<td style="text-align: left;"><code>convexity(curve, cfs, times)</code></td>
+<td style="text-align: left;"><code>convexity(valuation, curve)</code></td>
+<td style="text-align: left;"><code>convexity(discount, contract; index)</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">dollar convexity</td>
+<td style="text-align: left;"><code>convexity(DollarConvexity(), curve, cfs, times)</code></td>
+<td style="text-align: left;"><code>convexity(valuation, DollarConvexity(), curve)</code></td>
+<td style="text-align: left;"><code>convexity(DollarConvexity(), discount, contract; index)</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">key rates</td>
+<td style="text-align: left;"><code>duration(KeyRates(t), curve, cfs, times)</code></td>
+<td style="text-align: left;"><code>duration(valuation, KeyRates(t), curve)</code></td>
+<td style="text-align: left;"><code>duration(KeyRates(t), discount, contract; index)</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">all at once</td>
+<td style="text-align: left;"><code>sensitivities([SecondOrder(),] curve, cfs, times)</code></td>
+<td style="text-align: left;"><code>sensitivities(valuation, [SecondOrder(),] curve)</code></td>
+<td style="text-align: left;"><code>sensitivities([SecondOrder(),] discount, contract; index)</code></td>
+</tr>
+</tbody>
+</table>
+<p><code>sensitivities</code> returns the value, duration and DV01 from one derivative pass, and <code>SecondOrder()</code> adds convexity and dollar convexity. Dollar convexity is the unscaled second derivative of value: a shift <code>Δs</code> contributes <code>½ × dollar_convexity × Δs²</code>. <code>value</code> is a number. Without <code>KeyRates</code> the derivative fields are numbers; with it, duration and DV01 are per-tenor vectors and convexity and dollar convexity are matrices. With several curves, each field is keyed by curve role, the convexities in blocks such as <code>base.credit</code>. <code>SecondOrder()</code> needs second derivatives: a Hull–White swaption, whose critical rate FinanceModels differentiates to first order only, throws, as do calibration sensitivities, which are first order. For a floater, the discount role is spread risk, the index role is coupon reset, and effective duration is their sum:</p>
+<div id="54" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>frn = Bond.Floating(0.01, Periodic(1), 5.0, "OIS")
+risk = sensitivities(curve, frn)
+(risk.duration, effective = risk.duration.discount + risk.duration.index)</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>(duration = (discount = 4.524908001390014, index = -4.4025156219367085), effective = 0.12239237945330572)</code></pre>
+</div>
+</div>
+<p>The <a href="https://docs.juliaactuary.org/ActuaryUtilities/stable/upgrade/">upgrade guide</a> maps every 5.x call and result field to its replacement.</p>
+</section>
+<section id="one-mortality-interface-for-tables-and-laws-mortalitytables" class="level3">
+<h3 class="anchored" data-anchor-id="one-mortality-interface-for-tables-and-laws-mortalitytables">One mortality interface for tables and laws (MortalityTables)</h3>
+<ul>
+<li><code>cumhazard</code> is defined for every parametric law: in closed form where MortalityTables implements one (Makeham, Gompertz, Weibull, Kannisto and others), and by numerical integration otherwise, as for Beard; <code>survival</code> follows from it.</li>
+<li>Parametric models accept a <code>DeathDistribution</code> in <code>survival</code>, <code>decrement</code> and <code>complete_life_expectancy</code> for compatibility with table-based calls. They ignore that argument: the law already specifies mortality between integer ages.</li>
+<li><code>UltimateMortality</code> accepts any <code>AbstractVector</code> (ranges, views, vectors with <code>missing</code>) and wraps it without copying.</li>
+<li>Loading a table from CSV is a package extension, activated by <code>using CSV</code>.</li>
+</ul>
+<div id="56" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>m = MortalityTables.Beard()
+cumhazard(m, 40, 50), survival(m, 40, 50)</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>(4.127968753618562, 0.01611558031314834)</code></pre>
+</div>
+</div>
+</section>
+<section id="age-basis-conversions-mortalitytables" class="level3">
+<h3 class="anchored" data-anchor-id="age-basis-conversions-mortalitytables">Age-basis conversions (MortalityTables)</h3>
+<p><code>age_nearest_to_age_last</code> and <code>age_last_to_age_nearest</code> convert ultimate rates between age-nearest-birthday (ANB) and age-last-birthday (ALB) bases, assuming deaths are uniform over each year of age. The formula comes from the 1981 <em>Transactions of the Society of Actuaries</em> paper that published the 1980 CSO and CET tables on an age-last-birthday basis. The result keeps the input’s ages and number type, and the last rate must be one. Converting the 1980 CSO Male ANB table reproduces the published ALB table to its five-decimal rounding:</p>
+<div id="58" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>anb = MortalityTables.table(42).ultimate   # 1980 CSO Male, ANB
+alb = MortalityTables.table(41).ultimate   # 1980 CSO Male, ALB
+maximum(abs, age_nearest_to_age_last(anb) .- alb)</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>4.9981493152465636e-6</code></pre>
+</div>
+</div>
+<p>Thanks to <a href="https://github.com/aminemanai2003"><span class="citation" data-cites="aminemanai2003">@aminemanai2003</span></a> for this contribution (<a href="https://github.com/JuliaActuary/MortalityTables.jl/pull/154">#154</a>).</p>
+</section>
+<section id="irr-derivatives-of-every-order-financecore-2.8" class="level3">
+<h3 class="anchored" data-anchor-id="irr-derivatives-of-every-order-financecore-2.8">IRR derivatives of every order (FinanceCore 2.8)</h3>
+<p>An IRR is defined implicitly: it is the rate <code>y</code> at which the cashflows’ present value is zero, <code>Σ aₖ (1 + y)^(-tₖ) = 0</code>. As for a curve fit (see the implicit-function-theorem note under Sensitivities through calibration), its derivatives come from that equation at the root, not from the root-finder’s steps: <code>∂y/∂aₖ = -(∂PV/∂aₖ) / (∂PV/∂y)</code>, and similarly for the times and for higher orders. So <code>irr</code> supports gradients, Hessians and higher-order derivatives with respect to both amounts and times, whichever stage of the solver finds the root; before 2.8, a root found by the fallback stage silently had zero derivatives. Differentiating at a repeated root throws, because the sensitivity is undefined there.</p>
+<p>For an outlay of 100 repaid with 110 a year later, the IRR is 10%: <code>y = -a₂/a₁ - 1</code>. Paying 1 less up front raises it by 1.1 points, and receiving 1 more at the end raises it by 1 point:</p>
+<div id="60" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>ForwardDiff.gradient(a -&gt; rate(irr(a, [0.0, 1.0])), [-100.0, 110.0])</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>2-element Vector{Float64}:
+ 0.010999999999999998
+ 0.009999999999999995</code></pre>
+</div>
+</div>
+<p>The Hessian shows how those sensitivities change; the IRR is linear in the repayment, so that entry is zero up to rounding. Delaying the repayment lowers the IRR by about 10.5 points per year of delay, <code>-1.1 ln(1.1)</code>:</p>
+<div id="62" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>(hessian = ForwardDiff.hessian(a -&gt; rate(irr(a, [0.0, 1.0])), [-100.0, 110.0]),
+ delay = ForwardDiff.derivative(t -&gt; rate(irr([-100.0, 110.0], [0.0, t])), 1.0))</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>(hessian = [0.00021999999999999998 9.999999999999995e-5; 9.999999999999994e-5 -4.0657581468206416e-20], delay = -0.1048411977847573)</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="changes-affecting-existing-models" class="level2">
+<h2 class="anchored" data-anchor-id="changes-affecting-existing-models">Changes affecting existing models</h2>
+<p>These changes can alter valuations, risk measures or accepted inputs. Check the assumptions and conventions your existing models use when upgrading.</p>
+<section id="financemodels" class="level3">
+<h3 class="anchored" data-anchor-id="financemodels">FinanceModels</h3>
+<ul>
+<li><strong>Portfolios and composites are worth the sum of their parts.</strong> 6.x passed each contract’s position in a collection as a valuation time: a 3-year zero-coupon bond at a continuous 3% was worth 0.9139 alone but 0.9418 inside <code>[bond]</code>, and <code>[a, b]</code> and <code>[b, a]</code> differed. <code>present_value(model, contract)</code> is now the one valuation, and a collection or a <code>Composite</code> is worth the sum of its contracts’ values. Options, caps, floors and swaptions, which have closed forms but no cashflow projection, now combine too; they threw. These laws hold for contracts that carry their own payment times and whose values share a reporting currency, and sums taken in another order agree to rounding:</li>
+</ul>
+<div id="64" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>bs_model = Equity.BlackScholesMerton(0.01, 0.02, 0.15)
+call_1y = Option.EuroCall(CommonEquity(), 1.0, 1.0)
+put_1y = Option.EuroPut(CommonEquity(), 1.0, 1.0)
+(composite = pv(bs_model, Composite(call_1y, put_1y)),
+ portfolio = pv(bs_model, [put_1y, call_1y]),
+ sum = pv(bs_model, call_1y) + pv(bs_model, put_1y))</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>(composite = 0.11805304448046065, portfolio = 0.11805304448046065, sum = 0.11805304448046065)</code></pre>
+</div>
+</div>
+<ul>
+<li><strong>Valuation contexts.</strong> A contract that reads other models by key, such as a floater’s index curve, is valued under <code>Models(model; index = curve)</code> or <code>Models(model, store)</code>, which replace <code>Projection(contract; index)</code>; <code>Models(curve)</code> uses one curve for both. A custom closed form is defined on the contract, <code>present_value(ctx, c::MyContract)</code>, reading <code>discount(ctx, t)</code>, <code>ctx[key]</code> and <code>valuation_model(ctx)</code>. Using <code>valuation_model(ctx)</code> keeps the model’s closed-form kernel under <code>Models</code>; keyed observables come from the store. Wrappers that act on the cashflow stream (<code>Forward</code>, <code>FX.Converted</code>, transducers) need a cashflow projection.</li>
+</ul>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Which model does each part of a valuation use?
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>A fixed-rate bond needs a curve to discount its payments. A floater also needs an index curve to set its coupons. A valuation context supplies both:</p>
+<div id="66" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>discount_curve = Yield.Constant(Continuous(0.03))
+index_curve = Yield.Constant(Continuous(0.04))
+
+# Unit principal, annual coupons, 1% margin over the SOFR index
+floater = Bond.Floating(Periodic(0.01, 1), Periodic(1), 5.0, :SOFR)
+ctx = Models(discount_curve; index = index_curve)
+
+(value = pv(ctx, floater), cashflows = collect(Projection(floater, ctx)))</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>(value = 1.0931047541091208, cashflows = Cashflow{Float64, Float64}[Cashflow{Float64, Float64}(0.050810774192388226, 1.0), Cashflow{Float64, Float64}(0.050810774192388226, 2.0), Cashflow{Float64, Float64}(0.05081077419238822, 3.0), Cashflow{Float64, Float64}(0.05081077419238823, 4.0), Cashflow{Float64, Float64}(1.0508107741923882, 5.0)])</code></pre>
+</div>
+</div>
+<p>The floater projects its coupons from <code>index_curve</code>, and <code>pv</code> discounts the payments on <code>discount_curve</code>. <code>Projection</code> shows the payments before discounting.</p>
+<p>Contracts get their inputs through three operations:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Operation</th>
+<th>What it supplies under <code>Models(model, store)</code></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>discount(ctx, t)</code> or <code>discount(ctx, from, to)</code></td>
+<td>Discount factors from <code>model</code></td>
+</tr>
+<tr class="even">
+<td><code>ctx[key]</code></td>
+<td>The model stored under that key</td>
+</tr>
+<tr class="odd">
+<td><code>valuation_model(ctx)</code></td>
+<td><code>model</code> itself, for a model-specific pricing formula</td>
+</tr>
+</tbody>
+</table>
+<p><code>Models(curve)</code> uses one curve for discounting and every index lookup. <code>Models(model; index = curve)</code> returns <code>curve</code> for <strong>every key</strong>. Use an explicit store when different keys need different models:</p>
+<div id="68" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>term_curve = Yield.Constant(Continuous(0.045))
+keyed = Models(discount_curve, (; SOFR = index_curve, TERM_SOFR = term_curve))
+
+term_floater = Bond.Floating(Periodic(0.01, 1), Periodic(1), 5.0, :TERM_SOFR)
+pv(keyed, [floater, term_floater])</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>2.2100712566101404</code></pre>
+</div>
+</div>
+<p>Each floater reads its own index, and both use the same discount curve. With an explicit store, a missing or misspelled key throws instead of silently using another curve.</p>
+<p>The first model can also supply a closed-form price. An equity option uses the Black–Scholes model carried by its context:</p>
+<div id="70" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>bsm = Equity.BlackScholesMerton(0.03, 0.01, 0.20)
+option = Option.EuroCall(CommonEquity(), 1.0, 1.0)
+
+(plain = pv(bsm, option), bundled = pv(Models(bsm; index = index_curve), option))</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>(plain = 0.08827321225352117, bundled = 0.08827321225352117)</code></pre>
+</div>
+</div>
+<p>The values agree because the option uses the Black–Scholes model and reads nothing from the store. A contract that reads <code>ctx[key]</code> changes value when the stored model changes.</p>
+<p>For a custom closed form, define <code>FinanceCore.present_value(ctx, c::MyContract)</code> with the operations above. If its formula depends on the pricing model’s type, pass <code>valuation_model(ctx)</code> to a method of <code>FinanceModels.closed_form(model, contract)</code>.</p>
+<p>Portfolios and <code>Composite</code>s add their members’ values, so contracts valued only by closed forms can be members, if their values share a reporting currency. <code>Forward</code>, <code>FX.Converted</code> and transducers act on cashflow streams, so the contracts inside them must support projection; a valuation context does not supply one.</p>
+</div>
+</div>
+</div>
+<ul>
+<li><strong>One reporting currency per FX context.</strong> An <code>FX.Forwards</code> context, alone or as the model of <code>Models</code>, reports in its quote currency, and <code>FX.Forward</code> is one quote-currency cashflow. Contracts that carry a currency are checked against it: an <code>FX.Converted</code> must convert into it, and a base-currency <code>FX.BasisSwapLeg</code> throws unless the context reports in its base currency or is a plain yield curve; 6.x added its base-currency value to quote-currency values. Value the leg on a base-currency curve or convert it with <code>FX.Converted</code>. Inside <code>FX.Converted</code>, a leg must pay in the pair’s base currency, and an <code>FX.Forward</code>, which prices on the context’s own FX model, is not supported. The reporting currency is not a collateral choice: converting a present value at spot does not change the collateral assumptions the curves encode.</li>
+<li><strong>No valuation-time argument.</strong> <code>present_value(model, contract, t)</code> is removed: the third argument meant payment times for numbers, nothing for a <code>Cashflow</code>, and a valuation time for contracts. <code>pv(model, contract)</code> now also accumulates cashflows before time 0, which 6.x’s default valuation time of 0 dropped. On a deterministic curve, value the cashflows at or after <code>t</code> as of <code>t</code> by discounting each one over <code>[t, T]</code>. The boundary is explicit in your code (inclusive here, as in 6.x):</li>
+</ul>
+<div id="72" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>asof(model, contract, t) = sum(cf.amount * discount(model, t, cf.time)
+    for cf in collect(Projection(contract, model)) if cf.time &gt;= t; init = zero(discount(model, t, t)))
+asof(Yield.Constant(Continuous(0.04)), Bond.Fixed(0.05, Periodic(1), 5), 2.0)</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>1.0754617478299633</code></pre>
+</div>
+</div>
+<p>Don’t accumulate a time-0 value instead. <code>accumulation(model, t) * pv(model, contract)</code> also counts the cashflows before <code>t</code>. If the time-0 present value includes only cashflows at or after <code>t</code>, the product agrees in exact arithmetic, but where the accumulation overflows and the time-0 value underflows it is <code>Inf * 0 = NaN</code>.</p>
+<ul>
+<li><p><strong>Transducers over contracts apply in the order written.</strong> Inside a projection, <code>bond |&gt; double |&gt; add1</code> projected as [2.1, 4.1] instead of [1.1, 3.1], so its present value was wrong while <code>collect</code> was right. Stateful and early-terminating transducers (<code>Take</code>, <code>Scan</code>) now also work inside a projection, a portfolio or a <code>Composite</code>; they threw.</p></li>
+<li><p><strong>Rate results carry their convention.</strong> <code>knot_rates</code>, <code>Yield.instantaneous_forward</code> and <code>short_rate</code> return <code>Continuous</code> rates. They were bare continuous numbers, which FinanceCore reads as annual effective, so passing one on, as in <code>Yield.Constant(instantaneous_forward(c, 5))</code>, silently used the wrong rate. Use <code>rate(x)</code> for the number, for example to seed a ForwardDiff gradient. Coupons, margins and interest-rate strikes also accept a <code>Periodic</code> rate of the contract’s frequency, and other rate inputs accept a <code>Rate</code> in any convention; numbers keep their meaning.</p></li>
+<li><p><strong>Bootstrapping requires linear interpolation.</strong> With a smoother interpolant, adding a knot reshapes earlier segments, so bootstrapped coupon quotes silently stopped repricing (residuals up to 0.40% of par). <code>Fit.Bootstrap()</code> now accepts only <code>Spline.Linear()</code> and reprices every quote on the returned curve. Fit smooth curves to all quotes at once with <code>Fit.Loss</code>:</p></li>
+</ul>
+<div id="74" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>fit(Spline.Cubic(), CMTYield.(rates, tenors), Fit.Bootstrap())</code></pre>
+<div class="cell-output cell-output-error">
+<div class="ansi-escaped-output">
+<pre>ArgumentError: Fit.Bootstrap does not support FinanceModels.Spline.PolynomialSpline(3): adding a knot would change earlier curve segments and reprice earlier quotes. Use Spline.Linear(), or fit this strategy across all quotes with Fit.Loss(x -&gt; x^2).
+Stacktrace:
+ [1] <span class="ansi-bold">fit</span><span class="ansi-bold">(</span><span class="ansi-bright-black-fg">mod0</span>::FinanceModels.Spline.PolynomialSpline, <span class="ansi-bright-black-fg">quotes</span>::Vector<span class="ansi-bright-black-fg">{Quote{Float64, FinanceModels.Bond.Fixed{Periodic, Float64, Float64}}}</span>, <span class="ansi-bright-black-fg">method</span>::FinanceModels.Fit.Bootstrap; <span class="ansi-bright-black-fg">extrapolation</span>::Symbol<span class="ansi-bold">)</span>
+ <span class="ansi-bright-black-fg">  @</span> <span class="ansi-magenta-fg">FinanceModels</span> <span class="ansi-bright-black-fg">~/.julia/dev/pr-FinanceModels-v7-master/src/</span><span style="text-decoration:underline" class="ansi-bright-black-fg">fit.jl:519</span>
+ [2] <span class="ansi-bold">fit</span><span class="ansi-bold">(</span><span class="ansi-bright-black-fg">mod0</span>::FinanceModels.Spline.PolynomialSpline, <span class="ansi-bright-black-fg">quotes</span>::Vector<span class="ansi-bright-black-fg">{Quote{Float64, FinanceModels.Bond.Fixed{Periodic, Float64, Float64}}}</span>, <span class="ansi-bright-black-fg">method</span>::FinanceModels.Fit.Bootstrap<span class="ansi-bold">)</span>
+ <span class="ansi-bright-black-fg">  @</span> <span class="ansi-magenta-fg">FinanceModels</span> <span class="ansi-bright-black-fg">~/.julia/dev/pr-FinanceModels-v7-master/src/</span><span style="text-decoration:underline" class="ansi-bright-black-fg">fit.jl:515</span>
+ [3] top-level scope
+ <span class="ansi-bright-black-fg">  @</span> <span class="ansi-bright-black-fg">~/prog/JuliaActuary.org/posts/2026-fall-releases/</span><span style="text-decoration:underline" class="ansi-bright-black-fg">index.qmd:556</span></pre>
+</div>
+</div>
+</div>
+<ul>
+<li><strong>An explicit long-end assumption.</strong> Continuing the last interpolation polynomial past the last knot let that polynomial drive the long-end forwards, as in the figure above. The <code>:flat_forward</code> default changes zero rates and present values beyond the last knot of DataInterpolations curves; <code>Spline.MonotoneConvex()</code>, the <code>ZeroRateCurve</code> default, is unchanged. For a linear bootstrap, the 30-year zero rate under the new default and under 6.x’s <code>:extension</code>:</li>
+</ul>
+<div id="76" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>quotes = ZCBYield.([0.02, 0.025, 0.031, 0.036], [1, 2, 5, 10])
+zero(fit(Spline.Linear(), quotes, Fit.Bootstrap()), 30.0),
+zero(fit(Spline.Linear(), quotes, Fit.Bootstrap(); extrapolation = :extension), 30.0)</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>(Continuous(0.03859243637227028), Continuous(0.054718899047165113))</code></pre>
+</div>
+</div>
+<ul>
+<li><strong>Flat before the first knot.</strong> DataInterpolations curves hold the first knot’s zero rate between time 0 and the first knot, so their zero rates before it change; MonotoneConvex curves don’t. Bootstrapped values are unchanged, but the extra <code>t = 0</code> knot is gone, so a curve has exactly one knot rate per quote.</li>
+<li><strong>Curve arithmetic is factor arithmetic.</strong> <code>curve1 + curve2</code> and <code>curve1 - curve2</code> multiply and divide discount factors. Those are the only supported <code>CompositeYield</code> operations. For a pointwise change to one curve’s zero rates, use a <code>TenorShift</code>, written <code>curve + ((z, t) -&gt; ...)</code>. This one floors the zero rate at 0:</li>
+</ul>
+<div id="78" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>negative = ZeroRateCurve([-0.01, 0.0, 0.01], [1.0, 2.0, 5.0])
+floored = negative + ((z, t) -&gt; max(z, Continuous(0.0)))
+zero(negative, 1.0), zero(floored, 1.0)</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>(Continuous(-0.01), Continuous(0.0))</code></pre>
+</div>
+</div>
+<ul>
+<li><strong>Explicit quote conventions.</strong> <code>OISYield</code> builds annual-pay swaps beyond one year; it previously used quarterly payments. <code>ParSwapYield</code> and <code>InterestRateSwap</code> require an explicit <code>frequency</code>. <code>ParYield</code> throws when an explicit <code>frequency</code> conflicts with a <code>Periodic</code> rate’s own compounding; the keyword used to be ignored. Every <code>frequency</code> takes an integer or a <code>Periodic</code>.</li>
+<li><strong>Failed fits throw.</strong> An optimizer fit that doesn’t converge throws a <code>FitConvergenceError</code>; previously it returned the unfitted starting model. Optimizer-backed fits now accept <code>solve_kwargs</code>, passed to the solver, such as <code>(; maxiters = 10_000, g_tol = 1e-12)</code>. Here one iteration is too few:</li>
+</ul>
+<div id="80" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>fit(Yield.NelsonSiegel(), CMTYield.(rates, tenors); solve_kwargs = (; maxiters = 1))</code></pre>
+<div class="cell-output cell-output-error">
+<div class="ansi-escaped-output">
+<pre>FitConvergenceError: model fitting did not converge (optimizer return code Failure)
+Stacktrace:
+ [1] <span class="ansi-bold">__minimize</span><span class="ansi-bold">(</span>::Val<span class="ansi-bright-black-fg">{1}</span>, <span class="ansi-bright-black-fg">loss</span>::FinanceModels.var"#loss#77"<span class="ansi-bright-black-fg">{FinanceModels.Fit.Loss{FinanceModels.var"#__default_loss##0#__default_loss##1"}, FinanceModels.var"#build#76"{AccessibleModels.AccessibleModel{Nothing, FinanceModels.Yield.NelsonSiegel{Float64}, Tuple{Accessors.PropertyLens{:τ₁}, Accessors.PropertyLens{:β₀}, Accessors.PropertyLens{:β₁}, Accessors.PropertyLens{:β₂}}, NTuple{4, Distributions.Uniform{Float64}}, Distributions.ProductDistribution{1, 0, NTuple{4, Distributions.Uniform{Float64}}, Distributions.Continuous, Float64}}}}</span>, <span class="ansi-bright-black-fg">x0</span>::Vector<span class="ansi-bright-black-fg">{Float64}</span>, <span class="ansi-bright-black-fg">quotes</span>::Vector<span class="ansi-bright-black-fg">{Quote{Float64, FinanceModels.Bond.Fixed{Periodic, Float64, Float64}}}</span>, <span class="ansi-bright-black-fg">optimizer</span>::Optim.LBFGS<span class="ansi-bright-black-fg">{Nothing, LineSearches.InitialStatic{Float64}, LineSearches.HagerZhang{Float64, Base.RefValue{Bool}}, Returns{Nothing}}</span>, <span class="ansi-bright-black-fg">solve_kwargs</span>::@NamedTuple<span class="ansi-bright-black-fg">{maxiters::Int64}</span>; <span class="ansi-bright-black-fg">lb</span>::Vector<span class="ansi-bright-black-fg">{Float64}</span>, <span class="ansi-bright-black-fg">ub</span>::Vector<span class="ansi-bright-black-fg">{Float64}</span>, <span class="ansi-bright-black-fg">who</span>::String, <span class="ansi-bright-black-fg">hint</span>::String<span class="ansi-bold">)</span>
+ <span class="ansi-bright-black-fg">  @</span> <span class="ansi-magenta-fg">FinanceModels</span> <span class="ansi-bright-black-fg">~/.julia/dev/pr-FinanceModels-v7-master/src/</span><span style="text-decoration:underline" class="ansi-bright-black-fg">fit.jl:240</span>
+ [2] <span class="ansi-bold">__minimize</span><span class="ansi-bold">(</span><span class="ansi-bright-black-fg">loss</span>::Function, <span class="ansi-bright-black-fg">x0</span>::Vector<span class="ansi-bright-black-fg">{Float64}</span>, <span class="ansi-bright-black-fg">quotes</span>::Vector<span class="ansi-bright-black-fg">{Quote{Float64, FinanceModels.Bond.Fixed{Periodic, Float64, Float64}}}</span>, <span class="ansi-bright-black-fg">optimizer</span>::Optim.LBFGS<span class="ansi-bright-black-fg">{Nothing, LineSearches.InitialStatic{Float64}, LineSearches.HagerZhang{Float64, Base.RefValue{Bool}}, Returns{Nothing}}</span>, <span class="ansi-bright-black-fg">solve_kwargs</span>::@NamedTuple<span class="ansi-bright-black-fg">{maxiters::Int64}</span>; <span class="ansi-bright-black-fg">lb</span>::Vector<span class="ansi-bright-black-fg">{Float64}</span>, <span class="ansi-bright-black-fg">ub</span>::Vector<span class="ansi-bright-black-fg">{Float64}</span>, <span class="ansi-bright-black-fg">who</span>::String, <span class="ansi-bright-black-fg">hint</span>::String<span class="ansi-bold">)</span>
+ <span class="ansi-bright-black-fg">  @</span> <span class="ansi-magenta-fg">FinanceModels</span> <span class="ansi-bright-black-fg">~/.julia/dev/pr-FinanceModels-v7-master/src/</span><span style="text-decoration:underline" class="ansi-bright-black-fg">fit.jl:227</span>
+ [3] <span class="ansi-bold">fit</span><span class="ansi-bold">(</span><span class="ansi-bright-black-fg">mod0</span>::FinanceModels.Yield.NelsonSiegel<span class="ansi-bright-black-fg">{Float64}</span>, <span class="ansi-bright-black-fg">quotes</span>::Vector<span class="ansi-bright-black-fg">{Quote{Float64, FinanceModels.Bond.Fixed{Periodic, Float64, Float64}}}</span>, <span class="ansi-bright-black-fg">method</span>::FinanceModels.Fit.Loss<span class="ansi-bright-black-fg">{FinanceModels.var"#__default_loss##0#__default_loss##1"}</span>; <span class="ansi-bright-black-fg">variables</span>::Tuple<span class="ansi-bright-black-fg">{Pair{Accessors.PropertyLens{:τ₁}, IntervalSets.ClosedInterval{Float64}}, Pair{Accessors.PropertyLens{:β₀}, IntervalSets.ClosedInterval{Float64}}, Pair{Accessors.PropertyLens{:β₁}, IntervalSets.ClosedInterval{Float64}}, Pair{Accessors.PropertyLens{:β₂}, IntervalSets.ClosedInterval{Float64}}}</span>, <span class="ansi-bright-black-fg">optimizer</span>::Optim.LBFGS<span class="ansi-bright-black-fg">{Nothing, LineSearches.InitialStatic{Float64}, LineSearches.HagerZhang{Float64, Base.RefValue{Bool}}, Returns{Nothing}}</span>, <span class="ansi-bright-black-fg">solve_kwargs</span>::@NamedTuple<span class="ansi-bright-black-fg">{maxiters::Int64}</span><span class="ansi-bold">)</span>
+ <span class="ansi-bright-black-fg">  @</span> <span class="ansi-magenta-fg">FinanceModels</span> <span class="ansi-bright-black-fg">~/.julia/dev/pr-FinanceModels-v7-master/src/</span><span style="text-decoration:underline" class="ansi-bright-black-fg">fit.jl:422</span>
+ [4] <span class="ansi-bold">fit</span>
+ <span class="ansi-bright-black-fg">  @</span> <span class="ansi-bright-black-fg">~/.julia/dev/pr-FinanceModels-v7-master/src/</span><span style="text-decoration:underline" class="ansi-bright-black-fg">fit.jl:394</span><span class="ansi-bright-black-fg"> [inlined]</span>
+ [5] top-level scope
+ <span class="ansi-bright-black-fg">  @</span> <span class="ansi-bright-black-fg">~/prog/JuliaActuary.org/posts/2026-fall-releases/</span><span style="text-decoration:underline" class="ansi-bright-black-fg">index.qmd:581</span></pre>
+</div>
+</div>
+</div>
+<ul>
+<li><p><strong>Derivatives at kinks are defined or refused.</strong> Where <code>MonotoneConvex</code>, <code>PCHIP</code> or <code>Akima</code> switch formula, ForwardDiff used to return a derivative matching neither an up nor a down bump. Flat PCHIP gave <code>NaN</code>, and flat MonotoneConvex could be off by a factor of two. At a kink, MonotoneConvex now uses the average of the up- and down-bump derivatives as a convention; on a flat stretch, these partials need not sum to the parallel-shift derivative. PCHIP and Akima throw, as does differentiation through a fit whose resulting curve lies on a kink.</p></li>
+<li><p><strong>Correct swaption Greeks.</strong> Jamshidian’s critical rate was found by a bisection that dropped its derivatives, so ForwardDiff Greeks of Vasicek and Hull–White swaptions were wrong. On a 1×5 payer swaption, Vasicek’s <code>∂/∂a</code> had the wrong sign and vega was 9% too high. Now automatic differentiation matches a finite difference:</p></li>
+</ul>
+<div id="82" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>swaption = Option.Swaption(1.0, 6.0, 0.035, 1)
+price(a) = pv(ShortRate.Vasicek(a, 0.04, 0.01, Continuous(0.03)), swaption)
+ForwardDiff.derivative(price, 0.1), (price(0.1 + 1e-6) - price(0.1 - 1e-6)) / 2e-6</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>(0.008339500292175683, 0.008339500321211113)</code></pre>
+</div>
+</div>
+<ul>
+<li><strong>Short-rate models near zero mean reversion.</strong> Vasicek’s <code>-log P</code> was off by up to 4.5e-7 at small <code>aτ</code>, and Hull–White’s derivatives with respect to <code>a</code> vanished near <code>a = 0</code>. Near zero mean reversion, including <code>a = 0</code>, both now match high-precision references to a few units of rounding over the tested parameters, and Hull–White’s derivatives with respect to <code>a</code> no longer vanish.</li>
+<li><strong>Vasicek under negative mean reversion.</strong> With <code>a &lt; 0</code>, terms of Vasicek’s <code>-log P</code> grow like <code>e^{|a|τ}</code> and nearly cancel when the short rate is near its long-run level. 6.x computed them separately, so it lost the price. A constant 3% short rate (<code>σ = 0</code>, <code>r = b</code>) priced its 500-year bond at 0 instead of <code>e^{-15}</code> with <code>a = −0.1</code>. With <code>a = −1</code>, its 50-year price was 4.5 times too high, and prices were <code>NaN</code> from about 355 years. The terms are now grouped, so they keep their accuracy relative to their size, and a term with a zero weight stays zero when <code>e^{|a|τ}</code> overflows. That rate now prices exactly at every horizon (each ratio to <code>e^{-0.03τ}</code> is 1):</li>
+</ul>
+<div id="84" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>constant_3pct = ShortRate.Vasicek(-1.0, 0.03, 0.0, Continuous(0.03))
+[discount(constant_3pct, τ) / exp(-0.03τ) for τ in (50.0, 500.0, 1000.0)]</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>3-element Vector{Float64}:
+ 1.0
+ 1.0
+ 1.0</code></pre>
+</div>
+</div>
+<ul>
+<li><strong>Stable discounting between distant dates.</strong> Interval discounts no longer divide two discount factors that have underflowed to zero. This interval 20,000 years out was <code>NaN</code> (0/0) and is now approximately <code>exp(-0.05)</code>:</li>
+</ul>
+<div id="86" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>discount(Yield.NelsonSiegel(1.0, 0.05, -0.02, 0.01), 20000, 20001)</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>0.9512294245007573</code></pre>
+</div>
+</div>
+<p>Time derivatives at <code>t = 0</code> are also corrected where several curves gave <code>NaN</code>.</p>
+<ul>
+<li><p><strong>Stable CIR prices.</strong> The textbook formula raises a number within σ² of 1 to the power 2ab/σ², so a 10-year discount factor was 5.6e57 at σ = 1e-10, and a 10,000-year factor at σ = 0.01 was <code>NaN</code>. Prices now come from one stable formula for −log P, which agrees with a high-precision reference to about 1e-13, relative.</p></li>
+<li><p><strong>Forward-starting contracts read the index on their own clock.</strong> <code>Forward(s, floater)</code> fixed the floater’s coupons on the index from time 0: a one-year floater starting at time 2 paid 1.0202 instead of 1.0305 on an upward curve. Wrapper contracts also nest in any order now, such as a <code>Forward</code> of a <code>Forward</code> or of a <code>Composite</code>; those threw a <code>MethodError</code>.</p></li>
+<li><p><strong>Simulated paths end at their horizon.</strong> Evaluating a <code>RatePath</code> beyond the horizon it was simulated to now throws. It used to extend the last step, so a one-year simulation priced a payment at year 10. A horizon a whole number of steps away, up to roundoff, no longer gets an extra step: <code>horizon = 0.07, timestep = 0.01</code> took 8 steps and now takes 7, which changes those paths, and such a path ends at the horizon itself.</p></li>
+<li><p><strong>Short-rate limits.</strong> <code>zero(curve, 0)</code> is the short rate where it was <code>NaN</code> (Vasicek, CIR, Hull–White, Smith–Wilson, <code>ForwardStarting</code>), and <code>Yield.instantaneous_forward</code> works for every curve; at a knot it is the right-hand derivative of −log D, the forward of the piece that starts there. Hull–White conditional prices no longer turn <code>NaN</code> in the far tail, and Nelson–Siegel’s zero rate no longer jumps near <code>t = 0</code>. ### ActuaryUtilities</p></li>
+<li><p><strong>Dollar risk keeps its sign.</strong> Dollar sensitivities add across positions and reverse sign when a position is reversed. Ordinary liability payments entered as negative cashflows contribute negative DV01, and the new dollar convexity, <code>convexity(DollarConvexity(), …)</code>, behaves the same way:</p></li>
+</ul>
+<div id="88" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>duration(DV01(), curve, bond, bond_times), duration(DV01(), curve, annuity, annuity_times)</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>(0.08054389148368157, -0.10447751706802416)</code></pre>
+</div>
+</div>
+<p>The convention is <code>DV01 = −∂V/∂s × 10⁻⁴</code>, where <code>s</code> is the applicable rate shift. Aggregate as <code>asset_dv01 + liability_dv01</code>, and remove sign corrections added for the old absolute values. A mixed position’s DV01 need not share the sign of its present value, and a position worth zero can still have dollar risk.</p>
+<ul>
+<li><strong>Convexity uses continuous-zero shocks</strong>, for every yield model. It now equals the sum of the full key-rate convexity matrix. For <code>[5, 5, 105]</code> at times <code>[1, 2, 3]</code> under <code>Yield.Constant(Periodic(0.04, 1))</code>, convexity changes from 11.26 in 5.x to:</li>
+</ul>
+<div id="90" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>convexity(Yield.Constant(Periodic(0.04, 1)), [5.0, 5.0, 105.0], [1.0, 2.0, 3.0])</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>8.40087191197841</code></pre>
+</div>
+</div>
+<ul>
+<li><strong>Fixed cashflows on two curves take the combined curve.</strong> The fixed-cashflow IR01, CS01 and two-curve convexity forms are removed; use <code>duration(DV01(), base + credit, cfs, times)</code> and <code>convexity(base + credit, cfs, times)</code>. Mixed input types used to measure different one-basis-point moves: a curve with a scalar spread gave CS01 ≈ IR01 / (1 + spread). The IR01 and CS01 callback forms remain for valuations that use the curves differently.</li>
+<li><strong>Grids are only needed for key-rate results.</strong> Parallel measures no longer take a <code>tenors</code> argument. The grid never changed their values, and its position let swapped arguments return wrong numbers silently. The old call shapes throw a <code>MethodError</code>, and the upgrade guide maps each to its replacement.</li>
+<li><strong>Cashflow objects keep their payment times.</strong> A <code>Cashflow</code> is paid at its own time even when a times vector is also passed: in scalar, key-rate and bundled sensitivities, and in <code>present_values</code>, which now returns numbers. <code>present_values</code> used the paired time and returned <code>Cashflow</code>s, so a <code>Cashflow</code> at year 2 paired with year 10 was discounted over ten years.</li>
+<li><strong>Contract measures value in FinanceModels valuation contexts.</strong> Swaps now work in contract <code>duration</code>, <code>sensitivities</code> and <code>zspread</code>; they threw a <code>MethodError</code>. The measures differentiate <code>present_value(Models(discount; index), contract)</code>. The bumped discount curve discounts cashflows and prices closed forms; the bumped index curve stands for every model the contract reads by key, such as a floater’s index. Closed-form contracts now have risk inside a <code>Composite</code> or a portfolio too. A custom contract needs a cashflow projection or a closed form <code>present_value(ctx, c::MyContract)</code>; with neither, it throws instead of being treated as fixed. <code>reproject</code> is removed: value under <code>Models(discount; index = curve)</code>, and use <code>collect(Projection(contract, Models(discount; index = curve)))</code> for the projected cashflows.</li>
+<li><strong>Contracts come after the curve.</strong> Contract measures take the discount curve first, as fixed cashflows do, and the index curve as the keyword <code>index</code>, which defaults to the discount curve: <code>duration(Effective(), discount, contract; index)</code>, <code>sensitivities(discount, contract; index)</code> and <code>zspread(discount, contract, price; index)</code>. The contract-first orders and the positional <code>(forward, credit)</code> curves throw a <code>MethodError</code>.</li>
+<li><strong><code>sensitivities</code> has one result shape.</strong> It returns <code>(; value, duration, dv01)</code>, and with <code>SecondOrder()</code> also <code>convexity</code> and <code>dollar_convexity</code>; 5.x key-rate forms returned convexities by default. <code>value</code> is a number. The derivative fields are numbers; with <code>KeyRates</code>, duration and DV01 are vectors and the convexities matrices; with several curves they are keyed by role: <code>s.dv01.discount</code> (spread risk) and <code>s.dv01.index</code> (coupon reset) for a contract. Second-order results need second derivatives, so a Hull–White swaption throws. The upgrade guide maps the 5.x fields.</li>
+<li><strong>The valuation callback comes first.</strong> Every callback form takes the valuation first, then any marker, then the rate or curves: <code>duration(valuation, curve)</code>, <code>duration(valuation, DV01(), rate)</code>, <code>sensitivities(valuation, KeyRates(tenors), curve)</code>. Do-block calls are unchanged, and now also work for scalar and <code>Rate</code> inputs. The callback-second orders throw a <code>MethodError</code>.</li>
+<li><strong>Hull–White simulation is requested with <code>Scenarios</code>.</strong> A bare <code>HullWhite</code> model is a curve to every measure: a bump moves its curve, and caps and swaptions keep their Hull–White closed forms. <code>sensitivities(KeyRates(tenors), Scenarios(hw; horizon, n_scenarios, rng), cfs, times)</code> differentiates the simulated value; in 5.x the same <code>hw</code> was a curve to <code>duration</code> but a scenario generator to <code>sensitivities</code>, so one position could get two different key-rate vectors. The horizon is required and must be a whole number of timesteps. The constructor draws one seed, so every valuation reuses the same paths: values and dollar derivatives add across calls, and portfolio duration and convexity are value-weighted.</li>
+<li><strong><code>wasserstein</code> no longer wraps around on integer samples.</strong> Gaps between quantiles were taken in the samples’ own integer type, so <code>UInt8</code> samples 0 and 1 were 255 apart. Integer gaps are now subtracted exactly and then converted to the result’s floating-point type, so adjacent integers near <code>typemax</code> stay one apart:</li>
+</ul>
+<div id="92" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>wasserstein(UInt8[0], UInt8[1]), wasserstein(Int8[-100], Int8[100]), wasserstein([typemax(Int) - 1], [typemax(Int)])</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>(1.0, 200.0, 1.0)</code></pre>
+</div>
+</div>
+<ul>
+<li><strong><code>zspread</code> returns a <code>Continuous</code> rate.</strong> Added to an ordinary discount curve, <code>credit + zspread(…).zspread</code> reprices a contract valued from its cashflows, with the index curve held fixed. It was a bare number, which FinanceCore reads as annual effective. For Hull–White closed forms (caps, swaptions), shift <code>hw.curve</code> and rebuild the model instead: <code>hw + spread</code> is a composite curve, which has no closed forms.</li>
+<li><strong><code>spread</code> and <code>zspread</code> no longer depend on the notional.</strong> Convergence uses the Newton step in rate units, and <code>spread</code> also checks that its answer reprices relative to the size of the discounted cashflows. At a notional of <code>1e-10</code>, a true 2% z-spread used to come back as about 1.96%.</li>
+<li><strong><code>moic</code> follows distributions divided by contributions.</strong> Contributions with no distributions give <code>0.0</code>; positive distributions with no contributions give <code>Inf</code>; neither gives <code>NaN</code>. These cases previously threw:</li>
+</ul>
+<div id="94" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>moic([-1.0, 0.0]), moic([1.0, 2.0]), moic(Float64[])</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>(0.0, Inf, NaN)</code></pre>
+</div>
+</div>
+</section>
+<section id="mortalitytables" class="level3">
+<h3 class="anchored" data-anchor-id="mortalitytables">MortalityTables</h3>
+<ul>
+<li><strong>Reversed intervals give backward accumulation factors.</strong> For <code>b &gt; a</code> and positive forward survival, <code>survival(v, b, a) = 1 / survival(v, a, b)</code>. The backward factor can exceed one and is not a survival probability; it is useful for projecting a cohort backward from its surviving population. A zero forward factor gives an infinite reciprocal. This matches parametric laws and discount factors in FinanceCore and FinanceModels. 2.x returned <code>1.0</code> for reversed whole-age intervals.</li>
+<li><strong>Life expectancy is curtate or complete by name.</strong> <code>life_expectancy</code> is removed. <code>curtate_life_expectancy(m, age)</code> sums survival to each whole year after <code>age</code>, and <code>complete_life_expectancy(m, age, dist = UniformDeaths())</code> integrates it, for tables and laws alike. In 2.x, <code>life_expectancy</code> was curtate on a table but complete on a law. Complete table values now integrate one year of age at a time and change by up to 9e-6, relative. A law’s complete expectancy throws when its integral does not converge; 2.x returned the unconverged value, about 6.5e8 years for <code>InverseWeibull()</code> at 30:</li>
+</ul>
+<div id="96" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>(curtate = curtate_life_expectancy(anb, 65), complete = complete_life_expectancy(anb, 65))</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>(curtate = 13.537564178565761, complete = 14.036830415963374)</code></pre>
+</div>
+</div>
+<ul>
+<li><strong>Death distributions are renamed.</strong> <code>Uniform</code> and <code>Constant</code> are <code>UniformDeaths</code> and <code>ConstantForce</code>; the old names are removed. Law keywords with Unicode names also accept ASCII spellings, such as <code>sigma</code> for <code>σ</code>.</li>
+<li><strong>Fractional ages condition on survival.</strong> Survival from a fractional age under <code>UniformDeaths()</code> and <code>Balducci()</code> is now conditional on surviving to that age. Under <code>UniformDeaths()</code> with <code>q = 0.2</code>, survival from age 0.5 to 1 was <code>0.9</code> and is now <code>0.8/0.9</code>, so two half-years multiply to the full year’s <code>0.8</code>:</li>
+</ul>
+<div id="98" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>q = UltimateMortality([0.2, 0.3, 0.4])
+(from_half = survival(q, 0.5, 1.0, UniformDeaths()),
+ two_halves = survival(q, 0.0, 0.5, UniformDeaths()) * survival(q, 0.5, 1.0, UniformDeaths()),
+ reversed = survival(q, 2, 0))</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>(from_half = 0.8888888888888888, two_halves = 0.7999999999999999, reversed = 1.7857142857142858)</code></pre>
+</div>
+</div>
+<ul>
+<li><strong>Numeric types are preserved.</strong> A <code>Float32</code> table gives <code>Float32</code> results, and a <code>BigFloat</code> table gives <code>BigFloat</code> results, even for empty intervals:</li>
+</ul>
+<div id="100" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>typeof(survival(UltimateMortality(Float32[0.01, 0.02, 0.03]), 0, 2))</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>Float32</code></pre>
+</div>
+</div>
+<ul>
+<li><p><strong>Index rate vectors, not tables.</strong> Tables no longer forward indexing: use <code>table.ultimate[age]</code> or a select rate vector. Indexing a parametric model (<code>m[x]</code>) is replaced by <code>hazard(m, x)</code> or <code>m(x)</code>.</p></li>
+<li><p><strong>XTbML rates placed by their labels.</strong> Eight mort.SOA.org tables label grouped ages. Table 352 (“1946-49 Basic Table, ANB”) has issue ages 12, 17, 22 and so on, and 2.x placed them at consecutive ages, so most ages returned another age’s rates: <code>select[17]</code> gave issue age 37’s. Every rate now sits at its own age, with <code>missing</code> between the groups, and CSV tables get the same fix. Separately, 34 more bundled tables, whose metadata has an empty element, now load.</p></li>
+</ul>
+<div id="102" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>Plotting code</summary>
+<pre class="julia cell-code"><code>t352 = MortalityTables.table(352)
+fig = Figure(size = (720, 400))
+ax = Axis(fig[1, 1]; title = "Table 352: select rates by attained age, one line per issue age",
+    xlabel = "Attained age", ylabel = "q", yscale = log10)
+for issue_age in 12:10:62
+    sel = t352.select[issue_age]
+    ages = collect(eachindex(sel))
+    lines!(ax, ages, collect(sel); label = string(issue_age))
+end
+axislegend(ax, "Issue age"; position = :lt)
+fig</code></pre>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div>
+<figure class="figure">
+<p><img src="https://JuliaActuary.org/posts/2026-fall-releases/index_files/figure-html/cell-52-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<ul>
+<li><strong>Mortality-law fixes.</strong>
+<ul>
+<li>Kannisto’s closed-form cumulative hazard had its parameters swapped: <code>survival(Kannisto(), 0)</code> was 1.76.</li>
+<li>Several laws no longer overflow to <code>NaN</code> at old ages, and their derivatives stay finite too.</li>
+<li>Small decrements are no longer rounded away: a rate of <code>1e-18</code> gave <code>0.0</code>.</li>
+<li>Laws whose formula ends at a finite age, such as Wittstein and VanderMaen, have a life expectancy: survival is integrated to the law’s <code>omega</code>, giving the expected remaining lifetime capped at omega. If survival is still positive just before omega, the remaining probability of death is placed at omega, as at a table’s last age. 2.x integrated past omega and threw.</li>
+</ul></li>
+</ul>
+<div id="104" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>(kannisto_at_0 = survival(MortalityTables.Kannisto(), 0),
+ no_overflow = survival(MortalityTables.Kannisto(a = 0.5, b = 10), 80, 81),
+ tiny_decrement = decrement(UltimateMortality(fill(1e-18, 3)), 0, 1))</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>(kannisto_at_0 = 1.0, no_overflow = 0.36787944117144233, tiny_decrement = 1.0e-18)</code></pre>
+</div>
+</div>
+</section>
+<section id="financecore" class="level3">
+<h3 class="anchored" data-anchor-id="financecore">FinanceCore</h3>
+<ul>
+<li><strong>Collections of contracts are valued on each contract’s own timing.</strong> A collection of contracts, or a <code>Composite</code>, is worth the sum of its parts (see FinanceModels). A number in a collection is still paid at its position, so a numeric vector is a payment schedule: reversing <code>[10, 20]</code> changes the economics. Present values of numeric vectors without payment times are bitwise unchanged:</li>
+</ul>
+<div id="106" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>flat = Continuous(0.03)
+a, b = Cashflow(100.0, 1.0), Cashflow(50.0, 3.0)
+(pv(flat, [a]) === pv(flat, a), pv(flat, [a, b]) ≈ pv(flat, [b, a]) ≈ pv(flat, a) + pv(flat, b))</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>(true, true)</code></pre>
+</div>
+</div>
+<ul>
+<li><strong>The third argument is always payment times.</strong> <code>pv(rate, cf, t)</code> with a <code>Cashflow</code> ignored <code>t</code> and is removed: use <code>pv(rate, cf)</code>, or <code>pv(rate, amount(cf), t)</code> to pay the amount at another time. No method takes a valuation time; see the as-of reduction under FinanceModels.</li>
+<li><strong>Amounts and times pair by position, and their lengths must match.</strong> <code>pv(rate, amounts, times)</code> pairs vectors, offset vectors, tuples, generators and a scalar time with a collection by position, and throws a <code>DimensionMismatch</code> when one runs out first; 2.8 dropped the extra amounts or times. Empty amounts still give zero, whatever the times. <code>irr</code> pairs the same way:</li>
+</ul>
+<div id="108" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>pv(0.05, (10.0, 10.0, 10.0), (1.0, 2.0))</code></pre>
+<div class="cell-output cell-output-error">
+<div class="ansi-escaped-output">
+<pre>DimensionMismatch: amounts and times have different lengths
+Stacktrace:
+ [1] <span class="ansi-bold">_throw_length_mismatch</span><span class="ansi-bold">(</span><span class="ansi-bold">)</span>
+ <span class="ansi-bright-black-fg">  @</span> <span class="ansi-cyan-fg">FinanceCore</span> <span class="ansi-bright-black-fg">~/.julia/packages/FinanceCore/poZGd/src/</span><span style="text-decoration:underline" class="ansi-bright-black-fg">pv.jl:93</span>
+ [2] <span class="ansi-bold">_sum_present_values</span><span class="ansi-bold">(</span><span class="ansi-bright-black-fg">r</span>::Float64, <span class="ansi-bright-black-fg">x</span>::Tuple<span class="ansi-bright-black-fg">{Float64, Float64, Float64}</span>, <span class="ansi-bright-black-fg">times</span>::Tuple<span class="ansi-bright-black-fg">{Float64, Float64}</span><span class="ansi-bold">)</span>
+ <span class="ansi-bright-black-fg">  @</span> <span class="ansi-cyan-fg">FinanceCore</span> <span class="ansi-bright-black-fg">~/.julia/packages/FinanceCore/poZGd/src/</span><span style="text-decoration:underline" class="ansi-bright-black-fg">pv.jl:87</span>
+ [3] <span class="ansi-bold">present_value</span><span class="ansi-bold">(</span><span class="ansi-bright-black-fg">r</span>::Float64, <span class="ansi-bright-black-fg">x</span>::Tuple<span class="ansi-bright-black-fg">{Float64, Float64, Float64}</span>, <span class="ansi-bright-black-fg">times</span>::Tuple<span class="ansi-bright-black-fg">{Float64, Float64}</span><span class="ansi-bold">)</span>
+ <span class="ansi-bright-black-fg">  @</span> <span class="ansi-cyan-fg">FinanceCore</span> <span class="ansi-bright-black-fg">~/.julia/packages/FinanceCore/poZGd/src/</span><span style="text-decoration:underline" class="ansi-bright-black-fg">pv.jl:57</span>
+ [4] top-level scope
+ <span class="ansi-bright-black-fg">  @</span> <span class="ansi-bright-black-fg">~/prog/JuliaActuary.org/posts/2026-fall-releases/</span><span style="text-decoration:underline" class="ansi-bright-black-fg">index.qmd:723</span></pre>
+</div>
+</div>
+</div>
+<ul>
+<li><strong>Cashflows add only at equal times.</strong> <code>+</code> and <code>-</code> accepted times within <code>isapprox</code> tolerance, so addition was not associative. The times must now be equal. <code>FinanceCore.aggregate(cfs; key)</code> combines cashflows by <code>key(time)</code>: it preserves nominal totals for any <code>key</code>, but present value only when <code>key</code> leaves the payment times unchanged.</li>
+<li><strong>Interval discounts are defined for constant rates.</strong> <code>discount(rate, from, to)</code> and <code>accumulation(rate, from, to)</code> take a <code>Rate</code> or a number. The untyped fallback computed <code>discount(model, to - from)</code> for any model, which is wrong unless the rate is constant; a model outside FinanceModels without its own interval method now throws a <code>MethodError</code>. FinanceModels curves still need only <code>discount(curve, t)</code>.</li>
+<li><strong>Converting conventions preserves the force of interest exactly (2.8).</strong> The old round trip through a nominal quote lost it. Here the annual rate rounds to −100%, yet converts back exactly:</li>
+</ul>
+<div id="110" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>annual = convert(Periodic(1), Continuous(-40.0))
+annual, convert(Continuous(), annual)</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>(Periodic(-1.0, 1), Continuous(-40.0))</code></pre>
+</div>
+</div>
+<ul>
+<li><strong>No unconverged IRRs (2.8).</strong> 2.7 could return Newton’s last finite iterate after 100 steps, with a material NPV residual. Unconverged iterates now go to the robust root search.</li>
+<li><strong><code>Rate + Rate</code> adds in the left operand’s convention (documented in 2.8).</strong> It adds nominally, the way a spread is quoted, so mixed-convention sums depend on the order. <code>Continuous(a) + b</code> gives the convention-independent sum:</li>
+</ul>
+<div id="112" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>Periodic(0.04, 1) + Continuous(0.01), Continuous(0.01) + Periodic(0.04, 1)</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>(Periodic(0.05005016708416806, 1), Continuous(0.0492207131532813))</code></pre>
+</div>
+</div>
+<ul>
+<li><strong>Empty portfolios have zero value and no identifiable IRR (2.8).</strong> <code>present_value</code> returns zero for an empty collection, using the valuation’s numeric type, including <code>BigFloat</code> and automatic-differentiation types. An empty or all-zero stream has no identifiable IRR because every rate solves its pricing equation, so <code>irr</code> returns <code>nothing</code>:</li>
+</ul>
+<div id="114" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>pv(0.05, Any[]), irr(Float64[])</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>(0.0, nothing)</code></pre>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Additional API changes
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><strong>FinanceModels</strong></p>
+<ul>
+<li>Knot curves copy and validate their inputs and keep read-only knot vectors. Negative times throw a <code>DomainError</code>.</li>
+<li><code>Spline.MonotoneConvex()</code> is the one monotone convex selector; <code>Yield.build_model</code> and the <code>Yield.MonotoneConvex()</code> placeholder are removed.</li>
+<li><code>Spline.PolynomialSpline</code> accepts orders 1 to 3, and <code>Spline.BSpline</code> requires degree 1 or more.</li>
+<li><code>discount(curve, Inf)</code> returns the correct limit under a zero tail forward (it was <code>NaN</code>), and throws under <code>:extension</code>.</li>
+<li><code>implied_quote</code>, the swaption critical rate and differentiated fits check convergence relative to the size of the quote, so tiny notionals are handled.</li>
+<li>PCHIP and Akima fits on evenly spaced maturities start away from formula switches, so they converge.</li>
+<li><code>fit(curve, quotes)</code> refits a knot curve on its own knots, method and extrapolation, and an <code>FX.Forwards</code> with a knot-curve foreign curve refits it through the implied foreign quotes.</li>
+<li>Every <code>fit</code> accepts single-pass iterators of quotes.</li>
+<li>A fit throws when a ForwardDiff dual number from outside it reaches the optimizer’s parameters or loss, such as a price captured inside a custom contract, including through nested fits. It used to return a wrong derivative, often zero. The spline calibration sensitivities above use implicit differentiation and are supported.</li>
+<li>A Smith–Wilson fit differentiates with respect to coupons as well as quote prices.</li>
+<li><code>maturity</code> is defined for <code>Forward</code>, <code>Option.EuroCall</code> and <code>Option.EuroPut</code>, so <code>pv_mc</code>’s default horizon works for forward-starting contracts.</li>
+<li>Empty projections (including contracts valued past maturity) and caps or floors with no caplets value to a zero in the model’s number type, such as <code>BigFloat</code>, instead of a <code>Float64</code> <code>0.0</code>.</li>
+<li>The extension hooks are public, not exported: <code>FinanceModels.default_variables</code> and <code>FinanceModels.default_optimizer</code> (renamed from <code>__default_optic</code> and <code>__default_optim</code>), <code>FinanceModels.closed_form</code> and <code>Yield.force_of_interest</code>.</li>
+<li><code>Yield.TransformedYield</code>, deprecated in 6.1, is removed; use <code>Yield.TenorShift</code>.</li>
+</ul>
+<p><strong>ActuaryUtilities</strong></p>
+<ul>
+<li>The finite-difference <code>KeyRateDuration</code> API (<code>KeyRate</code>, <code>KeyRateZero</code>, <code>KeyRatePar</code>, <code>krd_points</code>) is removed. <code>KeyRates</code> applies the same triangular zero-rate bumps with ForwardDiff. For par-rate sensitivities, use the market-input callback (see the upgrade guide).</li>
+<li>Unmarked contract and portfolio measures default to <code>Effective()</code>.</li>
+<li>Zero cashflow streams return zeros typed like a nonempty result.</li>
+<li><code>dv01</code> is removed; <code>duration(DV01(), …)</code> takes the same forms, with the valuation first for callbacks and <code>DV01()</code> before <code>Effective()</code> or <code>Spread()</code> for contracts.</li>
+<li><code>price</code> is removed; use <code>present_value</code>, or <code>abs(present_value(…))</code>.</li>
+<li>The date function <code>duration(issue_date, date)</code> is <code>policy_duration</code>.</li>
+<li>Amounts and times pair by position, so offset arrays work. <code>KeyRates</code> keeps its own copy of the grid.</li>
+<li>Fixed-cashflow duration, DV01 and convexity are analytic for scalars, <code>Rate</code>s and yield models. Scalar and <code>Rate</code> DV01, which 5.x computed by automatic differentiation, can move in the last bits, and a <code>Float32</code> rate with <code>Float32</code> amounts gives a <code>Float32</code> DV01.</li>
+</ul>
+<p><strong>MortalityTables</strong></p>
+<ul>
+<li><code>mortality_vector</code> is an alias of <code>UltimateMortality</code>, and <code>MortalityTables.μ</code> of <code>hazard</code>.</li>
+<li><code>omega</code> of a parametric model is the last age where its law is defined.</li>
+<li>Life expectancy past a table’s last age is a <code>BoundsError</code>; past a bounded law’s <code>omega</code>, the law itself throws a <code>DomainError</code>.</li>
+<li>Tables with more than two blocks of rates raise an error naming the table.</li>
+</ul>
+<p><strong>FinanceCore</strong></p>
+<ul>
+<li>IRR handles zero amounts, tiny notionals and unsigned integer times.</li>
+<li><code>present_value(rate, amounts, times)</code> sums without building the vector of discounted amounts, so it no longer allocates. Results can differ from 2.8 in the last bits.</li>
+<li><code>convert(to, rate)</code> replaces the three-argument <code>convert(to, rate, from)</code>, which ignored <code>from</code>. Converted rates are unchanged.</li>
+<li><code>Rate(r, f)</code> converts a rate to the convention <code>f</code>, as <code>convert(f, r)</code> does: <code>Rate(Continuous(0.05), Periodic(2))</code> is <code>Periodic(0.0506302…, 2)</code>. <code>Rate(r)</code> returns <code>r</code>.</li>
+<li><code>discount(rate, t)</code> and <code>accumulation(rate, t)</code> take a <code>Rate</code> or a number; a model without its own method gets a <code>MethodError</code> from them.</li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="performance-and-tradeoffs" class="level2">
+<h2 class="anchored" data-anchor-id="performance-and-tradeoffs">Performance and tradeoffs</h2>
+<p>These provisional measurements compare the release candidates, benchmarked on October 2, with the latest tagged releases (FinanceCore 2.8, FinanceModels 6.5, MortalityTables 2.6, ActuaryUtilities 5.12), using BenchmarkTools on Julia 1.12 and the minimum of three alternating runs. They will be rerun against the final releases before publication.</p>
+<div id="116" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>Plotting code</summary>
+<pre class="julia cell-code"><code>speedups = [
+    "MortalityTables: table curtate_life_expectancy" =&gt; 27.4,
+    "MortalityTables: Beard survival (numerical cumhazard)" =&gt; 19.4,
+    "MortalityTables: Gompertz life expectancy" =&gt; 17.7,
+    "MortalityTables: parsing a select and ultimate XTbML table" =&gt; 23.3,
+    "ActuaryUtilities: effective duration of a bond" =&gt; 56.0,
+    "ActuaryUtilities: key rates of a bond" =&gt; 8.2,
+    "ActuaryUtilities: curve DV01 of fixed cashflows" =&gt; 3.2,
+    "FinanceCore: present value with explicit times" =&gt; 3.1,
+    "FinanceModels: MonotoneConvex fit" =&gt; 2.4,
+    "FinanceModels: Vasicek swaption" =&gt; 2.3,
+    "FinanceModels: portfolio of a bond, floater and swap" =&gt; 1.7,
+    "FinanceModels: swap on its index curve" =&gt; 1.4,
+]
+slowdowns = [   # times slower
+    "MortalityTables: fractional-age survival, UniformDeaths()" =&gt; 3.23,
+    "FinanceModels: point discount, Linear curve" =&gt; 1.55,
+    "FinanceModels: Hull–White discount(t)" =&gt; 1.54,
+    "FinanceModels: point discount, MonotoneConvex" =&gt; 1.33,
+    "FinanceModels: forward(Linear, 2, 3)" =&gt; 1.22,
+    "FinanceModels: CIR discount" =&gt; 1.17,
+    "FinanceModels: Vasicek discount" =&gt; 1.14,
+    "ActuaryUtilities: convexity of a callback on a curve" =&gt; 1.13,
+    "FinanceModels: Hull–White cap" =&gt; 1.09,
+    "FinanceModels: bond on a Linear curve" =&gt; 1.08,
+]
+labels = [first.(speedups); first.(slowdowns)]
+ratios = [last.(speedups); 1 ./ last.(slowdowns)]   # new speed ÷ old speed
+faster = ratios .&gt; 1
+fig = Figure(size = (800, 720))
+ax = Axis(fig[1, 1]; xscale = log10, xlabel = "speed relative to the tagged release (log scale)",
+    yticks = (eachindex(labels), labels), yreversed = true,
+    xticks = ([0.25, 0.5, 1, 2, 5, 10, 20, 50], ["¼×", "½×", "1×", "2×", "5×", "10×", "20×", "50×"]))
+barplot!(ax, eachindex(labels), ratios; direction = :x, fillto = 1, color = ifelse.(faster, CF_BLUE, CF_RED))
+vlines!(ax, [1.0]; color = CF_INK_SOFT)
+# faster: the speedup at the bar's end; slower: the slowdown just right of 1×, where the row is empty
+text!(ax, ifelse.(faster, ratios, 1.0), eachindex(labels);
+    text = [f ? string(round(r; digits = 1), "× faster") : string(round(1 / r; digits = 2), "× slower") for (r, f) in zip(ratios, faster)],
+    align = (:left, :center), offset = (4, 0))
+xlims!(ax, 0.25, 600)
+Label(fig[0, 1], "Speed against the latest tagged releases"; font = :bold, tellwidth = false)
+fig</code></pre>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div>
+<figure class="figure">
+<p><img src="https://JuliaActuary.org/posts/2026-fall-releases/index_files/figure-html/cell-59-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Package</th>
+<th>Workload</th>
+<th>Speedup</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>MortalityTables</td>
+<td><code>curtate_life_expectancy</code> on a table (now linear in the remaining ages)</td>
+<td>27×</td>
+</tr>
+<tr class="even">
+<td>MortalityTables</td>
+<td>Parametric survival, with a closed-form (Gompertz) or numerical (Beard) cumulative hazard</td>
+<td>14–19×</td>
+</tr>
+<tr class="odd">
+<td>MortalityTables</td>
+<td>Parametric complete life expectancy (Gompertz, Makeham, Weibull, Kannisto)</td>
+<td>9–18×</td>
+</tr>
+<tr class="even">
+<td>MortalityTables</td>
+<td>Parsing an XTbML table from disk (XML.jl replaces libxml2): the 1980 CSO ultimate table, the 2001 VBT select and ultimate table</td>
+<td>2.4×, 23×</td>
+</tr>
+<tr class="odd">
+<td>ActuaryUtilities</td>
+<td>Effective and spread duration of a bond or floater</td>
+<td>46–56×</td>
+</tr>
+<tr class="even">
+<td>ActuaryUtilities</td>
+<td>Key rates of a bond or floater, on one or two curves</td>
+<td>8–10×</td>
+</tr>
+<tr class="odd">
+<td>ActuaryUtilities</td>
+<td>Scalar and <code>Rate</code> DV01</td>
+<td>3.4–6.1×</td>
+</tr>
+<tr class="even">
+<td>ActuaryUtilities</td>
+<td>Curve duration, DV01 and convexity of fixed cashflows, now allocation-free</td>
+<td>2.3–3.4×</td>
+</tr>
+<tr class="odd">
+<td>FinanceCore</td>
+<td>Present value of amounts with explicit times, now allocation-free</td>
+<td>3.1–3.7×</td>
+</tr>
+<tr class="even">
+<td>FinanceModels</td>
+<td>Curve fits (Nelson–Siegel, Linear, MonotoneConvex)</td>
+<td>1.3–2.4×</td>
+</tr>
+<tr class="odd">
+<td>FinanceModels</td>
+<td>Vasicek swaption</td>
+<td>2.3×</td>
+</tr>
+<tr class="even">
+<td>FinanceModels</td>
+<td>A portfolio of a bond, a floater and a swap</td>
+<td>1.7×</td>
+</tr>
+<tr class="odd">
+<td>FinanceModels</td>
+<td>A swap, a <code>Composite</code> or a floater valued on its index curve</td>
+<td>1.2–1.4×</td>
+</tr>
+</tbody>
+</table>
+<p>Fitting a knot curve now rebuilds it once per optimizer candidate instead of once per knot.</p>
+<p>FinanceCore 2.8, already released, made IRRs of far-dated cashflows correct and up to 18× faster than 2.7. Newton now measures time from the first nonzero cashflow, which leaves the roots unchanged but lets it converge where it used to stall. Here 2.7 returned 9.99%:</p>
+<div id="118" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>irr([-100.0, 110.0], [1000.0, 1001.0])</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>Periodic(0.09999999999999998, 1)</code></pre>
+</div>
+</div>
+<p>The same comparison found slower paths, in red in the plot:</p>
+<ul>
+<li>point discounts on Linear and MonotoneConvex curves, by a few nanoseconds per call (up to 55%), from the new checks (a negative time throws, <code>t = Inf</code> returns the tail’s limit) and the curve’s layout. Hull–White discount factors, which come from its curve, slow down the same way, and a bond on a Linear curve is 8% slower;</li>
+<li><code>forward(curve, from, to)</code> on a Linear curve, by 22%: it is computed from cumulative log-discounts, which don’t underflow;</li>
+<li>Vasicek and CIR discount factors, by 14% and 17%, from the numerically stable kernels;</li>
+<li>a Hull–White cap, by 9%;</li>
+<li><code>convexity</code> of a valuation callback on a curve, by 13%;</li>
+<li>survival from a fractional age under <code>UniformDeaths()</code>, from 3 to 10 ns, now that it is conditional on surviving to that age.</li>
+</ul>
+</section>
+<section id="upgrading" class="level2">
+<h2 class="anchored" data-anchor-id="upgrading">Upgrading</h2>
+<p>Use FinanceModels 7 and ActuaryUtilities 6 together for the APIs shown here. The planned release set uses Julia 1.10 or newer:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Package</th>
+<th>Release</th>
+<th>Migration guidance</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>FinanceModels</td>
+<td>7.0</td>
+<td><a href="https://docs.juliaactuary.org/FinanceModels/stable/migration/">Migration guide</a> and <a href="https://github.com/JuliaActuary/FinanceModels.jl/blob/master/NEWS.md">NEWS</a></td>
+</tr>
+<tr class="even">
+<td>ActuaryUtilities</td>
+<td>6.0</td>
+<td><a href="https://docs.juliaactuary.org/ActuaryUtilities/stable/upgrade/">Version upgrade guide</a>, including replacements for removed calls</td>
+</tr>
+<tr class="odd">
+<td>MortalityTables</td>
+<td>3.0</td>
+<td><a href="https://github.com/JuliaActuary/MortalityTables.jl/blob/master/NEWS.md">Release notes</a></td>
+</tr>
+<tr class="even">
+<td>FinanceCore</td>
+<td>3.0</td>
+<td><a href="https://github.com/JuliaActuary/FinanceCore.jl/blob/main/NEWS.md">Release notes</a>, including a migration table</td>
+</tr>
+<tr class="odd">
+<td>EconomicScenarioGenerators</td>
+<td>0.7.1 (final planned release)</td>
+<td><a href="https://github.com/JuliaActuary/EconomicScenarioGenerators.jl/blob/main/NEWS.md">Release notes</a></td>
+</tr>
+</tbody>
+</table>
+<p>FinanceModels 7 and ActuaryUtilities 6 require FinanceCore 3, which includes the 2.8 fixes described here. FinanceModels 7 also requires Optimization 5. EconomicScenarioGenerators 0.7.1 supports FinanceModels 7 and is ESG’s final planned release. FinanceModels’ short-rate models, with <code>simulate</code> and <code>pv_mc</code>, succeed its interest-rate generators; its correlated and equity scenarios are planned for FinanceModels 7.1. Under FinanceModels 7, an ESG <code>YieldCurve</code> holds the zero rate flat before its first gridpoint and the forward flat after its last; values at the gridpoints don’t change.</p>
+<p>If something you rely on behaves differently and isn’t covered, open an issue in <a href="https://github.com/JuliaActuary/FinanceModels.jl/issues">FinanceModels</a>, <a href="https://github.com/JuliaActuary/ActuaryUtilities.jl/issues">ActuaryUtilities</a>, <a href="https://github.com/JuliaActuary/MortalityTables.jl/issues">MortalityTables</a> or <a href="https://github.com/JuliaActuary/FinanceCore.jl/issues">FinanceCore</a>, or ask on the <a href="https://github.com/orgs/JuliaActuary/discussions">JuliaActuary discussions</a>.</p>
+
+
+</section>
+
+ ]]></description>
+  <category>code</category>
+  <category>blog</category>
+  <guid>https://JuliaActuary.org/posts/2026-fall-releases/</guid>
+  <pubDate>Wed, 30 Sep 2026 04:00:00 GMT</pubDate>
+</item>
 <item>
   <title>Nested Stochastic Projections: Python vs. Julia</title>
   <dc:creator>Alec Loudenback</dc:creator>
@@ -1447,7 +2743,7 @@ Table&nbsp;5: Extrapolated cost of the paper’s full configuration — 190,000 
   <category>autodiff</category>
   <category>blog</category>
   <guid>https://JuliaActuary.org/posts/nested-stochastic-va/</guid>
-  <pubDate>Fri, 31 Jul 2026 06:00:00 GMT</pubDate>
+  <pubDate>Fri, 31 Jul 2026 04:00:00 GMT</pubDate>
 </item>
 <item>
   <title>Cassette Futurism: a Makie theme preview</title>
@@ -1677,7 +2973,7 @@ end</code></pre>
   <category>design</category>
   <category>code</category>
   <guid>https://JuliaActuary.org/posts/cassette-futurism-theme/</guid>
-  <pubDate>Sun, 24 May 2026 06:00:00 GMT</pubDate>
+  <pubDate>Sun, 24 May 2026 04:00:00 GMT</pubDate>
 </item>
 <item>
   <title>FinanceModels vs QuantLib: where Julia closes the gap</title>
@@ -2452,7 +3748,7 @@ timeit.timeit(krd_zerocurve, number=1_000)</code></pre>
   <category>autodiff</category>
   <category>finance</category>
   <guid>https://JuliaActuary.org/posts/quantlib-comparison/</guid>
-  <pubDate>Thu, 21 May 2026 06:00:00 GMT</pubDate>
+  <pubDate>Thu, 21 May 2026 04:00:00 GMT</pubDate>
 </item>
 <item>
   <title>FinanceModels.jl - Evolving the JuliaActuary Ecosystem</title>
@@ -2805,7 +4101,7 @@ end</code></pre>
   <category>code</category>
   <category>blog</category>
   <guid>https://JuliaActuary.org/posts/finance-models-announcement/</guid>
-  <pubDate>Sat, 19 Aug 2023 06:00:00 GMT</pubDate>
+  <pubDate>Sat, 19 Aug 2023 04:00:00 GMT</pubDate>
 </item>
 <item>
   <title>Modern Bayesian Statistics for Actuaries</title>
@@ -2925,7 +4221,7 @@ end</code></pre>
   <category>statistics</category>
   <category>blog</category>
   <guid>https://JuliaActuary.org/posts/bayesian-intro/</guid>
-  <pubDate>Thu, 13 Jul 2023 06:00:00 GMT</pubDate>
+  <pubDate>Thu, 13 Jul 2023 04:00:00 GMT</pubDate>
 </item>
 <item>
   <title>JuliaActuary and Hacktoberfest 2022</title>
@@ -2967,7 +4263,7 @@ end</code></pre>
   <category>contributing</category>
   <category>blog</category>
   <guid>https://JuliaActuary.org/posts/hacktoberfest/</guid>
-  <pubDate>Sat, 24 Sep 2022 06:00:00 GMT</pubDate>
+  <pubDate>Sat, 24 Sep 2022 04:00:00 GMT</pubDate>
   <media:content url="https://JuliaActuary.org/posts/hacktoberfest/hacktoberfest2022.webp" medium="image" type="image/webp"/>
 </item>
 <item>
@@ -3196,7 +4492,7 @@ BenchmarkTools.Trial: 10000 samples with 994 evaluations.
   <category>statistics</category>
   <category>bayesian</category>
   <guid>https://JuliaActuary.org/posts/getting-started-for-actuaries/</guid>
-  <pubDate>Sun, 24 Oct 2021 06:00:00 GMT</pubDate>
+  <pubDate>Sun, 24 Oct 2021 04:00:00 GMT</pubDate>
 </item>
 <item>
   <title>The Life Modeling Problem: A Comparison of Julia, Rust, Python, and R</title>
@@ -4007,7 +5303,7 @@ Platform Info:
   <category>code</category>
   <category>blog</category>
   <guid>https://JuliaActuary.org/posts/life-modeling-problem/</guid>
-  <pubDate>Sun, 16 May 2021 06:00:00 GMT</pubDate>
+  <pubDate>Sun, 16 May 2021 04:00:00 GMT</pubDate>
 </item>
 <item>
   <title>Julia for Actuaries</title>
@@ -4317,7 +5613,7 @@ size=100)</code></pre></td>
   <category>python</category>
   <category>blog</category>
   <guid>https://JuliaActuary.org/posts/julia-for-actuaries/</guid>
-  <pubDate>Thu, 09 Jul 2020 06:00:00 GMT</pubDate>
+  <pubDate>Thu, 09 Jul 2020 04:00:00 GMT</pubDate>
 </item>
 <item>
   <title>Coding the Future</title>
@@ -4428,7 +5724,7 @@ size=100)</code></pre></td>
   <category>industry</category>
   <category>blog</category>
   <guid>https://JuliaActuary.org/posts/coding-the-future/</guid>
-  <pubDate>Thu, 09 Jul 2020 06:00:00 GMT</pubDate>
+  <pubDate>Thu, 09 Jul 2020 04:00:00 GMT</pubDate>
 </item>
 <item>
   <title>Credibility When Claims Are Scarce</title>
@@ -5824,7 +7120,7 @@ length(horizon)</code></pre>
   <category>credibility</category>
   <category>modeling</category>
   <guid>https://JuliaActuary.org/posts/credibility-sparse-data/</guid>
-  <pubDate>Fri, 07 Aug 2026 04:37:22 GMT</pubDate>
+  <pubDate>Fri, 09 Oct 2026 20:50:43 GMT</pubDate>
 </item>
 <item>
   <title>How Much Capital Does Model Error Cost?</title>
@@ -6153,7 +7449,7 @@ end</code></pre>
   <category>modeling</category>
   <category>tutorial</category>
   <guid>https://JuliaActuary.org/posts/optimal-transport-capital/</guid>
-  <pubDate>Fri, 07 Aug 2026 04:37:22 GMT</pubDate>
+  <pubDate>Fri, 09 Oct 2026 20:50:43 GMT</pubDate>
 </item>
 <item>
   <title>Interactive Cashflow Analysis with ActuaryUtilities.jl</title>
@@ -6191,7 +7487,7 @@ using Pluto; Pluto.run()</code></pre>
   <category>financemodels</category>
   <category>assets</category>
   <guid>https://JuliaActuary.org/posts/cashflow-interactive/</guid>
-  <pubDate>Fri, 07 Aug 2026 04:37:22 GMT</pubDate>
+  <pubDate>Fri, 09 Oct 2026 20:50:43 GMT</pubDate>
 </item>
 <item>
   <title>Universal Life Policy Account Mechanics as a Differential Equation</title>
@@ -6470,7 +7766,7 @@ end</code></pre>
   <category>actuaryutilities</category>
   <category>tutorial</category>
   <guid>https://JuliaActuary.org/posts/policy-diffeq/</guid>
-  <pubDate>Fri, 07 Aug 2026 04:37:22 GMT</pubDate>
+  <pubDate>Fri, 09 Oct 2026 20:50:43 GMT</pubDate>
 </item>
 <item>
   <title>US Treasury Comparison Tool</title>
@@ -6508,7 +7804,7 @@ using Pluto; Pluto.run()</code></pre>
   <category>financemodels</category>
   <category>tutorial</category>
   <guid>https://JuliaActuary.org/posts/treasury-interactive/</guid>
-  <pubDate>Fri, 07 Aug 2026 04:37:22 GMT</pubDate>
+  <pubDate>Fri, 09 Oct 2026 20:50:43 GMT</pubDate>
 </item>
 <item>
   <title>Bayesian Markov-Chain-Monte-Carlo and Claims Data</title>
@@ -8604,7 +9900,7 @@ Use `describe(chains)` for summary statistics and quantiles.</code></pre>
   <category>statistics</category>
   <category>bayesian</category>
   <guid>https://JuliaActuary.org/posts/bayesian-claims-demo/</guid>
-  <pubDate>Fri, 07 Aug 2026 04:37:22 GMT</pubDate>
+  <pubDate>Fri, 09 Oct 2026 20:50:43 GMT</pubDate>
 </item>
 <item>
   <title>Nested Projection Mechanics</title>
@@ -9819,7 +11115,7 @@ end</code></pre>
   <category>actuaryutilities</category>
   <category>tutorial</category>
   <guid>https://JuliaActuary.org/posts/nested-policy-projections/</guid>
-  <pubDate>Fri, 07 Aug 2026 04:37:22 GMT</pubDate>
+  <pubDate>Fri, 09 Oct 2026 20:50:43 GMT</pubDate>
 </item>
 <item>
   <title>Using MortaltiyTables.jl with DataFrames</title>
@@ -10440,7 +11736,7 @@ sample_data</code></pre>
   <category>dataframes</category>
   <category>tutorial</category>
   <guid>https://JuliaActuary.org/posts/mortalitytables-and-dataframes/</guid>
-  <pubDate>Fri, 07 Aug 2026 04:37:22 GMT</pubDate>
+  <pubDate>Fri, 09 Oct 2026 20:50:43 GMT</pubDate>
 </item>
 <item>
   <title>Poisson approximation to Binomial</title>
@@ -10668,1130 +11964,7 @@ end</code></pre>
   <category>statistics</category>
   <category>experience-analysis</category>
   <guid>https://JuliaActuary.org/posts/poisson-approximation/</guid>
-  <pubDate>Fri, 07 Aug 2026 04:37:22 GMT</pubDate>
-</item>
-<item>
-  <title>Bayesian vs Limited Fluctuation Experience Analysis</title>
-  <link>https://JuliaActuary.org/posts/bayes-vs-limited-fluctuation/</link>
-  <description><![CDATA[ 
-
-
-
-
-
-<p>Alternate title: Why actuaries should cease to care about the number 1082.</p>
-<section id="introduction" class="level2">
-<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
-<p>This notebook briefly discusses two approaches to experience analysis (rate setting). One traditional method, Limited Fluctuation Credibility (LFC), has been around for a very long time although was never intended to be the most accurate predictive method. However, many actuaries still discuss the notion of “full” or “partially” credible indicating a reliance on the LFC concepts.</p>
-<p>The Bayesian approach uses explicit assumptions about the statistical relationships and all data given to the model to make inferences. Small datasets lead to greater uncertainty, while larger datasets never reach a point that could be considered “fully credible”, although the posterior density may narrow considerably.</p>
-<p>This notebook argues that the Bayesian approach is superior to the LFC heuristics and should be adopted more widely in actuarial practice.</p>
-<p>The example will use an auto-claims dataset and will use the first two years of experience to predict the third.</p>
-<div id="4" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>using CSV
-using DataFramesMeta
-using Distributions
-using Turing
-using MCMCChains
-using DataFrames
-using Logging;
-Logging.disable_logging(Logging.Warn);
-using StatsFuns
-using StatisticalRethinking
-using CairoMakie
-
-include(joinpath(@__DIR__, "..", "..", "assets", "themes", "cassette_futurism.jl"))
-set_theme!(cassette_futurism_theme())</code></pre>
-<div class="cell-output cell-output-stdout">
-<pre><code>WARNING: Constructor for type "HMC" was extended in `StatisticalRethinking` without explicit qualification or import.
-  NOTE: Assumed "HMC" refers to `Turing.HMC`. This behavior is deprecated and may differ in future versions.`
-  NOTE: This behavior may have differed in Julia versions prior to 1.12.
-  Hint: If you intended to create a new generic function of the same name, use `function HMC end`.
-  Hint: To silence the warning, qualify `HMC` as `Turing.HMC` in the method signature or explicitly `import Turing: HMC`.</code></pre>
-</div>
-</div>
-</section>
-<section id="limited-fluctuation-credibility" class="level2">
-<h2 class="anchored" data-anchor-id="limited-fluctuation-credibility">Limited Fluctuation Credibility</h2>
-<blockquote class="blockquote">
-<p>The Limited Fluctuation Method was so named because it allowed premiums to fluctuate from year to year based on experience, while limiting those fluctuations by giving less than full credibility to premiums based on limited data. In contrast, setting premium rates by giving full credibility to recent experience could be called the Full Fluctuation Method. While every credibility method serves to limit fluctuations, this method acquired its name because it was the first. The Limited Fluctuation Method, also known as Classical Credibility, is the most widely-used credibility method because it can be relatively simple to apply. Outside North America, this method is sometimes referred to as American Credibility.</p>
-</blockquote>
-<p>Quoted from <a href="https://www.soa.org/globalassets/assets/files/resources/tables-calcs-tools/credibility-methods-life-health-pensions.pdf">Atkinson, 2019</a>.</p>
-<section id="formulas" class="level3">
-<h3 class="anchored" data-anchor-id="formulas">Formulas</h3>
-<p>The Limited Fluctuation Method components: a credibility weight, <img src="https://latex.codecogs.com/png.latex?Z">, an Observed Rate, and a Prior Rate.</p>
-<p><img src="https://latex.codecogs.com/png.latex?%0A%5Ctext%7BCredibility-Weighted%20Rate%7D%20=%20Z%20%C3%97%20%5Ctext%7BObserved%20Rate%7D%20+%20(1%20%E2%80%93%20Z)%20%C3%97%20%5Ctext%7BPrior%20Rate%7D%0A"></p>
-<p>With probability equal to <img src="https://latex.codecogs.com/png.latex?LC_p"> that the Observed Rate does not differ from the true rate by more than <img src="https://latex.codecogs.com/png.latex?LC_r">.</p>
-<div id="6" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>LC_p = 0.9
-LC_r = 0.05</code></pre>
-<div class="cell-output cell-output-display" data-execution_count="1">
-<pre><code>0.05</code></pre>
-</div>
-</div>
-<p><img src="https://latex.codecogs.com/png.latex?%0A%5Ctext%7BClaims%20for%20full%20credibility%7D%20=%20%5Cleft(%5Cfrac%7B%5Ctext%7BZ-Score%7D%7D%7B%5Ctext%7Bratio%7D%7D%5Cright)%5E%7B2%7D%0A"></p>
-<div id="8" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>LC_full_credibility = round(Int, (quantile(Normal(), 1 - (1 - LC_p) / 2) / LC_r)^2)</code></pre>
-<div class="cell-output cell-output-display" data-execution_count="1">
-<pre><code>1082</code></pre>
-</div>
-</div>
-<p>Using the inputs above, we have a z-score corresponding to 0.9 of 1.6448536269514717, so: ( 1.6448536269514717 ÷ 0.05)² ≈ 1082. ““”</p>
-<p><a href="https://www.soa.org/globalassets/assets/files/resources/tables-calcs-tools/credibility-methods-life-health-pensions.pdf">Atkinson</a> goes on to nicely summarize the square root method which assigns full credibility, <img src="https://latex.codecogs.com/png.latex?Z%20=%201">, when the number of actual claims equals or exceeds the full credibility threshold of $LC_full_credibility claims.</p>
-<p>When the number of claims is less than full credibility:</p>
-<p><img src="https://latex.codecogs.com/png.latex?%0AZ%20=%20%5Csqrt%7B%5Cfrac%7B%5Ctext%7Bno.%20claims%20in%20group%7D%7D%7B%5Ctext%7Bno.%20claims%20full%20credibility%7D%7D%7D%0A"></p>
-</section>
-<section id="issues-with-limited-fluctuation" class="level3">
-<h3 class="anchored" data-anchor-id="issues-with-limited-fluctuation">Issues with Limited Fluctuation</h3>
-<ul>
-<li>Ignores available information:
-<ul>
-<li>Why does our <img src="https://latex.codecogs.com/png.latex?Z"> not vary by exposures?</li>
-<li>No mechanism for a related group to inform the credibility of another</li>
-<li>Results in a single point estimate with only approximate measure of estimate uncertainty</li>
-</ul></li>
-<li>Relies on a number of assumptions/constraints:
-<ul>
-<li>That aggregated claims can be approximated by a normal distribution</li>
-<li>The thresholds of $LC_p and $LC_r are arbitrary (e.g.&nbsp;all of the same arguments against p-value thresholds can apply to this approach) ““”</li>
-</ul></li>
-</ul>
-</section>
-</section>
-<section id="bayesian-approach" class="level2">
-<h2 class="anchored" data-anchor-id="bayesian-approach">Bayesian Approach</h2>
-<p>Bayes’ formula of updating the posterior probability conditioned on the observed data:</p>
-<p><img src="https://latex.codecogs.com/png.latex?%0AP(A%5Cmid%20B)%20=%20%5Cfrac%7BP(B%20%5Cmid%20A)%20P(A)%7D%7BP(B)%7D%0A"></p>
-<p>This is well known to most actuaries… but generally not applied frequently in practice!</p>
-<p>The issue is that once the probability distributions and data become non-trivial, the formula becomes analytically intractable. Work over the last several decades has set the stage for addressing these situations by developing algorithms that let you sample the Bayesian posterior, even if you can’t analytically say what that is.</p>
-<p>A full overview is beyond the scope of this notebook, which is simply to demonstrate that Limited Fluctuation Credibility is of questionable use in practice and that superior tools exist. For references on modern Bayesian statistics, see the end notes.</p>
-<p>Note that this is describing a <em>different</em>, more first-principles approach than the the Buhlman Bayesian approach, which attempts to simply relate group experience to population experience. The Bayesian approach described here is much more general and extensible.</p>
-<section id="the-formulation" class="level3">
-<h3 class="anchored" data-anchor-id="the-formulation">The formulation</h3>
-<p>Contrary to Limited Fluctuation, the Bayesian approach forces one to be explicit about the presumed structure of the probability model. The flexibility of the statistical model allows one to incorporate actuarial judgement in a quantitative way. For example, in this example we assume that the claims experience of each group informs a global (hyperparameter) prior distribution which we could use as a starting point for a new type of observation. More on this once the data is introduced.</p>
-</section>
-</section>
-<section id="sample-claims-prediction" class="level2">
-<h2 class="anchored" data-anchor-id="sample-claims-prediction">Sample Claims Prediction</h2>
-<p>The data comes from an <a href="https://www.kaggle.com/competitions/ClaimPredictionChallenge/data?select=dictionary.html">Allstate auto-claims data via Kaggle</a>. It contains exposure level information about predictor variable and claim amounts for calendar years 2005-2007.</p>
-<p>For simplicity, we will focus on the narrow objective of estimating the claims rate at the level of automobile make and model. We will use the years 2005 and 2006 as the training data set and then 2007 to evaluate the predictive model.</p>
-<p>The original data is over 13 million rows, we will load an already summarized CSV and split it into <code>train</code> and <code>test</code> sets based on the <code>Calendar_Year</code>.</p>
-<div id="10" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>train, test = let
-    pth = download("https://raw.githubusercontent.com/JuliaActuary/Learn/master/data/condensed_auto_claims.csv")
-    df = CSV.read(pth, DataFrame, normalizenames=true)
-    df.p_observed = df.claims ./ df.n
-
-
-    train = df[df.Calendar_Year.&lt;2007, :]
-    test = df[df.Calendar_Year.==2007, :]
-
-    train, test
-
-end</code></pre>
-<div class="cell-output cell-output-display" data-execution_count="1">
-<div class="ansi-escaped-output">
-<pre>(<span class="ansi-bold">2413×5 DataFrame</span>
-<span class="ansi-bold">  Row </span>│<span class="ansi-bold"> Calendar_Year </span><span class="ansi-bold"> Blind_Model </span><span class="ansi-bold"> n     </span><span class="ansi-bold"> claims </span><span class="ansi-bold"> p_observed </span>
-      │<span class="ansi-bright-black-fg"> Int64         </span><span class="ansi-bright-black-fg"> String7     </span><span class="ansi-bright-black-fg"> Int64 </span><span class="ansi-bright-black-fg"> Int64  </span><span class="ansi-bright-black-fg"> Float64    </span>
-──────┼───────────────────────────────────────────────────────
-    1 │          2005  K.78          6132      41  0.00668624
-    2 │          2005  Q.22         35141     270  0.00768333
-    3 │          2005  AR.41        18719     174  0.00929537
-    4 │          2006  AR.41        18868     196  0.010388
-    5 │          2005  D.20          4573      27  0.00590422
-    6 │          2006  D.20          5446      23  0.00422328
-    7 │          2006  AJ.129       50803     342  0.00673189
-    8 │          2006  AQ.17        44018     263  0.00597483
-  ⋮   │       ⋮             ⋮         ⋮      ⋮         ⋮
- 2407 │          2005  CB.8             1       0  0.0
- 2408 │          2005  AQ.1             1       0  0.0
- 2409 │          2005  AJ.96            1       0  0.0
- 2410 │          2005  AJ.51            1       0  0.0
- 2411 │          2006  AJ.51            1       0  0.0
- 2412 │          2005  BQ.6             1       0  0.0
- 2413 │          2006  BQ.6             1       0  0.0
-<span class="ansi-cyan-fg">                                             2398 rows omitted</span>, <span class="ansi-bold">1289×5 DataFrame</span>
-<span class="ansi-bold">  Row </span>│<span class="ansi-bold"> Calendar_Year </span><span class="ansi-bold"> Blind_Model </span><span class="ansi-bold"> n     </span><span class="ansi-bold"> claims </span><span class="ansi-bold"> p_observed </span>
-      │<span class="ansi-bright-black-fg"> Int64         </span><span class="ansi-bright-black-fg"> String7     </span><span class="ansi-bright-black-fg"> Int64 </span><span class="ansi-bright-black-fg"> Int64  </span><span class="ansi-bright-black-fg"> Float64    </span>
-──────┼───────────────────────────────────────────────────────
-    1 │          2007  X.45         99368     789  0.00794018
-    2 │          2007  Y.29         55783     435  0.00779807
-    3 │          2007  P.18          4923      46  0.0093439
-    4 │          2007  X.40          5573      22  0.0039476
-    5 │          2007  Y.42         25800     168  0.00651163
-    6 │          2007  AH.164       12564      88  0.00700414
-    7 │          2007  AH.119        4251      26  0.00611621
-    8 │          2007  W.3           7680      60  0.0078125
-  ⋮   │       ⋮             ⋮         ⋮      ⋮         ⋮
- 1283 │          2007  X.14             2       0  0.0
- 1284 │          2007  AM.7             1       0  0.0
- 1285 │          2007  BU.37            1       0  0.0
- 1286 │          2007  AE.6             2       0  0.0
- 1287 │          2007  CB.6             1       0  0.0
- 1288 │          2007  BU.32            1       0  0.0
- 1289 │          2007  CA.5             1       0  0.0
-<span class="ansi-cyan-fg">                                             1274 rows omitted</span>)</pre>
-</div>
-</div>
-</div>
-<section id="discussion-of-bayesian-model" class="level3">
-<h3 class="anchored" data-anchor-id="discussion-of-bayesian-model">Discussion of Bayesian model</h3>
-<p>Each group (make and model combination) has an expected claim rate <img src="https://latex.codecogs.com/png.latex?%CE%BC_i">, which is informed by the global hyperparameter <img src="https://latex.codecogs.com/png.latex?%CE%BC"> and variance <img src="https://latex.codecogs.com/png.latex?%5Csigma%5E2">. Then, the observed claims by group are assumed to be distributed according to a <a href="https://juliaactuary.org/tutorials/poissonbinomial/">Poisson distribution</a>.</p>
-<p>A complete overview of modern Bayesian models is beyond the scope of this notebook, but a few key points:</p>
-<ul>
-<li>We are forced with the Bayesian approach to be explicit about the assumptions (versus all of the implicit assumptions of alternative techniques like LF)</li>
-<li>We set <em>priors</em> which are the assumed distribution of model parameters before “learning” from the observations. With enough data, it can result in a posterior that the prior was very skeptical of beforehad.</li>
-<li>With the volume of data in the training set, the priors we select here are not that important. Some comments on why they were chosen though:
-<ul>
-<li>The rate of claims is linked with a <em>logistic</em> function, which looks like an integral sign of sorts. <code>logistic(0.0)</code> equals <code>0.5</code> while very negative inputs approach <code>0.0</code> and positive numbers approach <code>1.0</code>. We do this so that the rate of claims is always constrained in the range <img src="https://latex.codecogs.com/png.latex?(0,1)"></li>
-<li><code>μ \sim Normal(-2,4)</code> says that we expect the population of auto claims rate to be less than 0.5 (`logistic(-2) ≈ .12) but very wide range of possible values given the wide standard deviation.</li>
-<li><code>σ \sim Exponential(0.25)</code> says that we expect the standard devation of an individual group to be positive, but not super wide.</li>
-<li><code>μ_i \sim Normal(μ,σ)</code> is the actual prior for each group’s rate of claim and is informed by the above hyperparameters.</li>
-</ul></li>
-<li><code>@model</code> is a Turing.jl macro which enables interpreting the nice <code>~</code> syntax, which makes the Julia code look very similar to the traditional mathematical notation.</li>
-<li>Note the use of broadcasting with the dot syntax (e.g.&nbsp;the <code>.</code> in <code>.~</code>). This tells Julia to vectorize and fuse the computation.
-<ul>
-<li><code>data.claims ~ product_distribution(Poisson.(data.n .* logistic.(μ_i)))</code> means “each value in <code>data.claims</code> is a random outcome (<code>~</code>) distributed accroding to a corresponding Poisson distribution with <code>\lambda =n \times \text{logistic}(\mu_i)</code> where <code>text{logistic}(\mu_i)</code> is the average claims rate for each group.</li>
-</ul></li>
-</ul>
-<div id="12" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>@model function model_poisson(data, claims)
-    # hyperparameter that informs the prior for each group
-    μ ~ Normal(-2, 4)
-    σ ~ Exponential(0.25)
-
-    # the random variable representing the average claim rate for each group
-    # filldist creates a set of random variable without needing to list out each one
-    μ_i ~ filldist(Normal(μ, σ), length(unique(data.Blind_Model)))
-
-    # use the poisson appproximation to the binomial claim outcome with a
-    # logisitc link function to keep the probability between 0 and 1
-    claims ~ product_distribution(Poisson.(data.n .* logistic.(μ_i)))
-end</code></pre>
-<div class="cell-output cell-output-display" data-execution_count="1">
-<pre><code>model_poisson (generic function with 2 methods)</code></pre>
-</div>
-</div>
-<p>Here’s what the prior distribution of claims looks like… and peeking ahead to what the posterior for a single group of claims looks like. See how even though our posterior was very wide (favoring small claims rates), it was dominated by the data to create a very narrow posterior average claims rate.</p>
-<p>The model is combined with the data and <a href="https://turing.ml/stable/">Turing.jl</a> is used to computationally arrive at the posterior distribution for the parameters in the statistical model, <img src="https://latex.codecogs.com/png.latex?%5Cmu">, <img src="https://latex.codecogs.com/png.latex?%5Cmu_i">, and <img src="https://latex.codecogs.com/png.latex?%5Csigma">.</p>
-<div id="14" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>mp = let
-    # combine the different years in the training set
-    condensed = @chain train begin
-        groupby(:Blind_Model)
-        @combine begin
-            :n = sum(:n)
-            :claims = sum(:claims)
-        end
-    end
-    model_poisson(condensed, condensed.claims)
-end</code></pre>
-<div class="cell-output cell-output-display" data-execution_count="1">
-<div class="ansi-escaped-output">
-<pre>DynamicPPL.Model{typeof(model_poisson), (:data, :claims), (), (), Tuple{DataFrame, Vector{Int64}}, Tuple{}, DynamicPPL.DefaultContext, false}(model_poisson, (data = <span class="ansi-bold">1238×3 DataFrame</span>
-<span class="ansi-bold">  Row </span>│<span class="ansi-bold"> Blind_Model </span><span class="ansi-bold"> n      </span><span class="ansi-bold"> claims </span>
-      │<span class="ansi-bright-black-fg"> String7     </span><span class="ansi-bright-black-fg"> Int64  </span><span class="ansi-bright-black-fg"> Int64  </span>
-──────┼─────────────────────────────
-    1 │ K.78          14058      94
-    2 │ Q.22          71401     532
-    3 │ AR.41         37587     370
-    4 │ D.20          10019      50
-    5 │ AJ.129       100824     693
-    6 │ AQ.17         86702     541
-    7 │ BW.3          75655     410
-    8 │ BW.167        42737     294
-  ⋮   │      ⋮         ⋮       ⋮
- 1232 │ BG.8              1       0
- 1233 │ CA.5              2       0
- 1234 │ J.5               2       0
- 1235 │ AQ.1              1       0
- 1236 │ AJ.96             1       0
- 1237 │ AJ.51             2       0
- 1238 │ BQ.6              2       0
-<span class="ansi-cyan-fg">                   1223 rows omitted</span>, claims = [94, 532, 370, 50, 693, 541, 410, 294, 755, 162  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0]), NamedTuple(), DynamicPPL.DefaultContext())</pre>
-</div>
-</div>
-</div>
-</section>
-<section id="bayesian-posterior-sampling" class="level3">
-<h3 class="anchored" data-anchor-id="bayesian-posterior-sampling">Bayesian Posterior Sampling</h3>
-<p>Here’s where recent advances in algorithms and computing power make Bayesian analyis possible. We can’t analytically compute the posterior distribution, but we can genererate <em>samples</em> from the posterior such that the frequency of the sampled result appears in proportion to the true posterior density. This uses a technique called <a href="https://en.wikipedia.org/wiki/Markov_chain_Monte_Carlo">Markov Chain Monte Carlo</a>, abbreviated MCMC. There are different algorithms in this family, and we will use one called the No-U-Turn Sampler (NUTS for short).</p>
-<p>The result of the <code>sample</code> function is a set of data containing data that is generated in proportion to the posterior distributions and we will use this data to make predictions and understand the distribution of our parameters.</p>
-<p>Run the chain:</p>
-<div id="16" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>
-cp = MCMCChains.Chains(sample(mp, NUTS(), 500; check_model=false)) # this is the line that runs the MCMC sampler
-
-# ╔═╡ 6b5d2186-78ac-48ae-8529-e0dcd51d0b00
-let
-    # sample from the priors before learning from any data
-    ch_prior = MCMCChains.Chains(sample(mp, Prior(), 1500; check_model=false))
-
-    f = Figure()
-    ax = Axis(f[1, 1], title="Prior distribution of expected claims rate for a group")
-    μ = vec(ch_prior["μ_i[1]"].data)
-    hist!(ax, logistic.(μ); bins=50)
-    ax2 = Axis(f[2, 1], title="Posterior distribution of expected claims rate for a group")
-    μ = vec(cp["μ_i[1]"].data)
-    hist!(ax2, logistic.(μ); bins=50)
-    linkxaxes!(ax, ax2)
-    f
-end</code></pre>
-<div class="cell-output cell-output-display" data-execution_count="1">
-<div>
-<figure class="figure">
-<p><img src="https://JuliaActuary.org/posts/bayes-vs-limited-fluctuation/index_files/figure-html/cell-9-output-1.svg" class="img-fluid figure-img"></p>
-</figure>
-</div>
-</div>
-</div>
-</section>
-<section id="visualizing-the-posterior-density" class="level3">
-<h3 class="anchored" data-anchor-id="visualizing-the-posterior-density">Visualizing the Posterior Density</h3>
-<p>This is a plot of the posterior density for all of the many, many <img src="https://latex.codecogs.com/png.latex?%5Cmu"> parameters in our model. The black line shows the distribution which comes from our hyperparameters μ and σ. In the event of coming across a new group of interest (in our case, a new make of car), this is the prior distribution for the expected claims rate. The model has learned this from the data itself, and serves to regularize predictions.</p>
-<div id="18" class="cell" data-execution_count="1">
-<details class="code-fold">
-<summary>Utilitiy Function to Plot the Posterior</summary>
-<pre class="julia cell-code"><code>"""
-    dplot(chain,parameter_string)
-
-plot the posterior density for model parameters matching the given string.
-"""
-function dplot(ch, param_string)
-    f = Figure()
-    ax = Axis(f[1, 1])
-
-    # plot each group posterior
-    for (ind, param) in enumerate(ch.name_map.parameters)
-        if contains(string(param), param_string)
-            v = vec(getindex(ch, param).data)
-            density!(
-                ax, logistic.(v), color=(:red, 0.0),
-                strokecolor=(:red, 0.3), strokewidth=1, strokearound=false, label="Individual group posterior"
-            )
-        end
-    end
-
-    # Plot hyperparameters
-    hyper_mean = mean(getindex(ch, :μ).data)
-    hyper_sigma = mean(getindex(ch, :σ).data)
-    d = density!(
-        ax, logistic.(rand(Normal(hyper_mean, hyper_sigma), 1000)), color=(:black, 0.0),
-        strokecolor=(:black, 0.3), strokewidth=3, strokearound=false, label="Hyper-parameter distribution"
-    )
-
-
-    xlims!(0.0, 0.03)
-    hideydecorations!(ax)
-    axislegend(ax, unique=true)
-    return f
-end
-
-dplot(cp, "μ")</code></pre>
-</details>
-<div class="cell-output cell-output-display" data-execution_count="1">
-<div>
-<figure class="figure">
-<p><img src="https://JuliaActuary.org/posts/bayes-vs-limited-fluctuation/index_files/figure-html/cell-10-output-1.svg" class="img-fluid figure-img"></p>
-</figure>
-</div>
-</div>
-</div>
-</section>
-</section>
-<section id="predictions-and-results" class="level2">
-<h2 class="anchored" data-anchor-id="predictions-and-results">Predictions and Results</h2>
-<p>Here we compare four predictive models:</p>
-<ol type="1">
-<li>Naive, where the predicted rate for the 2007 year is the average of each groups’ for 2005-2006</li>
-<li>Limited Fluctuation Overall, where the “prior” in the LFC formula is the overall mean claim rate for 2005-2006</li>
-<li>Limited Fluctuation Year-by-Year where the “prior” in the LFC formula is the claim rate for the ith group in 2005 and updated using 2006 claim rates.</li>
-<li>Bayesian approach where the predicted claim rate is based on the bayesian model discussed above.</li>
-</ol>
-<section id="predictions" class="level3">
-<h3 class="anchored" data-anchor-id="predictions">Predictions</h3>
-</section>
-<section id="bayesian-approach-has-lower-error" class="level3">
-<h3 class="anchored" data-anchor-id="bayesian-approach-has-lower-error">Bayesian approach has lower error</h3>
-<p>Looking at the accumulated absolute error, the bayesian approach has about 16% lower error than the Limited Fluctuation approaches.</p>
-</section>
-<section id="total-actual-to-expected" class="level3">
-<h3 class="anchored" data-anchor-id="total-actual-to-expected">Total Actual to Expected</h3>
-<p>Here, offsetting errors happen to make the naive and LF year-by-year (the latter is a good proxy for the former) such that their total A/E is better than the Bayesian approach.</p>
-<p>Given the lower error of the Bayesian approach, one would expect that over multiple years that it would produce more accurate predictions than the alternative methods.</p>
-</section>
-</section>
-<section id="conclusion" class="level2">
-<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
-<p>This notebook shows that the Bayesian approach results in claims predictions with less total predictive error than the limited fluctuation method.</p>
-<section id="further-thoughts" class="level3">
-<h3 class="anchored" data-anchor-id="further-thoughts">Further thoughts</h3>
-<p>The Bayesian approach could be extended to improve its accuracy even further:</p>
-<ul>
-<li>Using vehicle make data to add more hierarchical structure to the statistical model. For example, one may observe that Porsches experience crashes at a higher rate than Volvos. LFC cannot embed that sort of overlapping hierarchy into its framework.</li>
-<li>The Bayesian hyperparameter provides a framework to think about “unseen” make-model combinations</li>
-</ul>
-</section>
-<section id="downsides-to-the-bayesian-approach" class="level3">
-<h3 class="anchored" data-anchor-id="downsides-to-the-bayesian-approach">Downsides to the Bayesian approach</h3>
-<ul>
-<li>Computationally intensive. Complex <code>@models</code> can take very long time to run (many hours), compared to relatively quick frequentest methods like maximum likelihood estimation.</li>
-</ul>
-</section>
-<section id="further-reading" class="level3">
-<h3 class="anchored" data-anchor-id="further-reading">Further Reading</h3>
-<p>If this notebook has piqued your interest in Bayesian techniques, the following books are recommended learning resources (from easiest to most difficult):</p>
-<ul>
-<li>Statistical Rethinking
-<ul>
-<li>See also <a href="https://github.com/StatisticalRethinkingJulia/StatisticalRethinking.jl">StatisticalRethinking.jl</a> for Julia implementations of all of the book’s code and utility functions</li>
-</ul></li>
-<li>Bayes Rules!</li>
-<li>Bayeisan Data Analysis</li>
-</ul>
-</section>
-</section>
-<section id="appendices" class="level2">
-<h2 class="anchored" data-anchor-id="appendices">Appendices</h2>
-<p>Additional legwork to get the alternate limited fluctuation approach data:</p>
-<div id="20" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code># An alternate approach to LFC where the first year becomes the prior, adjusted by data from the seonc year.
-LF2 = let
-    # split dataset by year and recombine
-    df2005 = @subset(train, :Calendar_Year .== 2005)
-    df2006 = @subset(train, :Calendar_Year .== 2006)
-    df = outerjoin(df2005, df2006, on=:Blind_Model, renamecols="_2005" =&gt; "_2006")
-
-    # use 2005 actuals as LFC prior, and the overall mean if model is missing
-    μ_2005 = sum(skipmissing(df.claims_2005)) / sum(skipmissing(df.n_2005))
-    df.assumed = coalesce.(df.p_observed_2005, μ_2005)
-
-    df.LF2_Z = min.(1, .√(coalesce.(df.claims_2006, 0.0) ./ LC_full_credibility))
-    df.LF2_μ = let Z = df.LF2_Z
-        # use the 2005 mean if the model not observed in 2006
-        Z .* coalesce.(df.p_observed_2006, μ_2005) .+ (1 .- Z) .* df.assumed
-    end
-    df
-end
-
-claims_summary_posterior = let
-    # combine the dataset by model
-    df = @chain train begin
-        groupby(:Blind_Model)
-        @combine begin
-            :n = sum(:n)
-            :claims = sum(:claims)
-        end
-    end
-    pop_μ = sum(df.claims) / sum(df.n)
-    df[!, :pop_μ] .= pop_μ
-
-    ## Bayesian prediction
-    # get the mean of the posterior estimate for the ith model group
-    means = map(1:length(unique(df.Blind_Model))) do i
-        d = logistic.(getindex(cp, Symbol("μ_i[$i]")).data)
-        (est=mean(d), se=std(d))
-    end
-
-    df.p_observed = df.claims ./ df.n
-    df.bayes_μ = [x.est for x in means]
-    df.bayes_se = [x.se for x in means]
-
-    ## Limited Fluctuation (square root rule)
-    # using overall population mean
-    # using the square-root rule
-    df.LF_Z = min.(1, .√(df.claims ./ LC_full_credibility))
-    df.LF_μ = let Z = df.LF_Z
-        Z .* (df.p_observed) .+ (1 .- Z) .* pop_μ
-    end
-
-    ## Limited Fluctuation
-    # using the first year as the prior, 2nd year as new data
-    # using some additional procesing to get the LF2 dataframe, see appendix
-    df2005 = @subset(train, :Calendar_Year .== 2005)
-    dict2005 = Dict(
-        model =&gt; rate
-        for (model, rate) in zip(df2005.Blind_Model, df2005.p_observed)
-    )
-
-    df = leftjoin(df, LF2[:, [:Blind_Model, :LF2_μ]], on=:Blind_Model)
-
-    df = innerjoin(df, test; on=:Blind_Model, renamecols="_train" =&gt; "_test")
-
-    # predictions on the test set using the predictive rates time exposures
-    df.pred_bayes = df.n_test .* df.bayes_μ_train
-    df.pred_LF = df.n_test .* df.LF_μ_train
-    df.pred_LF2 = df.n_test .* df.LF2_μ_train
-    df.pred_naive = df.n_test .* df.p_observed_train
-
-    sort!(df, :n_train, rev=true)
-end</code></pre>
-<div class="cell-output cell-output-display" data-execution_count="1">
-<div><div style="float: left;"><span>1224×18 DataFrame</span></div><div style="float: right;"><span style="font-style: italic;">1199 rows omitted</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
-<table class="data-frame caption-top table table-sm table-striped small">
-<thead>
-<tr class="header">
-<th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">Blind_Model</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">n_train</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">claims_train</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">pop_μ_train</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">p_observed_train</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">bayes_μ_train</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">bayes_se_train</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">LF_Z_train</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">LF_μ_train</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">LF2_μ_train</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">Calendar_Year_test</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">n_test</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">claims_test</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">p_observed_test</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">pred_bayes</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">pred_LF</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">pred_LF2</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">pred_naive</th>
-</tr>
-<tr class="subheader headerLastRow even">
-<th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="InlineStrings.String7">String7</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="Union{Missing, Float64}">Float64?</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">1</td>
-<td style="text-align: left;">K.7</td>
-<td style="text-align: right;">382210</td>
-<td style="text-align: right;">3365</td>
-<td style="text-align: right;">0.0072979</td>
-<td style="text-align: right;">0.00880406</td>
-<td style="text-align: right;">0.00879363</td>
-<td style="text-align: right;">0.000160509</td>
-<td style="text-align: right;">1.0</td>
-<td style="text-align: right;">0.00880406</td>
-<td style="text-align: right;">0.00853456</td>
-<td style="text-align: right;">2007</td>
-<td style="text-align: right;">215223</td>
-<td style="text-align: right;">1798</td>
-<td style="text-align: right;">0.00835413</td>
-<td style="text-align: right;">1892.59</td>
-<td style="text-align: right;">1894.84</td>
-<td style="text-align: right;">1836.83</td>
-<td style="text-align: right;">1894.84</td>
-</tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">2</td>
-<td style="text-align: left;">X.45</td>
-<td style="text-align: right;">192591</td>
-<td style="text-align: right;">1542</td>
-<td style="text-align: right;">0.0072979</td>
-<td style="text-align: right;">0.0080066</td>
-<td style="text-align: right;">0.007995</td>
-<td style="text-align: right;">0.000195162</td>
-<td style="text-align: right;">1.0</td>
-<td style="text-align: right;">0.0080066</td>
-<td style="text-align: right;">0.00801192</td>
-<td style="text-align: right;">2007</td>
-<td style="text-align: right;">99368</td>
-<td style="text-align: right;">789</td>
-<td style="text-align: right;">0.00794018</td>
-<td style="text-align: right;">794.447</td>
-<td style="text-align: right;">795.6</td>
-<td style="text-align: right;">796.129</td>
-<td style="text-align: right;">795.6</td>
-</tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">3</td>
-<td style="text-align: left;">AU.14</td>
-<td style="text-align: right;">188702</td>
-<td style="text-align: right;">1687</td>
-<td style="text-align: right;">0.0072979</td>
-<td style="text-align: right;">0.00894002</td>
-<td style="text-align: right;">0.00890296</td>
-<td style="text-align: right;">0.00020534</td>
-<td style="text-align: right;">1.0</td>
-<td style="text-align: right;">0.00894002</td>
-<td style="text-align: right;">0.00874644</td>
-<td style="text-align: right;">2007</td>
-<td style="text-align: right;">114742</td>
-<td style="text-align: right;">1071</td>
-<td style="text-align: right;">0.00933398</td>
-<td style="text-align: right;">1021.54</td>
-<td style="text-align: right;">1025.8</td>
-<td style="text-align: right;">1003.58</td>
-<td style="text-align: right;">1025.8</td>
-</tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">4</td>
-<td style="text-align: left;">W.16</td>
-<td style="text-align: right;">150304</td>
-<td style="text-align: right;">1064</td>
-<td style="text-align: right;">0.0072979</td>
-<td style="text-align: right;">0.00707899</td>
-<td style="text-align: right;">0.00707184</td>
-<td style="text-align: right;">0.000203841</td>
-<td style="text-align: right;">0.991647</td>
-<td style="text-align: right;">0.00708082</td>
-<td style="text-align: right;">0.00691906</td>
-<td style="text-align: right;">2007</td>
-<td style="text-align: right;">83039</td>
-<td style="text-align: right;">510</td>
-<td style="text-align: right;">0.00614169</td>
-<td style="text-align: right;">587.238</td>
-<td style="text-align: right;">587.984</td>
-<td style="text-align: right;">574.552</td>
-<td style="text-align: right;">587.832</td>
-</tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">5</td>
-<td style="text-align: left;">AU.11</td>
-<td style="text-align: right;">133445</td>
-<td style="text-align: right;">1188</td>
-<td style="text-align: right;">0.0072979</td>
-<td style="text-align: right;">0.00890254</td>
-<td style="text-align: right;">0.00883305</td>
-<td style="text-align: right;">0.000265519</td>
-<td style="text-align: right;">1.0</td>
-<td style="text-align: right;">0.00890254</td>
-<td style="text-align: right;">0.00878751</td>
-<td style="text-align: right;">2007</td>
-<td style="text-align: right;">70028</td>
-<td style="text-align: right;">642</td>
-<td style="text-align: right;">0.00916776</td>
-<td style="text-align: right;">618.561</td>
-<td style="text-align: right;">623.427</td>
-<td style="text-align: right;">615.372</td>
-<td style="text-align: right;">623.427</td>
-</tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">6</td>
-<td style="text-align: left;">BO.38</td>
-<td style="text-align: right;">125206</td>
-<td style="text-align: right;">775</td>
-<td style="text-align: right;">0.0072979</td>
-<td style="text-align: right;">0.0061898</td>
-<td style="text-align: right;">0.00619253</td>
-<td style="text-align: right;">0.000225941</td>
-<td style="text-align: right;">0.846325</td>
-<td style="text-align: right;">0.00636009</td>
-<td style="text-align: right;">0.0061673</td>
-<td style="text-align: right;">2007</td>
-<td style="text-align: right;">68966</td>
-<td style="text-align: right;">437</td>
-<td style="text-align: right;">0.00633646</td>
-<td style="text-align: right;">427.074</td>
-<td style="text-align: right;">438.63</td>
-<td style="text-align: right;">425.334</td>
-<td style="text-align: right;">426.886</td>
-</tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">7</td>
-<td style="text-align: left;">AO.7</td>
-<td style="text-align: right;">109746</td>
-<td style="text-align: right;">1055</td>
-<td style="text-align: right;">0.0072979</td>
-<td style="text-align: right;">0.00961311</td>
-<td style="text-align: right;">0.00956919</td>
-<td style="text-align: right;">0.000285966</td>
-<td style="text-align: right;">0.987444</td>
-<td style="text-align: right;">0.00958404</td>
-<td style="text-align: right;">0.00956317</td>
-<td style="text-align: right;">2007</td>
-<td style="text-align: right;">59534</td>
-<td style="text-align: right;">543</td>
-<td style="text-align: right;">0.00912084</td>
-<td style="text-align: right;">569.692</td>
-<td style="text-align: right;">570.576</td>
-<td style="text-align: right;">569.334</td>
-<td style="text-align: right;">572.307</td>
-</tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">8</td>
-<td style="text-align: left;">AJ.58</td>
-<td style="text-align: right;">107538</td>
-<td style="text-align: right;">891</td>
-<td style="text-align: right;">0.0072979</td>
-<td style="text-align: right;">0.00828544</td>
-<td style="text-align: right;">0.00826096</td>
-<td style="text-align: right;">0.000257076</td>
-<td style="text-align: right;">0.907455</td>
-<td style="text-align: right;">0.00819405</td>
-<td style="text-align: right;">0.00824136</td>
-<td style="text-align: right;">2007</td>
-<td style="text-align: right;">52176</td>
-<td style="text-align: right;">394</td>
-<td style="text-align: right;">0.00755136</td>
-<td style="text-align: right;">431.024</td>
-<td style="text-align: right;">427.533</td>
-<td style="text-align: right;">430.001</td>
-<td style="text-align: right;">432.301</td>
-</tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">9</td>
-<td style="text-align: left;">AJ.52</td>
-<td style="text-align: right;">107252</td>
-<td style="text-align: right;">691</td>
-<td style="text-align: right;">0.0072979</td>
-<td style="text-align: right;">0.00644277</td>
-<td style="text-align: right;">0.00644543</td>
-<td style="text-align: right;">0.000239207</td>
-<td style="text-align: right;">0.799145</td>
-<td style="text-align: right;">0.00661453</td>
-<td style="text-align: right;">0.00644592</td>
-<td style="text-align: right;">2007</td>
-<td style="text-align: right;">51952</td>
-<td style="text-align: right;">292</td>
-<td style="text-align: right;">0.00562057</td>
-<td style="text-align: right;">334.853</td>
-<td style="text-align: right;">343.638</td>
-<td style="text-align: right;">334.879</td>
-<td style="text-align: right;">334.715</td>
-</tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">10</td>
-<td style="text-align: left;">AJ.129</td>
-<td style="text-align: right;">100824</td>
-<td style="text-align: right;">693</td>
-<td style="text-align: right;">0.0072979</td>
-<td style="text-align: right;">0.00687336</td>
-<td style="text-align: right;">0.00686469</td>
-<td style="text-align: right;">0.000270906</td>
-<td style="text-align: right;">0.8003</td>
-<td style="text-align: right;">0.00695814</td>
-<td style="text-align: right;">0.00685673</td>
-<td style="text-align: right;">2007</td>
-<td style="text-align: right;">48920</td>
-<td style="text-align: right;">323</td>
-<td style="text-align: right;">0.00660262</td>
-<td style="text-align: right;">335.82</td>
-<td style="text-align: right;">340.392</td>
-<td style="text-align: right;">335.431</td>
-<td style="text-align: right;">336.245</td>
-</tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">11</td>
-<td style="text-align: left;">AU.58</td>
-<td style="text-align: right;">98015</td>
-<td style="text-align: right;">970</td>
-<td style="text-align: right;">0.0072979</td>
-<td style="text-align: right;">0.00989644</td>
-<td style="text-align: right;">0.00979188</td>
-<td style="text-align: right;">0.000313325</td>
-<td style="text-align: right;">0.94683</td>
-<td style="text-align: right;">0.00975828</td>
-<td style="text-align: right;">0.00989406</td>
-<td style="text-align: right;">2007</td>
-<td style="text-align: right;">53424</td>
-<td style="text-align: right;">508</td>
-<td style="text-align: right;">0.00950883</td>
-<td style="text-align: right;">523.122</td>
-<td style="text-align: right;">521.326</td>
-<td style="text-align: right;">528.58</td>
-<td style="text-align: right;">528.708</td>
-</tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">12</td>
-<td style="text-align: left;">X.38</td>
-<td style="text-align: right;">97642</td>
-<td style="text-align: right;">837</td>
-<td style="text-align: right;">0.0072979</td>
-<td style="text-align: right;">0.00857213</td>
-<td style="text-align: right;">0.00854512</td>
-<td style="text-align: right;">0.000292569</td>
-<td style="text-align: right;">0.879527</td>
-<td style="text-align: right;">0.00841862</td>
-<td style="text-align: right;">0.00854678</td>
-<td style="text-align: right;">2007</td>
-<td style="text-align: right;">49682</td>
-<td style="text-align: right;">396</td>
-<td style="text-align: right;">0.00797069</td>
-<td style="text-align: right;">424.539</td>
-<td style="text-align: right;">418.254</td>
-<td style="text-align: right;">424.621</td>
-<td style="text-align: right;">425.881</td>
-</tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">13</td>
-<td style="text-align: left;">Y.34</td>
-<td style="text-align: right;">92959</td>
-<td style="text-align: right;">734</td>
-<td style="text-align: right;">0.0072979</td>
-<td style="text-align: right;">0.00789595</td>
-<td style="text-align: right;">0.00786948</td>
-<td style="text-align: right;">0.000286233</td>
-<td style="text-align: right;">0.823634</td>
-<td style="text-align: right;">0.00779048</td>
-<td style="text-align: right;">0.00785037</td>
-<td style="text-align: right;">2007</td>
-<td style="text-align: right;">53780</td>
-<td style="text-align: right;">443</td>
-<td style="text-align: right;">0.00823726</td>
-<td style="text-align: right;">423.22</td>
-<td style="text-align: right;">418.972</td>
-<td style="text-align: right;">422.193</td>
-<td style="text-align: right;">424.644</td>
-</tr>
-<tr class="even">
-<td style="text-align: right;">⋮</td>
-<td style="text-align: right;">⋮</td>
-<td style="text-align: right;">⋮</td>
-<td style="text-align: right;">⋮</td>
-<td style="text-align: right;">⋮</td>
-<td style="text-align: right;">⋮</td>
-<td style="text-align: right;">⋮</td>
-<td style="text-align: right;">⋮</td>
-<td style="text-align: right;">⋮</td>
-<td style="text-align: right;">⋮</td>
-<td style="text-align: right;">⋮</td>
-<td style="text-align: right;">⋮</td>
-<td style="text-align: right;">⋮</td>
-<td style="text-align: right;">⋮</td>
-<td style="text-align: right;">⋮</td>
-<td style="text-align: right;">⋮</td>
-<td style="text-align: right;">⋮</td>
-<td style="text-align: right;">⋮</td>
-<td style="text-align: right;">⋮</td>
-</tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">1213</td>
-<td style="text-align: left;">BU.32</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">0.0072979</td>
-<td style="text-align: right;">0.0</td>
-<td style="text-align: right;">0.00633077</td>
-<td style="text-align: right;">0.00157206</td>
-<td style="text-align: right;">0.0</td>
-<td style="text-align: right;">0.0072979</td>
-<td style="text-align: right;">0.0</td>
-<td style="text-align: right;">2007</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">0.0</td>
-<td style="text-align: right;">0.00633077</td>
-<td style="text-align: right;">0.0072979</td>
-<td style="text-align: right;">0.0</td>
-<td style="text-align: right;">0.0</td>
-</tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">1214</td>
-<td style="text-align: left;">CA.5</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">0.0072979</td>
-<td style="text-align: right;">0.0</td>
-<td style="text-align: right;">0.00632971</td>
-<td style="text-align: right;">0.00179153</td>
-<td style="text-align: right;">0.0</td>
-<td style="text-align: right;">0.0072979</td>
-<td style="text-align: right;">0.0</td>
-<td style="text-align: right;">2007</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">0.0</td>
-<td style="text-align: right;">0.00632971</td>
-<td style="text-align: right;">0.0072979</td>
-<td style="text-align: right;">0.0</td>
-<td style="text-align: right;">0.0</td>
-</tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">1215</td>
-<td style="text-align: left;">D.18</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">0.0072979</td>
-<td style="text-align: right;">0.0</td>
-<td style="text-align: right;">0.00634532</td>
-<td style="text-align: right;">0.00154824</td>
-<td style="text-align: right;">0.0</td>
-<td style="text-align: right;">0.0072979</td>
-<td style="text-align: right;">0.00748894</td>
-<td style="text-align: right;">2007</td>
-<td style="text-align: right;">512</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">0.00390625</td>
-<td style="text-align: right;">3.24881</td>
-<td style="text-align: right;">3.73652</td>
-<td style="text-align: right;">3.83434</td>
-<td style="text-align: right;">0.0</td>
-</tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">1216</td>
-<td style="text-align: left;">Q.7</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">0.0072979</td>
-<td style="text-align: right;">0.0</td>
-<td style="text-align: right;">0.00641471</td>
-<td style="text-align: right;">0.00166908</td>
-<td style="text-align: right;">0.0</td>
-<td style="text-align: right;">0.0072979</td>
-<td style="text-align: right;">0.00748894</td>
-<td style="text-align: right;">2007</td>
-<td style="text-align: right;">3</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">0.0</td>
-<td style="text-align: right;">0.0192441</td>
-<td style="text-align: right;">0.0218937</td>
-<td style="text-align: right;">0.0224668</td>
-<td style="text-align: right;">0.0</td>
-</tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">1217</td>
-<td style="text-align: left;">BW.139</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">0.0072979</td>
-<td style="text-align: right;">0.0</td>
-<td style="text-align: right;">0.00640531</td>
-<td style="text-align: right;">0.00167216</td>
-<td style="text-align: right;">0.0</td>
-<td style="text-align: right;">0.0072979</td>
-<td style="text-align: right;">0.00748894</td>
-<td style="text-align: right;">2007</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">0.0</td>
-<td style="text-align: right;">0.00640531</td>
-<td style="text-align: right;">0.0072979</td>
-<td style="text-align: right;">0.00748894</td>
-<td style="text-align: right;">0.0</td>
-</tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">1218</td>
-<td style="text-align: left;">BG.8</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">0.0072979</td>
-<td style="text-align: right;">0.0</td>
-<td style="text-align: right;">0.00645546</td>
-<td style="text-align: right;">0.0017266</td>
-<td style="text-align: right;">0.0</td>
-<td style="text-align: right;">0.0072979</td>
-<td style="text-align: right;">0.00748894</td>
-<td style="text-align: right;">2007</td>
-<td style="text-align: right;">28</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">0.0</td>
-<td style="text-align: right;">0.180753</td>
-<td style="text-align: right;">0.204341</td>
-<td style="text-align: right;">0.20969</td>
-<td style="text-align: right;">0.0</td>
-</tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">1219</td>
-<td style="text-align: left;">R.35</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">0.0072979</td>
-<td style="text-align: right;">0.0</td>
-<td style="text-align: right;">0.00647779</td>
-<td style="text-align: right;">0.00161922</td>
-<td style="text-align: right;">0.0</td>
-<td style="text-align: right;">0.0072979</td>
-<td style="text-align: right;">0.00748894</td>
-<td style="text-align: right;">2007</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">0.0</td>
-<td style="text-align: right;">0.0129556</td>
-<td style="text-align: right;">0.0145958</td>
-<td style="text-align: right;">0.0149779</td>
-<td style="text-align: right;">0.0</td>
-</tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">1220</td>
-<td style="text-align: left;">I.6</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">0.0072979</td>
-<td style="text-align: right;">0.0</td>
-<td style="text-align: right;">0.00636597</td>
-<td style="text-align: right;">0.00178451</td>
-<td style="text-align: right;">0.0</td>
-<td style="text-align: right;">0.0072979</td>
-<td style="text-align: right;">0.00748894</td>
-<td style="text-align: right;">2007</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">0.0</td>
-<td style="text-align: right;">0.00636597</td>
-<td style="text-align: right;">0.0072979</td>
-<td style="text-align: right;">0.00748894</td>
-<td style="text-align: right;">0.0</td>
-</tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">1221</td>
-<td style="text-align: left;">BM.8</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">0.0072979</td>
-<td style="text-align: right;">0.0</td>
-<td style="text-align: right;">0.00648241</td>
-<td style="text-align: right;">0.00177801</td>
-<td style="text-align: right;">0.0</td>
-<td style="text-align: right;">0.0072979</td>
-<td style="text-align: right;">0.00748894</td>
-<td style="text-align: right;">2007</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">0.0</td>
-<td style="text-align: right;">0.00648241</td>
-<td style="text-align: right;">0.0072979</td>
-<td style="text-align: right;">0.00748894</td>
-<td style="text-align: right;">0.0</td>
-</tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">1222</td>
-<td style="text-align: left;">AJ.96</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">0.0072979</td>
-<td style="text-align: right;">0.0</td>
-<td style="text-align: right;">0.00640576</td>
-<td style="text-align: right;">0.00179094</td>
-<td style="text-align: right;">0.0</td>
-<td style="text-align: right;">0.0072979</td>
-<td style="text-align: right;">0.0</td>
-<td style="text-align: right;">2007</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">0.0</td>
-<td style="text-align: right;">0.00640576</td>
-<td style="text-align: right;">0.0072979</td>
-<td style="text-align: right;">0.0</td>
-<td style="text-align: right;">0.0</td>
-</tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">1223</td>
-<td style="text-align: left;">AQ.1</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">0.0072979</td>
-<td style="text-align: right;">0.0</td>
-<td style="text-align: right;">0.00642683</td>
-<td style="text-align: right;">0.00169356</td>
-<td style="text-align: right;">0.0</td>
-<td style="text-align: right;">0.0072979</td>
-<td style="text-align: right;">0.0</td>
-<td style="text-align: right;">2007</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">0.0</td>
-<td style="text-align: right;">0.00642683</td>
-<td style="text-align: right;">0.0072979</td>
-<td style="text-align: right;">0.0</td>
-<td style="text-align: right;">0.0</td>
-</tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">1224</td>
-<td style="text-align: left;">AJ.118</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">0.0072979</td>
-<td style="text-align: right;">0.0</td>
-<td style="text-align: right;">0.00642594</td>
-<td style="text-align: right;">0.00163521</td>
-<td style="text-align: right;">0.0</td>
-<td style="text-align: right;">0.0072979</td>
-<td style="text-align: right;">0.0</td>
-<td style="text-align: right;">2007</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">0.0</td>
-<td style="text-align: right;">0.00642594</td>
-<td style="text-align: right;">0.0072979</td>
-<td style="text-align: right;">0.0</td>
-<td style="text-align: right;">0.0</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-<div id="22" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>let df = claims_summary_posterior
-    f = Figure()
-    ax = Axis(f[1, 1], title="Cumulative Predictive Residual Error", subtitle="(Lower is better predictive accuracy)", xlabel=L"$i^{th}$ vehicle group", ylabel=L"absolute error")
-    lines!(ax, cumsum(abs.(df.pred_LF .- df.claims_test)), label="Limited Fluctuation Overall", color=(:purple, 0.5))
-    lines!(ax, cumsum(abs.(df.pred_LF2 .- df.claims_test)), label="Limited Fluctuation Year-by-Year", color=(:blue, 0.5))
-    lines!(ax, cumsum(abs.(df.pred_bayes .- df.claims_test)), label="Bayesian", color=(:red, 0.5))
-    lines!(ax, cumsum(abs.(df.pred_naive .- df.claims_test)), label="Naive", color=(:grey10, 0.5))
-    # xlims!(0,40)
-    # Legend(f[1,1],[s1,s2],["LFC"halign=:right,valign=:top)
-    axislegend(ax, position=:rb)
-    f
-end</code></pre>
-<div class="cell-output cell-output-display" data-execution_count="1">
-<div>
-<figure class="figure">
-<p><img src="https://JuliaActuary.org/posts/bayes-vs-limited-fluctuation/index_files/figure-html/cell-12-output-1.svg" class="img-fluid figure-img"></p>
-</figure>
-</div>
-</div>
-</div>
-<div id="24" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>let
-    post = claims_summary_posterior
-    X = @chain vcat(train, test) begin
-        groupby(:Calendar_Year)
-        @combine :claim_rate = sum(:claims) / sum(:n)
-    end
-    f = Figure()
-    ax = Axis(f[1, 1], xlabel="year", ylabel="claims rate")
-    scatter!(ax, X.Calendar_Year, X.claim_rate, label="data")
-    scatter!(ax, [2007], [sum(post.pred_bayes) / sum(post.n_test)], label="Bayes", marker=:hline, markersize=30)
-    scatter!(ax, [2007], [sum(post.pred_LF) / sum(post.n_test)], label="LF Overall", marker=:hline, markersize=30)
-    scatter!(ax, [2007], [sum(post.pred_LF2) / sum(post.n_test)], label="LF Year-by-Year", marker=:hline, markersize=30)
-    scatter!(ax, [2007], [sum(post.pred_naive) / sum(post.n_test)], label="naive", marker=:hline, markersize=30)
-    axislegend(ax, position=:rb)
-    ylims!(0.005, 0.008)
-    f
-end</code></pre>
-<div class="cell-output cell-output-display" data-execution_count="1">
-<div>
-<figure class="figure">
-<p><img src="https://JuliaActuary.org/posts/bayes-vs-limited-fluctuation/index_files/figure-html/cell-13-output-1.svg" class="img-fluid figure-img"></p>
-</figure>
-</div>
-</div>
-</div>
-</section>
-<section id="some-remarks-about-the-results" class="level2">
-<h2 class="anchored" data-anchor-id="some-remarks-about-the-results">Some Remarks about the Results</h2>
-<p>With limited, real-world data drawing conclusions is a little bit messy because we don’t know what the ground-truth should be, but here are some thoughts that seem to be consistent with what the data and results suggest:</p>
-<ul>
-<li>The Bayesian approach partially pools the data: it’s an approach in-between assuming each group is independent from the rest and assuming that a single rate applies to all exposures.</li>
-<li>The partial pooling limits over-fitting, which happens with the naive approach. Our Bayesian approach is somewhat skeptical of groups with low observation counts that stand out from the rest. But it also doesn’t forgoe useful data, as it learns from even low exposures according to what’s consistent with probability theory (Baye’s rule).</li>
-<li>The naive approach is pretty close to the textbook definition of over-fitting. The LF approaches appear to be under-fitting group-level as there are only $(sum(claims_summary_posterior.LF_Z_train .&gt;= .9999)) groups with “full credibility” (<code>Z=1</code>), even though there are groups with less than “full credibility” with over 100,000 observations in the training set.</li>
-</ul>
-
-
-</section>
-
- ]]></description>
-  <category>modeling</category>
-  <category>statistics</category>
-  <category>experience-analysis</category>
-  <category>bayesian</category>
-  <guid>https://JuliaActuary.org/posts/bayes-vs-limited-fluctuation/</guid>
-  <pubDate>Fri, 07 Aug 2026 04:37:22 GMT</pubDate>
+  <pubDate>Fri, 09 Oct 2026 20:50:43 GMT</pubDate>
 </item>
 </channel>
 </rss>
