@@ -1,15 +1,16 @@
 ---
 title: "FinanceModels 7, ActuaryUtilities 6, MortalityTables 3 and FinanceCore 3"
 author: "Alec Loudenback"
-date: "2026-09-30"
+date: "2026-10-11"
 categories: [code, blog]
 ---
 
 <!--
 DRAFT: to do before publishing
-- Confirm release status once FinanceModels 7.0.0, ActuaryUtilities 6.0.0, MortalityTables 3.0.0
-and EconomicScenarioGenerators 0.7.1 are registered, and update the date. FinanceCore 3.0.0 is
-registered (2026-10-08).
+- Release status checked on 2026-10-11: FinanceCore 3.0.0 and FinanceModels 7.0.0 are
+registered. ActuaryUtilities 6.0.0, MortalityTables 3.0.0 and EconomicScenarioGenerators 0.7.1
+are still pending (General has AU 5.12.0, MT 2.6.0 and ESG 0.7.0). Refresh the status and
+date before publishing.
 - 2026-10-02: the FinanceCore 3.0, valuation-context, callback-order, `Scenarios`, `wasserstein`
 and bounded-law edits were checked in a scratch environment (FinanceCore f6ee618, FinanceModels
 1a7e5ed, ActuaryUtilities a7422e3; the bounded-law claim against MortalityTables 2.6.0 and e69b660).
@@ -53,8 +54,8 @@ Replace the provisional performance paragraph with the final benchmark date and 
 -->
 
 ::: {.callout-warning}
-## Draft: these releases are not yet available
-FinanceModels 7.0, ActuaryUtilities 6.0, MortalityTables 3.0 and EconomicScenarioGenerators 0.7.1 are not yet released, so installing the packages today gives the previous versions (only FinanceCore 3.0 is released). The code in this post ran on the release candidates, and details may change before release.
+## Draft: release status as of October 11, 2026
+FinanceCore 3.0 and FinanceModels 7.0 are registered. ActuaryUtilities 6.0, MortalityTables 3.0 and EconomicScenarioGenerators 0.7.1 are still awaiting registration. The examples use the development environment described below; the benchmarks remain provisional.
 :::
 
 ```{julia}
@@ -65,7 +66,9 @@ Pkg.activate(".")
 Pkg.instantiate()
 ```
 
-Four major JuliaActuary releases bring sensitivities through curve calibration, curve blending, more consistent risk measures, and corrections to discounting and mortality calculations. Some changes alter the numbers existing models produce: portfolio values, the sign of DV01, zero rates beyond a curve's last knot, and the rates of eight SOA tables. Others simplify the APIs or improve performance. This post explains what changes, why, and how to migrate.
+Four major JuliaActuary releases improve curve calibration, interest-rate risk, valuation and mortality calculations. They add sensitivities through calibration and curve blending, simplify common calls, and fix errors that could produce plausible but incorrect results.
+
+Some fixes change the numbers in existing models: portfolio values, the sign of DV01, zero rates beyond a curve's last knot, and the age assignments of rates in eight SOA tables. The examples below explain those changes and show how to migrate.
 
 **FinanceModels 7.0**, **ActuaryUtilities 6.0**, **MortalityTables 3.0** and **FinanceCore 3.0** are major releases with breaking changes; FinanceCore 3.0 includes the fixes of FinanceCore 2.8. Migration guides and release notes are linked under [Upgrading](#upgrading).
 
@@ -73,8 +76,9 @@ Four major JuliaActuary releases bring sensitivities through curve calibration, 
 2. [Changes affecting existing models](#changes-affecting-existing-models)
 3. [Performance and tradeoffs](#performance-and-tradeoffs)
 4. [Upgrading](#upgrading)
+5. [AI assistance disclosure](#ai-assistance-disclosure)
 
-All the code below runs as part of this post.
+The code blocks execute when the post is rendered. The examples currently use local package checkouts; [Upgrading](#upgrading) lists the target versions and migration guides.
 
 ```{julia}
 using FinanceModels, FinanceCore, ActuaryUtilities, MortalityTables, ForwardDiff
@@ -197,7 +201,7 @@ fig
 
 Knot curves now share an interface for inspecting and updating their rates and tenors. `ZeroRateCurve` returns the concrete curve it builds: a `Yield.MonotoneConvex` for the default interpolation, a `Yield.Spline` otherwise. Use `knot_rates` (the knot zero rates, as `Continuous` rates) and `knot_tenors` to inspect it, and `reconstruct(curve; rates, tenors, spline, extrapolation)` to build a modified copy.
 
-This matters when you start from a curve someone else built, such as a vendor's valuation-date curve, a scenario generator's or another team's, and need variations of it: stress tests, sensitivity runs, or a roll-forward to new rates. Rebuilding the curve by hand from its rates can drop settings the rates don't show. A different interpolation method moves values between the knots, and a default tail moves every value beyond the last knot. `reconstruct` changes only what you pass and keeps everything else.
+Use `reconstruct` when you need to stress or update an existing curve while keeping its interpolation and extrapolation settings. Rates alone do not describe the whole curve: changing the interpolation changes values between knots, and changing the tail affects values beyond the last knot. `reconstruct` preserves the settings you do not replace.
 
 For example, here is a steepening stress on a curve delivered with cubic interpolation and its long end held at a 3.5% forward:
 
@@ -207,7 +211,7 @@ steepener = Continuous.([0.0, 0.001, 0.0025, 0.004, 0.005])   # +0bp at 1 year, 
 stressed = reconstruct(delivered; rates = knot_rates(delivered) .+ steepener)
 ```
 
-The stressed curve prints as the call that rebuilds it, so the interpolation and tail it kept are visible, and the printout can go straight into a report, a test or a bug report. Knot curves also compare by value, so `stressed == delivered` tells you whether a curve changed between runs. The stress lowers the liability's value:
+The stressed curve prints as a call that rebuilds it, including its interpolation and tail settings. Knot curves also compare by value, so `stressed == delivered` checks whether their contents match. Here the higher rates lower the liability's value:
 
 ```{julia}
 (delivered = pv(delivered, cfs, times), stressed = pv(stressed, cfs, times))
@@ -219,7 +223,7 @@ The stressed curve prints as the call that rebuilds it, so the interpolation and
 ForwardDiff.gradient(z -> pv(reconstruct(curve; rates = z), cfs, times), rate.(knot_rates(curve)))
 ```
 
-(On a cubic spline like `delivered`, the same sensitivities swing between positive and negative, because moving one knot reshapes the whole curve. That's one reason local interpolants such as `Spline.Linear()` or the monotone convex default are easier to hedge against.)
+On a cubic spline like `delivered`, the same sensitivities swing between positive and negative because moving one knot reshapes the whole curve. Local interpolants such as `Spline.Linear()` or the monotone convex default make those exposures easier to interpret.
 
 ### Blending curves (FinanceModels)
 
@@ -246,7 +250,7 @@ The grading starts after the first example's liability ends, at 20 years, so the
 (market = pv(curve, cfs, times), graded = pv(graded, cfs, times))
 ```
 
-Grading the zero rates with the same weights gives a different curve. A zero rate averages its curve's forwards from time 0, so shifting weight between the curves as the tenor grows shifts that whole history at once. The forward rate absorbs the shift: a weight that varies with tenor adds `w′(t) (Lₐ(t) − L_b(t))` to it, where `L = −log D`. Here that term pulls the forwards far below both curves:
+Applying the same weights to zero rates gives a different curve. A continuously compounded zero rate averages forwards from time 0, so changing its weight with tenor also changes the contribution of all those earlier forwards. This adds `w′(t) (Lₐ(t) − L_b(t))` to the instantaneous forward, where `L = −log D`. In this example, the extra term pulls forward rates below both input curves:
 
 ```{julia}
 zero_graded = Yield.Blend(curve, ultimate, grade, Yield.ZeroRates())
@@ -286,21 +290,21 @@ The mixture's zero rate starts near 4% and falls toward the low scenario's 2%, b
 [rate(zero(mixture, t)) for t in (1, 10, 30, 100, 1000)]
 ```
 
-The same mixture over simulated short-rate paths, `Yield.Blend(collect(paths), fill(1 / n, n), Yield.DiscountFactors())`, is their expected discount factor. It gives the expected present value of cashflows that don't vary by scenario. Weights that don't sum to 1 throw an `ArgumentError`, and discount-factor weights must lie in [0, 1]. The [blending guide](https://docs.juliaactuary.org/FinanceModels/stable/yield_arithmetic/#Blending-curves) covers each space, including a mixture rebased to a later date.
+For `n` simulated short-rate paths, `Yield.Blend(collect(paths), fill(1 / n, n), Yield.DiscountFactors())` gives the sample mean of their discount factors. It therefore gives the mean present value of cashflows that do not vary by scenario.
+
+Weights must sum to 1, and discount-factor weights must lie in [0, 1]. The [blending guide](https://docs.juliaactuary.org/FinanceModels/stable/yield_arithmetic/#Blending-curves) covers each space, including how to rebase a mixture to a later date.
 
 ### Parallel risk without tenor grids (ActuaryUtilities)
 
-ActuaryUtilities 6 measures parallel risk directly, with new forms that need no key-rate grid:
+ActuaryUtilities 6 measures a parallel rate shift directly. You supply a tenor grid only when you want to split the result into key-rate exposures. The same interface covers fixed cashflows, contracts and valuation callbacks, including valuations that use separate rate and credit curves.
 
-- a `DV01` do-block for any valuation;
-- two-curve callbacks for `IR01` and `CS01`;
-- two-curve convexity, returned as blocks keyed by role, such as `base.credit`;
-- `sensitivities(valuation, curve)`, the value with its duration and DV01 from one derivative pass (`SecondOrder()` adds convexity and dollar convexity);
-- dollar convexity, `convexity(DollarConvexity(), curve, cfs, times)`: the second derivative of value, not divided by it, so it is defined at zero value and adds across positions.
+`sensitivities(valuation, curve)` returns value, duration and DV01 together. Add `SecondOrder()` for convexity and the new dollar convexity. Dollar convexity is the second derivative of value before normalization, so it remains defined at zero value and adds across positions.
 
 ::: {.callout-note collapse="true"}
 ## What is a valuation callback?
-A valuation callback is a function you write that takes a curve (or a rate) and returns a value. ActuaryUtilities shifts the curve, calls your function with each shifted curve, and differentiates the result with ForwardDiff. Because the callback recomputes the whole valuation under each shift, it captures cashflows that depend on rates. Here a five-year floater pays the one-year forward rate plus 1%, so its coupons reset on whatever curve it receives. Treating today's projected coupons as fixed cashflows misses the reset and gives a bond-like duration:
+A valuation callback is a function that takes a curve or rate and returns a value. ActuaryUtilities uses ForwardDiff to differentiate your entire calculation with respect to rate shifts, including any cashflows that depend on rates.
+
+Here a five-year floater pays the one-year forward rate plus 1%. Its coupons reset on the curve the callback receives. Treating today's projected coupons as fixed cashflows misses those resets and gives a bond-like duration:
 
 ```{julia}
 frn_value(c) = sum(1:5) do t
@@ -312,9 +316,9 @@ frozen = [100 * (1 / discount(curve, t - 1, t) - 1 + 0.01) + (t == 5 ? 100 : 0) 
 (callback = duration(frn_value, curve), frozen = duration(curve, frozen, 1:5))
 ```
 
-Only the fixed 1% margin has rate risk, so the floater's duration is small. These are the effective and spread durations of the floater contract in [One call shape for every sensitivity](#one-call-shape-for-every-sensitivity-actuaryutilities), which needs no callback: fixed cashflows and contracts go after the curve, and ActuaryUtilities values them itself.
+With one curve for projection and discounting, only the fixed 1% margin has rate risk, so the floater's duration is small. The callback result is its effective duration; freezing the coupons gives its spread duration. The equivalent contract example in [One call shape for every sensitivity](#one-call-shape-for-every-sensitivity-actuaryutilities) lets ActuaryUtilities perform the valuation for you.
 
-The callback comes first, so it can be a named function, an anonymous function, a callable struct, or a `do` block, which Julia passes as the first argument: `duration(DV01(), curve) do c ... end`. It must accept ForwardDiff's dual numbers, so avoid converting values to `Float64` inside it. With two curves it takes both, as in `(base, credit) -> …`, and with a `NamedTuple` of curves it takes the named tuple.
+The callback comes first. It can be a named function, an anonymous function, a callable struct, or a `do` block, which Julia passes as the first argument: `duration(DV01(), curve) do c ... end`. It must accept ForwardDiff's dual numbers, so avoid converting intermediate values to `Float64`. A two-curve callback takes both curves, as in `(base, credit) -> …`; a named-curve callback takes their `NamedTuple`.
 :::
 
 Take a 10-year 4.5% bond held against a 25-year annuity liability:
@@ -366,8 +370,8 @@ fig
 ```
 
 ::: {.callout-note}
-## Equal rate and credit sensitivities are the usual case
-When a valuation depends only on the combined rate, as fixed cashflows discounted at `base + credit` do, its IR01, CS01 and combined-curve DV01 are equal, and so are its four convexity blocks. A one-basis-point move in either curve is a one-basis-point move in the rate the cashflows are discounted at. Fixed cashflows are always in this case, so their two-curve forms are removed: use `duration(DV01(), base + credit, cfs, times)` and `convexity(base + credit, cfs, times)`.
+## Fixed cashflows need only the combined curve
+For fixed cashflows discounted at `base + credit`, a one-basis-point continuous-zero shift in either curve has the same effect. IR01, CS01 and combined-curve DV01 are equal, as are the four convexity blocks. The redundant fixed-cashflow two-curve forms are removed: use `duration(DV01(), base + credit, cfs, times)` and `convexity(base + credit, cfs, times)`.
 :::
 
 Key-rate results still use a grid, now given as a `KeyRates(tenors)` marker before the curve argument. These sensitivities differentiate prescribed changes to the curve's continuous zero rates; calibration sensitivities instead change market quotes and refit the curve. Dollar measures retain the position's sign:
@@ -400,7 +404,7 @@ Valuation callbacks can be callable structs, and the parallel measures accept ca
 
 ### One call shape for every sensitivity (ActuaryUtilities)
 
-ActuaryUtilities 6 takes arguments in one order: the valuation callback (if any), the order marker of `sensitivities`, a measure marker such as `DV01()` or `KeyRates(tenors)`, the curve or curves, then the cashflows or the contract. A contract's index curve is the keyword `index`, which defaults to the discount curve:
+Arguments now follow one order: an optional valuation callback, derivative-order and measure markers, the curve or curves, then cashflows or a contract. Contract calls take the index curve through the keyword `index`, which defaults to the discount curve. In the table, square brackets mark optional arguments:
 
 | Measure | Fixed cashflows | Valuation callback | Contract or portfolio |
 |:--|:--|:--|:--|
@@ -411,7 +415,19 @@ ActuaryUtilities 6 takes arguments in one order: the valuation callback (if any)
 | key rates | `duration(KeyRates(t), curve, cfs, times)` | `duration(valuation, KeyRates(t), curve)` | `duration(KeyRates(t), discount, contract; index)` |
 | all at once | `sensitivities([SecondOrder(),] curve, cfs, times)` | `sensitivities(valuation, [SecondOrder(),] curve)` | `sensitivities([SecondOrder(),] discount, contract; index)` |
 
-`sensitivities` returns the value, duration and DV01 from one derivative pass, and `SecondOrder()` adds convexity and dollar convexity. Dollar convexity is the unscaled second derivative of value: a shift `Δs` contributes `½ × dollar_convexity × Δs²`. `value` is a number. Without `KeyRates` the derivative fields are numbers; with it, duration and DV01 are per-tenor vectors and convexity and dollar convexity are matrices. With several curves, each field is keyed by curve role, the convexities in blocks such as `base.credit`. `SecondOrder()` needs second derivatives: a Hull–White swaption, whose critical rate FinanceModels differentiates to first order only, throws, as do calibration sensitivities, which are first order. For a floater, the discount role is spread risk, the index role is coupon reset, and effective duration is their sum:
+`sensitivities` returns `value`, `duration` and `dv01`. `FirstOrder()` is the default; pass `SecondOrder()` to add `convexity` and `dollar_convexity`. The result shape follows the requested shifts:
+
+| Requested risk | Derivative fields |
+|---|---|
+| One parallel curve shift | Numbers |
+| `KeyRates(tenors)` | Duration and DV01 vectors; convexity matrices |
+| Several curves | Fields keyed by curve role, with convexity blocks such as `base.credit` |
+
+`value` is always a number. Dollar convexity has no basis-point scaling: for one parallel shift of `b` basis points, the second-order approximation is `ΔV ≈ -dv01 * b + 0.5 * dollar_convexity * (b / 10_000)^2`.
+
+Second-order results require second derivatives throughout the valuation. Calibration sensitivities and the Hull–White swaption critical-rate calculation support first derivatives only, so requesting `SecondOrder()` for those valuations throws.
+
+For a floater, the discount role measures spread risk and the index role measures coupon resets. Effective duration is their sum:
 
 ```{julia}
 frn = Bond.Floating(0.01, Periodic(1), 5.0, "OIS")
@@ -419,7 +435,9 @@ risk = sensitivities(curve, frn)
 (risk.duration, effective = risk.duration.discount + risk.duration.index)
 ```
 
-The [upgrade guide](https://docs.juliaactuary.org/ActuaryUtilities/stable/upgrade/) maps every 5.x call and result field to its replacement.
+For risk to market quotes rather than prescribed curve shifts, pass a named tuple of input vectors to `sensitivities(valuation, inputs)`. The callback builds the curves and values the position, so the derivatives include supported calibration steps.
+
+The [upgrade guide](https://docs.juliaactuary.org/ActuaryUtilities/dev/upgrade/) maps the changed 5.x calls and result fields to their replacements.
 
 ### One mortality interface for tables and laws (MortalityTables)
 
@@ -447,7 +465,9 @@ Thanks to [@aminemanai2003](https://github.com/aminemanai2003) for this contribu
 
 ### IRR derivatives of every order (FinanceCore 2.8)
 
-An IRR is defined implicitly: it is the rate `y` at which the cashflows' present value is zero, `Σ aₖ (1 + y)^(-tₖ) = 0`. As for a curve fit (see the implicit-function-theorem note under [Sensitivities through calibration](#sensitivities-through-calibration-financemodels)), its derivatives come from that equation at the root, not from the root-finder's steps: `∂y/∂aₖ = -(∂PV/∂aₖ) / (∂PV/∂y)`, and similarly for the times and for higher orders. So `irr` supports gradients, Hessians and higher-order derivatives with respect to both amounts and times, whichever stage of the solver finds the root; before 2.8, a root found by the fallback stage silently had zero derivatives. Differentiating at a repeated root throws, because the sensitivity is undefined there.
+An IRR is the rate `y` at which the cashflows' present value is zero: `Σ aₖ (1 + y)^(-tₖ) = 0`. Differentiating that equation at the root gives `∂y/∂aₖ = -(∂PV/∂aₖ) / (∂PV/∂y)`, with similar expressions for payment times and higher orders. This uses the same implicit-function approach as [sensitivities through calibration](#sensitivities-through-calibration-financemodels).
+
+`irr` supports gradients, Hessians and higher-order derivatives with respect to amounts and times, whichever stage of the solver finds the root. Before FinanceCore 2.8, roots found by the fallback stage silently had zero derivatives. Differentiating at a repeated root throws because the sensitivity is undefined there.
 
 For an outlay of 100 repaid with 110 a year later, the IRR is 10%: `y = -a₂/a₁ - 1`. Paying 1 less up front raises it by 1.1 points, and receiving 1 more at the end raises it by 1 point:
 
@@ -468,7 +488,7 @@ These changes can alter valuations, risk measures or accepted inputs. Check the 
 
 ### FinanceModels
 
-- **Portfolios and composites are worth the sum of their parts.** 6.x passed each contract's position in a collection as a valuation time: a 3-year zero-coupon bond at a continuous 3% was worth 0.9139 alone but 0.9418 inside `[bond]`, and `[a, b]` and `[b, a]` differed. `present_value(model, contract)` is now the one valuation, and a collection or a `Composite` is worth the sum of its contracts' values. Options, caps, floors and swaptions, which have closed forms but no cashflow projection, now combine too; they threw. These laws hold for contracts that carry their own payment times and whose values share a reporting currency, and sums taken in another order agree to rounding:
+- **Portfolios and composites are worth the sum of their parts.** In 6.x, a contract's position in a collection was passed as its valuation time. A 3-year zero-coupon bond at a continuous 3% was worth 0.9139 alone but 0.9418 inside `[bond]`; changing the order of contracts changed the result. Collections and `Composite`s now sum their members' values, including closed-form options, caps, floors and swaptions. This applies to contracts with their own payment times and a common reporting currency, up to rounding:
 
 ```{julia}
 bs_model = Equity.BlackScholesMerton(0.01, 0.02, 0.15)
@@ -479,7 +499,7 @@ put_1y = Option.EuroPut(CommonEquity(), 1.0, 1.0)
  sum = pv(bs_model, call_1y) + pv(bs_model, put_1y))
 ```
 
-- **Valuation contexts.** A contract that reads other models by key, such as a floater's index curve, is valued under `Models(model; index = curve)` or `Models(model, store)`, which replace `Projection(contract; index)`; `Models(curve)` uses one curve for both. A custom closed form is defined on the contract, `present_value(ctx, c::MyContract)`, reading `discount(ctx, t)`, `ctx[key]` and `valuation_model(ctx)`. Using `valuation_model(ctx)` keeps the model's closed-form kernel under `Models`; keyed observables come from the store. Wrappers that act on the cashflow stream (`Forward`, `FX.Converted`, transducers) need a cashflow projection.
+- **Valuation contexts supply discounting and projection models.** Replace `Projection(contract; index)` with a context such as `Models(discount; index)`, then call `present_value(ctx, contract)`. Use `Models(model, store)` when contracts need several named models. `Models(curve)` uses the same curve for discounting and index lookups. The example below shows the distinction and the extension points for custom contracts.
 
 ::: {.callout-note collapse="true"}
 ## Which model does each part of a valuation use?
@@ -532,10 +552,10 @@ The values agree because the option uses the Black–Scholes model and reads not
 
 For a custom closed form, define `FinanceCore.present_value(ctx, c::MyContract)` with the operations above. If its formula depends on the pricing model's type, pass `valuation_model(ctx)` to a method of `FinanceModels.closed_form(model, contract)`.
 
-Portfolios and `Composite`s add their members' values, so contracts valued only by closed forms can be members, if their values share a reporting currency. `Forward`, `FX.Converted` and transducers act on cashflow streams, so the contracts inside them must support projection; a valuation context does not supply one.
+Portfolios and `Composite`s can include contracts valued only by closed forms, provided their values share a reporting currency. `Forward`, `FX.Converted` and transducers act on cashflow streams, so their underlying contracts must support projection.
 :::
 
-- **One reporting currency per FX context.** An `FX.Forwards` context, alone or as the model of `Models`, reports in its quote currency, and `FX.Forward` is one quote-currency cashflow. Contracts that carry a currency are checked against it: an `FX.Converted` must convert into it, and a base-currency `FX.BasisSwapLeg` throws unless the context reports in its base currency or is a plain yield curve; 6.x added its base-currency value to quote-currency values. Value the leg on a base-currency curve or convert it with `FX.Converted`. Inside `FX.Converted`, a leg must pay in the pair's base currency, and an `FX.Forward`, which prices on the context's own FX model, is not supported. The reporting currency is not a collateral choice: converting a present value at spot does not change the collateral assumptions the curves encode.
+- **One reporting currency per FX context.** `FX.Forwards`, including inside `Models`, reports in its quote currency. Contracts with currency information are checked against it, preventing a base-currency value from being added to quote-currency values. Value a base-currency `FX.BasisSwapLeg` on its own currency's curve or convert it with `FX.Converted`. A converted leg must pay in the FX pair's base currency; converting an `FX.Forward` this way is unsupported. Reporting currency and collateral assumptions remain separate: converting a present value at spot does not change the collateral assumptions encoded in the curves.
 - **No valuation-time argument.** `present_value(model, contract, t)` is removed: the third argument meant payment times for numbers, nothing for a `Cashflow`, and a valuation time for contracts. `pv(model, contract)` now also accumulates cashflows before time 0, which 6.x's default valuation time of 0 dropped. On a deterministic curve, value the cashflows at or after `t` as of `t` by discounting each one over `[t, T]`. The boundary is explicit in your code (inclusive here, as in 6.x):
 
 ```{julia}
@@ -549,7 +569,7 @@ Don't accumulate a time-0 value instead. `accumulation(model, t) * pv(model, con
 - **Transducers over contracts apply in the order written.** Inside a projection, `bond |> double |> add1` projected as [2.1, 4.1] instead of [1.1, 3.1], so its present value was wrong while `collect` was right. Stateful and early-terminating transducers (`Take`, `Scan`) now also work inside a projection, a portfolio or a `Composite`; they threw.
 
 - **Rate results carry their convention.** `knot_rates`, `Yield.instantaneous_forward` and `short_rate` return `Continuous` rates. They were bare continuous numbers, which FinanceCore reads as annual effective, so passing one on, as in `Yield.Constant(instantaneous_forward(c, 5))`, silently used the wrong rate. Use `rate(x)` for the number, for example to seed a ForwardDiff gradient. Coupons, margins and interest-rate strikes also accept a `Periodic` rate of the contract's frequency, and other rate inputs accept a `Rate` in any convention; numbers keep their meaning.
-- **Bootstrapping requires linear interpolation.** With a smoother interpolant, adding a knot reshapes earlier segments, so bootstrapped coupon quotes silently stopped repricing (residuals up to 0.40% of par). `Fit.Bootstrap()` now accepts only `Spline.Linear()` and reprices every quote on the returned curve. Fit smooth curves to all quotes at once with `Fit.Loss`:
+- **Bootstrapping requires linear interpolation.** With a smoother interpolant, adding a knot reshapes earlier segments, so bootstrapped coupon quotes could stop repricing, with residuals up to 0.40% of par. `Fit.Bootstrap()` now accepts only `Spline.Linear()` and checks every quote on the returned curve. For a smooth curve, use the default least-squares fit, such as `fit(Spline.Cubic(), quotes)`. This bootstrap call now throws:
 
 ```{julia}
 #| error: true
@@ -581,7 +601,7 @@ zero(negative, 1.0), zero(floored, 1.0)
 fit(Yield.NelsonSiegel(), CMTYield.(rates, tenors); solve_kwargs = (; maxiters = 1))
 ```
 
-- **Derivatives at kinks are defined or refused.** Where `MonotoneConvex`, `PCHIP` or `Akima` switch formula, ForwardDiff used to return a derivative matching neither an up nor a down bump. Flat PCHIP gave `NaN`, and flat MonotoneConvex could be off by a factor of two. At a kink, MonotoneConvex now uses the average of the up- and down-bump derivatives as a convention; on a flat stretch, these partials need not sum to the parallel-shift derivative. PCHIP and Akima throw, as does differentiation through a fit whose resulting curve lies on a kink.
+- **Derivatives at interpolation kinks have explicit rules.** At points where an interpolant switches formula, a unique derivative may not exist. ForwardDiff previously returned `NaN` or a value matching neither a positive nor a negative bump. At a kink, MonotoneConvex uses the average of the two one-sided derivatives as a convention; on a flat stretch, those partials need not sum to the parallel-shift derivative. PCHIP and Akima throw at kinks. Differentiation through a fitted curve also throws if the fit lands on a kink.
 
 - **Correct swaption Greeks.** Jamshidian's critical rate was found by a bisection that dropped its derivatives, so ForwardDiff Greeks of Vasicek and Hull–White swaptions were wrong. On a 1×5 payer swaption, Vasicek's `∂/∂a` had the wrong sign and vega was 9% too high. Now automatic differentiation matches a finite difference:
 
@@ -592,7 +612,7 @@ ForwardDiff.derivative(price, 0.1), (price(0.1 + 1e-6) - price(0.1 - 1e-6)) / 2e
 ```
 
 - **Short-rate models near zero mean reversion.** Vasicek's `-log P` was off by up to 4.5e-7 at small `aτ`, and Hull–White's derivatives with respect to `a` vanished near `a = 0`. Near zero mean reversion, including `a = 0`, both now match high-precision references to a few units of rounding over the tested parameters, and Hull–White's derivatives with respect to `a` no longer vanish.
-- **Vasicek under negative mean reversion.** With `a < 0`, terms of Vasicek's `-log P` grow like `e^{|a|τ}` and nearly cancel when the short rate is near its long-run level. 6.x computed them separately, so it lost the price. A constant 3% short rate (`σ = 0`, `r = b`) priced its 500-year bond at 0 instead of `e^{-15}` with `a = −0.1`. With `a = −1`, its 50-year price was 4.5 times too high, and prices were `NaN` from about 355 years. The terms are now grouped, so they keep their accuracy relative to their size, and a term with a zero weight stays zero when `e^{|a|τ}` overflows. That rate now prices exactly at every horizon (each ratio to `e^{-0.03τ}` is 1):
+- **Vasicek under negative mean reversion.** With `a < 0`, large terms in Vasicek's `-log P` nearly cancel when the short rate is close to the model's level parameter. Computing them separately lost accuracy. Even a constant 3% rate (`σ = 0`, `r = b`) priced a 500-year bond at 0 instead of `e^{-15}` when `a = −0.1`. The formula now groups the cancelling terms and preserves zero contributions when another factor overflows. In the constant-rate example below, each price agrees exactly with `e^{-0.03τ}`:
 
 ```{julia}
 constant_3pct = ShortRate.Vasicek(-1.0, 0.03, 0.0, Continuous(0.03))
@@ -607,10 +627,12 @@ discount(Yield.NelsonSiegel(1.0, 0.05, -0.02, 0.01), 20000, 20001)
 
 Time derivatives at `t = 0` are also corrected where several curves gave `NaN`.
 
-- **Stable CIR prices.** The textbook formula raises a number within σ² of 1 to the power 2ab/σ², so a 10-year discount factor was 5.6e57 at σ = 1e-10, and a 10,000-year factor at σ = 0.01 was `NaN`. Prices now come from one stable formula for −log P, which agrees with a high-precision reference to about 1e-13, relative.
+- **Stable CIR prices and path derivatives.** At small volatility, the textbook price formula raises a number extremely close to 1 to an enormous power. This produced a 10-year discount factor of 5.6e57 at `σ = 1e-10`; long-horizon prices could also become `NaN`. A stable formula for `−log P` now agrees with high-precision references to about `1e-13` relative error in the checked cases. In simulation, clipping a CIR state to zero no longer turns zero diffusion derivatives into `NaN` for the rest of the path.
 - **Forward-starting contracts read the index on their own clock.** `Forward(s, floater)` fixed the floater's coupons on the index from time 0: a one-year floater starting at time 2 paid 1.0202 instead of 1.0305 on an upward curve. Wrapper contracts also nest in any order now, such as a `Forward` of a `Forward` or of a `Composite`; those threw a `MethodError`.
 - **Simulated paths end at their horizon.** Evaluating a `RatePath` beyond the horizon it was simulated to now throws. It used to extend the last step, so a one-year simulation priced a payment at year 10. A horizon a whole number of steps away, up to roundoff, no longer gets an extra step: `horizon = 0.07, timestep = 0.01` took 8 steps and now takes 7, which changes those paths, and such a path ends at the horizon itself.
-- **Short-rate limits.** `zero(curve, 0)` is the short rate where it was `NaN` (Vasicek, CIR, Hull–White, Smith–Wilson, `ForwardStarting`), and `Yield.instantaneous_forward` works for every curve; at a knot it is the right-hand derivative of −log D, the forward of the piece that starts there. Hull–White conditional prices no longer turn `NaN` in the far tail, and Nelson–Siegel's zero rate no longer jumps near `t = 0`.
+- **`short_rate` returns the recorded simulated rate.** It previously returned the average of the rates at the start and end of a step, so the value at `t` depended on the next random draw. `short_rate(path, t)` now returns the recorded rate at a simulation grid time, allowing for roundoff; off-grid queries throw. Read the grid with `FinanceModels.simulation_times(path)`. A hand-built `RatePath(interp)` has no recorded rates, so `short_rate` throws on it. `Yield.instantaneous_forward(path, t)` remains the slope of the discount integral. Recording rates preserves discount factors and random draws but increases path storage.
+- **Short-rate limits.** `zero(curve, 0)` returns the short rate for models that previously returned `NaN`, including Vasicek, CIR, Hull–White, Smith–Wilson and `ForwardStarting`. `Yield.instantaneous_forward` works for every curve and uses the right-hand derivative of `−log D` at a knot. Hull–White conditional prices no longer become `NaN` in the far tail, and Nelson–Siegel's zero rate no longer jumps near `t = 0`.
+
 ### ActuaryUtilities
 
 - **Dollar risk keeps its sign.** Dollar sensitivities add across positions and reverse sign when a position is reversed. Ordinary liability payments entered as negative cashflows contribute negative DV01, and the new dollar convexity, `convexity(DollarConvexity(), …)`, behaves the same way:
@@ -621,7 +643,7 @@ duration(DV01(), curve, bond, bond_times), duration(DV01(), curve, annuity, annu
 
 The convention is `DV01 = −∂V/∂s × 10⁻⁴`, where `s` is the applicable rate shift. Aggregate as `asset_dv01 + liability_dv01`, and remove sign corrections added for the old absolute values. A mixed position's DV01 need not share the sign of its present value, and a position worth zero can still have dollar risk.
 
-- **Convexity uses continuous-zero shocks**, for every yield model. It now equals the sum of the full key-rate convexity matrix. For `[5, 5, 105]` at times `[1, 2, 3]` under `Yield.Constant(Periodic(0.04, 1))`, convexity changes from 11.26 in 5.x to:
+- **Yield-curve convexity uses continuous-zero shocks.** It agrees, up to rounding, with the sum of the full key-rate convexity matrix. Scalar and explicit `Rate` inputs keep their compounding conventions. For `[5, 5, 105]` at times `[1, 2, 3]` under `Yield.Constant(Periodic(0.04, 1))`, convexity changes from 11.26 in 5.x to:
 
 ```{julia}
 convexity(Yield.Constant(Periodic(0.04, 1)), [5.0, 5.0, 105.0], [1.0, 2.0, 3.0])
@@ -630,18 +652,18 @@ convexity(Yield.Constant(Periodic(0.04, 1)), [5.0, 5.0, 105.0], [1.0, 2.0, 3.0])
 - **Fixed cashflows on two curves take the combined curve.** The fixed-cashflow IR01, CS01 and two-curve convexity forms are removed; use `duration(DV01(), base + credit, cfs, times)` and `convexity(base + credit, cfs, times)`. Mixed input types used to measure different one-basis-point moves: a curve with a scalar spread gave CS01 ≈ IR01 / (1 + spread). The IR01 and CS01 callback forms remain for valuations that use the curves differently.
 - **Grids are only needed for key-rate results.** Parallel measures no longer take a `tenors` argument. The grid never changed their values, and its position let swapped arguments return wrong numbers silently. The old call shapes throw a `MethodError`, and the upgrade guide maps each to its replacement.
 - **Cashflow objects keep their payment times.** A `Cashflow` is paid at its own time even when a times vector is also passed: in scalar, key-rate and bundled sensitivities, and in `present_values`, which now returns numbers. `present_values` used the paired time and returned `Cashflow`s, so a `Cashflow` at year 2 paired with year 10 was discounted over ten years.
-- **Contract measures value in FinanceModels valuation contexts.** Swaps now work in contract `duration`, `sensitivities` and `zspread`; they threw a `MethodError`. The measures differentiate `present_value(Models(discount; index), contract)`. The bumped discount curve discounts cashflows and prices closed forms; the bumped index curve stands for every model the contract reads by key, such as a floater's index. Closed-form contracts now have risk inside a `Composite` or a portfolio too. A custom contract needs a cashflow projection or a closed form `present_value(ctx, c::MyContract)`; with neither, it throws instead of being treated as fixed. `reproject` is removed: value under `Models(discount; index = curve)`, and use `collect(Projection(contract, Models(discount; index = curve)))` for the projected cashflows.
+- **Contract risk uses FinanceModels valuation contexts.** The measures differentiate `present_value(Models(discount; index), contract)`. Swaps now work in `duration`, `sensitivities` and `zspread`, and closed-form contracts retain their risk inside portfolios and composites. Custom contracts need a cashflow projection or a context-aware `present_value` method. `reproject` is removed: use `Models(discount; index = curve)` for valuation and `collect(Projection(contract, ctx))` to inspect the cashflows.
 - **Contracts come after the curve.** Contract measures take the discount curve first, as fixed cashflows do, and the index curve as the keyword `index`, which defaults to the discount curve: `duration(Effective(), discount, contract; index)`, `sensitivities(discount, contract; index)` and `zspread(discount, contract, price; index)`. The contract-first orders and the positional `(forward, credit)` curves throw a `MethodError`.
-- **`sensitivities` has one result shape.** It returns `(; value, duration, dv01)`, and with `SecondOrder()` also `convexity` and `dollar_convexity`; 5.x key-rate forms returned convexities by default. `value` is a number. The derivative fields are numbers; with `KeyRates`, duration and DV01 are vectors and the convexities matrices; with several curves they are keyed by role: `s.dv01.discount` (spread risk) and `s.dv01.index` (coupon reset) for a contract. Second-order results need second derivatives, so a Hull–White swaption throws. The upgrade guide maps the 5.x fields.
+- **Sensitivity fields and defaults change.** Replace plural fields such as `durations` and `dv01s` with `duration` and `dv01`. Multiple-curve results use roles such as `s.dv01.discount` and `s.dv01.index`. Pass `SecondOrder()` when you need convexity; 5.x key-rate forms returned it by default. The [result-shape table above](#one-call-shape-for-every-sensitivity-actuaryutilities) shows the new layout, and the upgrade guide maps the old fields.
 - **The valuation callback comes first.** Every callback form takes the valuation first, then any marker, then the rate or curves: `duration(valuation, curve)`, `duration(valuation, DV01(), rate)`, `sensitivities(valuation, KeyRates(tenors), curve)`. Do-block calls are unchanged, and now also work for scalar and `Rate` inputs. The callback-second orders throw a `MethodError`.
-- **Hull–White simulation is requested with `Scenarios`.** A bare `HullWhite` model is a curve to every measure: a bump moves its curve, and caps and swaptions keep their Hull–White closed forms. `sensitivities(KeyRates(tenors), Scenarios(hw; horizon, n_scenarios, rng), cfs, times)` differentiates the simulated value; in 5.x the same `hw` was a curve to `duration` but a scenario generator to `sensitivities`, so one position could get two different key-rate vectors. The horizon is required and must be a whole number of timesteps. The constructor draws one seed, so every valuation reuses the same paths: values and dollar derivatives add across calls, and portfolio duration and convexity are value-weighted.
+- **Hull–White simulation is explicit.** A bare `HullWhite` model consistently uses its curve and closed-form valuations. For Monte Carlo risk, pass `Scenarios(hw; horizon, n_scenarios, rng, ...)` in place of the curve. The required horizon must align with the timestep and cover every payment. Each `Scenarios` fixes its grid and seed; reusing it makes valuations reproducible and dollar risks additive across positions. Add values and dollar derivatives before normalizing to obtain portfolio duration or convexity.
 - **`wasserstein` no longer wraps around on integer samples.** Gaps between quantiles were taken in the samples' own integer type, so `UInt8` samples 0 and 1 were 255 apart. Integer gaps are now subtracted exactly and then converted to the result's floating-point type, so adjacent integers near `typemax` stay one apart:
 
 ```{julia}
 wasserstein(UInt8[0], UInt8[1]), wasserstein(Int8[-100], Int8[100]), wasserstein([typemax(Int) - 1], [typemax(Int)])
 ```
-- **`zspread` returns a `Continuous` rate.** Added to an ordinary discount curve, `credit + zspread(…).zspread` reprices a contract valued from its cashflows, with the index curve held fixed. It was a bare number, which FinanceCore reads as annual effective. For Hull–White closed forms (caps, swaptions), shift `hw.curve` and rebuild the model instead: `hw + spread` is a composite curve, which has no closed forms.
-- **`spread` and `zspread` no longer depend on the notional.** Convergence uses the Newton step in rate units, and `spread` also checks that its answer reprices relative to the size of the discounted cashflows. At a notional of `1e-10`, a true 2% z-spread used to come back as about 1.96%.
+- **`zspread` returns a typed continuous rate.** Add `zspread(…).zspread` directly to an ordinary discount curve, or use `rate(...)` to extract its numeric value. The old bare number was interpreted as annual effective when added to a curve. For Hull–White closed forms, shift `hw.curve` and rebuild the model: `hw + spread` creates a composite curve without those pricing formulas.
+- **Spread solving is independent of notional.** `spread` and `zspread` now test convergence in rate units. If you set `tol`, supply a rate tolerance rather than a currency tolerance. `spread` also checks repricing relative to the size of the discounted cashflows. At a notional of `1e-10`, a true 2% z-spread previously came back as about 1.96%.
 - **`moic` follows distributions divided by contributions.** Contributions with no distributions give `0.0`; positive distributions with no contributions give `Inf`; neither gives `NaN`. These cases previously threw:
 
 ```{julia}
@@ -651,7 +673,7 @@ moic([-1.0, 0.0]), moic([1.0, 2.0]), moic(Float64[])
 ### MortalityTables
 
 - **Reversed intervals give backward accumulation factors.** For `b > a` and positive forward survival, `survival(v, b, a) = 1 / survival(v, a, b)`. The backward factor can exceed one and is not a survival probability; it is useful for projecting a cohort backward from its surviving population. A zero forward factor gives an infinite reciprocal. This matches parametric laws and discount factors in FinanceCore and FinanceModels. 2.x returned `1.0` for reversed whole-age intervals.
-- **Life expectancy is curtate or complete by name.** `life_expectancy` is removed. `curtate_life_expectancy(m, age)` sums survival to each whole year after `age`, and `complete_life_expectancy(m, age, dist = UniformDeaths())` integrates it, for tables and laws alike. In 2.x, `life_expectancy` was curtate on a table but complete on a law. Complete table values now integrate one year of age at a time and change by up to 9e-6, relative. A law's complete expectancy throws when its integral does not converge; 2.x returned the unconverged value, about 6.5e8 years for `InverseWeibull()` at 30:
+- **Life expectancy is explicit about its definition.** Replace `life_expectancy` with `curtate_life_expectancy` for expected whole years of remaining life, or `complete_life_expectancy` for expected remaining lifetime including fractional years. Both names work for tables and laws. The old function was curtate for tables but complete for laws. Complete table calculations now integrate one year of age at a time, changing results by up to `9e-6` relative. A law's complete expectancy throws if integration does not converge; 2.x accepted an unconverged estimate of about 6.5e8 years for `InverseWeibull()` at age 30:
 
 ```{julia}
 (curtate = curtate_life_expectancy(anb, 65), complete = complete_life_expectancy(anb, 65))
@@ -675,7 +697,7 @@ typeof(survival(UltimateMortality(Float32[0.01, 0.02, 0.03]), 0, 2))
 
 - **Index rate vectors, not tables.** Tables no longer forward indexing: use `table.ultimate[age]` or a select rate vector. Indexing a parametric model (`m[x]`) is replaced by `hazard(m, x)` or `m(x)`.
 
-- **XTbML rates placed by their labels.** Eight mort.SOA.org tables label grouped ages. Table 352 ("1946-49 Basic Table, ANB") has issue ages 12, 17, 22 and so on, and 2.x placed them at consecutive ages, so most ages returned another age's rates: `select[17]` gave issue age 37's. Every rate now sits at its own age, with `missing` between the groups, and CSV tables get the same fix. Separately, 34 more bundled tables, whose metadata has an empty element, now load.
+- **Table rates follow their age labels.** Eight mort.SOA.org tables use grouped ages. Table 352 ("1946-49 Basic Table, ANB"), for example, has issue ages 12, 17, 22 and so on. Version 2.x placed those rows at consecutive ages: `select[17]` returned issue age 37's rates. Rates now sit at their labeled ages, with `missing` between groups; CSV tables receive the same correction. The loader also accepts empty metadata elements, making 34 additional bundled tables readable.
 
 ```{julia}
 #| code-fold: true
@@ -697,7 +719,7 @@ fig
   - Kannisto's closed-form cumulative hazard had its parameters swapped: `survival(Kannisto(), 0)` was 1.76.
   - Several laws no longer overflow to `NaN` at old ages, and their derivatives stay finite too.
   - Small decrements are no longer rounded away: a rate of `1e-18` gave `0.0`.
-  - Laws whose formula ends at a finite age, such as Wittstein and VanderMaen, have a life expectancy: survival is integrated to the law's `omega`, giving the expected remaining lifetime capped at omega. If survival is still positive just before omega, the remaining probability of death is placed at omega, as at a table's last age. 2.x integrated past omega and threw.
+  - Laws defined only up to a finite age, such as Wittstein and VanderMaen, now have a life expectancy capped at `omega`. Any probability mass surviving to that boundary is placed there, as at a table's last age. Version 2.x integrated beyond the boundary and threw.
 
 ```{julia}
 (kannisto_at_0 = survival(MortalityTables.Kannisto(), 0),
@@ -716,7 +738,7 @@ a, b = Cashflow(100.0, 1.0), Cashflow(50.0, 3.0)
 ```
 
 - **The third argument is always payment times.** `pv(rate, cf, t)` with a `Cashflow` ignored `t` and is removed: use `pv(rate, cf)`, or `pv(rate, amount(cf), t)` to pay the amount at another time. No method takes a valuation time; see the as-of reduction under [FinanceModels](#financemodels).
-- **Amounts and times pair by position, and their lengths must match.** `pv(rate, amounts, times)` pairs vectors, offset vectors, tuples, generators and a scalar time with a collection by position, and throws a `DimensionMismatch` when one runs out first; 2.8 dropped the extra amounts or times. Empty amounts still give zero, whatever the times. `irr` pairs the same way:
+- **Amounts and times pair by position.** `pv(rate, amounts, times)` pairs the first amount with the first time, including for offset vectors, tuples and generators. For nonempty amounts, unequal lengths throw `DimensionMismatch`; 2.8 silently dropped unmatched entries. Empty amounts still give zero regardless of the supplied times. `irr` uses the same pairing rule:
 
 ```{julia}
 #| error: true
@@ -733,7 +755,7 @@ annual, convert(Continuous(), annual)
 ```
 
 - **No unconverged IRRs (2.8).** 2.7 could return Newton's last finite iterate after 100 steps, with a material NPV residual. Unconverged iterates now go to the robust root search.
-- **`Rate + Rate` adds in the left operand's convention (documented in 2.8).** It adds nominally, the way a spread is quoted, so mixed-convention sums depend on the order. `Continuous(a) + b` gives the convention-independent sum:
+- **`Rate + Rate` uses the left operand's convention (documented in 2.8).** It adds quoted rates after converting to that convention, so mixed-convention sums depend on operand order. For an additive shift in the force of interest, use `Continuous(a) + b`:
 
 ```{julia}
 Periodic(0.04, 1) + Continuous(0.01), Continuous(0.01) + Periodic(0.04, 1)
@@ -795,7 +817,7 @@ pv(0.05, Any[]), irr(Float64[])
 
 ## Performance and tradeoffs
 
-These provisional measurements compare the release candidates, benchmarked on October 2, with the latest tagged releases (FinanceCore 2.8, FinanceModels 6.5, MortalityTables 2.6, ActuaryUtilities 5.12), using BenchmarkTools on Julia 1.12 and the minimum of three alternating runs. They will be rerun against the final releases before publication.
+These provisional measurements compare the October 2 release candidates with FinanceCore 2.8, FinanceModels 6.5, MortalityTables 2.6 and ActuaryUtilities 5.12. They use BenchmarkTools on Julia 1.12 and the minimum of three alternating runs. The final releases still need a fresh benchmark run before publication; the figures below describe the measured candidates.
 
 ```{julia}
 #| code-fold: true
@@ -840,7 +862,7 @@ text!(ax, ifelse.(faster, ratios, 1.0), eachindex(labels);
     text = [f ? string(round(r; digits = 1), "× faster") : string(round(1 / r; digits = 2), "× slower") for (r, f) in zip(ratios, faster)],
     align = (:left, :center), offset = (4, 0))
 xlims!(ax, 0.25, 600)
-Label(fig[0, 1], "Speed against the latest tagged releases"; font = :bold, tellwidth = false)
+Label(fig[0, 1], "Release-candidate speed: October 2 benchmarks"; font = :bold, tellwidth = false)
 fig
 ```
 
@@ -879,16 +901,22 @@ The same comparison found slower paths, in red in the plot:
 
 ## Upgrading
 
-Use FinanceModels 7 and ActuaryUtilities 6 together for the APIs shown here. The planned release set uses Julia 1.10 or newer:
+Use FinanceModels 7 and ActuaryUtilities 6 together for the APIs shown here. The release set requires Julia 1.10 or newer. FinanceCore 3 and FinanceModels 7 are registered; the remaining target versions below are pending as of October 11:
 
 | Package | Release | Migration guidance |
 |---|---|---|
 | FinanceModels | 7.0 | [Migration guide](https://docs.juliaactuary.org/FinanceModels/stable/migration/) and [NEWS](https://github.com/JuliaActuary/FinanceModels.jl/blob/master/NEWS.md) |
-| ActuaryUtilities | 6.0 | [Version upgrade guide](https://docs.juliaactuary.org/ActuaryUtilities/stable/upgrade/), including replacements for removed calls |
+| ActuaryUtilities | 6.0 | [Version upgrade guide](https://docs.juliaactuary.org/ActuaryUtilities/dev/upgrade/), including replacements for removed calls |
 | MortalityTables | 3.0 | [Release notes](https://github.com/JuliaActuary/MortalityTables.jl/blob/master/NEWS.md) |
 | FinanceCore | 3.0 | [Release notes](https://github.com/JuliaActuary/FinanceCore.jl/blob/main/NEWS.md), including a migration table |
 | EconomicScenarioGenerators | 0.7.1 (final planned release) | [Release notes](https://github.com/JuliaActuary/EconomicScenarioGenerators.jl/blob/main/NEWS.md) |
 
-FinanceModels 7 and ActuaryUtilities 6 require FinanceCore 3, which includes the 2.8 fixes described here. FinanceModels 7 also requires Optimization 5. EconomicScenarioGenerators 0.7.1 supports FinanceModels 7 and is ESG's final planned release. FinanceModels' short-rate models, with `simulate` and `pv_mc`, succeed its interest-rate generators; its correlated and equity scenarios are planned for FinanceModels 7.1. Under FinanceModels 7, an ESG `YieldCurve` holds the zero rate flat before its first gridpoint and the forward flat after its last; values at the gridpoints don't change.
+FinanceModels 7 and ActuaryUtilities 6 require FinanceCore 3, which includes the 2.8 fixes described here. FinanceModels 7 also requires Optimization 5.
+
+EconomicScenarioGenerators 0.7.1 is planned as its final release, adding compatibility with FinanceModels 7. FinanceModels' short-rate models, `simulate` and `pv_mc` cover its interest-rate workflows; correlated and equity scenarios are planned for FinanceModels 7.1, after which ESG is planned to be archived. Under FinanceModels 7, an ESG `YieldCurve` holds the zero rate flat before its first grid point and the forward flat after its last. Values at the grid points stay the same.
 
 If something you rely on behaves differently and isn't covered, open an issue in [FinanceModels](https://github.com/JuliaActuary/FinanceModels.jl/issues), [ActuaryUtilities](https://github.com/JuliaActuary/ActuaryUtilities.jl/issues), [MortalityTables](https://github.com/JuliaActuary/MortalityTables.jl/issues) or [FinanceCore](https://github.com/JuliaActuary/FinanceCore.jl/issues), or ask on the [JuliaActuary discussions](https://github.com/orgs/JuliaActuary/discussions).
+
+## AI assistance disclosure
+
+GPT Astra and Claude Opus 5.5 identified and fixed many of the issues described in this post. They also helped draft and revise the post.
