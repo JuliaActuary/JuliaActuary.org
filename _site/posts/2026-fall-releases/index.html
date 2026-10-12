@@ -207,25 +207,6 @@ ul.task-list li input[type="checkbox"] {
 
 
 
-<!--
-Before publishing: complete MortalityTables 3.0.0 registration from
-cae71f5750374cb234826080a7487520d87828e5 and EconomicScenarioGenerators 0.7.1.
-Refresh the release-status text, then remove this comment and the draft callout.
-The examples, benchmark environments and linked documentation have been refreshed.
--->
-<div class="callout callout-style-default callout-warning callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Warning</span>Draft: release status as of October 11, 2026
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>FinanceCore 3.0, FinanceModels 7.0 and ActuaryUtilities 6.0 are registered. MortalityTables 3.0 and EconomicScenarioGenerators 0.7.1 are awaiting registration. The MT examples and benchmarks use the exact commit designated for its 3.0.0 release.</p>
-</div>
-</div>
 <p>Four major JuliaActuary releases improve curve calibration, interest-rate risk, valuation and mortality calculations. They add sensitivities through calibration and curve blending, simplify common calls, and fix errors that could produce plausible but incorrect results.</p>
 <p>Some fixes change the numbers in existing models: portfolio values, the sign of DV01, zero rates beyond a curve’s last knot, and the age assignments of rates in eight SOA tables. The examples below explain those changes and show how to migrate.</p>
 <p><strong>FinanceModels 7.0</strong>, <strong>ActuaryUtilities 6.0</strong>, <strong>MortalityTables 3.0</strong> and <strong>FinanceCore 3.0</strong> are major releases with breaking changes; FinanceCore 3.0 includes the fixes of FinanceCore 2.8. Migration guides and release notes are linked under <a href="#upgrading">Upgrading</a>.</p>
@@ -271,7 +252,7 @@ liability(rates)</code></pre>
 </div>
 <p>These first-order sensitivities come from the fitted pricing equations through the implicit function theorem. They require no finite-difference bump size and preserve the ordinary fit’s value.</p>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -280,7 +261,7 @@ liability(rates)</code></pre>
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p>A bond’s yield to maturity is defined implicitly, as the rate at which present value equals price. To see how the yield moves with the price, you don’t rerun the root-finder: differentiating <code>PV(y) = P</code> at the answer gives <code>dy/dP = 1 / PV′(y)</code>, the familiar duration relationship. A curve fit is the same idea with many quotes at once. After fitting, FinanceModels differentiates the repricing equations and solves for the quote sensitivities, avoiding a separate refit for each bumped quote. Their accuracy depends on the fit’s tolerance and conditioning, which FinanceModels checks.</p>
 </div>
@@ -507,7 +488,7 @@ average = Yield.Blend(low, high, 0.5, Yield.ZeroRates())
 <p>ActuaryUtilities 6 measures a parallel rate shift directly. You supply a tenor grid only when you want to split the result into key-rate exposures. The same interface covers fixed cashflows, contracts and valuation callbacks, including valuations that use separate rate and credit curves.</p>
 <p><code>sensitivities(valuation, curve)</code> returns value, duration and DV01 together. Add <code>SecondOrder()</code> for convexity and the new dollar convexity. Dollar convexity is the second derivative of value before normalization, so it remains defined at zero value and adds across positions.</p>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -516,7 +497,7 @@ average = Yield.Blend(low, high, 0.5, Yield.ZeroRates())
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p>A valuation callback is a function that takes a curve or rate and returns a value. ActuaryUtilities uses ForwardDiff to differentiate your entire calculation with respect to rate shifts, including any cashflows that depend on rates.</p>
 <p>Here a five-year floater pays the one-year forward rate plus 1%. Its coupons reset on the curve the callback receives. Treating today’s projected coupons as fixed cashflows misses those resets and gives a bond-like duration:</p>
@@ -823,7 +804,7 @@ put_1y = Option.EuroPut(CommonEquity(), 1.0, 1.0)
 <li><strong>Valuation contexts supply discounting and projection models.</strong> Replace <code>Projection(contract; index)</code> with a context such as <code>Models(discount; index)</code>, then call <code>present_value(ctx, contract)</code>. Use <code>Models(model, store)</code> when contracts need several named models. <code>Models(curve)</code> uses the same curve for discounting and index lookups. The example below shows the distinction and the extension points for custom contracts.</li>
 </ul>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -832,7 +813,7 @@ put_1y = Option.EuroPut(CommonEquity(), 1.0, 1.0)
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p>A fixed-rate bond needs a curve to discount its payments. A floater also needs an index curve to set its coupons. A valuation context supplies both:</p>
 <div id="66" class="cell" data-execution_count="1">
@@ -933,7 +914,7 @@ Stacktrace:
  [2] <span class="ansi-bold">fit</span><span class="ansi-bold">(</span><span class="ansi-bright-black-fg">mod0</span>::FinanceModels.Spline.PolynomialSpline, <span class="ansi-bright-black-fg">quotes</span>::Vector<span class="ansi-bright-black-fg">{Quote{Float64, FinanceModels.Bond.Fixed{Periodic, Float64, Float64}}}</span>, <span class="ansi-bright-black-fg">method</span>::FinanceModels.Fit.Bootstrap<span class="ansi-bold">)</span>
  <span class="ansi-bright-black-fg">  @</span> <span class="ansi-magenta-fg">FinanceModels</span> <span class="ansi-bright-black-fg">~/.julia/packages/FinanceModels/quEQy/src/</span><span style="text-decoration:underline" class="ansi-bright-black-fg">fit.jl:515</span>
  [3] top-level scope
- <span class="ansi-bright-black-fg">  @</span> <span class="ansi-bright-black-fg">/private/tmp/juliaactuary-fall-finalization/posts/2026-fall-releases/</span><span style="text-decoration:underline" class="ansi-bright-black-fg">index.qmd:540</span></pre>
+ <span class="ansi-bright-black-fg">  @</span> <span class="ansi-bright-black-fg">/private/tmp/juliaactuary-fall-finalization/posts/2026-fall-releases/</span><span style="text-decoration:underline" class="ansi-bright-black-fg">index.qmd:528</span></pre>
 </div>
 </div>
 </div>
@@ -979,7 +960,7 @@ Stacktrace:
  [4] <span class="ansi-bold">fit</span>
  <span class="ansi-bright-black-fg">  @</span> <span class="ansi-bright-black-fg">~/.julia/packages/FinanceModels/quEQy/src/</span><span style="text-decoration:underline" class="ansi-bright-black-fg">fit.jl:394</span><span class="ansi-bright-black-fg"> [inlined]</span>
  [5] top-level scope
- <span class="ansi-bright-black-fg">  @</span> <span class="ansi-bright-black-fg">/private/tmp/juliaactuary-fall-finalization/posts/2026-fall-releases/</span><span style="text-decoration:underline" class="ansi-bright-black-fg">index.qmd:565</span></pre>
+ <span class="ansi-bright-black-fg">  @</span> <span class="ansi-bright-black-fg">/private/tmp/juliaactuary-fall-finalization/posts/2026-fall-releases/</span><span style="text-decoration:underline" class="ansi-bright-black-fg">index.qmd:553</span></pre>
 </div>
 </div>
 </div>
@@ -1186,7 +1167,7 @@ Stacktrace:
  [3] <span class="ansi-bold">present_value</span><span class="ansi-bold">(</span><span class="ansi-bright-black-fg">r</span>::Float64, <span class="ansi-bright-black-fg">x</span>::Tuple<span class="ansi-bright-black-fg">{Float64, Float64, Float64}</span>, <span class="ansi-bright-black-fg">times</span>::Tuple<span class="ansi-bright-black-fg">{Float64, Float64}</span><span class="ansi-bold">)</span>
  <span class="ansi-bright-black-fg">  @</span> <span class="ansi-cyan-fg">FinanceCore</span> <span class="ansi-bright-black-fg">~/.julia/packages/FinanceCore/poZGd/src/</span><span style="text-decoration:underline" class="ansi-bright-black-fg">pv.jl:57</span>
  [4] top-level scope
- <span class="ansi-bright-black-fg">  @</span> <span class="ansi-bright-black-fg">/private/tmp/juliaactuary-fall-finalization/posts/2026-fall-releases/</span><span style="text-decoration:underline" class="ansi-bright-black-fg">index.qmd:709</span></pre>
+ <span class="ansi-bright-black-fg">  @</span> <span class="ansi-bright-black-fg">/private/tmp/juliaactuary-fall-finalization/posts/2026-fall-releases/</span><span style="text-decoration:underline" class="ansi-bright-black-fg">index.qmd:697</span></pre>
 </div>
 </div>
 </div>
@@ -1222,7 +1203,7 @@ annual, convert(Continuous(), annual)</code></pre>
 </div>
 </div>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -1231,7 +1212,7 @@ annual, convert(Continuous(), annual)</code></pre>
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p><strong>FinanceModels</strong></p>
 <ul>
@@ -1515,7 +1496,7 @@ fig</code></pre>
 </section>
 <section id="upgrading" class="level2">
 <h2 class="anchored" data-anchor-id="upgrading">Upgrading</h2>
-<p>Use FinanceModels 7 and ActuaryUtilities 6 together for the APIs shown here. The release set requires Julia 1.10 or newer. FinanceCore 3, FinanceModels 7 and ActuaryUtilities 6 are registered; MortalityTables 3 and EconomicScenarioGenerators 0.7.1 are pending as of October 11:</p>
+<p>Use FinanceModels 7 and ActuaryUtilities 6 together for the APIs shown here. The release set requires Julia 1.10 or newer.</p>
 <table class="caption-top table">
 <thead>
 <tr class="header">

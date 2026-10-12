@@ -10,18 +10,6 @@ resources:
   - benchmarks.zip
 ---
 
-<!--
-Before publishing: complete MortalityTables 3.0.0 registration from
-cae71f5750374cb234826080a7487520d87828e5 and EconomicScenarioGenerators 0.7.1.
-Refresh the release-status text, then remove this comment and the draft callout.
-The examples, benchmark environments and linked documentation have been refreshed.
--->
-
-::: {.callout-warning}
-## Draft: release status as of October 11, 2026
-FinanceCore 3.0, FinanceModels 7.0 and ActuaryUtilities 6.0 are registered. MortalityTables 3.0 and EconomicScenarioGenerators 0.7.1 are awaiting registration. The MT examples and benchmarks use the exact commit designated for its 3.0.0 release.
-:::
-
 ```{julia}
 #| echo: false
 #| output: false
@@ -883,7 +871,7 @@ irr([-100.0, 110.0], [1000.0, 1001.0])
 
 ## Upgrading
 
-Use FinanceModels 7 and ActuaryUtilities 6 together for the APIs shown here. The release set requires Julia 1.10 or newer. FinanceCore 3, FinanceModels 7 and ActuaryUtilities 6 are registered; MortalityTables 3 and EconomicScenarioGenerators 0.7.1 are pending as of October 11:
+Use FinanceModels 7 and ActuaryUtilities 6 together for the APIs shown here. The release set requires Julia 1.10 or newer.
 
 | Package | Release | Migration guidance |
 |---|---|---|
