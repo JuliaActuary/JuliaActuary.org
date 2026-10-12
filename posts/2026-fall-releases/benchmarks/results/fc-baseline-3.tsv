@@ -1,0 +1,12 @@
+version	workload	minimum_ns	median_ns	allocations	bytes
+baseline	pv(0.05, amounts30) (periods 1:n)	69.45863125638407	77.7150153217569	0	0
+baseline	pv(0.05, amounts30, times30)	244.66840731070496	277.1984334203655	4	368
+baseline	pv(Continuous(0.05), amounts30, times30)	243.23936170212767	273.27127659574467	4	352
+baseline	pv(Continuous(0.05), Cashflows30)	69.75689479060266	77.97037793667008	0	0
+baseline	pv(Continuous(0.05), Cashflows30, times30)	244.72295514511873	276.82585751978894	4	352
+baseline	pv(Continuous(0.05), Cashflow)	3.25	3.708	0	0
+baseline	discount(Periodic(0.05, 2), 3, 7.5)	3.25	3.417	0	0
+baseline	accumulation(Continuous(0.05), 3, 7.5)	3.25	3.708	0	0
+baseline	convert(Continuous(), Periodic(0.05, 2))	1.5	1.583	0	0
+baseline	Cashflow + Cashflow (same time)	1.958	2.042	0	0
+baseline	irr(31 amounts)	493.12371134020617	552.4072164948453	0	0

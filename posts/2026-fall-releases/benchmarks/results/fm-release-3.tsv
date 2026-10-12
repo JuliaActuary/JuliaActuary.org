@@ -1,0 +1,34 @@
+version	workload	minimum_ns	median_ns	allocations	bytes
+release	discount(Linear, 7.3)	10.093093093093094	11.345345345345345	0	0
+release	discount(Cubic, 7.3)	12.262262262262261	13.846846846846846	0	0
+release	discount(MonotoneConvex, 7.3)	12.17917917917918	14.014014014014014	0	0
+release	discount(NelsonSiegel, 7.3)	7.125	8.125	0	0
+release	zero(Linear, 7.3)	4.167	4.708	0	0
+release	forward(Linear, 2, 3)	15.667	17.792	0	0
+release	discount(Vasicek, 10)	10.416	10.541	0	0
+release	discount(CIR zero volatility, 10)	19.098294884653964	21.398194583751255	0	0
+release	discount(CIR, 10)	24.347389558232933	27.233935742971887	0	0
+release	discount(HullWhite, 7.3)	10.094094094094094	11.344344344344345	0	0
+release	discount(HullWhite, 2, 3, r)	29.845070422535212	33.53521126760563	0	0
+release	pv(Linear, 15y semiannual bond)	413.31658291457285	470.89447236180905	0	0
+release	pv(MonotoneConvex, 15y bond)	453.0456852791878	519.8781725888325	0	0
+release	pv(Linear, 30 amounts, times)	410.625	467.085	0	0
+release	pv floater on its index	757.7433628318585	855.8230088495575	0	0
+release	pv 10y swap on its index	1979.1	2233.3	0	0
+release	pv portfolio [bond, floater, swap]	3401.0	3854.25	14	2016
+release	pv Composite(bond, floater)	1216.6	1375.0	0	0
+release	pv Forward(2, floater)	1112.5	1162.5	0	0
+release	pv FX.Converted(bond)	364.0382775119617	412.47846889952154	0	0
+release	pv FX.Forward	9.458	10.666	0	0
+release	pv BSM call	18.0	20.291	0	0
+release	pv Vasicek swaption	849.7631578947369	963.8157894736842	3	288
+release	pv HullWhite cap (3y quarterly)	532.8465608465608	602.0687830687831	0	0
+release	collect(15y bond)	191.3065015479876	220.39473684210526	8	1664
+release	fit NelsonSiegel to 6 ZCB yields (LBFGS)	634167.0	716417.0	18560	1075360
+release	fit BSM implied vol (Fminbox LBFGS)	23791.0	27416.0	744	51488
+release	fit Linear, 12 CMT quotes (Newton)	409875.0	454937.5	678	824864
+release	fit MonotoneConvex, 12 CMT quotes	1.293042e6	1.431375e6	1989	364320
+release	refit Linear, unchanged quotes	406459.0	454750.0	676	824704
+release	refit Linear, 1bp	408125.0	457542.0	676	824704
+release	bootstrap Linear, 12 CMT quotes	41000.0	47125.0	1063	70256
+release	pv_mc Vasicek 10y ZCB, 200 scenarios	142333.0	160833.0	1614	493408

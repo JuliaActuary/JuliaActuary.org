@@ -1,0 +1,12 @@
+version	workload	minimum_ns	median_ns	allocations	bytes
+release	pv(0.05, amounts30) (periods 1:n)	69.4437627811861	77.70961145194273	0	0
+release	pv(0.05, amounts30, times30)	76.95893223819301	85.9435318275154	0	0
+release	pv(Continuous(0.05), amounts30, times30)	76.98868312757202	86.03395061728395	0	0
+release	pv(Continuous(0.05), Cashflows30)	69.78527607361963	78.0081799591002	0	0
+release	pv(Continuous(0.05), Cashflows30, times30)	75.059670781893	83.89094650205762	0	0
+release	pv(Continuous(0.05), Cashflow)	3.25	3.708	0	0
+release	discount(Periodic(0.05, 2), 3, 7.5)	3.25	3.416	0	0
+release	accumulation(Continuous(0.05), 3, 7.5)	3.25	3.416	0	0
+release	convert(Continuous(), Periodic(0.05, 2))	1.5	1.542	0	0
+release	Cashflow + Cashflow (same time)	1.916	2.042	0	0
+release	irr(31 amounts)	492.91237113402065	551.9742268041238	0	0

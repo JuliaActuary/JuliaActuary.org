@@ -1,0 +1,31 @@
+version	workload	minimum_ns	median_ns	allocations	bytes
+release	duration(Modified(), 0.04, cfs30, times30)	134.048	149.76228571428572	0	0
+release	duration(0.04, cfs30) (periods 1:n)	131.0665914221219	146.4446952595937	0	0
+release	duration(0.04, Cashflows30)	133.11915367483297	148.71046770601336	0	0
+release	duration(Macaulay(), Periodic(0.04, 2), cfs30, times30)	70.95286885245902	79.44877049180327	0	0
+release	convexity(Periodic(0.04, 2), cfs30, times30)	71.82546201232033	80.25359342915812	0	0
+release	duration(DV01(), 0.04, cfs30, times30)	132.89784335981838	148.45856980703746	0	0
+release	duration(DV01(), Continuous(0.04), cfs30, times30)	70.93558282208589	79.4560327198364	0	0
+release	duration(curve, cfs30, times30)	326.57456140350877	368.42105263157896	0	0
+release	duration(DV01(), curve, cfs30, times30)	326.8805309734513	369.10176991150445	0	0
+release	convexity(curve, cfs30, times30)	326.90748898678413	369.6784140969163	0	0
+release	duration(KeyRates, curve, cfs30, times30)	524.3421052631579	599.3421052631579	4	256
+release	sensitivities(KeyRates, curve, cfs30, times30)	604.5197740112994	685.2655367231638	10	1568
+release	duration(IR01(), curve, credit, cfs30, times30)	491.6666666666667	552.348717948718	0	0
+release	convexity(curve, credit, cfs30, times30)	501.2953367875648	562.6062176165804	0	0
+release	sensitivities(KeyRates, curve, credit, cfs30, times30)	739.6694214876034	839.1818181818181	10	1568
+release	duration(callback, curve)	357.93809523809523	402.5809523809524	0	0
+release	convexity(callback, curve)	832.2133333333334	943.88	0	0
+release	duration(callback, DV01(), curve)	348.0604651162791	394.1860465116279	0	0
+release	duration(callback, IR01(), curve, credit)	1050.0	1083.4	0	0
+release	sensitivities(callback, KeyRates, curve)	4583.285714285715	5196.428571428572	29	20480
+release	duration(Effective(), bond, curve)	322.5108225108225	384.5584415584416	0	0
+release	duration(Effective(), floater, curve)	930.1470588235294	1088.235294117647	0	0
+release	duration(Spread(), floater, curve)	796.4947368421052	905.7	0	0
+release	convexity(Effective(), floater, curve)	2069.4444444444443	2379.6666666666665	0	0
+release	sensitivities(KeyRates, bond, curve)	2041.6666666666667	2333.3333333333335	28	6880
+release	sensitivities(KeyRates, floater, curve, credit)	4142.857142857143	4761.857142857143	28	6880
+release	Hull-White key rates, 100 paths, 10y cashflows	1.346208e6	1.495458e6	1870	20066032
+release	irr(31 amounts)	493.12886597938143	552.6237113402062	0	0
+release	wasserstein(1000 Float64, 1000 Float64)	15375.0	17750.0	24	44736
+release	wasserstein(1000 Int, 1000 Int; p = 2)	3703.125	4385.375	8	18304

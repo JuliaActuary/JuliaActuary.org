@@ -1,0 +1,31 @@
+version	workload	minimum_ns	median_ns	allocations	bytes
+baseline	duration(Modified(), 0.04, cfs30, times30)	130.98552338530067	146.62249443207128	0	0
+baseline	duration(0.04, cfs30) (periods 1:n)	136.31156930126002	152.30011454753722	2	304
+baseline	duration(0.04, Cashflows30)	141.38262910798122	158.5	2	304
+baseline	duration(Macaulay(), Periodic(0.04, 2), cfs30, times30)	70.79529170931423	79.06857727737973	0	0
+baseline	convexity(Periodic(0.04, 2), cfs30, times30)	70.98358974358975	79.31589743589744	0	0
+baseline	duration(DV01(), 0.04, cfs30, times30)	461.3112244897959	526.1479591836735	8	1024
+baseline	duration(DV01(), Continuous(0.04), cfs30, times30)	497.63917525773195	567.8711340206186	8	1024
+baseline	duration(curve, cfs30, times30)	724.436974789916	831.5882352941177	6	816
+baseline	duration(DV01(), curve, cfs30, times30)	1079.1	1233.3	8	1120
+baseline	convexity(curve, cfs30, times30)	1154.1	1312.5	8	1632
+baseline	duration(KeyRates, curve, cfs30, times30)	552.4193548387096	626.7903225806451	5	288
+baseline	sensitivities(KeyRates, curve, cfs30, times30)	789.5408163265306	894.9897959183673	15	1616
+baseline	duration(IR01(), curve, credit, cfs30, times30)	1562.5	1770.8	9	1328
+baseline	convexity(curve, credit, cfs30, times30)	1291.6	1479.2	11	928
+baseline	sensitivities(KeyRates, curve, credit, cfs30, times30)	1316.7	1491.7	22	2992
+baseline	duration(callback, curve)	654.0679012345679	750.5123456790124	5	784
+baseline	convexity(callback, curve)	1329.1	1533.3	10	1792
+baseline	duration(callback, DV01(), curve)	1300.0	1512.5	10	1248
+baseline	duration(callback, IR01(), curve, credit)	4882.0	5625.0	41	9888
+baseline	sensitivities(callback, KeyRates, curve)	5833.4	6650.0	47	39728
+baseline	duration(Effective(), bond, curve)	18000.0	20500.0	91	32144
+baseline	duration(Effective(), floater, curve)	42083.0	47750.0	119	45664
+baseline	duration(Spread(), floater, curve)	42000.0	47958.0	119	45664
+baseline	convexity(Effective(), floater, curve)	2722.222222222222	3175.8888888888887	8	2944
+baseline	sensitivities(KeyRates, bond, curve)	18083.0	20791.0	90	32128
+baseline	sensitivities(KeyRates, floater, curve, credit)	41958.0	47667.0	118	45648
+baseline	Hull-White key rates, 100 paths, 10y cashflows	1.098917e6	1.240667e6	2800	11993184
+baseline	irr(31 amounts)	494.41237113402065	553.6958762886597	0	0
+baseline	wasserstein(1000 Float64, 1000 Float64)	15500.0	17916.0	24	44736
+baseline	wasserstein(1000 Int, 1000 Int; p = 2)	3026.0	3432.375	8	18304

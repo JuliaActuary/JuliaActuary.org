@@ -7,6 +7,11 @@ ForwardDiff = "f6369f11-7733-5829-9624-2563aa707210"
 MortalityTables = "4780e19d-04b9-53dc-86c2-9e9aa59b5a12"
 
 [sources]
-ActuaryUtilities = {path = "/Users/alecloudenback/.julia/dev/pr-ActuaryUtilities-sensitivity-engine"}
-FinanceModels = {path = "/Users/alecloudenback/.julia/dev/pr-FinanceModels-v7-master"}
-MortalityTables = {path = "/Users/alecloudenback/.julia/dev/pr-MortalityTables-life-expectancy"}
+MortalityTables = {url = "https://github.com/JuliaActuary/MortalityTables.jl", rev = "cae71f5750374cb234826080a7487520d87828e5"}
+
+[compat]
+ActuaryUtilities = "=6.0.0"
+FinanceCore = "=3.0.0"
+FinanceModels = "=7.0.0"
+MortalityTables = "=3.0.0"
+julia = "1.10"

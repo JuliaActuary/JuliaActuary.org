@@ -1,0 +1,12 @@
+FinanceCore 2.8.0 at /Users/alecloudenback/.julia/packages/FinanceCore/yFIq7/src/FinanceCore.jl
+pv(0.05, amounts30) (periods 1:n): 0.069 μs; 0 allocations
+pv(0.05, amounts30, times30): 0.245 μs; 4 allocations
+pv(Continuous(0.05), amounts30, times30): 0.243 μs; 4 allocations
+pv(Continuous(0.05), Cashflows30): 0.07 μs; 0 allocations
+pv(Continuous(0.05), Cashflows30, times30): 0.245 μs; 4 allocations
+pv(Continuous(0.05), Cashflow): 0.003 μs; 0 allocations
+discount(Periodic(0.05, 2), 3, 7.5): 0.003 μs; 0 allocations
+accumulation(Continuous(0.05), 3, 7.5): 0.003 μs; 0 allocations
+convert(Continuous(), Periodic(0.05, 2)): 0.002 μs; 0 allocations
+Cashflow + Cashflow (same time): 0.002 μs; 0 allocations
+irr(31 amounts): 0.493 μs; 0 allocations

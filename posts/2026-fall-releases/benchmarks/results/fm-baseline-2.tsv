@@ -1,0 +1,34 @@
+version	workload	minimum_ns	median_ns	allocations	bytes
+baseline	discount(Linear, 7.3)	10.551551551551551	10.635635635635635	0	0
+baseline	discount(Cubic, 7.3)	12.553553553553554	14.056056056056056	0	0
+baseline	discount(MonotoneConvex, 7.3)	12.137137137137136	13.93093093093093	0	0
+baseline	discount(NelsonSiegel, 7.3)	7.791	7.875	0	0
+baseline	zero(Linear, 7.3)	8.583	8.667	0	0
+baseline	forward(Linear, 2, 3)	14.695390781563127	16.574148296593187	0	0
+baseline	discount(Vasicek, 10)	6.958	7.833	0	0
+baseline	discount(CIR zero volatility, 10)	6.416	7.209	0	0
+baseline	discount(CIR, 10)	20.729187562688065	23.277833500501504	0	0
+baseline	discount(HullWhite, 7.3)	9.50950950950951	10.635635635635635	0	0
+baseline	discount(HullWhite, 2, 3, r)	53.038696537678206	65.17311608961303	0	0
+baseline	pv(Linear, 15y semiannual bond)	404.9396984924623	452.47236180904525	0	0
+baseline	pv(MonotoneConvex, 15y bond)	503.4507772020725	564.7668393782384	0	0
+baseline	pv(Linear, 30 amounts, times)	316.2350597609562	340.47410358565736	2	304
+baseline	pv floater on its index	889.8809523809524	1003.952380952381	5	2448
+baseline	pv 10y swap on its index	3208.25	3614.625	5	2448
+baseline	pv portfolio [bond, floater, swap]	7166.75	8114.5	46	4992
+baseline	pv Composite(bond, floater)	1850.0	2120.9	5	2448
+baseline	pv Forward(2, floater)	808.3411764705883	925.0	5	2448
+baseline	pv FX.Converted(bond)	354.07109004739334	395.7345971563981	0	0
+baseline	pv FX.Forward	11.511511511511511	12.887887887887889	0	0
+baseline	pv BSM call	18.012036108324974	20.22768304914744	0	0
+baseline	pv Vasicek swaption	3062.5	3437.5	2	96
+baseline	pv HullWhite cap (3y quarterly)	559.2378378378378	630.2945945945946	0	0
+baseline	collect(15y bond)	165.6231884057971	188.73517786561266	5	1536
+baseline	fit NelsonSiegel to 6 ZCB yields (LBFGS)	798917.0	884417.0	25429	1623840
+baseline	fit BSM implied vol (Fminbox LBFGS)	24417.0	27959.0	771	43168
+baseline	fit Linear, 12 CMT quotes (Newton)	812083.0	945250.0	794	603472
+baseline	fit MonotoneConvex, 12 CMT quotes	2.8955e6	3.17175e6	2524	425296
+baseline	refit Linear, unchanged quotes	841542.0	921209.0	794	603472
+baseline	refit Linear, 1bp	647959.0	736771.0	690	557312
+baseline	bootstrap Linear, 12 CMT quotes	51084.0	58250.0	996	53360
+baseline	pv_mc Vasicek 10y ZCB, 200 scenarios	140334.0	157833.0	1214	265312

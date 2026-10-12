@@ -9,3 +9,16 @@ Manifest.toml
 /.quarto/
 _freeze/
 **/*.quarto_ipynb
+
+# Pin the release article and its benchmark environments.
+!/posts/2026-fall-releases/Manifest.toml
+!/_site/posts/2026-fall-releases/Manifest.toml
+!/posts/2026-fall-releases/benchmarks/baseline/Manifest.toml
+!/posts/2026-fall-releases/benchmarks/release/Manifest.toml
+# Retain only this article's executed output cache.
+!/_freeze/
+/_freeze/*
+!/_freeze/posts/
+/_freeze/posts/*
+!/_freeze/posts/2026-fall-releases/
+/posts/2026-fall-releases/benchmarks/smoke/*.tsv

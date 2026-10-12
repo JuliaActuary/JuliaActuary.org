@@ -1,0 +1,12 @@
+FinanceCore 2.8.0 at /Users/alecloudenback/.julia/packages/FinanceCore/yFIq7/src/FinanceCore.jl
+PASS pv(0.05, amounts30) (periods 1:n)
+PASS pv(0.05, amounts30, times30)
+PASS pv(Continuous(0.05), amounts30, times30)
+PASS pv(Continuous(0.05), Cashflows30)
+PASS pv(Continuous(0.05), Cashflows30, times30)
+PASS pv(Continuous(0.05), Cashflow)
+PASS discount(Periodic(0.05, 2), 3, 7.5)
+PASS accumulation(Continuous(0.05), 3, 7.5)
+PASS convert(Continuous(), Periodic(0.05, 2))
+PASS Cashflow + Cashflow (same time)
+PASS irr(31 amounts)

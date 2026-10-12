@@ -1,0 +1,14 @@
+MortalityTables 3.0.0
+survival(Gompertz, 40, 60): 0.012 μs; 0 allocations
+survival(Beard, 40, 50) (numerical cumhazard): 0.559 μs; 6 allocations
+life_expectancy(Gompertz, 40): 5.09 μs; 6 allocations
+life_expectancy(Makeham, 65): 1.867 μs; 5 allocations
+life_expectancy(Weibull, 40): 2.551 μs; 6 allocations
+life_expectancy(Kannisto, 80): 5.5 μs; 6 allocations
+survival(1980 CSO ult, 40, 60): 0.003 μs; 0 allocations
+survival(1980 CSO ult, 40.5, 60.25, Uniform): 0.009 μs; 0 allocations
+life_expectancy(1980 CSO ult, 40): 0.022 μs; 0 allocations
+decrement(1980 CSO ult, 40, 60): 0.003 μs; 0 allocations
+load table 1980 CSO (XTbML): 3.719 μs; 72 allocations
+parse uncached XTbML ultimate: 61.292 μs; 2758 allocations
+parse uncached XTbML select and ultimate: 1253.917 μs; 65924 allocations

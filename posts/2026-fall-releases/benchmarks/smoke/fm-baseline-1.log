@@ -1,0 +1,34 @@
+FinanceModels 6.5.0 at /Users/alecloudenback/.julia/packages/FinanceModels/jLvhx/src/FinanceModels.jl | FinanceCore 2.8.0
+PASS discount(Linear, 7.3): 0.7597159755737792
+PASS discount(Cubic, 7.3): 0.7595352026296129
+PASS discount(MonotoneConvex, 7.3): 0.7595513389196137
+PASS discount(NelsonSiegel, 7.3): 0.7525583608569251
+PASS zero(Linear, 7.3): Continuous(0.03764529204128893)
+PASS forward(Linear, 2, 3): Continuous(0.036942051837891995)
+PASS discount(Vasicek, 10): 0.7013084364040655
+PASS discount(CIR zero volatility, 10): 0.6954389459421917
+PASS discount(CIR, 10): 0.7007960974750913
+PASS discount(HullWhite, 7.3): 0.7597159755737792
+PASS discount(HullWhite, 2, 3, r): 0.9689262684597021
+PASS pv(Linear, 15y semiannual bond): 1.0058650290800524
+PASS pv(MonotoneConvex, 15y bond): 1.0057647394298554
+PASS pv(Linear, 30 amounts, times): 90.58789846197207
+PASS pv floater on its index: 1.018281829945827
+PASS pv 10y swap on its index: 0.0
+PASS pv portfolio [bond, floater, swap]: 2.024146859025878
+PASS pv Composite(bond, floater): 2.0241468590258793
+PASS pv Forward(2, floater): 0.939764459909136
+PASS pv FX.Converted(bond): 1.2288935525949838
+PASS pv FX.Forward: -0.049863914700477616
+PASS pv BSM call: 0.03526742240402345
+PASS pv Vasicek swaption: 0.02599629509207155
+PASS pv HullWhite cap (3y quarterly): 0.01868724055993965
+PASS collect(15y bond): Cashflow{Float64, Float64}[Cashflow{Float64, Float64}(0.02, 0.5), Cashflow{Float64, Float64}(0.02, 1.0), Cashflow{Float64, Float64}(0.02, 1.5), Cashflow{Float64, Float64}(0.02, 2.0), Cashflow{Float64, Float64}(0.02, 2.5), Cashflow{Float64, Float64}(0.02, 3.0), Cashflow{Float64, Float64}(0.02, 3.5),
+PASS fit NelsonSiegel to 6 ZCB yields (LBFGS): FinanceModels.Yield.NelsonSiegel{Float64}(5.005413407992177, 0.03915506396165469, -0.009592660129523978, 0.009801100717046651)
+PASS fit BSM implied vol (Fminbox LBFGS): FinanceModels.Equity.BlackScholesMerton{Float64, Float64, FinanceModels.Volatility.Constant{Float64}}(0.01, 0.02, FinanceModels.Volatility.Constant{Float64}(0.15000000180693254))
+PASS fit Linear, 12 CMT quotes (Newton): FinanceModels.Yield.Spline{DataInterpolations.LinearInterpolation{Vector{Float64}, Vector{Float64}, Vector{Float64}, Vector{Float64}, Float64, FindFirstFunctions.SearchProperties{Float64}}}(DataInterpolations.LinearInterpolation{Vector{Float64}, Vector{Float64}, Vector{Float64}, Vector{Float64}, Flo
+PASS fit MonotoneConvex, 12 CMT quotes: FinanceModels.Yield.MonotoneConvex{Float64, Float64}([0.030064851041794512, 0.03131715087991918, 0.0330341008170885, 0.03576908333915992, 0.03747112094830875, 0.03976884583556203, 0.04092154399542316, 0.04147306082831573, 0.04143964484507191, 0.041132106259067026, 0.04056814532022972, 0.040142044538
+PASS refit Linear, unchanged quotes: FinanceModels.Yield.Spline{DataInterpolations.LinearInterpolation{Vector{Float64}, Vector{Float64}, Vector{Float64}, Vector{Float64}, Float64, FindFirstFunctions.SearchProperties{Float64}}}(DataInterpolations.LinearInterpolation{Vector{Float64}, Vector{Float64}, Vector{Float64}, Vector{Float64}, Flo
+PASS refit Linear, 1bp: FinanceModels.Yield.Spline{DataInterpolations.LinearInterpolation{Vector{Float64}, Vector{Float64}, Vector{Float64}, Vector{Float64}, Float64, FindFirstFunctions.SearchProperties{Float64}}}(DataInterpolations.LinearInterpolation{Vector{Float64}, Vector{Float64}, Vector{Float64}, Vector{Float64}, Flo
+PASS bootstrap Linear, 12 CMT quotes: FinanceModels.Yield.Spline{DataInterpolations.LinearInterpolation{Vector{Float64}, Vector{Float64}, Vector{Float64}, Vector{Float64}, Float64, FindFirstFunctions.SearchProperties{Float64}}}(DataInterpolations.LinearInterpolation{Vector{Float64}, Vector{Float64}, Vector{Float64}, Vector{Float64}, Flo
+PASS pv_mc Vasicek 10y ZCB, 200 scenarios: 0.6930339933609259

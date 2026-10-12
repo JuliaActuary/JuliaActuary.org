@@ -1,0 +1,14 @@
+MortalityTables 2.6.0
+PASS survival(Gompertz, 40, 60): 0.8265137737801581
+PASS survival(Beard, 40, 50) (numerical cumhazard): 0.016115580313148345
+PASS life_expectancy(Gompertz, 40): 34.751553038275816
+PASS life_expectancy(Makeham, 65): 0.9499230842471362
+PASS life_expectancy(Weibull, 40): 10.979193274148374
+PASS life_expectancy(Kannisto, 80): 3.8467540572408954
+PASS survival(1980 CSO ult, 40, 60): 0.8931491662919174
+PASS survival(1980 CSO ult, 40.5, 60.25, Uniform): 0.8910535436172518
+PASS life_expectancy(1980 CSO ult, 40): 35.44566185627232
+PASS decrement(1980 CSO ult, 40, 60): 0.10685083370808257
+PASS load table 1980 CSO (XTbML): MortalityTables.UltimateTable{OffsetArrays.OffsetVector{Float64, Vector{Float64}}}([0.0037, 0.00059, 0.00051, 0.0005, 0.00046, 0.00041, 0.00036, 0.0003, 0.00025, 0.00022  …  0.20675, 0.21977, 0.23408, 0.25097, 0.27302, 0.30992, 0.36746, 0.4708, 0.6567, 1.0], TableMetaData("1980 CSO Basic Table – Mal
+PASS parse uncached XTbML ultimate: MortalityTables.UltimateTable{OffsetArrays.OffsetVector{Float64, Vector{Float64}}}([0.0037, 0.00059, 0.00051, 0.0005, 0.00046, 0.00041, 0.00036, 0.0003, 0.00025, 0.00022  …  0.20675, 0.21977, 0.23408, 0.25097, 0.27302, 0.30992, 0.36746, 0.4708, 0.6567, 1.0], TableMetaData("1980 CSO Basic Table – Mal
+PASS parse uncached XTbML select and ultimate: MortalityTables.SelectUltimateTable{OffsetArrays.OffsetVector{OffsetArrays.OffsetVector{T} where T, Vector{OffsetArrays.OffsetVector{T} where T}}, OffsetArrays.OffsetVector{Float64, Vector{Float64}}}(OffsetArrays.OffsetVector{T} where T[Union{Missing, Float64}[missing, missing, missing, missing, mis

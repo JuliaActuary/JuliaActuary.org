@@ -2,6 +2,7 @@
   {
     "listing": "/blog.html",
     "items": [
+      "/posts/2026-fall-releases/index.html",
       "/posts/nested-stochastic-va/index.html",
       "/posts/quantlib-comparison/index.html",
       "/posts/finance-models-announcement/index.html",

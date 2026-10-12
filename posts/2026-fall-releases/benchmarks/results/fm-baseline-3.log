@@ -1,0 +1,34 @@
+FinanceModels 6.5.0 at /Users/alecloudenback/.julia/packages/FinanceModels/jLvhx/src/FinanceModels.jl | FinanceCore 2.8.0
+discount(Linear, 7.3): 0.009 μs; 0 allocations
+discount(Cubic, 7.3): 0.013 μs; 0 allocations
+discount(MonotoneConvex, 7.3): 0.012 μs; 0 allocations
+discount(NelsonSiegel, 7.3): 0.007 μs; 0 allocations
+zero(Linear, 7.3): 0.008 μs; 0 allocations
+forward(Linear, 2, 3): 0.014 μs; 0 allocations
+discount(Vasicek, 10): 0.007 μs; 0 allocations
+discount(CIR zero volatility, 10): 0.006 μs; 0 allocations
+discount(CIR, 10): 0.021 μs; 0 allocations
+discount(HullWhite, 7.3): 0.009 μs; 0 allocations
+discount(HullWhite, 2, 3, r): 0.053 μs; 0 allocations
+pv(Linear, 15y semiannual bond): 0.403 μs; 0 allocations
+pv(MonotoneConvex, 15y bond): 0.501 μs; 0 allocations
+pv(Linear, 30 amounts, times): 0.302 μs; 2 allocations
+pv floater on its index: 0.884 μs; 5 allocations
+pv 10y swap on its index: 3.208 μs; 5 allocations
+pv portfolio [bond, floater, swap]: 7.125 μs; 46 allocations
+pv Composite(bond, floater): 1.858 μs; 5 allocations
+pv Forward(2, floater): 0.804 μs; 5 allocations
+pv FX.Converted(bond): 0.354 μs; 0 allocations
+pv FX.Forward: 0.011 μs; 0 allocations
+pv BSM call: 0.018 μs; 0 allocations
+pv Vasicek swaption: 3.062 μs; 2 allocations
+pv HullWhite cap (3y quarterly): 0.558 μs; 0 allocations
+collect(15y bond): 0.165 μs; 5 allocations
+fit NelsonSiegel to 6 ZCB yields (LBFGS): 788.166 μs; 25429 allocations
+fit BSM implied vol (Fminbox LBFGS): 24.25 μs; 771 allocations
+fit Linear, 12 CMT quotes (Newton): 810.916 μs; 794 allocations
+fit MonotoneConvex, 12 CMT quotes: 2878.667 μs; 2524 allocations
+refit Linear, unchanged quotes: 800.833 μs; 794 allocations
+refit Linear, 1bp: 647.75 μs; 690 allocations
+bootstrap Linear, 12 CMT quotes: 50.917 μs; 996 allocations
+pv_mc Vasicek 10y ZCB, 200 scenarios: 139.584 μs; 1214 allocations

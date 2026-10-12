@@ -1,0 +1,34 @@
+version	workload	minimum_ns	median_ns	allocations	bytes
+baseline	discount(Linear, 7.3)	9.459	10.75	0	0
+baseline	discount(Cubic, 7.3)	12.595595595595595	14.223223223223224	0	0
+baseline	discount(MonotoneConvex, 7.3)	11.886886886886886	13.68068068068068	0	0
+baseline	discount(NelsonSiegel, 7.3)	7.0	7.916	0	0
+baseline	zero(Linear, 7.3)	7.708	8.708	0	0
+baseline	forward(Linear, 2, 3)	14.40380761523046	16.61623246492986	0	0
+baseline	discount(Vasicek, 10)	6.958	7.875	0	0
+baseline	discount(CIR zero volatility, 10)	6.375	7.209	0	0
+baseline	discount(CIR, 10)	20.749498997995993	23.25551102204409	0	0
+baseline	discount(HullWhite, 7.3)	9.467467467467467	10.802802802802804	0	0
+baseline	discount(HullWhite, 2, 3, r)	53.46903553299492	65.69340101522843	0	0
+baseline	pv(Linear, 15y semiannual bond)	403.33	452.295	0	0
+baseline	pv(MonotoneConvex, 15y bond)	500.86528497409324	565.8445595854922	0	0
+baseline	pv(Linear, 30 amounts, times)	301.62948207171314	340.47011952191235	2	304
+baseline	pv floater on its index	884.433962264151	1005.5094339622641	5	2448
+baseline	pv 10y swap on its index	3208.375	3614.5	5	2448
+baseline	pv portfolio [bond, floater, swap]	7125.0	8062.5	46	4992
+baseline	pv Composite(bond, floater)	1858.4	2104.2	5	2448
+baseline	pv Forward(2, floater)	803.8426966292135	912.9213483146067	5	2448
+baseline	pv FX.Converted(bond)	354.06635071090045	395.54028436018956	0	0
+baseline	pv FX.Forward	11.458	12.875	0	0
+baseline	pv BSM call	18.0	20.167	0	0
+baseline	pv Vasicek swaption	3062.5	3145.875	2	96
+baseline	pv HullWhite cap (3y quarterly)	558.1081081081081	630.4054054054054	0	0
+baseline	collect(15y bond)	164.8677462887989	193.0944669365722	5	1536
+baseline	fit NelsonSiegel to 6 ZCB yields (LBFGS)	788166.0	908458.0	25429	1623840
+baseline	fit BSM implied vol (Fminbox LBFGS)	24250.0	28209.0	771	43168
+baseline	fit Linear, 12 CMT quotes (Newton)	810916.0	915542.0	794	603472
+baseline	fit MonotoneConvex, 12 CMT quotes	2.878667e6	3.126e6	2524	425296
+baseline	refit Linear, unchanged quotes	800833.0	909500.0	794	603472
+baseline	refit Linear, 1bp	647750.0	727229.0	690	557312
+baseline	bootstrap Linear, 12 CMT quotes	50917.0	58458.0	996	53360
+baseline	pv_mc Vasicek 10y ZCB, 200 scenarios	139584.0	156583.0	1214	265312

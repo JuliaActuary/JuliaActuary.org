@@ -3,59 +3,23 @@ title: "FinanceModels 7, ActuaryUtilities 6, MortalityTables 3 and FinanceCore 3
 author: "Alec Loudenback"
 date: "2026-10-11"
 categories: [code, blog]
+resources:
+  - Project.toml
+  - Manifest.toml
+  - reproducibility.txt
+  - benchmarks.zip
 ---
 
 <!--
-DRAFT: to do before publishing
-- Release status checked on 2026-10-11: FinanceCore 3.0.0 and FinanceModels 7.0.0 are
-registered. ActuaryUtilities 6.0.0, MortalityTables 3.0.0 and EconomicScenarioGenerators 0.7.1
-are still pending (General has AU 5.12.0, MT 2.6.0 and ESG 0.7.0). Refresh the status and
-date before publishing.
-- 2026-10-02: the FinanceCore 3.0, valuation-context, callback-order, `Scenarios`, `wasserstein`
-and bounded-law edits were checked in a scratch environment (FinanceCore f6ee618, FinanceModels
-1a7e5ed, ActuaryUtilities a7422e3; the bounded-law claim against MortalityTables 2.6.0 and e69b660).
-After the third review the heads are FinanceCore feb655e, FinanceModels 3795ce2 and
-ActuaryUtilities 916bb89; the chunks changed for that review (`wasserstein`, as-of, Black–Scholes
-composite, FinanceCore laws, IRR) were rerun on them. `pv(…, times)` can now differ in the last
-digits. 2026-10-03, after the final review: FinanceCore 60fad7f, FinanceModels 625de99,
-ActuaryUtilities 09c68d1, MortalityTables 9803be9; every non-plot chunk was rerun on them, with
-unchanged outputs. Then the explicit rate conventions (FinanceModels 8242994 with
-`feat/explicit-rate-conventions` 5b446e7 below #336, ActuaryUtilities 3e93a9a): every chunk was
-rerun, with the same values (the steepener and the gradient seed are now typed). After the
-2026-10-03 review fixes: FinanceCore 183352b, FinanceModels 3630130 (rate PR 1d8ee46). 2026-10-04, after
-the ergonomics review and review 8 (pushed): FinanceCore ad90877, FinanceModels b22f39b (rate PR
-453cd5a), ActuaryUtilities 387ef5c, MortalityTables f4fcfba (rebased on master, so it includes the
-age-basis PR #154); every non-plot chunk was rerun on them, with unchanged outputs apart from the
-renamed `UniformDeaths()`, the new life-expectancy chunk and the two-curve convexity blocks, now
-keyed by role. 2026-10-05 (pushed): ActuaryUtilities 2661464 (`dv01` removed, dollar convexity
-added) and MortalityTables 294dd91; the post is rendered in its own environment on these heads.
-2026-10-09: added curve blends (FinanceModels #343) and Vasicek under negative mean reversion
-(#341/#342; the 6.x numbers were measured on FinanceModels 6.5.0). The environment now uses the
-registered FinanceCore 3.0.0 and FinanceModels master 607261c2 (#336–#344 merged); MortalityTables
-is d8e8351 (#153 merged). The post was re-rendered on Julia 1.13.1.
-- This post's environment (Project.toml/Manifest.toml beside this file) develops the release
-worktrees ~/.julia/dev/pr-FinanceModels-v7-master (a detached checkout of master),
-pr-ActuaryUtilities-sensitivity-engine and pr-MortalityTables-life-expectancy; FinanceCore is the
-registered 3.0.0 (the previous Project/Manifest are in the evidence folder's backups). Before
-publishing: `Pkg.free` those three, add the registered versions, re-render, and commit the new
-Manifest and `_freeze/posts/2026-fall-releases/`.
-- Performance numbers come from the 2026-10-02 benchmarks against the latest tagged releases (FC 2.8.0,
-FM 6.5.0, MT 2.6.0, AU 5.12.0): `2026-master-plan-drafts/evidence/2026-10-01/next-version/perf/`
-(`RELEASE.md`, `release/summary.md`, `fc-sum/`, and `mt-parse/` for the uncached XTbML parse), taken
-before the third review's fixes. Re-run them against the registered releases and publish the benchmark Manifest.
-The "Two-curve IR01 and convexity" row (1.7–3.2×) was dropped on 2026-10-05: its fixed-cashflow forms
-are removed; benchmark their replacements (`duration(DV01(), base + credit, …)` and the two-curve
-callbacks) in the refresh.
-Include unchanged-quote and updated-quote refits, and zero-volatility CIR. Compare every workload
-against the same tagged-release baseline; recheck the slowdown explanations as well as the timings.
-Replace the provisional performance paragraph with the final benchmark date and evidence link.
-- Check that the linked migration guides, API docs and NEWS contain these releases once deployed;
-  a successful HTTP response alone is not enough. Confirm the version table against registered Project.toml files.
+Before publishing: complete MortalityTables 3.0.0 registration from
+cae71f5750374cb234826080a7487520d87828e5 and EconomicScenarioGenerators 0.7.1.
+Refresh the release-status text, then remove this comment and the draft callout.
+The examples, benchmark environments and linked documentation have been refreshed.
 -->
 
 ::: {.callout-warning}
 ## Draft: release status as of October 11, 2026
-FinanceCore 3.0 and FinanceModels 7.0 are registered. ActuaryUtilities 6.0, MortalityTables 3.0 and EconomicScenarioGenerators 0.7.1 are still awaiting registration. The examples use the development environment described below; the benchmarks remain provisional.
+FinanceCore 3.0, FinanceModels 7.0 and ActuaryUtilities 6.0 are registered. MortalityTables 3.0 and EconomicScenarioGenerators 0.7.1 are awaiting registration. The MT examples and benchmarks use the exact commit designated for its 3.0.0 release.
 :::
 
 ```{julia}
@@ -78,7 +42,7 @@ Some fixes change the numbers in existing models: portfolio values, the sign of 
 4. [Upgrading](#upgrading)
 5. [AI assistance disclosure](#ai-assistance-disclosure)
 
-The code blocks execute when the post is rendered. The examples currently use local package checkouts; [Upgrading](#upgrading) lists the target versions and migration guides.
+The code blocks execute when the post is rendered. The [Project.toml](Project.toml) and [Manifest.toml](Manifest.toml) record the complete environment: FinanceCore 3.0.0, FinanceModels 7.0.0, ActuaryUtilities 6.0.0 and the MortalityTables 3.0.0 release commit. [Reproduction instructions](reproducibility.txt) explain how to rebuild the examples and figures; [Upgrading](#upgrading) links the migration guides.
 
 ```{julia}
 using FinanceModels, FinanceCore, ActuaryUtilities, MortalityTables, ForwardDiff
@@ -437,7 +401,7 @@ risk = sensitivities(curve, frn)
 
 For risk to market quotes rather than prescribed curve shifts, pass a named tuple of input vectors to `sensitivities(valuation, inputs)`. The callback builds the curves and values the position, so the derivatives include supported calibration steps.
 
-The [upgrade guide](https://docs.juliaactuary.org/ActuaryUtilities/dev/upgrade/) maps the changed 5.x calls and result fields to their replacements.
+The [upgrade guide](https://docs.juliaactuary.org/ActuaryUtilities/stable/upgrade/) maps the changed 5.x calls and result fields to their replacements.
 
 ### One mortality interface for tables and laws (MortalityTables)
 
@@ -817,99 +781,117 @@ pv(0.05, Any[]), irr(Float64[])
 
 ## Performance and tradeoffs
 
-These provisional measurements compare the October 2 release candidates with FinanceCore 2.8, FinanceModels 6.5, MortalityTables 2.6 and ActuaryUtilities 5.12. They use BenchmarkTools on Julia 1.12 and the minimum of three alternating runs. The final releases still need a fresh benchmark run before publication; the figures below describe the measured candidates.
+These October 11 measurements compare FinanceCore 3.0.0, FinanceModels 7.0.0, ActuaryUtilities 6.0.0 and the MortalityTables 3.0.0 release commit with FinanceCore 2.8.0, FinanceModels 6.5.0, ActuaryUtilities 5.12.0 and MortalityTables 2.6.0.
+
+The harness uses BenchmarkTools 1.8 on Julia 1.13.1 and an Apple M4 Max, with one Julia thread and one BLAS thread. Each figure is the **smallest trial minimum across three alternating baseline/release runs**, with a one-second budget per trial and compilation excluded. Other jobs were running on the workstation; minima reduce transient interference, but small differences should be treated cautiously. The [benchmark archive](benchmarks.zip) contains all 87 workloads, both complete environments, raw timings, medians and variation between runs.
 
 ```{julia}
 #| code-fold: true
 #| code-summary: "Plotting code"
 speedups = [
-    "MortalityTables: table curtate_life_expectancy" => 27.4,
-    "MortalityTables: Beard survival (numerical cumhazard)" => 19.4,
-    "MortalityTables: Gompertz life expectancy" => 17.7,
-    "MortalityTables: parsing a select and ultimate XTbML table" => 23.3,
-    "ActuaryUtilities: effective duration of a bond" => 56.0,
-    "ActuaryUtilities: key rates of a bond" => 8.2,
-    "ActuaryUtilities: curve DV01 of fixed cashflows" => 3.2,
-    "FinanceCore: present value with explicit times" => 3.1,
-    "FinanceModels: MonotoneConvex fit" => 2.4,
-    "FinanceModels: Vasicek swaption" => 2.3,
-    "FinanceModels: portfolio of a bond, floater and swap" => 1.7,
-    "FinanceModels: swap on its index curve" => 1.4,
+    "MortalityTables: table curtate life expectancy" => 26.10092461,
+    "MortalityTables: Beard survival" => 19.32112332,
+    "MortalityTables: Gompertz complete life expectancy" => 14.26770571,
+    "MortalityTables: select and ultimate XTbML parse" => 21.65875065,
+    "ActuaryUtilities: effective duration of a bond" => 54.77955705,
+    "ActuaryUtilities: key-rate bundle of a bond" => 9.97711543,
+    "ActuaryUtilities: fixed-cashflow curve DV01" => 3.21218274,
+    "FinanceCore: present value with explicit times" => 3.17976350,
+    "FinanceModels: MonotoneConvex fit" => 2.18134246,
+    "FinanceModels: Vasicek swaption" => 3.61088924,
+    "FinanceModels: bond/floater/swap portfolio" => 2.08948148,
+    "FinanceModels: swap on its index curve" => 1.62876284,
 ]
-slowdowns = [   # times slower
-    "MortalityTables: fractional-age survival, UniformDeaths()" => 3.23,
-    "FinanceModels: point discount, Linear curve" => 1.55,
-    "FinanceModels: Hull–White discount(t)" => 1.54,
-    "FinanceModels: point discount, MonotoneConvex" => 1.33,
-    "FinanceModels: forward(Linear, 2, 3)" => 1.22,
-    "FinanceModels: CIR discount" => 1.17,
-    "FinanceModels: Vasicek discount" => 1.14,
-    "ActuaryUtilities: convexity of a callback on a curve" => 1.13,
-    "FinanceModels: Hull–White cap" => 1.09,
-    "FinanceModels: bond on a Linear curve" => 1.08,
+slowdowns = [
+    "MortalityTables: fractional-age UDD survival" => 2.97303519,
+    "FinanceModels: zero-volatility CIR discount" => 2.99280915,
+    "FinanceModels: Vasicek discount" => 1.34133372,
+    "FinanceModels: CIR discount" => 1.17139263,
+    "FinanceModels: 30 cashflows on a Linear curve" => 1.36520215,
+    "FinanceModels: forward-starting floater" => 1.38560413,
+    "ActuaryUtilities: Hull–White key rates, 100 paths" => 1.22503155,
+    "ActuaryUtilities: integer Wasserstein distance" => 1.23871049,
 ]
 labels = [first.(speedups); first.(slowdowns)]
-ratios = [last.(speedups); 1 ./ last.(slowdowns)]   # new speed ÷ old speed
+ratios = [last.(speedups); 1 ./ last.(slowdowns)]
 faster = ratios .> 1
-fig = Figure(size = (800, 720))
-ax = Axis(fig[1, 1]; xscale = log10, xlabel = "speed relative to the tagged release (log scale)",
+fig = Figure(size = (840, 720))
+ax = Axis(fig[1, 1]; xscale = log10, xlabel = "speed relative to the baseline releases (log scale)",
     yticks = (eachindex(labels), labels), yreversed = true,
     xticks = ([0.25, 0.5, 1, 2, 5, 10, 20, 50], ["¼×", "½×", "1×", "2×", "5×", "10×", "20×", "50×"]))
 barplot!(ax, eachindex(labels), ratios; direction = :x, fillto = 1, color = ifelse.(faster, CF_BLUE, CF_RED))
 vlines!(ax, [1.0]; color = CF_INK_SOFT)
-# faster: the speedup at the bar's end; slower: the slowdown just right of 1×, where the row is empty
 text!(ax, ifelse.(faster, ratios, 1.0), eachindex(labels);
-    text = [f ? string(round(r; digits = 1), "× faster") : string(round(1 / r; digits = 2), "× slower") for (r, f) in zip(ratios, faster)],
+    text = [f ? string(round(r; digits = 1), "× faster") : string(round(1 / r; digits = 1), "× slower") for (r, f) in zip(ratios, faster)],
     align = (:left, :center), offset = (4, 0))
-xlims!(ax, 0.25, 600)
-Label(fig[0, 1], "Release-candidate speed: October 2 benchmarks"; font = :bold, tellwidth = false)
+xlims!(ax, min(0.25, minimum(ratios) / 1.2), max(600, maximum(ratios) * 3))
+Label(fig[0, 1], "Release benchmarks: October 11, 2026"; font = :bold, tellwidth = false)
 fig
 ```
 
-| Package | Workload | Speedup |
-|---|---|---|
-| MortalityTables | `curtate_life_expectancy` on a table (now linear in the remaining ages) | 27× |
-| MortalityTables | Parametric survival, with a closed-form (Gompertz) or numerical (Beard) cumulative hazard | 14–19× |
-| MortalityTables | Parametric complete life expectancy (Gompertz, Makeham, Weibull, Kannisto) | 9–18× |
-| MortalityTables | Parsing an XTbML table from disk (XML.jl replaces libxml2): the 1980 CSO ultimate table, the 2001 VBT select and ultimate table | 2.4×, 23× |
-| ActuaryUtilities | Effective and spread duration of a bond or floater | 46–56× |
-| ActuaryUtilities | Key rates of a bond or floater, on one or two curves | 8–10× |
-| ActuaryUtilities | Scalar and `Rate` DV01 | 3.4–6.1× |
-| ActuaryUtilities | Curve duration, DV01 and convexity of fixed cashflows, now allocation-free | 2.3–3.4× |
-| FinanceCore | Present value of amounts with explicit times, now allocation-free | 3.1–3.7× |
-| FinanceModels | Curve fits (Nelson–Siegel, Linear, MonotoneConvex) | 1.3–2.4× |
-| FinanceModels | Vasicek swaption | 2.3× |
-| FinanceModels | A portfolio of a bond, a floater and a swap | 1.7× |
-| FinanceModels | A swap, a `Composite` or a floater valued on its index curve | 1.2–1.4× |
+Selected timings below are in microseconds. Ratios compare the old and new implementations of the same requested workflow; several fixes intentionally change its numerical result.
 
-Fitting a knot curve now rebuilds it once per optimizer candidate instead of once per knot.
+| Package | Workload | Baseline (μs) | Release (μs) | Change |
+|---|---|---:|---:|---:|
+| MortalityTables | table curtate life expectancy | 0.560 | 0.0214 | 26.1× faster |
+| MortalityTables | Beard survival | 10.8 | 0.556 | 19.3× faster |
+| MortalityTables | Gompertz complete life expectancy | 72.6 | 5.09 | 14.3× faster |
+| MortalityTables | select and ultimate XTbML parse | 26,906 | 1,242 | 21.7× faster |
+| ActuaryUtilities | effective duration of a bond | 17.7 | 0.323 | 54.8× faster |
+| ActuaryUtilities | key-rate bundle of a bond | 17.9 | 1.79 | 10.0× faster |
+| ActuaryUtilities | fixed-cashflow curve DV01 | 1.05 | 0.327 | 3.2× faster |
+| FinanceCore | present value with explicit times | 0.245 | 0.0769 | 3.2× faster |
+| FinanceModels | MonotoneConvex fit | 2,801 | 1,284 | 2.2× faster |
+| FinanceModels | Vasicek swaption | 3.06 | 0.848 | 3.6× faster |
+| FinanceModels | bond/floater/swap portfolio | 7.05 | 3.38 | 2.1× faster |
+| FinanceModels | swap on its index curve | 3.20 | 1.97 | 1.6× faster |
 
-FinanceCore 2.8, already released, made IRRs of far-dated cashflows correct and up to 18× faster than 2.7. Newton now measures time from the first nonzero cashflow, which leaves the roots unchanged but lets it converge where it used to stall. Here 2.7 returned 9.99%:
+FinanceCore's explicit-time present-value calls and AU's curve duration, DV01 and convexity calls for fixed cashflows allocate nothing in these workloads.
+
+The refit and migration cases need a little more context:
+
+| Workflow | Baseline (μs) | Release (μs) | Change |
+|---|---:|---:|---:|
+| Linear calibration, unchanged quotes | 801 | 405 | 2.0× faster |
+| Linear calibration, quotes up 1 bp | 641 | 406 | 1.6× faster |
+| Fixed-cashflow IR01 → DV01 on `base + credit` | 1.56 | 0.489 | 3.2× faster |
+| Fixed-cashflow convexity on two curves → their sum | 1.27 | 0.490 | 2.6× faster |
+| Two-curve IR01 callback | 4.68 | 1.05 | 4.5× faster |
+
+FinanceModels 6.5 cannot refit an existing Linear spline through `fit`, so its refit baseline is a fresh fit to the requested quotes. The 7.0 calls start from the previously calibrated curve. Separate fresh-fit comparisons in the archive avoid that warm-start difference.
+
+For AU's removed two-curve fixed-cashflow calls, the replacement discounts on `base + credit`. One convexity result replaces three identical blocks. Callback and fixed-cashflow sensitivity bundles request `SecondOrder()` in AU 6 to match the Hessians computed by AU 5. Contract bundles return first derivatives in both versions; AU 5 also computed an internal Hessian that it discarded.
+
+The slower paths shown in red are:
+
+- **MortalityTables: fractional-age UDD survival:** 3.04 → 9.04 ns, or 3.0× slower.
+- **FinanceModels: zero-volatility CIR discount:** 6.38 → 19.08 ns, or 3.0× slower.
+- **FinanceModels: Vasicek discount:** 6.96 → 9.33 ns, or 1.3× slower.
+- **FinanceModels: CIR discount:** 20.73 → 24.28 ns, or 1.2× slower.
+- **FinanceModels: 30 cashflows on a Linear curve:** 0.30 → 0.41 μs, or 1.4× slower.
+- **FinanceModels: forward-starting floater:** 0.80 → 1.11 μs, or 1.4× slower.
+- **ActuaryUtilities: Hull–White key rates, 100 paths:** 1098.92 → 1346.21 μs, or 1.2× slower.
+- **ActuaryUtilities: integer Wasserstein distance:** 2.99 → 3.70 μs, or 1.2× slower.
+
+Zero-volatility CIR returns the same discount factor in both versions for this case. Fractional-age mortality survival returns a corrected conditional probability. The timings alone do not isolate the cause of each slowdown, and small changes in point discounts or bond valuation are comparable to the observed timing variation. Full results, including near-unchanged workloads, are in the archive.
+
+FinanceCore 2.8, already released, corrected IRRs of far-dated cashflows. Newton measures time from the first nonzero cashflow, which leaves the roots unchanged but lets it converge where it used to stall. Here 2.7 returned 9.99%:
 
 ```{julia}
 irr([-100.0, 110.0], [1000.0, 1001.0])
 ```
 
-The same comparison found slower paths, in red in the plot:
-
-- point discounts on Linear and MonotoneConvex curves, by a few nanoseconds per call (up to 55%), from the new checks (a negative time throws, `t = Inf` returns the tail's limit) and the curve's layout. Hull–White discount factors, which come from its curve, slow down the same way, and a bond on a Linear curve is 8% slower;
-- `forward(curve, from, to)` on a Linear curve, by 22%: it is computed from cumulative log-discounts, which don't underflow;
-- Vasicek and CIR discount factors, by 14% and 17%, from the numerically stable kernels;
-- a Hull–White cap, by 9%;
-- `convexity` of a valuation callback on a curve, by 13%;
-- survival from a fractional age under `UniformDeaths()`, from 3 to 10 ns, now that it is conditional on surviving to that age.
-
 ## Upgrading
 
-Use FinanceModels 7 and ActuaryUtilities 6 together for the APIs shown here. The release set requires Julia 1.10 or newer. FinanceCore 3 and FinanceModels 7 are registered; the remaining target versions below are pending as of October 11:
+Use FinanceModels 7 and ActuaryUtilities 6 together for the APIs shown here. The release set requires Julia 1.10 or newer. FinanceCore 3, FinanceModels 7 and ActuaryUtilities 6 are registered; MortalityTables 3 and EconomicScenarioGenerators 0.7.1 are pending as of October 11:
 
 | Package | Release | Migration guidance |
 |---|---|---|
-| FinanceModels | 7.0 | [Migration guide](https://docs.juliaactuary.org/FinanceModels/stable/migration/) and [NEWS](https://github.com/JuliaActuary/FinanceModels.jl/blob/master/NEWS.md) |
-| ActuaryUtilities | 6.0 | [Version upgrade guide](https://docs.juliaactuary.org/ActuaryUtilities/dev/upgrade/), including replacements for removed calls |
-| MortalityTables | 3.0 | [Release notes](https://github.com/JuliaActuary/MortalityTables.jl/blob/master/NEWS.md) |
-| FinanceCore | 3.0 | [Release notes](https://github.com/JuliaActuary/FinanceCore.jl/blob/main/NEWS.md), including a migration table |
-| EconomicScenarioGenerators | 0.7.1 (final planned release) | [Release notes](https://github.com/JuliaActuary/EconomicScenarioGenerators.jl/blob/main/NEWS.md) |
+| FinanceModels | 7.0 | [Migration guide](https://docs.juliaactuary.org/FinanceModels/stable/migration/) and [NEWS](https://github.com/JuliaActuary/FinanceModels.jl/blob/v7.0.0/NEWS.md) |
+| ActuaryUtilities | 6.0 | [Version upgrade guide](https://docs.juliaactuary.org/ActuaryUtilities/stable/upgrade/), including replacements for removed calls |
+| MortalityTables | 3.0 | [Release notes](https://github.com/JuliaActuary/MortalityTables.jl/blob/cae71f5750374cb234826080a7487520d87828e5/NEWS.md) |
+| FinanceCore | 3.0 | [Release notes](https://github.com/JuliaActuary/FinanceCore.jl/blob/v3.0.0/NEWS.md), including a migration table |
+| EconomicScenarioGenerators | 0.7.1 (final planned release) | [Proposed release notes](https://github.com/JuliaActuary/EconomicScenarioGenerators.jl/blob/2adedcf6030cc3210af7a2c2e59c7adc85702d61/NEWS.md) |
 
 FinanceModels 7 and ActuaryUtilities 6 require FinanceCore 3, which includes the 2.8 fixes described here. FinanceModels 7 also requires Optimization 5.
 

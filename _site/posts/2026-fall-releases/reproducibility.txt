@@ -1,0 +1,18 @@
+# Reproducing the fall 2026 release post
+
+The code and figures were executed with Julia 1.13.1 and Quarto 1.9.16. `Project.toml` pins the four JuliaActuary versions; `Manifest.toml` records the complete resolved environment. No dependency uses a local filesystem path.
+
+MortalityTables is pinned to the public commit designated for its 3.0.0 tag: `cae71f5750374cb234826080a7487520d87828e5` (tree `8fb7e2ef6bbef04c8aac2c4c87ca9e382ed07470`). FinanceCore 3.0.0, FinanceModels 7.0.0 and ActuaryUtilities 6.0.0 come from General.
+
+To rebuild the post, use a checkout of `JuliaActuary/juliaactuary.org` containing this post and run from the repository root:
+
+```sh
+julia +1.13.1 --project=posts/2026-fall-releases --startup-file=no -e 'using Pkg; Pkg.instantiate()'
+quarto render posts/2026-fall-releases/index.qmd
+```
+
+Quarto must use Julia 1.13.1; select that version through Juliaup or set `QUARTO_JULIA` to its executable. The post's code activates the environment beside the source, and the website repository supplies the shared plot theme and assets. Three examples deliberately demonstrate exceptions and have `error: true`; the other blocks must execute successfully.
+
+The committed `_freeze/posts/2026-fall-releases/` directory records the executed output. `_site/posts/2026-fall-releases/` contains the rendered page and figures for the site's deployment workflow. A fresh explicit render executes the source; a frozen site build can reuse its outputs.
+
+Download `benchmarks.zip` for the benchmark harness, both pinned environments, raw run summaries, machine metadata and comparison notes. Benchmark reproduction uses separate environments from the post's plotting environment. See `benchmarks/README.md` in that archive for the commands and API mappings.

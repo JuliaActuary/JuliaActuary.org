@@ -1,0 +1,14 @@
+version	workload	minimum_ns	median_ns	allocations	bytes
+release	survival(Gompertz, 40, 60)	11.71971971971972	13.138138138138139	0	0
+release	survival(Beard, 40, 50) (numerical cumhazard)	558.6098901098901	642.4010989010989	6	512
+release	life_expectancy(Gompertz, 40)	5090.166666666667	5722.333333333333	6	880
+release	life_expectancy(Makeham, 65)	1866.7	2104.1	5	336
+release	life_expectancy(Weibull, 40)	2550.8888888888887	2884.222222222222	6	880
+release	life_expectancy(Kannisto, 80)	5500.0	6201.5	6	880
+release	survival(1980 CSO ult, 40, 60)	2.583	2.959	0	0
+release	survival(1980 CSO ult, 40.5, 60.25, Uniform)	9.25	10.375	0	0
+release	life_expectancy(1980 CSO ult, 40)	21.522567703109328	21.647943831494484	0	0
+release	decrement(1980 CSO ult, 40, 60)	2.833	3.209	0	0
+release	load table 1980 CSO (XTbML)	3718.75	4250.0	72	7952
+release	parse uncached XTbML ultimate	61292.0	70584.0	2758	151936
+release	parse uncached XTbML select and ultimate	1.253917e6	1.392292e6	65924	2984400

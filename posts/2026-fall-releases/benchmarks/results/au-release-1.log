@@ -1,0 +1,31 @@
+ActuaryUtilities at /Users/alecloudenback/.julia/packages/ActuaryUtilities/HMdzZ/src/ActuaryUtilities.jl | FinanceModels 7.0.0 | FinanceCore 3.0.0
+duration(Modified(), 0.04, cfs30, times30): 0.134 μs; 0 allocations
+duration(0.04, cfs30) (periods 1:n): 0.131 μs; 0 allocations
+duration(0.04, Cashflows30): 0.133 μs; 0 allocations
+duration(Macaulay(), Periodic(0.04, 2), cfs30, times30): 0.071 μs; 0 allocations
+convexity(Periodic(0.04, 2), cfs30, times30): 0.072 μs; 0 allocations
+duration(DV01(), 0.04, cfs30, times30): 0.133 μs; 0 allocations
+duration(DV01(), Continuous(0.04), cfs30, times30): 0.071 μs; 0 allocations
+duration(curve, cfs30, times30): 0.326 μs; 0 allocations
+duration(DV01(), curve, cfs30, times30): 0.328 μs; 0 allocations
+convexity(curve, cfs30, times30): 0.328 μs; 0 allocations
+duration(KeyRates, curve, cfs30, times30): 0.526 μs; 4 allocations
+sensitivities(KeyRates, curve, cfs30, times30): 0.612 μs; 10 allocations
+duration(IR01(), curve, credit, cfs30, times30): 0.491 μs; 0 allocations
+convexity(curve, credit, cfs30, times30): 0.49 μs; 0 allocations
+sensitivities(KeyRates, curve, credit, cfs30, times30): 0.741 μs; 10 allocations
+duration(callback, curve): 0.356 μs; 0 allocations
+convexity(callback, curve): 0.83 μs; 0 allocations
+duration(callback, DV01(), curve): 0.347 μs; 0 allocations
+duration(callback, IR01(), curve, credit): 1.05 μs; 0 allocations
+sensitivities(callback, KeyRates, curve): 4.565 μs; 29 allocations
+duration(Effective(), bond, curve): 0.324 μs; 0 allocations
+duration(Effective(), floater, curve): 0.934 μs; 0 allocations
+duration(Spread(), floater, curve): 0.792 μs; 0 allocations
+convexity(Effective(), floater, curve): 2.083 μs; 0 allocations
+sensitivities(KeyRates, bond, curve): 2.037 μs; 28 allocations
+sensitivities(KeyRates, floater, curve, credit): 4.113 μs; 28 allocations
+Hull-White key rates, 100 paths, 10y cashflows: 1361.875 μs; 1870 allocations
+irr(31 amounts): 0.493 μs; 0 allocations
+wasserstein(1000 Float64, 1000 Float64): 15.459 μs; 24 allocations
+wasserstein(1000 Int, 1000 Int; p = 2): 3.917 μs; 8 allocations

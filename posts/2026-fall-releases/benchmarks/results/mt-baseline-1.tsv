@@ -1,0 +1,14 @@
+version	workload	minimum_ns	median_ns	allocations	bytes
+baseline	survival(Gompertz, 40, 60)	165.07509881422925	202.733860342556	17	272
+baseline	survival(Beard, 40, 50) (numerical cumhazard)	10792.0	12417.0	1295	21584
+baseline	life_expectancy(Gompertz, 40)	73209.0	84375.0	7719	125584
+baseline	life_expectancy(Makeham, 65)	27458.0	31583.0	2957	48096
+baseline	life_expectancy(Weibull, 40)	33833.0	39416.0	3726	61184
+baseline	life_expectancy(Kannisto, 80)	48333.0	54958.0	5135	83616
+baseline	survival(1980 CSO ult, 40, 60)	2.666	2.959	0	0
+baseline	survival(1980 CSO ult, 40.5, 60.25, Uniform)	3.083	3.458	0	0
+baseline	life_expectancy(1980 CSO ult, 40)	561.9351351351352	581.081081081081	0	0
+baseline	decrement(1980 CSO ult, 40, 60)	2.833	3.209	0	0
+baseline	load table 1980 CSO (XTbML)	3781.25	4291.625	73	7968
+baseline	parse uncached XTbML ultimate	144500.0	163083.0	3252	160448
+baseline	parse uncached XTbML select and ultimate	2.7006625e7	2.7526375e7	78720	3410624

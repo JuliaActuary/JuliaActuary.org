@@ -1,0 +1,10 @@
+{
+  "timestamp": "2026-10-12T02:39:34.220164+00:00",
+  "platform": "macOS-27.0.1-arm64-arm-64bit-Mach-O",
+  "processor": "arm",
+  "julia": "julia version 1.13.1",
+  "seconds": 1.0,
+  "rounds": 1,
+  "threads": 1,
+  "cpu": "Apple M4 Max"
+}
