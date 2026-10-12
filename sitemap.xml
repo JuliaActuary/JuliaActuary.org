@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://JuliaActuary.org/blog.html</loc>
-    <lastmod>2025-06-14T19:05:26.432Z</lastmod>
+    <lastmod>2026-10-12T01:44:52.418Z</lastmod>
   </url>
   <url>
     <loc>https://JuliaActuary.org/packages.html</loc>
@@ -147,5 +147,9 @@
   <url>
     <loc>https://JuliaActuary.org/posts/optimal-transport-capital/index.html</loc>
     <lastmod>2026-08-07T04:24:17.655Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.org/posts/2026-fall-releases/index.html</loc>
+    <lastmod>2026-10-12T04:01:03.025Z</lastmod>
   </url>
 </urlset>
