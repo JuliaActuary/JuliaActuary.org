@@ -31,7 +31,7 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<link href=".//assets/favicon.ico" rel="icon">
+<link href=".//assets/logos/favicon.ico" rel="icon">
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
@@ -224,35 +224,16 @@ MortalityTable (Insured Lives Mortality):
         <span class="code-example-head">Working with Yield Curves</span>
   </div>
 
-<pre class="julia-repl"><code>
-julia&gt; using FinanceModels
+<pre class="julia"><code>using FinanceModels
 
-julia&gt; maturities = [0.5, 1.0, 1.5, 2.0]
-julia&gt; rates      = [5.0, 5.8, 6.4, 6.8] ./ 100
-julia&gt; quotes     = ZCBYield.(rates,maturities)
+maturities = [0.5, 1.0, 1.5, 2.0]
+rates = [5.0, 5.8, 6.4, 6.8] ./ 100
+quotes = ZCBYield.(rates, maturities)
 
-julia&gt; rf_curve = fit(Spline.Cubic(), quotes, Fit.Bootstrap())
-
-
-               ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀Yield Curve (FinanceModels.Yield.Spline)⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-               ┌────────────────────────────────────────────────────────────┐
-           0.4 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ Zero rates
-               │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-               │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-               │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⡠⠤⠒⠋│
-               │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⠤⠖⠊⠉⠁⠀⠀⠀⠀│
-               │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⡤⠔⠒⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-               │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⡠⠤⠒⠊⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-   Periodic(1) │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⡠⠤⠖⠊⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-               │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⡠⠤⠖⠊⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-               │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⡠⠤⠒⠊⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-               │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⡤⠤⠒⠋⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-               │⠀⠀⠀⠀⠀⠀⠀⣀⡠⠤⠖⠒⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-               │⠀⢀⡠⠤⠒⠋⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-               │⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-             0 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-               └────────────────────────────────────────────────────────────┘
-               ⠀0⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀time⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀30⠀</code></pre>
+curve = fit(Spline.Linear(), quotes, Fit.Bootstrap())
+discount(curve, 2.0)          # discount factor to year 2
+zero(curve, 1.5)              # continuously compounded zero rate
+forward(curve, 1.0, 2.0)      # rate between years 1 and 2</code></pre>
 
 
         </div></li>
@@ -268,17 +249,17 @@ julia&gt; using ActuaryUtilities
 julia&gt; cashflows = [5, 5, 105]
 julia&gt; discount_rate = 0.03
 
-julia&gt; present_value(discount_rate, cashflows)           
-105.65
+julia&gt; round(present_value(discount_rate, cashflows); digits=2)
+105.66
 
-julia&gt; duration(Macaulay(), discount_rate, cashflows)    
+julia&gt; round(duration(Macaulay(), discount_rate, cashflows); digits=2)
 2.86
 
-julia&gt; duration(discount_rate, cashflows)                
+julia&gt; round(duration(discount_rate, cashflows); digits=2)
 2.78
 
-julia&gt; convexity(discount_rate, cashflows)               
-10.62</code></pre>
+julia&gt; round(convexity(discount_rate, cashflows); digits=2)
+10.63</code></pre>
 
 
         </div></div></li>
@@ -290,7 +271,7 @@ julia&gt; convexity(discount_rate, cashflows)
   </div>
 <pre class="julia"><code>using LifeContingencies
 using MortalityTables
-using FinanceModels
+using FinanceCore
 
 # load mortality rates from MortalityTables.jl
 vbt2015 = MortalityTables.table("2015 VBT Smoker Distinct Male Non-Smoker ALB")
@@ -300,7 +281,7 @@ life = SingleLife(                       # The life underlying the risk
     mortality = vbt2015.select[issue_age],    # -- Mortality rates
 )
 
-yield = Yield.Constant(0.05)            # Using a flat 5% interest rate
+yield = Periodic(0.05, 1)            # Using a flat 5% interest rate
 
 lc = LifeContingency(life, yield)        # combine the life with the yield
 ins = Insurance(lc)                      # alternate way to construct: Insurance(life, yield)
@@ -326,16 +307,17 @@ LifeContingencies.V(lc,5)                # Net premium reserve for whole life in
     </div>
 </div>
     
+<p>The life-contingency example uses the compatible LifeContingencies 2.5 / FinanceCore 2 / MortalityTables 2 environment. See <a href="./packages.html#current-releases">package compatibility</a> before combining it with the newer finance and mortality releases.</p>
 </section>
 <section id="packages" class="level2">
 <h2 class="anchored" data-anchor-id="packages">Packages</h2>
-<p>These packages are available for use in your project. See more on the <a href="./packages.html">Packages page</a>.</p>
+<p>See the <a href="./packages.html#current-releases">current releases and migration guides</a>, including the Julia 1.10 minimum for the latest finance and mortality packages.</p>
 <p><a href="./packages.html#mortalitytables.jl"><code>MortalityTables.jl</code></a> - Easily work with standard <a href="https://mort.soa.org/">mort.SOA.org</a> tables and parametric models with common survival calculations.</p>
 <p><a href="./packages.html#lifecontingencies.jl"><code>LifeContingencies.jl</code></a> - Insurance, annuity, premium, and reserve maths.</p>
 <p><a href="./packages.html#actuaryutilities.jl"><code>ActuaryUtilities.jl</code></a> - Robust and fast calculations for <code>internal_rate_of_return</code>, <code>duration</code>, <code>convexity</code>, <code>present_value</code>, <code>breakeven</code>, and AD-based key rate <code>sensitivities</code>.</p>
 <p><a href="./packages.html#financemodels.jl"><code>FinanceModels.jl</code></a> - Composable contracts, models, and functions for financial instruments — including stochastic short-rate models and Monte Carlo simulation.</p>
 <p><a href="./packages.html#experienceanalysis.jl"><code>ExperienceAnalysis.jl</code></a> - Meeting your exposure calculation needs.</p>
-<p><a href="./packages.html#economicscenariogenerators.jl"><code>EconomicScenarioGenerators.jl</code></a> - Easy-to-use scenario generation that’s FinanceModels.jl compatible.</p>
+<p><a href="./packages.html#economicscenariogenerators.jl"><code>EconomicScenarioGenerators.jl</code></a> - Scenario generation for existing ESG workflows. For current short-rate models, see FinanceModels 7 and the <a href="./packages.html#economicscenariogenerators.jl">compatibility notes</a>.</p>
 
 
 </section>

@@ -17,6 +17,12 @@ Pkg.instantiate()
 using CSV, DataFrames, PrettyTables, CairoMakie
 ```
 
+## Current package benchmarks
+
+The [fall 2026 release benchmarks](/posts/2026-fall-releases/index.qmd#performance-and-tradeoffs) compare FinanceCore 3, FinanceModels 7, ActuaryUtilities 6 and MortalityTables 3 with the preceding releases. They include scripts, environments and raw results, with Julia timings taken from the minimum of warmed BenchmarkTools trials across repeated runs. The [QuantLib comparison](/posts/quantlib-comparison/index.qmd) covers matched cashflow and sensitivity calculations.
+
+The cross-language measurements below are historical results from the linked benchmark studies. They have not been rerun for the current package releases; their speed ratios describe those original environments.
+
 ## The Life Modeling Problem
 
 Inspired by the discussion in the [ActuarialOpenSource](https://github.com/actuarialopensource) GitHub community discussion, folks started submitted solutions to what someone referred to as the "Life Modeling Problem". This user [submitted a short snippet](https://github.com/orgs/actuarialopensource/teams/common-room/discussions/5) for consideration of a representative problem.

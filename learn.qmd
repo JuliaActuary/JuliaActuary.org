@@ -8,7 +8,7 @@ toc: true
 
 ## Installation
 
-After installing Julia from the official website, head to the [Packages](packages.qmd) to see how to install JuliaActuary packages.
+Install Julia 1.10 or newer for the current FinanceCore, FinanceModels, ActuaryUtilities and MortalityTables releases. Then see [Packages](packages.qmd#current-releases) for installation, version compatibility and migration guides.
 
 ## Documentation
 
@@ -41,44 +41,25 @@ If you have other ideas or questions, join the [JuliaActuary Github Discussions]
 You can also access help text when using the packages in the REPL by [activating help mode](https://docs.julialang.org/en/v1/stdlib/REPL/index.html#Help-mode-1), e.g.:
 
 ```julia-repl
-julia> ? survival
-    survival(mortality_vector,to_age)
-    survival(mortality_vector,from_age,to_age)
+julia> using MortalityTables
 
-
-  Returns the survival through attained age to_age. The start of the 
-  calculation is either the start of the vector, or attained age `from_age` 
-  and `to_age` need to be Integers. 
-
-  Add a DeathDistribution as the last argument to handle floating point 
-  and non-whole ages:
-
-    survival(mortality_vector,to_age,::DeathDistribution)
-    survival(mortality_vector,from_age,to_age,::DeathDistribution)
-
-
-  If given a negative to_age, it will return 1.0. Aside from simplifying the code, 
-  this makes sense as for something to exist in order to decrement in the first place, 
-  it must have existed and survived to the point of being able to be decremented.
-
-  Examples
-  ≡≡≡≡≡≡≡≡≡≡
-
-  julia> qs = UltimateMortality([0.1,0.3,0.6,1]);
-
-  julia> survival(qs,0)
-  1.0
-  julia> survival(qs,1)
-  0.9
-
-  julia> survival(qs,1,1)
-  1.0
-  julia> survival(qs,1,2)
-  0.7
-
-  julia> survival(qs,0.5,Uniform())
-  0.95
+help?> survival
 ```
+
+The help text describes survival for a rate vector or a parametric mortality law. For tables, pass `table.ultimate` or `table.select[issue_age]`. Fractional ages use `UniformDeaths()`, `ConstantForce()`, or `Balducci()`:
+
+```julia-repl
+julia> qs = UltimateMortality([0.1, 0.3, 0.6, 1.0]);
+
+julia> survival(qs, 0, 1)
+0.9
+
+julia> survival(qs, 0, 0.5, UniformDeaths())
+0.95
+```
+
+An age outside a table raises `BoundsError`. A reversed interval returns the reciprocal survival factor, which can exceed one; it is an accumulation factor, not a probability. See the [MortalityTables documentation](https://docs.juliaactuary.org/MortalityTables/stable/).
+
 
 
 ## Integration with R and Python

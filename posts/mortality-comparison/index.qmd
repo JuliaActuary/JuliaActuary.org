@@ -9,6 +9,8 @@ Scroll down below the sample video to see how to run it.
 
 The recording above shows a [Pluto.jl](https://github.com/fonsp/Pluto.jl) notebook visualizing the difference between different mortality tables.
 
+The linked notebook pins MortalityTables 2.6. For MortalityTables 3, see the [current table API](/packages.qmd#mortalitytables.jl) and [release notes](https://github.com/JuliaActuary/MortalityTables.jl/blob/v3.0.0/NEWS.md), including the renamed fractional-age assumptions.
+
 ## Instructions to Run
 
 Because JuliaActuary doesn't have an active server to run this on, you have to run it locally.
@@ -26,5 +28,5 @@ using Pluto; Pluto.run()
 2.  In the Pluto window that opens, enter this URL into the `Open from file:` box:
 
 ```         
-https://raw.githubusercontent.com/JuliaActuary/Learn/master/MortalityTableComparison.jl
+https://raw.githubusercontent.com/JuliaActuary/Learn/master/pluto_live_notebooks/MortalityTableComparison.jl
 ```

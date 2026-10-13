@@ -40,7 +40,7 @@ These packages are available for use in your project. Scroll down for more infor
 </td>
 <td style="vertical-align: top;">
    <p><strong><a href="/packages.html#economicscenariogenerators.jl">EconomicScenarioGenerators.jl</a></strong></p>
-<p>Easy-to-use scenario generation that's FinanceModels.jl compatible.</p>
+<p>Scenario iterators for existing ESG workflows; see version compatibility below.</p>
 </td>
 
 </tr>
@@ -50,6 +50,24 @@ These packages are available for use in your project. Scroll down for more infor
 ::: callout-tip
 For consistency, you can lock any package in its current state and not worry about breaking changes to any code that you write. Julia's package manager lets you [exactly recreate a set of code and its dependencies](https://julialang.github.io/Pkg.jl/v1/toml-files/#Manifest.toml-1). [More information](https://stackoverflow.com/questions/63485891/how-do-i-ensure-repeatability-of-julia-code-and-assoicated-dependencies).
 :::
+
+## Current releases
+
+Checked against the Julia General registry on October 12, 2026:
+
+| Package | Latest registered release | Documentation |
+|---|---|---|
+| FinanceCore | 3.0.0 | [Guide](https://docs.juliaactuary.org/FinanceCore/stable/) |
+| FinanceModels | 7.0.1 | [Migration guide](https://docs.juliaactuary.org/FinanceModels/stable/migration/) |
+| ActuaryUtilities | 6.0.0 | [Upgrade guide](https://docs.juliaactuary.org/ActuaryUtilities/stable/upgrade/) |
+| MortalityTables | 3.0.0 | [Release notes](https://github.com/JuliaActuary/MortalityTables.jl/blob/v3.0.0/NEWS.md) |
+| ExperienceAnalysis | 2.0.2 | [Guide](https://docs.juliaactuary.org/ExperienceAnalysis/stable/) |
+| LifeContingencies | 2.5.0 | [Guide](https://docs.juliaactuary.org/LifeContingencies/stable/) |
+| EconomicScenarioGenerators | 0.7.0 | [Repository](https://github.com/JuliaActuary/EconomicScenarioGenerators.jl) |
+
+FinanceModels 7, ActuaryUtilities 6, FinanceCore 3 and MortalityTables 3 work together and require Julia 1.10 or newer. The [fall release overview](/posts/2026-fall-releases/index.qmd) explains the breaking changes and gives worked examples.
+
+LifeContingencies 2.5 requires FinanceCore 2 and MortalityTables 1 or 2. Use a separate project for its examples. EconomicScenarioGenerators 0.7 supports FinanceCore 2 or 3, but its optional FinanceModels integration requires FinanceModels 6; version 0.7.1 with FinanceModels 7 compatibility is not yet registered. For short-rate simulation with FinanceModels 7, use its `ShortRate` models, `simulate` and `pv_mc` directly.
 
 ## Adding and Using Packages
 
@@ -73,9 +91,9 @@ using PackageName
 
 ### Features
 
-- Full set of SOA mort.soa.org tables included
+- Bundled mort.soa.org data, with loaders for supported mortality-table layouts
 - `survival` and `decrement` functions to calculate decrements over period of time
-- Partial year mortality calculations (Uniform, Constant, Balducci)
+- Partial-year mortality calculations (`UniformDeaths`, `ConstantForce`, `Balducci`)
 - Friendly syntax and flexible usage
 - Extensive set of parametric mortality models.
 
@@ -84,6 +102,8 @@ using PackageName
 Load and see information about a particular table:
 
 ```julia
+julia> using MortalityTables
+
 julia> vbt2001 = MortalityTables.table("2001 VBT Residual Standard Select and Ultimate - Male Nonsmoker, ANB")
 
 MortalityTable (Insured Lives Mortality):
@@ -130,34 +150,37 @@ julia> vbt2001.ultimate[95]        # ultimate vectors only need to be called wit
  0.24298
 ```
 
-Calculate the force of mortality or survival over a range of time:
+Calculate survival and death probabilities over a range of ages:
 
 ```julia
 julia> survival(vbt2001.ultimate,30,40) # the survival between ages 30 and 40
 0.9894404665434904
 
 julia> decrement(vbt2001.ultimate,30,40) # the decrement between ages 30 and 40
-0.010559533456509618
+0.010559533456509524
 ```
 
-Non-whole periods of time are supported when you specify the assumption (`Constant()`, `Uniform()`, or `Balducci()`) for fractional periods:
+Non-whole periods of time are supported when you specify the assumption (`ConstantForce()`, `UniformDeaths()`, or `Balducci()`) for fractional periods:
 
 ```julia
-julia> survival(vbt2001.ultimate,30,40.5,Uniform()) # the survival between ages 30 and 40.5
+julia> survival(vbt2001.ultimate,30,40.5,UniformDeaths()) # the survival between ages 30 and 40.5
 0.9887676470262408
 ```
 
 ### Parametric Models
 
-Over 20 different models included. Example with the `Gompertz` model
+Parametric laws include `Gompertz`, `Makeham`, `Weibull`, and the new `Gompertz2`, `Makeham2`, `Carriere1` and `Carriere2` models. A law describes an instantaneous force of mortality; use `decrement` to obtain a probability over an age interval. For example:
 
 ```julia
 m = MortalityTables.Gompertz(a=0.01,b=0.2)
 
-m[20]                 # the mortality rate at age 20
+hazard(m, 20)          # instantaneous force of mortality at age 20
+decrement(m, 20, 21)   # probability of death between ages 20 and 21
 decrement(m,20,25)    # the five year cumulative mortality rate
 survival(m,20,25) # the five year survival rate
 ```
+
+Use `curtate_life_expectancy(model_or_rates, age)` for expected complete future years, or `complete_life_expectancy(model_or_rates, age)` for expected remaining time including fractional years. These replace `life_expectancy` in version 3. Loading a CSV table requires `using CSV` to activate the extension.
 
 [MortalityTables package on Github 🡭](https://github.com/JuliaActuary/MortalityTables.jl)
 
@@ -171,15 +194,17 @@ A collection of common functions/manipulations used in Actuarial Calculations.
 ### Quickstart
 
 ```julia
+using ActuaryUtilities
+
 cfs = [5, 5, 105]
 times    = [1, 2, 3]
 
 discount_rate = 0.03
 
-present_value(discount_rate, cfs, times)           # 105.65
+present_value(discount_rate, cfs, times)           # ≈ 105.66
 duration(Macaulay(), discount_rate, cfs, times)    #   2.86
 duration(discount_rate, cfs, times)                #   2.78
-convexity(discount_rate, cfs, times)               #  10.62
+convexity(discount_rate, cfs, times)               # ≈ 10.63
 ```
 
 ### Features
@@ -187,25 +212,30 @@ convexity(discount_rate, cfs, times)               #  10.62
 #### Financial Maths
 
 - `duration`:
-  - Calculate the `Macaulay`, `Modified`, or `DV01` durations for a set of cashflows
+  - `Macaulay()` and `Modified()` duration for fixed cashflows; `duration(DV01(), ...)` gives signed dollar value lost per basis-point increase
 - `convexity` for price sensitivity
 - Flexible interest rate options via the [`FinanceModels.jl`](https://github.com/JuliaActuary/FinanceModels.jl) package.
 - `internal_rate_of_return` or `irr` to calculate the IRR given cashflows (including at timepoints like Excel's `XIRR`)
 - `breakeven` to calculate the breakeven time for a set of cashflows
 - `accum_offset` to calculate accumulations like survivorship from a mortality vector
 
-#### Key Rate Sensitivities via Automatic Differentiation
+#### Sensitivities via Automatic Differentiation
 
-Compute exact key rate durations, DV01s, and convexities using ForwardDiff through `ZeroRateCurve` from FinanceModels.jl — machine-precision sensitivities in a single pass, no bump-and-reprice required.
+`sensitivities(curve, cashflows, times)` returns value, duration and signed DV01 for a parallel continuous-rate shift. Add `KeyRates(tenors)` for exposures to a chosen tenor grid, and `SecondOrder()` for convexity and dollar convexity:
 
-- `sensitivities`: bundled value, key rate durations, and convexity matrix in a single AD pass
-- Two-curve decomposition: separate `IR01` (risk-free) and `CS01` (credit spread) sensitivities
-- Do-block syntax for rate-dependent instruments (callable bonds, floaters)
-- Hull-White stochastic model: key rate sensitivities of Monte Carlo expected values
+```julia
+using ActuaryUtilities, FinanceModels
 
-#### Options Pricing
+curve = ZeroRateCurve([0.03, 0.04, 0.045], [1.0, 5.0, 10.0])
+cashflows, times = [5.0, 5.0, 105.0], [1.0, 2.0, 3.0]
+risk = sensitivities(SecondOrder(), KeyRates([1.0, 5.0, 10.0]), curve, cashflows, times)
+risk.dv01
+```
 
-- `eurocall` and `europut` for Black-Scholes option prices
+- Value and derivatives share the same valuation; automatic differentiation avoids a finite-difference bump size. Accuracy still depends on the model, interpolation and any calibration tolerances.
+- Valuation callbacks support rate-dependent cashflows and separate discount, index and credit roles. The `IR01()` and `CS01()` callback forms distinguish base-rate and credit-spread exposure. For fixed cashflows discounted by `base + credit`, both equal `duration(DV01(), base + credit, cashflows, times)`.
+- Contracts use effective duration by default, including how index rates affect their cashflows. Fixed-cashflow and contract APIs are described in the [upgrade guide](https://docs.juliaactuary.org/ActuaryUtilities/stable/upgrade/).
+- Callbacks can differentiate through calibrated market quotes; Hull–White paths support sensitivities of the simulated valuation with fixed random draws.
 
 #### Risk Measures
 
@@ -215,8 +245,7 @@ Compute exact key rate durations, DV01s, and convexities using ForwardDiff throu
 
 #### Insurance mechanics
 
-- `duration`:
-  - Calculate the duration given an issue date and date (a.k.a. policy duration)
+- `policy_duration(issue_date, date)` calculates the policy year; the former date-based `duration` method was renamed in version 6.
 
 [ActuaryUtilities package on GitHub 🡭](https://github.com/JuliaActuary/ActuaryUtilities.jl)
 
@@ -244,20 +273,20 @@ the mortality calculations
   - `ä(life,yield,n)`: `present_value` of life-contingent annuity due for `n` years
 - Contains various commutation functions such as `D(x)`,`M(x)`,`C(x)`, etc.
 - `SingleLife` and `JointLife` capable
-- Interest rate mechanics via [`FinanceModels.jl`](https://github.com/JuliaActuary/FinanceModels.jl)
-- More documentation available by clicking the DOCS badges at the top of this README
+- Interest rate mechanics via FinanceCore; compatible FinanceModels curves can also be used
+- [LifeContingencies documentation](https://docs.juliaactuary.org/LifeContingencies/stable/)
 
 ### Examples
 
 #### Basic Functions
 
-Calculate various items for a 30-year-old male nonsmoker using 2015 VBT base table and a 5% interest rate
+In a separate project with LifeContingencies 2.5, FinanceCore 2 and MortalityTables 2, calculate values for a 30-year-old male nonsmoker using the 2001 VBT table and a 5% annual effective interest rate. `Pkg.add(["LifeContingencies", "FinanceCore", "MortalityTables"])` resolves that compatible set in an empty project.
 
 ```julia
 
 using LifeContingencies
 using MortalityTables
-using FinanceModels
+using FinanceCore
 import LifeContingencies: V, ä     # pull the shortform notation into scope
 
 # load mortality rates from MortalityTables.jl
@@ -268,7 +297,7 @@ life = SingleLife(                 # The life underlying the risk
     mortality = vbt2001.select[issue_age],    # -- Mortality rates
 )
 
-yield = FinanceModels.Yield.Constant(0.05) 
+yield = Periodic(0.05, 1)
 
 lc = LifeContingency(life, yield)  # LifeContingency joins the risk with interest
 
@@ -383,7 +412,7 @@ Existing `struct`s:
 - `Bond.Floating`
 - `Forward` (an obligation with a forward start time)
 - `Composite` (combine two other contracts, e.g. into a swap)
-- `EuroCall`
+- `Option.EuroCall`, `Option.EuroPut`
 - `CommonEquity`
 - `Option.Cap`, `Option.Floor`, `Option.Swaption` (interest rate derivatives)
 
@@ -393,7 +422,8 @@ Commonly, we deal with conventions that imply a contract and an observed price. 
 - `ZCBPrice`
 - `CMTYield`
 - `ParYield`
-- `ParSwapYield`
+- `ParSwapYield` (supply `frequency` explicitly)
+- `OISYield`
 - `ForwardYield`
 
 FinanceModels offers a way to define new contracts as well.
@@ -412,7 +442,7 @@ Models are objects that can be fit to observed prices and then subsequently used
 Yield models include:
 
 - `Yield.Constant`
-- Bootstrapped `Spline`s
+- `ZeroRateCurve` for direct interpolation; `Spline.Linear()` for exact bootstrapping and `Fit.Loss` for other spline fits
 - `Yield.SmithWilson`
 - `Yield.NelsonSiegel`
 - `Yield.NelsonSiegelSvensson`
@@ -443,7 +473,7 @@ Construct a zero-rate curve directly from rates and tenors without fitting:
 
 Other models include:
 
-- `BlackScholesMerton` derivative valuation
+- `Equity.BlackScholesMerton` derivative valuation and the qualified `FinanceModels.eurocall` / `FinanceModels.europut` pricing functions
 
 
 ### Projections
@@ -464,11 +494,19 @@ julia> collect(b)
  Cashflow{Float64, Float64}(1.02, 3.0)
 ```
 
-However, `Projection`s allow one to combine three elements which can be extended to define any desired output (such as amortization schedules, financial statement projections, or account value rollforwards). The three elements are:
+For a contract whose cashflows depend on a model, construct a valuation context. `Models(discount; index)` supplies the discount curve and the curve used to project floating payments:
 
-- the underlying **contract** of interest
-- the **model** which includes assumptions of how the contract will behave
-- a `ProjectionKind` which indicates the kind of output desired (cashflow stream, amortization schedule, etc...)
+```julia
+discount_curve = Yield.Constant(0.03)
+index_curve = Yield.Constant(0.04)
+floater = Bond.Floating(0.01, Periodic(4), 2.0, :index)
+ctx = Models(discount_curve; index = index_curve)
+
+present_value(ctx, floater)              # value the contract under the context
+collect(Projection(floater, ctx))        # inspect its projected cashflows
+```
+
+Custom contracts can provide a cashflow projection or a closed-form `present_value(ctx, contract)` method. See the [FinanceModels migration guide](https://docs.juliaactuary.org/FinanceModels/stable/migration/) for extending the current interface.
 
 ### Fitting Models
 
@@ -477,18 +515,20 @@ However, `Projection`s allow one to combine three elements which can be extended
        Model                                                               Method
           |                                                                   |
   	|------------|                                                     |---------------|
-fit(Spline.Cubic(), CMTYield.([0.04,0.05,0.055,0.06,0.065],[1,2,3,4,5]), Fit.Bootstrap())
+fit(Spline.Linear(), CMTYield.([0.04,0.05,0.055,0.06,0.065],[1,2,3,4,5]), Fit.Bootstrap())
                     |-------------------------------------------------|
                                               |
                                               Quotes
 ```
 
  - **Model** could be `Spline.Linear()`, `Yield.NelsonSiegelSvensson()`, `Equity.BlackScholesMerton(...)`, etc.
- - **Quote** could be `CMTYield`s, `ParYield`s, `Option.EuroCall`, etc.
+ - **Quote** could be built by `CMTYield` or `ParYield`, or explicitly as `Quote(price, Option.EuroCall(...))`.
  - **Method** could be `Fit.Loss(x->x^2)`, `Fit.Loss(x->abs(x))`, `Fit.Bootstrap()`, etc.
 
 
-This unified way to fit models offers a much simpler way to extend functionality to new models or contract types.
+`Fit.Bootstrap()` supports linear splines only. Fit quadratic, cubic and other interpolation strategies to all quotes with `Fit.Loss(x -> x^2)`, or construct `ZeroRateCurve` directly when the inputs are already zero rates. Spline curves hold the first zero rate flat before the first knot and use flat-forward extrapolation beyond the last knot by default.
+
+`implied_quote(curve, CMTYield, maturity)` reads an instrument quote from a curve. `Yield.Blend` combines curves in discount-factor, zero-rate or forward-rate space; its weights represent a blend rather than adding two full discount curves.
 
 #### Using Models
 
@@ -498,7 +538,7 @@ After being fit, models can be used to value contracts:
 present_value(model,cashflows)
 ```
 
-Additionally, [ActuaryUtilities.jl](https://github.com/JuliaActuary/ActuaryUtilities.jl) offers a number of other methods that can be used, such as `duration`, `convexity`, `price` which can be used for analysis with the fitted models.
+Additionally, [ActuaryUtilities.jl](https://github.com/JuliaActuary/ActuaryUtilities.jl) offers a number of other methods that can be used, such as `duration`, `convexity` and `sensitivities` which can be used for analysis with the fitted models.
 
 ### Rates
 
@@ -535,7 +575,7 @@ Continuous()(0.05)
 Convert rates between different types with `convert`. E.g.:
 
 ```julia-repl
-r = Rate(FinanceModels.Periodic(12),0.01)             # rate that compounds 12 times per rate period (ie monthly)
+r = Rate(0.01, FinanceModels.Periodic(12))             # rate that compounds 12 times per rate period (ie monthly)
 
 convert(FinanceModels.Periodic(1),r)                  # convert monthly rate to annual effective
 convert(FinanceModels.Continuous(),r)          # convert monthly rate to continuous
@@ -543,7 +583,7 @@ convert(FinanceModels.Continuous(),r)          # convert monthly rate to continu
 
 #### Arithmetic
 
-Adding, substracting, multiplying, dividing, and comparing rates is supported.
+Rate arithmetic preserves the compounding convention. Convert rates to the same frequency before adding or comparing different conventions, for example `annual + convert(Periodic(1), continuous)`. Multiplying a rate by a scalar scales its quoted rate. Adding yield curves has a different meaning: it multiplies their discount factors.
 
 
 [FinanceModels package on GitHub 🡭](https://github.com/JuliaActuary/FinanceModels.jl)
@@ -561,6 +601,8 @@ Adding, substracting, multiplying, dividing, and comparing rates is supported.
 ### Quickstart
 
 ```julia
+using ExperienceAnalysis, DataFrames, Dates, DayCounts
+
 df = DataFrame(
     policy_id = 1:3,
     issue_date = [Date(2020,5,10), Date(2020,4,5), Date(2019, 3, 10)],
@@ -621,77 +663,19 @@ Calculate exposures with `exposure(basis, from, to, continued_exposure; study_st
 
 ## EconomicScenarioGenerators.jl
 
-> Easy-to-use scenario generation that's FinanceModels.jl compatible.
+EconomicScenarioGenerators 0.7 provides iterators for Vasicek, Cox–Ingersoll–Ross, Hull–White and equity scenarios. Its registered FinanceModels extension currently supports FinanceModels 6. Version 0.7.1 is planned to add FinanceModels 7 compatibility; see the [repository](https://github.com/JuliaActuary/EconomicScenarioGenerators.jl) for its status.
 
-
-### Models
-
-#### Interest Rate Models
-
-- `Vasicek`
-- `CoxIngersollRoss`
-- `HullWhite`
-
-#### EquityModels
-
-- `BlackScholesMerton`
-
-### Interest Rate Model Examples
-
-#### Vasicek
+For interest-rate scenarios in a FinanceModels 7 project, use its built-in models and paths:
 
 ```julia
-m = Vasicek(0.136,0.0168,0.0119,Continuous(0.01)) # a, b, σ, initial Rate
-s = ScenarioGenerator(
-        1,  # timestep
-        30, # projection horizon
-        m,  # model
-    )
+using FinanceModels, Random
+
+model = ShortRate.Vasicek(0.136, 0.0168, 0.0119, Continuous(0.01))
+paths = simulate(model; n_scenarios = 100, timestep = 1 / 12,
+    horizon = 30.0, rng = Xoshiro(2026))
+discount(first(paths), 10.0)
 ```
 
-This can be iterated over, or you can collect all of the rates like:
+A simulated path is defined on its simulated time grid, so choose a horizon covering every payment you value. `short_rate(path, t)` reads the simulated rate at a grid point; it is different from the forward rate between two times. Use `pv_mc` to value contracts across paths.
 
-```julia
-rates = collect(s)
-```
-
-or 
-
-```julia
-for r in s
-    # do something with r
-end
-```
-
-And the package integrates with [FinanceModels.jl](https://github.com/JuliaActuary/FinanceModels.jl):
-
-```julia
-YieldCurve(s)
-
-```
-
-will produce a yield curve object:
-
-```julia-repl
-              ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀Yield Curve (FinanceModels.Yield.Spline)⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-              ┌────────────────────────────────────────────────────────────┐           
-         0.03 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⠤⠤⠔⠒⠉⠉⠒⠒⠒⠒⠒⠤⣄⣀│ Zero rates
-              │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⠤⠒⠒⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│           
-              │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⠔⠊⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│           
-              │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⠔⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│           
-              │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣀⠀⠀⣀⡤⠖⠊⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│           
-              │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⠤⠖⠋⠁⠀⠀⠉⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│           
-              │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⠔⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│           
-   Continuous │⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⡤⠒⠓⠦⠤⠖⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│           
-              │⠀⠀⠀⠀⠀⠀⠀⢰⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│           
-              │⠀⠀⣀⠖⠢⡀⡰⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│           
-              │⠉⠉⠁⠀⠀⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│           
-              │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│           
-              │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│           
-              │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│           
-            0 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│           
-              └────────────────────────────────────────────────────────────┘           
-              ⠀0⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀time⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀30⠀           
-```
-
-[EconomicScenarioGenerators package on GitHub 🡭](https://github.com/JuliaActuary/EconomicScenarioGenerators.jl)
+Existing ESG users can keep `ScenarioGenerator` and `YieldCurve` in a compatible FinanceModels 6 environment. Correlated and equity scenarios are planned for FinanceModels 7.1; they are not part of the 7.0 release.

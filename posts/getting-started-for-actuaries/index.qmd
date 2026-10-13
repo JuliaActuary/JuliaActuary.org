@@ -7,7 +7,7 @@ categories: [industry,blog,statistics,bayesian]
 ---
 
 
-The previously published article titled [Julia for Actuaries](/blog/julia-actuaries) gave a longer introduction to why Julia works so well in actuarial workflows. In summary: Julia's attributes are "evident in its pragmatic, productivity-focused design choices, pleasant syntax, rich ecosystem, thriving communities, and its ability to be both very general purpose and power cutting edge computing".
+The previously published article titled [Julia for Actuaries](/posts/julia-for-actuaries/index.qmd) gave a longer introduction to why Julia works so well in actuarial workflows. In summary: Julia's attributes are "evident in its pragmatic, productivity-focused design choices, pleasant syntax, rich ecosystem, thriving communities, and its ability to be both very general purpose and power cutting edge computing".
 
 This is the second in the following trilogy of articles:
 
@@ -27,7 +27,7 @@ There are three main reasons to consider using Julia:
 
 3) **The language, tooling, and ecosystem is very modern, mature, and powerful.** A built-in package manager, packages that work together without needing to know about each other, differentiable programming, meta-programming (macros), first-class GPU/parallel support, and wide range of packages relevant to actuarial workloads.
 
-More detail of why Julia works so well in actuarial contexts was discussed in the prior article, [Julia for Actuaries](/blog/julia-actuaries). The rest of this article is going to focus on getting oriented to using Julia, and the next article in the series will introduce actuarial packages available.
+More detail of why Julia works so well in actuarial contexts was discussed in the prior article, [Julia for Actuaries](/posts/julia-for-actuaries/index.qmd). The rest of this article is going to focus on getting oriented to using Julia, and the next article in the series will introduce actuarial packages available.
 
 ## The language itself
 

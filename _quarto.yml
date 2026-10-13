@@ -6,7 +6,7 @@ julia:
 
 website:
   title: "JuliaActuary"
-  favicon: /assets/favicon.ico
+  favicon: /assets/logos/favicon.ico
   site-url: "https://JuliaActuary.org"
   navbar:
     logo: /assets/logos/android-chrome-512x512.png

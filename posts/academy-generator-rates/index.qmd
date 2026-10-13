@@ -15,6 +15,8 @@ Scroll down below the sample video to see how to run it.
 
 The recording above shows a [Pluto.jl](https://github.com/fonsp/Pluto.jl) notebook manipulating the long-rate mean reversion parameter of the stochastic interest rate process (with the full curve interpolated via a Nelson-Siegel functional form), based on the American Academy of Actuaries' (AAA) [Economic Scenario Generator](https://www.actuary.org/content/economic-scenario-generators) (ESG).
 
+The linked notebook embeds an older environment with ActuaryUtilities 2.2.3 and Yields 0.5. For the current AAA example, see [Academy generator scenarios and validation](/posts/academy-generator/index.qmd). For FinanceModels 7 short-rate simulation, see [the package guide](/packages.qmd#economicscenariogenerators.jl).
+
 ## Instructions to Run
 
 Because JuliaActuary doesn't have a beefy server to run this on and let anybody run/visualize thousands of stochastic scenarios, for this one you have to run it locally. Assuming that you already have Julia installed but still need to install Pluto notebooks:

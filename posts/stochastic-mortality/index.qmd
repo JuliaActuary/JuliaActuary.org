@@ -98,7 +98,7 @@ This is using a threaded approach where it could be operating on any of the comp
 ```{julia}
 function pol_project!(benefits, lives, policy, params)
     # some starting values for the given policy
-    dur = duration(policy.issue_date, params.val_date)
+    dur = policy_duration(policy.issue_date, params.val_date)
     start_age = policy.issue_age + dur - 1
     COLA_factor = 1 + policy.COLA
     cur_benefit = policy.benefit_base * COLA_factor^(dur - 1)
@@ -179,7 +179,7 @@ project(repeat(policies, 100_000), params)
 
 ## Benchmarking
 
-Using a Macbook Air M3 laptop, about 45 million policies able to be stochastically projected per second:
+The original benchmark on a MacBook Air M3 laptop projected about 45 million policies per second. This memory-intensive benchmark is not rerun when rendering the page, so that number describes the original environment rather than the current package releases:
 
 ```{julia}
 #| eval: false

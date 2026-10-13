@@ -176,7 +176,7 @@ end
 ::: {.callout-note collapse="true"}
 ## Consolidating Cashflows
 
-Later on we will generate vectors of vectors of cashflows without any guarantee that the timepoints will line up, making aggregating cashflows by timepoints a non-obvious task. There are many ways to accomplish this, but [I like Transducers](https://juliaactuary.github.io/FinanceModels.jl/dev/faq/#Why-does-the-package-rely-on-using-Transducers?). 
+Later on we will generate vectors of vectors of cashflows without any guarantee that the timepoints will line up, making aggregating cashflows by timepoints a non-obvious task. There are many ways to accomplish this, but [I like Transducers](https://docs.juliaactuary.org/FinanceModels/stable/faq/#Why-does-the-package-rely-on-using-Transducers?).
 
 Transducers are unfamiliar to many people, and don't let the presence deter you from the main points of this post. The details aren't central to the point of this blog post so just skip over if confusing.
 

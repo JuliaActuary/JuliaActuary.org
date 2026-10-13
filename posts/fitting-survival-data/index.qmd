@@ -1,5 +1,5 @@
 ---
-title: "Fitting survival data with MortaltityTables.jl"
+title: "Fitting survival data with MortalityTables.jl"
 categories: [survival, tutorial]
 ---
 ```{julia}

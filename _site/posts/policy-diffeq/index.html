@@ -31,7 +31,7 @@ ul.task-list li input[type="checkbox"] {
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
-<link href="../..//assets/favicon.ico" rel="icon">
+<link href="../..//assets/logos/favicon.ico" rel="icon">
 <script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
@@ -238,19 +238,9 @@ using CairoMakie
 using ActuaryUtilities
 using LaTeXStrings
 
+# Apply the site's custom Makie plot theme (cassette futurism).
 include(joinpath(@__DIR__, "..", "..", "assets", "themes", "cassette_futurism.jl"))
 set_theme!(cassette_futurism_theme())</code></pre>
-<div class="cell-output cell-output-stdout">
-<div class="ansi-escaped-output">
-<pre><span class="ansi-green-fg ansi-bold">Precompiling</span> packages...
-   3876.6 ms<span class="ansi-green-fg">  ✓ </span>QuartoNotebookWorkerMakieExt<span class="ansi-bright-black-fg"> (serial)</span>
-  1 dependency successfully precompiled in 4 seconds
-<span class="ansi-green-fg ansi-bold">Precompiling</span> packages...
-   3340.7 ms<span class="ansi-green-fg">  ✓ </span>QuartoNotebookWorkerCairoMakieExt<span class="ansi-bright-black-fg"> (serial)</span>
-  1 dependency successfully precompiled in 3 seconds
-</pre>
-</div>
-</div>
 </div>
 <p>Let’s use the 2001 CSO table as the basis for cost of insurance charges:</p>
 <div id="6" class="cell" data-execution_count="1">
@@ -259,7 +249,7 @@ set_theme!(cassette_futurism_theme())</code></pre>
 <pre><code>MortalityTable (CSO/CET):
    Name:
        2001 CSO Super Preferred Select and Ultimate - Male Nonsmoker, ANB
-   Fields: 
+   Fields:
        (:select, :ultimate, :metadata)
    Provider:
        American Academy of Actuaries
@@ -279,7 +269,7 @@ set_theme!(cassette_futurism_theme())</code></pre>
 <li><code>u</code> is the <em>state</em> of the system. We will track three variables to represent the <code>state</code>:
 <ul>
 <li><code>state[1]</code> is the account value</li>
-<li><code>state[2]</code> is the premium paid</li>
+<li><code>state[2]</code> is the premium paid at that timestep</li>
 <li><code>state[3]</code> is the policy duration</li>
 </ul></li>
 <li><code>p</code> are the parameters of the system.</li>
@@ -292,7 +282,7 @@ set_theme!(cassette_futurism_theme())</code></pre>
 
     # calculated variables
     cur_date = p.issue_date + Day(t)
-    dur = duration(p.issue_date, cur_date)
+    dur = policy_duration(p.issue_date, cur_date)
     att_age = p.issue_age + dur - 1
 
     # lapse if AV &lt;= 0 
@@ -321,7 +311,7 @@ set_theme!(cassette_futurism_theme())</code></pre>
         end
 
         # daily events
-        int(av) = av * ((1 + p.int_rate)^(1 / 360) - 1.0)
+        int(av) = av * ((1 + p.int_rate)^(1 / 365) - 1.0)
 
 
 
@@ -361,7 +351,7 @@ end</code></pre>
 </section>
 <section id="runing-the-system" class="level2">
 <h2 class="anchored" data-anchor-id="runing-the-system">Runing the system</h2>
-<p>This results in the following plot. The tracked output variables u1 and u2 represent the two vars that we tracked above: account value and cumulative premium.</p>
+<p>This results in the following plot of the tracked account value (<code>state[1]</code>):</p>
 <div id="12" class="cell" data-execution_count="1">
 <pre class="julia cell-code"><code>begin
     pp = params(
@@ -399,7 +389,7 @@ end</code></pre>
 <section id="moving-up-the-ladder-of-abstraction" class="level2 page-columns page-full">
 <h2 class="anchored" data-anchor-id="moving-up-the-ladder-of-abstraction">Moving up the ladder of abstraction</h2>
 <p>An excellent way to understand the behavior of a model is to <a href="http://worrydream.com/LadderOfAbstraction/">move up the ladder of abstraction</a>. Below, we will see what happens to the projection at varying levels of credit rates and annual premiums.</p>
-<p>md”The full range of simulated outcomes can take a couple of minutes to run:</p>
+<p>The full range of simulated outcomes can take a couple of minutes to run:</p>
 <div id="14" class="cell" data-execution_count="1">
 <pre class="julia cell-code"><code>begin
     prem_range = 1000.0:100.0:9000.0
@@ -411,7 +401,8 @@ end</code></pre>
         proj = solve(prob, FunctionMap())
         end_av = proj[end][1]
         if end_av == 0.0
-            lapse_time = findfirst(isequal(0.0), proj[1, 2:end])
+            # +1 because the search starts at the 2nd column of `proj`
+            lapse_time = findfirst(isequal(0.0), proj[1, 2:end]) + 1
         else
             lapse_time = length(proj)
         end

@@ -16,6 +16,8 @@ Pkg.instantiate()
 using MortalityTables
 using Turing
 using UUIDs
+using Random
+Random.seed!(20261012)
 using DataFramesMeta
 using MCMCChains
 using CairoMakie
@@ -186,9 +188,9 @@ end
 
 ## 2. Parametric model
 
-In this example, we utilize a [MakehamBeard](https://juliaactuary.github.io/MortalityTables.jl/stable/ParametricMortalityModels/#MortalityTables.MakehamBeard) parameterization because it's already very similar in form to a [logistic function](https://en.wikipedia.org/wiki/Logistic_function). This is important because our desired output is a probability (ie the probablity of a death at a given age), so the value must be constrained to be in the interval between zero and one.
+We use the [Makeham–Beard mortality law](https://docs.juliaactuary.org/MortalityTables/stable/ParametricMortalityModels/#MortalityTables.MakehamBeard) to describe how the force of mortality varies with age. `hazard(model, age)` is an instantaneous rate, not a death probability. The binomial likelihood needs the annual probability `decrement(model, age, age + 1)`, obtained by integrating the hazard over that year. This probability is between zero and one for a valid mortality law.
 
-The **prior** values for `a`,`b`,`c`, and `k` are chosen to constrain the hazard (mortality) rate to be between zero and one.
+The priors keep `a`, `b` and `k` positive, with `c = 0`. The binomial probability comes from `decrement`; the instantaneous hazard itself need not be bounded by one.
 
 This isn't an ideal parameterization (e.g. we aren't including information about the select underwriting period), but is an example of utilizing Bayesian techniques on life experience data.
 
@@ -206,7 +208,7 @@ This isn't an ideal parameterization (e.g. we aren't including information about
     # and how consistent the parameters are with the data
     for i = 1:nrow(data)
         age = data.att_age[i]
-        q = clamp(MortalityTables.hazard(m, age), 1e-10, 1 - 1e-10)
+        q = clamp(MortalityTables.decrement(m, age, age + 1), 1e-10, 1 - 1e-10)
         deaths[i] ~ Binomial(data.exposures[i], q)
     end
 end
@@ -246,7 +248,7 @@ let
         s = sample(chain2, 1)
         a = only(s[:a]); b = only(s[:b]); k = only(s[:k]); c = 0
         m = MortalityTables.MakehamBeard(; a, b, c, k)
-        lines!(ax, ages, age -> MortalityTables.hazard(m, age);
+        lines!(ax, ages, age -> MortalityTables.decrement(m, age, age + 1);
             color=(CASSETTE_PALETTE[3], 0.08), linewidth=0.8)
     end
 
@@ -283,7 +285,7 @@ This model extends the prior to create a multi-level model. Each risk class (`ri
 
         m = MortalityTables.MakehamBeard(; a=a[risk], b, c, k)
         age = data.att_age[i]
-        q = clamp(MortalityTables.hazard(m, age), 1e-10, 1 - 1e-10)
+        q = clamp(MortalityTables.decrement(m, age, age + 1), 1e-10, 1 - 1e-10)
         deaths[i] ~ Binomial(data.exposures[i], q)
     end
 end
@@ -316,7 +318,7 @@ let data = data2
         a = only(s[Symbol("a[$r]")])
         b = only(s[:b]); k = only(s[:k]); c = 0
         m = MortalityTables.MakehamBeard(; a, b, c, k)
-        lines!(ax, ages, age -> MortalityTables.hazard(m, age);
+        lines!(ax, ages, age -> MortalityTables.decrement(m, age, age + 1);
             color=(risk_colors[r], 0.12), linewidth=0.8,
             label = (i == 1 ? "risk level $r" : nothing))
     end
@@ -352,7 +354,7 @@ The key is to use the Poisson distribution:
 
         m = MortalityTables.MakehamBeard(; a=a[risk], b, c, k)
         age = data.att_age[i]
-        q = MortalityTables.hazard(m, age)
+        q = MortalityTables.decrement(m, age, age + 1)
         deaths[i] ~ Poisson(data.exposures[i] * q)
     end
 end
@@ -389,7 +391,7 @@ let data = data2
         a = only(s[Symbol("a[$r]")])
         b = only(s[:b]); k = only(s[:k]); c = only(s[:c])
         m = MortalityTables.MakehamBeard(; a, b, c, k)
-        lines!(ax, ages, age -> MortalityTables.hazard(m, age);
+        lines!(ax, ages, age -> MortalityTables.decrement(m, age, age + 1);
             color=(risk_colors[r], 0.12), linewidth=0.8,
             label = (i == 1 ? "risk level $r" : nothing))
     end

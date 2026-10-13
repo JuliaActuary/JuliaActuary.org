@@ -36,25 +36,27 @@ The above rates and associated maturities represent yields of zero coupon bonds 
 quotes = ZCBYield.(rates, mats)
 ```
 
-Fitting is then calling `fit` along with the desired curve construction technique. Here are several variants:
+With FinanceModels 7, `Fit.Bootstrap()` supports linear interpolation. Quadratic and cubic splines use a loss fit over all quotes. Here are six alternatives:
 
 ```{julia}
 ns = fit(Yield.NelsonSiegel(), quotes);
 nss = fit(Yield.NelsonSiegelSvensson(), quotes);
 sw = fit(Yield.SmithWilson(ufr=0.05, α=0.1), quotes);
 bl = fit(Spline.Linear(), quotes, Fit.Bootstrap());
-bq = fit(Spline.Quadratic(), quotes, Fit.Bootstrap());
-bc = fit(Spline.Cubic(), quotes, Fit.Bootstrap());
+bq = fit(Spline.Quadratic(), quotes, Fit.Loss(x -> x^2));
+bc = fit(Spline.Cubic(), quotes, Fit.Loss(x -> x^2));
 ```
 
-That's it! We've fit the rates using six different techniques. These can now be used in a variety of ways, such as calculating the `present_value`, `duration`, or `convexity` of different cashflows if you imported [ActuaryUtilities.jl](https://github.com/JuliaActuary/ActuaryUtilities.jl)"
+These curves can discount cashflows with `present_value`, or supply `duration` and `convexity` calculations in [ActuaryUtilities](https://docs.juliaactuary.org/ActuaryUtilities/stable/). The fitted spline curves use flat-forward extrapolation after the final 30-year knot. Their zero rates approach that forward rate; they do not continue the final interpolation polynomial.
+
+For direct interpolation of observed zero rates, use `ZeroRateCurve(rates, mats, Spline.Cubic())`. A loss fit is useful when fitting the prices of coupon-bearing instruments as well.
 
 ## Visualizing the results
 
 ```{julia}
 const CURVES = [
-    (bc,  "Bootstrap (Cubic)"),
-    (bq,  "Bootstrap (Quadratic)"),
+    (bc,  "Loss fit (Cubic)"),
+    (bq,  "Loss fit (Quadratic)"),
     (bl,  "Bootstrap (Linear)"),
     (ns,  "NelsonSiegel"),
     (nss, "NelsonSiegelSvensson"),

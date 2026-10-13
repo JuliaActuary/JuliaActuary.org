@@ -226,7 +226,7 @@ That sentence is the improvement. The old margin promised nothing either. It jus
 
 - Daniel Kuhn, Peyman Mohajerin Esfahani, Viet Anh Nguyen & Soroosh Shafieezadeh-Abadeh (2019), [*Wasserstein Distributionally Robust Optimization*](https://arxiv.org/abs/1908.08729) — the theory behind the exact worst case, including the CTE stability bound used here.
 - Arthur Charpentier (2026), [*Optimal Transport for Actuarial Science*](https://hal.science/hal-05684645) ⟨hal-05684645⟩ — a survey of transport ideas across actuarial problems; the package documentation follows it.
-- [ActuaryUtilities.jl risk measures documentation](https://juliaactuary.github.io/ActuaryUtilities.jl/stable/risk_measures/) — `robustvalue`, `CTE`, `VaR`, and exactly what is returned for measures without the closed form.
+- [ActuaryUtilities.jl risk measures documentation](https://docs.juliaactuary.org/ActuaryUtilities/stable/risk_measures/) — `robustvalue`, `CTE`, `VaR`, and exactly what is returned for measures without the closed form.
 - [*How Far Did the Book Move?*](/posts/optimal-transport/index.html) — part one: the drift measurement, its checks (a permutation screen and a generative Turing model), and the stress this post's radius is anchored to.
 
 ## Footnotes and colophon

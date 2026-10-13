@@ -61,9 +61,9 @@ So again, performance matters!
 
 ### Readability and Expressiveness
 
-Actuaries, even the [10x Actuary](/blog/coding-for-the-future/), aren't pure computer scientists and computational efficiency has never been *so* critical that they sacrifice everything else to get it. So the industry never turned to the 40-year king of performance computation, [Fortran](https://en.wikipedia.org/wiki/Fortran). The syntax is very "close to the machine". I's a bit rough to read to anyone not well versed.
+Actuaries, even the [10x Actuary](/posts/coding-the-future/index.qmd), aren't pure computer scientists and computational efficiency has never been *so* critical that they sacrifice everything else to get it. So the industry never turned to the 40-year king of performance computation, [Fortran](https://en.wikipedia.org/wiki/Fortran). The syntax is very "close to the machine". I's a bit rough to read to anyone not well versed.
 
-Interestingly, [APL](https://en.wikipedia.org/wiki/APL_(programming_language)) took off and was one of the dominant languages used by actuaries before the advent of [vendor-supplied modeling solutions](/blog/coding-for-the-future/#the_10x_actuary).
+Interestingly, [APL](https://en.wikipedia.org/wiki/APL_(programming_language)) took off and was one of the dominant languages used by actuaries before the advent of [vendor-supplied modeling solutions](/posts/coding-the-future/index.qmd#the-10x-actuary).
 
 Counting the occurrences of a string looks like this in APL:
 ```
@@ -468,7 +468,7 @@ I wanted to go a little bit deeper and show how 1) Julia just runs fast even if 
 
 ### Code
 
-All of the benchmarked code can be found in the [JuliaActuary Learn repository](https://github.com/JuliaActuary/Learn/tree/master/LifeModelingProblemBenchmarks). Please file an issue or submit a PR request there for issues/suggestions.
+All of the benchmarked code can be found in the [JuliaActuary Learn repository](https://github.com/JuliaActuary/Learn/tree/master/Benchmarks/LifeModelingProblem). Please file an issue or submit a PR request there for issues/suggestions.
 
 ### Hardware
 

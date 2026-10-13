@@ -87,36 +87,17 @@ MortalityTable (Insured Lives Mortality):
 
 ```
 
-```julia-repl
+```julia
+using FinanceModels
 
-julia> using FinanceModels
+maturities = [0.5, 1.0, 1.5, 2.0]
+rates = [5.0, 5.8, 6.4, 6.8] ./ 100
+quotes = ZCBYield.(rates, maturities)
 
-julia> maturities = [0.5, 1.0, 1.5, 2.0]
-julia> rates      = [5.0, 5.8, 6.4, 6.8] ./ 100
-julia> quotes     = ZCBYield.(rates,maturities)
-
-julia> rf_curve = fit(Spline.Cubic(), quotes, Fit.Bootstrap())
-
-
-               ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀Yield Curve (FinanceModels.Yield.Spline)⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-               ┌────────────────────────────────────────────────────────────┐
-           0.4 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ Zero rates
-               │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-               │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-               │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⡠⠤⠒⠋│
-               │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⠤⠖⠊⠉⠁⠀⠀⠀⠀│
-               │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⡤⠔⠒⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-               │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⡠⠤⠒⠊⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-   Periodic(1) │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⡠⠤⠖⠊⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-               │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⡠⠤⠖⠊⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-               │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⡠⠤⠒⠊⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-               │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⡤⠤⠒⠋⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-               │⠀⠀⠀⠀⠀⠀⠀⣀⡠⠤⠖⠒⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-               │⠀⢀⡠⠤⠒⠋⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-               │⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-             0 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-               └────────────────────────────────────────────────────────────┘
-               ⠀0⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀time⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀30⠀
+curve = fit(Spline.Linear(), quotes, Fit.Bootstrap())
+discount(curve, 2.0)          # discount factor to year 2
+zero(curve, 1.5)              # continuously compounded zero rate
+forward(curve, 1.0, 2.0)      # rate between years 1 and 2
 ```
 
 ```{=html}
@@ -138,17 +119,17 @@ julia> using ActuaryUtilities
 julia> cashflows = [5, 5, 105]
 julia> discount_rate = 0.03
 
-julia> present_value(discount_rate, cashflows)           
-105.65
+julia> round(present_value(discount_rate, cashflows); digits=2)
+105.66
 
-julia> duration(Macaulay(), discount_rate, cashflows)    
+julia> round(duration(Macaulay(), discount_rate, cashflows); digits=2)
 2.86
 
-julia> duration(discount_rate, cashflows)                
+julia> round(duration(discount_rate, cashflows); digits=2)
 2.78
 
-julia> convexity(discount_rate, cashflows)               
-10.62
+julia> round(convexity(discount_rate, cashflows); digits=2)
+10.63
 ```
 
 ```{=html}
@@ -166,7 +147,7 @@ julia> convexity(discount_rate, cashflows)
 ```julia
 using LifeContingencies
 using MortalityTables
-using FinanceModels
+using FinanceCore
 
 # load mortality rates from MortalityTables.jl
 vbt2015 = MortalityTables.table("2015 VBT Smoker Distinct Male Non-Smoker ALB")
@@ -176,7 +157,7 @@ life = SingleLife(                       # The life underlying the risk
     mortality = vbt2015.select[issue_age],    # -- Mortality rates
 )
 
-yield = Yield.Constant(0.05)            # Using a flat 5% interest rate
+yield = Periodic(0.05, 1)            # Using a flat 5% interest rate
 
 lc = LifeContingency(life, yield)        # combine the life with the yield
 ins = Insurance(lc)                      # alternate way to construct: Insurance(life, yield)
@@ -207,9 +188,11 @@ LifeContingencies.V(lc,5)                # Net premium reserve for whole life in
     
 ```
 
+The life-contingency example uses the compatible LifeContingencies 2.5 / FinanceCore 2 / MortalityTables 2 environment. See [package compatibility](packages.qmd#current-releases) before combining it with the newer finance and mortality releases.
+
 ## Packages
 
-These packages are available for use in your project. See more on the [Packages page](/packages.qmd).
+See the [current releases and migration guides](/packages.qmd#current-releases), including the Julia 1.10 minimum for the latest finance and mortality packages.
 
 [`MortalityTables.jl`](/packages.html#mortalitytables.jl)
   - Easily work with standard [mort.SOA.org](https://mort.soa.org/) tables and parametric models with common survival calculations.
@@ -227,4 +210,4 @@ These packages are available for use in your project. See more on the [Packages 
 - Meeting your exposure calculation needs.
 
 [`EconomicScenarioGenerators.jl`](/packages.html#economicscenariogenerators.jl)
-- Easy-to-use scenario generation that's FinanceModels.jl compatible.
+- Scenario generation for existing ESG workflows. For current short-rate models, see FinanceModels 7 and the [compatibility notes](/packages.qmd#economicscenariogenerators.jl).

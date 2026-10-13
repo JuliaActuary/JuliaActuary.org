@@ -5,6 +5,12 @@ date: "2023-8-19"
 categories: [code,blog]
 ---
 
+::: {.callout-note}
+## Historical release announcement
+
+This August 2023 article describes the original FinanceModels 4 interface. Its extension hooks, projection examples and non-linear bootstrap calls are historical. For FinanceModels 7, use the [current package examples](/packages.qmd#financemodels.jl), [migration guide](https://docs.juliaactuary.org/FinanceModels/stable/migration/) and [fall 2026 release overview](/posts/2026-fall-releases/index.qmd). The current hooks are `FinanceModels.default_variables` and `FinanceModels.default_optimizer`; valuation uses `present_value(ctx, contract)`.
+:::
+
 Yields.jl has evolved into FinanceModels.jl. The benefits are:
 
 - Provide a composable set of **contracts** and **`Quotes`** 
@@ -369,7 +375,7 @@ In addition to the more composable code for the end-user, the package itself has
 
 ## Migration Guide
 
-For those looking to upgrade from Yields (v3.x.x) to FinanceModels (v4+), there is a [migration guide here](https://juliaactuary.github.io/FinanceModels.jl/dev/migration/). Associated packages [ActuaryUtilities.jl](https://github.com/JuliaActuary/ActuaryUtilities.jl/pull/101#issue-1773044104) and [FinanceCore.jl](https://github.com/JuliaActuary/FinanceCore.jl/compare/v1.1.0...v2.0.0) had major version releases for minor breaking changes where most code should remain unaffected (FinanceCore is not intended to be user-facing).
+For those looking to upgrade from Yields (v3.x.x) to FinanceModels (v4+), there is a [migration guide here](https://docs.juliaactuary.org/FinanceModels/stable/migration/). Associated packages [ActuaryUtilities.jl](https://github.com/JuliaActuary/ActuaryUtilities.jl/pull/101#issue-1773044104) and [FinanceCore.jl](https://github.com/JuliaActuary/FinanceCore.jl/compare/v1.1.0...v2.0.0) had major version releases for minor breaking changes where most code should remain unaffected (FinanceCore is not intended to be user-facing).
 
 Some tutorials or examples on the site may still use Yields.jl - that's okay as they will still work given Julia's strong degree of reproducibility and dependency management tools. Please open an issue on the [JuliaActuary.org repository](https://github.com/JuliaActuary/JuliaActuary.org) if you have trouble with any of the old example code.
 

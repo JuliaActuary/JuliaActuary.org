@@ -8,3 +8,8 @@ Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
 MortalityTables = "4780e19d-04b9-53dc-86c2-9e9aa59b5a12"
 OhMyThreads = "67456a42-1dca-4109-a031-0a68de7e3ad5"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+
+[compat]
+ActuaryUtilities = "6"
+MortalityTables = "3"
+julia = "1.10"

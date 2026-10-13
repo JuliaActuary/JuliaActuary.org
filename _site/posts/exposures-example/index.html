@@ -24,14 +24,14 @@ ul.task-list li input[type="checkbox"] {
 </style>
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="../../site_libs/quarto-nav/headroom.min.js"></script>
 <script src="../../site_libs/clipboard/clipboard.min.js"></script>
 <script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
-<link href="../..//assets/favicon.ico" rel="icon">
+<link href="../..//assets/logos/favicon.ico" rel="icon">
 <script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
@@ -70,7 +70,7 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
 
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -199,7 +199,7 @@ ul.task-list li input[type="checkbox"] {
 
 
 
-<p>In this tutorial, we will walk through how to calculate exposures using the <a href="../../packages/#lifecontingenciesjl">ExperienceAnalysis.jl package</a>.</p>
+<p>In this tutorial, we will walk through how to calculate exposures using the <a href="../../packages.html#experienceanalysis.jl">ExperienceAnalysis.jl package</a>.</p>
 <p>In summary, the package will help calculate the exposure periods given parameters about the kind of period and timepoints under consideration. This will return an array of tuples with a <code>from</code> and <code>to</code> date:</p>
 <div id="4" class="cell" data-execution_count="1">
 <pre class="julia cell-code"><code>using ExperienceAnalysis
@@ -225,9 +225,9 @@ exposure(basis, issue, termination)</code></pre>
 <li><code>ExperienceAnalysis.AnniversaryCalendar(period,period)</code> will split into the smaller of the calendar or policy anniversary period.</li>
 </ul>
 <p>Where <code>period</code> is a <a href="https://docs.julialang.org/en/v1/stdlib/Dates/#Period-Types">Period Type from the Dates standard library</a>.</p>
-<p>Calculate exposures with <code>exposures(basis,from,to,continue_exposure)</code>.</p>
+<p>Calculate exposures with <code>exposure(basis, from, to, continued_exposure; study_start, study_end)</code>.</p>
 <ul>
-<li><code>continue_exposures</code> indicates whether the exposure should be extended through the full exposure period rather than terminate at the <code>to</code> date.</li>
+<li><code>continued_exposure</code> indicates whether the exposure should be extended through the full exposure period rather than terminate at the <code>to</code> date.</li>
 </ul>
 </section>
 <section id="full-example" class="level2">
@@ -245,15 +245,15 @@ df = DataFrame(
 <div><div style="float: left;"><span>3×4 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
 <table class="data-frame caption-top table table-sm table-striped small">
 <thead>
-<tr class="header">
-<th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
+<tr class="columnLabelRow header">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th">id</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th">issue</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th">end_date</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th">status</th>
 </tr>
-<tr class="subheader headerLastRow even">
-<th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
+<tr class="columnLabelRow even">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
 <th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th" title="Dates.Date">Date</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th" title="Dates.Date">Date</th>
@@ -261,22 +261,22 @@ df = DataFrame(
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">1</td>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">1</td>
 <td style="text-align: right;">1</td>
 <td style="text-align: left;">2016-07-04</td>
 <td style="text-align: left;">2020-01-17</td>
 <td style="text-align: left;">Claim</td>
 </tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">2</td>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">2</td>
 <td style="text-align: right;">2</td>
 <td style="text-align: left;">2016-01-01</td>
 <td style="text-align: left;">2018-05-04</td>
 <td style="text-align: left;">Lapse</td>
 </tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">3</td>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">3</td>
 <td style="text-align: right;">3</td>
 <td style="text-align: left;">2016-01-01</td>
 <td style="text-align: left;">2020-12-31</td>
@@ -319,16 +319,16 @@ study_start = Date(2018, 6, 30)</code></pre>
 <div><div style="float: left;"><span>6×5 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
 <table class="data-frame caption-top table table-sm table-striped small">
 <thead>
-<tr class="header">
-<th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
+<tr class="columnLabelRow header">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th">id</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th">issue</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th">end_date</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th">status</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th">exposure</th>
 </tr>
-<tr class="subheader headerLastRow even">
-<th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
+<tr class="columnLabelRow even">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
 <th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th" title="Dates.Date">Date</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th" title="Dates.Date">Date</th>
@@ -337,48 +337,48 @@ study_start = Date(2018, 6, 30)</code></pre>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">1</td>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">1</td>
 <td style="text-align: right;">1</td>
 <td style="text-align: left;">2016-07-04</td>
 <td style="text-align: left;">2020-01-17</td>
 <td style="text-align: left;">Claim</td>
 <td style="text-align: left;">(from = Date("2018-06-30"), to = Date("2018-07-03"), policy_timestep = 2)</td>
 </tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">2</td>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">2</td>
 <td style="text-align: right;">1</td>
 <td style="text-align: left;">2016-07-04</td>
 <td style="text-align: left;">2020-01-17</td>
 <td style="text-align: left;">Claim</td>
 <td style="text-align: left;">(from = Date("2018-07-04"), to = Date("2019-07-03"), policy_timestep = 3)</td>
 </tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">3</td>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">3</td>
 <td style="text-align: right;">1</td>
 <td style="text-align: left;">2016-07-04</td>
 <td style="text-align: left;">2020-01-17</td>
 <td style="text-align: left;">Claim</td>
 <td style="text-align: left;">(from = Date("2019-07-04"), to = Date("2020-07-03"), policy_timestep = 4)</td>
 </tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">4</td>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">4</td>
 <td style="text-align: right;">3</td>
 <td style="text-align: left;">2016-01-01</td>
 <td style="text-align: left;">2020-12-31</td>
 <td style="text-align: left;">Inforce</td>
 <td style="text-align: left;">(from = Date("2018-06-30"), to = Date("2018-12-31"), policy_timestep = 3)</td>
 </tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">5</td>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">5</td>
 <td style="text-align: right;">3</td>
 <td style="text-align: left;">2016-01-01</td>
 <td style="text-align: left;">2020-12-31</td>
 <td style="text-align: left;">Inforce</td>
 <td style="text-align: left;">(from = Date("2019-01-01"), to = Date("2019-12-31"), policy_timestep = 4)</td>
 </tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">6</td>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">6</td>
 <td style="text-align: right;">3</td>
 <td style="text-align: left;">2016-01-01</td>
 <td style="text-align: left;">2020-12-31</td>
@@ -396,53 +396,54 @@ study_start = Date(2018, 6, 30)</code></pre>
 <div id="14" class="cell" data-execution_count="1">
 <pre class="julia cell-code"><code>using DayCounts
 
-df.exposure_fraction = map(e -&gt; yearfrac(e.from, e.to, DayCounts.Actual360()), df.exposure)
+# note: the `to` date is inclusive, so we add a day when computing the fraction
+df.exposure_fraction = map(e -&gt; yearfrac(e.from, e.to + Day(1), DayCounts.Thirty360()), df.exposure)
 df[:, [:exposure, :exposure_fraction]]</code></pre>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div><div style="float: left;"><span>6×2 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
 <table class="data-frame caption-top table table-sm table-striped small">
 <thead>
-<tr class="header">
-<th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
+<tr class="columnLabelRow header">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th">exposure</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th">exposure_fraction</th>
 </tr>
-<tr class="subheader headerLastRow even">
-<th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
+<tr class="columnLabelRow even">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
 <th style="text-align: left;" data-quarto-table-cell-role="th" title="@NamedTuple{from::Dates.Date, to::Dates.Date, policy_timestep::Int64}">NamedTup…</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">1</td>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">1</td>
 <td style="text-align: left;">(from = Date("2018-06-30"), to = Date("2018-07-03"), policy_timestep = 2)</td>
-<td style="text-align: right;">0.00833333</td>
+<td style="text-align: right;">0.0111111</td>
 </tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">2</td>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">2</td>
 <td style="text-align: left;">(from = Date("2018-07-04"), to = Date("2019-07-03"), policy_timestep = 3)</td>
-<td style="text-align: right;">1.01111</td>
+<td style="text-align: right;">1.0</td>
 </tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">3</td>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">3</td>
 <td style="text-align: left;">(from = Date("2019-07-04"), to = Date("2020-07-03"), policy_timestep = 4)</td>
-<td style="text-align: right;">1.01389</td>
+<td style="text-align: right;">1.0</td>
 </tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">4</td>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">4</td>
 <td style="text-align: left;">(from = Date("2018-06-30"), to = Date("2018-12-31"), policy_timestep = 3)</td>
-<td style="text-align: right;">0.511111</td>
-</tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">5</td>
-<td style="text-align: left;">(from = Date("2019-01-01"), to = Date("2019-12-31"), policy_timestep = 4)</td>
-<td style="text-align: right;">1.01111</td>
-</tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">6</td>
-<td style="text-align: left;">(from = Date("2020-01-01"), to = Date("2020-06-30"), policy_timestep = 5)</td>
 <td style="text-align: right;">0.502778</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">5</td>
+<td style="text-align: left;">(from = Date("2019-01-01"), to = Date("2019-12-31"), policy_timestep = 4)</td>
+<td style="text-align: right;">1.0</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">6</td>
+<td style="text-align: left;">(from = Date("2020-01-01"), to = Date("2020-06-30"), policy_timestep = 5)</td>
+<td style="text-align: right;">0.5</td>
 </tr>
 </tbody>
 </table>

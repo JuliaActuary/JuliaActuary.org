@@ -2,23 +2,23 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://JuliaActuary.org/blog.html</loc>
-    <lastmod>2026-10-12T01:44:52.418Z</lastmod>
+    <lastmod>2026-10-12T04:15:51.140Z</lastmod>
   </url>
   <url>
     <loc>https://JuliaActuary.org/packages.html</loc>
-    <lastmod>2026-07-18T01:25:22.980Z</lastmod>
+    <lastmod>2026-10-12T18:26:29.154Z</lastmod>
   </url>
   <url>
     <loc>https://JuliaActuary.org/index.html</loc>
-    <lastmod>2026-07-18T01:25:22.980Z</lastmod>
+    <lastmod>2026-10-12T17:52:19.828Z</lastmod>
   </url>
   <url>
     <loc>https://JuliaActuary.org/posts/mortality-comparison/index.html</loc>
-    <lastmod>2025-06-14T19:05:26.448Z</lastmod>
+    <lastmod>2026-10-12T18:07:53.643Z</lastmod>
   </url>
   <url>
     <loc>https://JuliaActuary.org/posts/autodiff_ALM/index.html</loc>
-    <lastmod>2026-07-18T01:25:22.981Z</lastmod>
+    <lastmod>2026-10-12T18:06:28.041Z</lastmod>
   </url>
   <url>
     <loc>https://JuliaActuary.org/posts/exposures-example/index.html</loc>
@@ -26,79 +26,95 @@
   </url>
   <url>
     <loc>https://JuliaActuary.org/posts/stochastic-mortality/index.html</loc>
-    <lastmod>2026-07-18T01:25:22.986Z</lastmod>
+    <lastmod>2026-10-12T18:30:39.597Z</lastmod>
   </url>
   <url>
     <loc>https://JuliaActuary.org/posts/academy-generator-rates/index.html</loc>
-    <lastmod>2026-07-18T01:25:22.980Z</lastmod>
+    <lastmod>2026-10-12T18:07:53.644Z</lastmod>
   </url>
   <url>
     <loc>https://JuliaActuary.org/posts/fitting-survival-data/index.html</loc>
-    <lastmod>2026-07-18T01:25:22.983Z</lastmod>
+    <lastmod>2026-10-12T17:52:19.878Z</lastmod>
   </url>
   <url>
     <loc>https://JuliaActuary.org/posts/fitting-yield-curves/index.html</loc>
-    <lastmod>2026-07-18T01:25:22.983Z</lastmod>
+    <lastmod>2026-10-12T16:59:58.509Z</lastmod>
   </url>
   <url>
-    <loc>https://JuliaActuary.org/posts/bayes-vs-limited-fluctuation/index.html</loc>
-    <lastmod>2026-07-18T01:25:22.981Z</lastmod>
+    <loc>https://JuliaActuary.org/posts/optimal-transport/index.html</loc>
+    <lastmod>2026-10-12T18:06:28.042Z</lastmod>
   </url>
   <url>
-    <loc>https://JuliaActuary.org/posts/mortalitytables-and-dataframes/index.html</loc>
-    <lastmod>2025-06-21T05:31:10.069Z</lastmod>
-  </url>
-  <url>
-    <loc>https://JuliaActuary.org/posts/nested-policy-projections/index.html</loc>
+    <loc>https://JuliaActuary.org/posts/poisson-approximation/index.html</loc>
     <lastmod>2026-07-18T01:25:22.985Z</lastmod>
-  </url>
-  <url>
-    <loc>https://JuliaActuary.org/posts/bayesian-claims-demo/index.html</loc>
-    <lastmod>2026-07-18T01:25:22.981Z</lastmod>
-  </url>
-  <url>
-    <loc>https://JuliaActuary.org/posts/treasury-interactive/index.html</loc>
-    <lastmod>2025-06-14T19:05:26.449Z</lastmod>
-  </url>
-  <url>
-    <loc>https://JuliaActuary.org/posts/cashflow-interactive/index.html</loc>
-    <lastmod>2026-07-18T01:25:22.982Z</lastmod>
-  </url>
-  <url>
-    <loc>https://JuliaActuary.org/posts/finance-models-announcement/index.html</loc>
-    <lastmod>2026-07-18T01:25:22.983Z</lastmod>
-  </url>
-  <url>
-    <loc>https://JuliaActuary.org/community.html</loc>
-    <lastmod>2025-06-14T19:05:26.432Z</lastmod>
-  </url>
-  <url>
-    <loc>https://JuliaActuary.org/examples.html</loc>
-    <lastmod>2025-06-14T19:05:26.432Z</lastmod>
-  </url>
-  <url>
-    <loc>https://JuliaActuary.org/posts/credibility-sparse-data/index.html</loc>
-    <lastmod>2026-07-26T14:15:51.398Z</lastmod>
-  </url>
-  <url>
-    <loc>https://JuliaActuary.org/posts/policy-diffeq/index.html</loc>
-    <lastmod>2026-07-18T01:25:22.986Z</lastmod>
-  </url>
-  <url>
-    <loc>https://JuliaActuary.org/posts/life-modeling-problem/index.html</loc>
-    <lastmod>2026-07-18T01:25:22.985Z</lastmod>
-  </url>
-  <url>
-    <loc>https://JuliaActuary.org/posts/bayesian-intro/index.html</loc>
-    <lastmod>2026-07-18T01:25:22.982Z</lastmod>
   </url>
   <url>
     <loc>https://JuliaActuary.org/posts/julia-for-actuaries/index.html</loc>
     <lastmod>2026-07-18T01:25:22.984Z</lastmod>
   </url>
   <url>
-    <loc>https://JuliaActuary.org/posts/poisson-approximation/index.html</loc>
+    <loc>https://JuliaActuary.org/posts/2026-fall-releases/benchmarks/results/summary.html</loc>
+    <lastmod>2026-10-12T04:09:23.921Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.org/posts/bayesian-intro/index.html</loc>
+    <lastmod>2026-07-18T01:25:22.982Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.org/posts/life-modeling-problem/index.html</loc>
+    <lastmod>2026-10-12T18:28:58.977Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.org/posts/policy-diffeq/index.html</loc>
+    <lastmod>2026-10-12T18:15:09.774Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.org/posts/optimal-transport-capital/index.html</loc>
+    <lastmod>2026-10-12T16:59:58.511Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.org/posts/finance-models-announcement/index.html</loc>
+    <lastmod>2026-10-12T18:07:53.644Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.org/community.html</loc>
+    <lastmod>2026-10-12T16:59:58.507Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.org/examples.html</loc>
+    <lastmod>2026-10-12T04:15:51.141Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.org/posts/credibility-sparse-data/index.html</loc>
+    <lastmod>2026-07-26T14:15:51.398Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.org/posts/cashflow-interactive/index.html</loc>
+    <lastmod>2026-10-12T18:07:53.643Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.org/posts/treasury-interactive/index.html</loc>
+    <lastmod>2026-10-12T18:07:53.643Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.org/posts/bayesian-claims-demo/index.html</loc>
+    <lastmod>2026-10-12T17:52:19.862Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.org/posts/2026-fall-releases/index.html</loc>
+    <lastmod>2026-10-12T04:09:23.922Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.org/posts/nested-policy-projections/index.html</loc>
     <lastmod>2026-07-18T01:25:22.985Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.org/posts/mortalitytables-and-dataframes/index.html</loc>
+    <lastmod>2025-06-21T05:31:10.069Z</lastmod>
+  </url>
+  <url>
+    <loc>https://JuliaActuary.org/posts/bayes-vs-limited-fluctuation/index.html</loc>
+    <lastmod>2026-07-18T01:25:22.981Z</lastmod>
   </url>
   <url>
     <loc>https://JuliaActuary.org/posts/nested-stochastic-va/index.html</loc>
@@ -114,11 +130,11 @@
   </url>
   <url>
     <loc>https://JuliaActuary.org/posts/getting-started-for-actuaries/index.html</loc>
-    <lastmod>2026-07-18T01:25:22.984Z</lastmod>
+    <lastmod>2026-10-12T18:33:29.670Z</lastmod>
   </url>
   <url>
     <loc>https://JuliaActuary.org/posts/coding-the-future/index.html</loc>
-    <lastmod>2025-06-14T19:05:26.445Z</lastmod>
+    <lastmod>2026-10-12T18:33:29.670Z</lastmod>
   </url>
   <url>
     <loc>https://JuliaActuary.org/posts/academy-generator/index.html</loc>
@@ -126,30 +142,18 @@
   </url>
   <url>
     <loc>https://JuliaActuary.org/posts/quantlib-comparison/index.html</loc>
-    <lastmod>2026-07-18T01:25:22.986Z</lastmod>
+    <lastmod>2026-10-12T16:59:58.510Z</lastmod>
   </url>
   <url>
     <loc>https://JuliaActuary.org/benchmarks.html</loc>
-    <lastmod>2026-08-01T04:49:57.162Z</lastmod>
+    <lastmod>2026-10-12T16:59:58.509Z</lastmod>
   </url>
   <url>
     <loc>https://JuliaActuary.org/all-posts.html</loc>
-    <lastmod>2025-06-14T19:05:26.413Z</lastmod>
+    <lastmod>2026-10-12T04:15:51.140Z</lastmod>
   </url>
   <url>
     <loc>https://JuliaActuary.org/learn.html</loc>
-    <lastmod>2026-02-17T21:35:32.694Z</lastmod>
-  </url>
-  <url>
-    <loc>https://JuliaActuary.org/posts/optimal-transport/index.html</loc>
-    <lastmod>2026-08-07T04:15:39.477Z</lastmod>
-  </url>
-  <url>
-    <loc>https://JuliaActuary.org/posts/optimal-transport-capital/index.html</loc>
-    <lastmod>2026-08-07T04:24:17.655Z</lastmod>
-  </url>
-  <url>
-    <loc>https://JuliaActuary.org/posts/2026-fall-releases/index.html</loc>
-    <lastmod>2026-10-12T04:01:03.025Z</lastmod>
+    <lastmod>2026-10-12T16:59:58.507Z</lastmod>
   </url>
 </urlset>

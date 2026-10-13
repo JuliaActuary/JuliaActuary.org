@@ -31,7 +31,7 @@ ul.task-list li input[type="checkbox"] {
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
-<link href="../..//assets/favicon.ico" rel="icon">
+<link href="../..//assets/logos/favicon.ico" rel="icon">
 <script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
@@ -207,6 +207,7 @@ using LinearAlgebra            # math
 using BenchmarkTools           # benchmarking
 using OhMyThreads              # multi-threading
 
+# Apply the site's custom Makie plot theme (cassette futurism).
 include(joinpath(@__DIR__, "..", "..", "assets", "themes", "cassette_futurism.jl"))
 set_theme!(cassette_futurism_theme())</code></pre>
 </div>
@@ -400,26 +401,26 @@ end
 end</code></pre>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>100000-element Vector{DeferredAnnuity{Int64, Float64}}:
+ DeferredAnnuity{Int64, Float64}(1, 0.009988829495716861)
+ DeferredAnnuity{Int64, Float64}(11, 0.048613487329580624)
+ DeferredAnnuity{Int64, Float64}(18, 0.05177859152668137)
+ DeferredAnnuity{Int64, Float64}(14, 0.05108046813021651)
  DeferredAnnuity{Int64, Float64}(3, 0.019937936965500825)
- DeferredAnnuity{Int64, Float64}(17, 0.051714618573584406)
+ DeferredAnnuity{Int64, Float64}(15, 0.05141229637424002)
+ DeferredAnnuity{Int64, Float64}(18, 0.05177859152668137)
+ DeferredAnnuity{Int64, Float64}(7, 0.03847750979086058)
+ DeferredAnnuity{Int64, Float64}(8, 0.0419258485355399)
+ DeferredAnnuity{Int64, Float64}(16, 0.051607152912174645)
+ ⋮
  DeferredAnnuity{Int64, Float64}(14, 0.05108046813021651)
  DeferredAnnuity{Int64, Float64}(10, 0.04698961087662551)
  DeferredAnnuity{Int64, Float64}(12, 0.049761345150540474)
- DeferredAnnuity{Int64, Float64}(2, 0.0198981133775843)
- DeferredAnnuity{Int64, Float64}(2, 0.0198981133775843)
- DeferredAnnuity{Int64, Float64}(20, 0.051933558828553925)
- DeferredAnnuity{Int64, Float64}(15, 0.05141229637424002)
- DeferredAnnuity{Int64, Float64}(8, 0.0419258485355399)
- ⋮
- DeferredAnnuity{Int64, Float64}(11, 0.048613487329580624)
- DeferredAnnuity{Int64, Float64}(5, 0.029452531739357923)
- DeferredAnnuity{Int64, Float64}(4, 0.023834377623749747)
- DeferredAnnuity{Int64, Float64}(5, 0.029452531739357923)
- DeferredAnnuity{Int64, Float64}(3, 0.019937936965500825)
- DeferredAnnuity{Int64, Float64}(9, 0.04476297466971608)
+ DeferredAnnuity{Int64, Float64}(6, 0.034366975211449755)
  DeferredAnnuity{Int64, Float64}(17, 0.051714618573584406)
- DeferredAnnuity{Int64, Float64}(1, 0.009988829495716861)
- DeferredAnnuity{Int64, Float64}(3, 0.019937936965500825)</code></pre>
+ DeferredAnnuity{Int64, Float64}(9, 0.04476297466971608)
+ DeferredAnnuity{Int64, Float64}(8, 0.0419258485355399)
+ DeferredAnnuity{Int64, Float64}(14, 0.05108046813021651)
+ DeferredAnnuity{Int64, Float64}(14, 0.05108046813021651)</code></pre>
 </div>
 </div>
 <div class="callout callout-style-default callout-note callout-titled">
@@ -434,7 +435,7 @@ end</code></pre>
 </div>
 <div id="callout-2" class="callout-2-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>Later on we will generate vectors of vectors of cashflows without any guarantee that the timepoints will line up, making aggregating cashflows by timepoints a non-obvious task. There are many ways to accomplish this, but <a href="https://juliaactuary.github.io/FinanceModels.jl/dev/faq/#Why-does-the-package-rely-on-using-Transducers?">I like Transducers</a>.</p>
+<p>Later on we will generate vectors of vectors of cashflows without any guarantee that the timepoints will line up, making aggregating cashflows by timepoints a non-obvious task. There are many ways to accomplish this, but <a href="https://docs.juliaactuary.org/FinanceModels/stable/faq/#Why-does-the-package-rely-on-using-Transducers?">I like Transducers</a>.</p>
 <p>Transducers are unfamiliar to many people, and don’t let the presence deter you from the main points of this post. The details aren’t central to the point of this blog post so just skip over if confusing.</p>
 <div id="22" class="cell" data-execution_count="1">
 <pre class="julia cell-code"><code>function consolidate(cashflows)
@@ -454,33 +455,33 @@ end</code></pre>
 <pre class="julia cell-code"><code>cashflow_vectors = [l(c) for l in liabilities]</code></pre>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>100000-element Vector{Vector{Cashflow{Float64, Rational{Int64}}}}:
+ [Cashflow{Float64, Rational{Int64}}(-0.004085858465737679, 1//12), Cashflow{Float64, Rational{Int64}}(-0.004224514759559243, 1//6), Cashflow{Float64, Rational{Int64}}(-0.004388271423025512, 1//4), Cashflow{Float64, Rational{Int64}}(-0.004579427370077135, 1//3), Cashflow{Float64, Rational{Int64}}(-0.004800700750370862, 5//12), Cashflow{Float64, Rational{Int64}}(-0.0050552759234296805, 1//2), Cashflow{Float64, Rational{Int64}}(-0.005346855772250516, 7//12), Cashflow{Float64, Rational{Int64}}(-0.005679718326711681, 2//3), Cashflow{Float64, Rational{Int64}}(-0.006058775775797353, 3//4), Cashflow{Float64, Rational{Int64}}(-0.006489632610658917, 5//6), Cashflow{Float64, Rational{Int64}}(-0.0069786376879914045, 11//12), Cashflow{Float64, Rational{Int64}}(-0.9520883422854205, 1//1)]
+ [Cashflow{Float64, Rational{Int64}}(-0.0049038424385172375, 1//12), Cashflow{Float64, Rational{Int64}}(-0.005003342312704534, 1//6), Cashflow{Float64, Rational{Int64}}(-0.005104701202457077, 1//4), Cashflow{Float64, Rational{Int64}}(-0.005207358411037622, 1//3), Cashflow{Float64, Rational{Int64}}(-0.005310692394094387, 5//12), Cashflow{Float64, Rational{Int64}}(-0.005414017645807302, 1//2), Cashflow{Float64, Rational{Int64}}(-0.005516582099269058, 7//12), Cashflow{Float64, Rational{Int64}}(-0.005617565161865263, 2//3), Cashflow{Float64, Rational{Int64}}(-0.005716076516180846, 3//4), Cashflow{Float64, Rational{Int64}}(-0.0058111558260197415, 5//6)  …  Cashflow{Float64, Rational{Int64}}(-0.005407598148241427, 41//4), Cashflow{Float64, Rational{Int64}}(-0.005320442564745627, 31//3), Cashflow{Float64, Rational{Int64}}(-0.0052350166727639195, 125//12), Cashflow{Float64, Rational{Int64}}(-0.005151284793128043, 21//2), Cashflow{Float64, Rational{Int64}}(-0.005069212027467017, 127//12), Cashflow{Float64, Rational{Int64}}(-0.004988764241340426, 32//3), Cashflow{Float64, Rational{Int64}}(-0.0049099080477190945, 43//4), Cashflow{Float64, Rational{Int64}}(-0.004832610790807698, 65//6), Cashflow{Float64, Rational{Int64}}(-0.004756840530202081, 131//12), Cashflow{Float64, Rational{Int64}}(-0.3673579326275773, 11//1)]
+ [Cashflow{Float64, Rational{Int64}}(-0.00484668200548985, 1//12), Cashflow{Float64, Rational{Int64}}(-0.0049100274641540355, 1//6), Cashflow{Float64, Rational{Int64}}(-0.004973771861878092, 1//4), Cashflow{Float64, Rational{Int64}}(-0.005037561154641696, 1//3), Cashflow{Float64, Rational{Int64}}(-0.005101018961600112, 5//12), Cashflow{Float64, Rational{Int64}}(-0.00516374613478892, 1//2), Cashflow{Float64, Rational{Int64}}(-0.005225320508363633, 7//12), Cashflow{Float64, Rational{Int64}}(-0.00528529684781004, 2//3), Cashflow{Float64, Rational{Int64}}(-0.005343207020245248, 3//4), Cashflow{Float64, Rational{Int64}}(-0.005398560407581078, 5//6)  …  Cashflow{Float64, Rational{Int64}}(-0.0028498899525714987, 69//4), Cashflow{Float64, Rational{Int64}}(-0.0028466477109700184, 52//3), Cashflow{Float64, Rational{Int64}}(-0.0028438381970336854, 209//12), Cashflow{Float64, Rational{Int64}}(-0.0028414643370289795, 35//2), Cashflow{Float64, Rational{Int64}}(-0.0028395292581497736, 211//12), Cashflow{Float64, Rational{Int64}}(-0.0028380362943343424, 53//3), Cashflow{Float64, Rational{Int64}}(-0.002836988992328804, 71//4), Cashflow{Float64, Rational{Int64}}(-0.002836391118006782, 107//6), Cashflow{Float64, Rational{Int64}}(-0.0028362466629578338, 215//12), Cashflow{Float64, Rational{Int64}}(-0.6510276535254121, 18//1)]
+ [Cashflow{Float64, Rational{Int64}}(-0.004989026914463392, 1//12), Cashflow{Float64, Rational{Int64}}(-0.005072503613158184, 1//6), Cashflow{Float64, Rational{Int64}}(-0.005157007583915993, 1//4), Cashflow{Float64, Rational{Int64}}(-0.005242076337285006, 1//3), Cashflow{Float64, Rational{Int64}}(-0.0053272085834838116, 5//12), Cashflow{Float64, Rational{Int64}}(-0.005411862934794599, 1//2), Cashflow{Float64, Rational{Int64}}(-0.0054954569390823806, 7//12), Cashflow{Float64, Rational{Int64}}(-0.00557736649771718, 2//3), Cashflow{Float64, Rational{Int64}}(-0.005656925723839015, 3//4), Cashflow{Float64, Rational{Int64}}(-0.005733427299288154, 5//6)  …  Cashflow{Float64, Rational{Int64}}(-0.003404660033356735, 53//4), Cashflow{Float64, Rational{Int64}}(-0.0033708218012461827, 40//3), Cashflow{Float64, Rational{Int64}}(-0.003337581040356867, 161//12), Cashflow{Float64, Rational{Int64}}(-0.0033049298363434097, 27//2), Cashflow{Float64, Rational{Int64}}(-0.003272860428437546, 163//12), Cashflow{Float64, Rational{Int64}}(-0.0032413652074448113, 41//3), Cashflow{Float64, Rational{Int64}}(-0.003210436713800933, 55//4), Cashflow{Float64, Rational{Int64}}(-0.003180067635691048, 83//6), Cashflow{Float64, Rational{Int64}}(-0.0031502508072285204, 167//12), Cashflow{Float64, Rational{Int64}}(-0.4672090174521514, 14//1)]
  [Cashflow{Float64, Rational{Int64}}(-0.0040787064420970826, 1//12), Cashflow{Float64, Rational{Int64}}(-0.004181837084799977, 1//6), Cashflow{Float64, Rational{Int64}}(-0.004290237133783712, 1//4), Cashflow{Float64, Rational{Int64}}(-0.004402449495381768, 1//3), Cashflow{Float64, Rational{Int64}}(-0.00451663974771565, 5//12), Cashflow{Float64, Rational{Int64}}(-0.004630522083421415, 1//2), Cashflow{Float64, Rational{Int64}}(-0.004741279733252552, 7//12), Cashflow{Float64, Rational{Int64}}(-0.00484548256916171, 2//3), Cashflow{Float64, Rational{Int64}}(-0.004939006489146975, 3//4), Cashflow{Float64, Rational{Int64}}(-0.005016961898414784, 5//6)  …  Cashflow{Float64, Rational{Int64}}(-0.0034881369196172805, 9//4), Cashflow{Float64, Rational{Int64}}(-0.0034750286149361565, 7//3), Cashflow{Float64, Rational{Int64}}(-0.0034894594281216834, 29//12), Cashflow{Float64, Rational{Int64}}(-0.0035317716401467763, 5//2), Cashflow{Float64, Rational{Int64}}(-0.0036029399996526067, 31//12), Cashflow{Float64, Rational{Int64}}(-0.0037046064641791895, 8//3), Cashflow{Float64, Rational{Int64}}(-0.0038391371219646596, 11//4), Cashflow{Float64, Rational{Int64}}(-0.00400970300555729, 17//6), Cashflow{Float64, Rational{Int64}}(-0.004220386926584579, 35//12), Cashflow{Float64, Rational{Int64}}(-0.9066566084455148, 3//1)]
- [Cashflow{Float64, Rational{Int64}}(-0.004891215295878957, 1//12), Cashflow{Float64, Rational{Int64}}(-0.004958966692784059, 1//6), Cashflow{Float64, Rational{Int64}}(-0.005027230356527339, 1//4), Cashflow{Float64, Rational{Int64}}(-0.005095628499248275, 1//3), Cashflow{Float64, Rational{Int64}}(-0.005163757905081053, 5//12), Cashflow{Float64, Rational{Int64}}(-0.0052311893693252655, 1//2), Cashflow{Float64, Rational{Int64}}(-0.0052974673461451335, 7//12), Cashflow{Float64, Rational{Int64}}(-0.005362109830380762, 2//3), Cashflow{Float64, Rational{Int64}}(-0.0054246084999782515, 3//4), Cashflow{Float64, Rational{Int64}}(-0.005484429146402067, 5//6)  …  Cashflow{Float64, Rational{Int64}}(-0.00281549132409045, 65//4), Cashflow{Float64, Rational{Int64}}(-0.0028050122556286493, 49//3), Cashflow{Float64, Rational{Int64}}(-0.00279493303752313, 197//12), Cashflow{Float64, Rational{Int64}}(-0.0027852535075186717, 33//2), Cashflow{Float64, Rational{Int64}}(-0.0027759736354747693, 199//12), Cashflow{Float64, Rational{Int64}}(-0.002767093526022738, 50//3), Cashflow{Float64, Rational{Int64}}(-0.0027586134213474886, 67//4), Cashflow{Float64, Rational{Int64}}(-0.0027505337040978593, 101//6), Cashflow{Float64, Rational{Int64}}(-0.002742854900433503, 203//12), Cashflow{Float64, Rational{Int64}}(-0.6089189939944261, 17//1)]
+ [Cashflow{Float64, Rational{Int64}}(-0.004969120405811204, 1//12), Cashflow{Float64, Rational{Int64}}(-0.005047050365765408, 1//6), Cashflow{Float64, Rational{Int64}}(-0.005125802688680543, 1//4), Cashflow{Float64, Rational{Int64}}(-0.005204945068597846, 1//3), Cashflow{Float64, Rational{Int64}}(-0.005284011648055461, 5//12), Cashflow{Float64, Rational{Int64}}(-0.005362502043055925, 1//2), Cashflow{Float64, Rational{Int64}}(-0.005439880651722219, 7//12), Cashflow{Float64, Rational{Int64}}(-0.005515576287951582, 2//3), Cashflow{Float64, Rational{Int64}}(-0.005588982183192956, 3//4), Cashflow{Float64, Rational{Int64}}(-0.005659456401106093, 5//6)  …  Cashflow{Float64, Rational{Int64}}(-0.003095135904573605, 57//4), Cashflow{Float64, Rational{Int64}}(-0.0030702310298667437, 43//3), Cashflow{Float64, Rational{Int64}}(-0.003045806631755013, 173//12), Cashflow{Float64, Rational{Int64}}(-0.0030218578210388625, 29//2), Cashflow{Float64, Rational{Int64}}(-0.0029983798227155747, 175//12), Cashflow{Float64, Rational{Int64}}(-0.0029753679754469797, 44//3), Cashflow{Float64, Rational{Int64}}(-0.0029528177310823808, 59//4), Cashflow{Float64, Rational{Int64}}(-0.0029307246542385214, 89//6), Cashflow{Float64, Rational{Int64}}(-0.0029090844219367973, 179//12), Cashflow{Float64, Rational{Int64}}(-0.513456896562433, 15//1)]
+ [Cashflow{Float64, Rational{Int64}}(-0.00484668200548985, 1//12), Cashflow{Float64, Rational{Int64}}(-0.0049100274641540355, 1//6), Cashflow{Float64, Rational{Int64}}(-0.004973771861878092, 1//4), Cashflow{Float64, Rational{Int64}}(-0.005037561154641696, 1//3), Cashflow{Float64, Rational{Int64}}(-0.005101018961600112, 5//12), Cashflow{Float64, Rational{Int64}}(-0.00516374613478892, 1//2), Cashflow{Float64, Rational{Int64}}(-0.005225320508363633, 7//12), Cashflow{Float64, Rational{Int64}}(-0.00528529684781004, 2//3), Cashflow{Float64, Rational{Int64}}(-0.005343207020245248, 3//4), Cashflow{Float64, Rational{Int64}}(-0.005398560407581078, 5//6)  …  Cashflow{Float64, Rational{Int64}}(-0.0028498899525714987, 69//4), Cashflow{Float64, Rational{Int64}}(-0.0028466477109700184, 52//3), Cashflow{Float64, Rational{Int64}}(-0.0028438381970336854, 209//12), Cashflow{Float64, Rational{Int64}}(-0.0028414643370289795, 35//2), Cashflow{Float64, Rational{Int64}}(-0.0028395292581497736, 211//12), Cashflow{Float64, Rational{Int64}}(-0.0028380362943343424, 53//3), Cashflow{Float64, Rational{Int64}}(-0.002836988992328804, 71//4), Cashflow{Float64, Rational{Int64}}(-0.002836391118006782, 107//6), Cashflow{Float64, Rational{Int64}}(-0.0028362466629578338, 215//12), Cashflow{Float64, Rational{Int64}}(-0.6510276535254121, 18//1)]
+ [Cashflow{Float64, Rational{Int64}}(-0.004424258662627023, 1//12), Cashflow{Float64, Rational{Int64}}(-0.004531287849794747, 1//6), Cashflow{Float64, Rational{Int64}}(-0.004641425855601325, 1//4), Cashflow{Float64, Rational{Int64}}(-0.004753930805967418, 1//3), Cashflow{Float64, Rational{Int64}}(-0.004867946524016453, 5//12), Cashflow{Float64, Rational{Int64}}(-0.004982492484160319, 1//2), Cashflow{Float64, Rational{Int64}}(-0.005096454586812677, 7//12), Cashflow{Float64, Rational{Int64}}(-0.005208577175287752, 2//3), Cashflow{Float64, Rational{Int64}}(-0.005317456788965952, 3//4), Cashflow{Float64, Rational{Int64}}(-0.005421538222340484, 5//6)  …  Cashflow{Float64, Rational{Int64}}(-0.010779718099495577, 25//4), Cashflow{Float64, Rational{Int64}}(-0.010707757626314915, 19//3), Cashflow{Float64, Rational{Int64}}(-0.01063260474415043, 77//12), Cashflow{Float64, Rational{Int64}}(-0.010554332167721845, 13//2), Cashflow{Float64, Rational{Int64}}(-0.01047301604582292, 79//12), Cashflow{Float64, Rational{Int64}}(-0.010388735819327524, 20//3), Cashflow{Float64, Rational{Int64}}(-0.010301574071366447, 27//4), Cashflow{Float64, Rational{Int64}}(-0.010211616370121152, 41//6), Cashflow{Float64, Rational{Int64}}(-0.010118951104718079, 83//12), Cashflow{Float64, Rational{Int64}}(-0.48575081864113745, 7//1)]
+ [Cashflow{Float64, Rational{Int64}}(-0.004557385177676505, 1//12), Cashflow{Float64, Rational{Int64}}(-0.004664387545950275, 1//6), Cashflow{Float64, Rational{Int64}}(-0.0047742008193853965, 1//4), Cashflow{Float64, Rational{Int64}}(-0.00488614452367044, 1//3), Cashflow{Float64, Rational{Int64}}(-0.004999441950790049, 5//12), Cashflow{Float64, Rational{Int64}}(-0.0051132127602090665, 1//2), Cashflow{Float64, Rational{Int64}}(-0.005226466320959016, 7//12), Cashflow{Float64, Rational{Int64}}(-0.005338096093052123, 2//3), Cashflow{Float64, Rational{Int64}}(-0.005446875388809937, 3//4), Cashflow{Float64, Rational{Int64}}(-0.005551454897149994, 5//6)  …  Cashflow{Float64, Rational{Int64}}(-0.009612003204621645, 29//4), Cashflow{Float64, Rational{Int64}}(-0.009517691790623088, 22//3), Cashflow{Float64, Rational{Int64}}(-0.009421239317538287, 89//12), Cashflow{Float64, Rational{Int64}}(-0.009322735198487444, 15//2), Cashflow{Float64, Rational{Int64}}(-0.009222270238825802, 91//12), Cashflow{Float64, Rational{Int64}}(-0.009119936465989032, 23//3), Cashflow{Float64, Rational{Int64}}(-0.009015826957992887, 31//4), Cashflow{Float64, Rational{Int64}}(-0.008910035671122777, 47//6), Cashflow{Float64, Rational{Int64}}(-0.008802657267349105, 95//12), Cashflow{Float64, Rational{Int64}}(-0.4224849041397684, 8//1)]
+ [Cashflow{Float64, Rational{Int64}}(-0.004934341012856126, 1//12), Cashflow{Float64, Rational{Int64}}(-0.005006985379965156, 1//6), Cashflow{Float64, Rational{Int64}}(-0.005080281729186395, 1//4), Cashflow{Float64, Rational{Int64}}(-0.0051538260967086925, 1//3), Cashflow{Float64, Rational{Int64}}(-0.00522718538625404, 5//12), Cashflow{Float64, Rational{Int64}}(-0.00529989663220021, 1//2), Cashflow{Float64, Rational{Int64}}(-0.005371466505717817, 7//12), Cashflow{Float64, Rational{Int64}}(-0.005441371096268787, 2//3), Cashflow{Float64, Rational{Int64}}(-0.0055090560020900166, 3//4), Cashflow{Float64, Rational{Int64}}(-0.005573936764447176, 5//6)  …  Cashflow{Float64, Rational{Int64}}(-0.0029003255089834427, 61//4), Cashflow{Float64, Rational{Int64}}(-0.002882910770566691, 46//3), Cashflow{Float64, Rational{Int64}}(-0.0028659134998877214, 185//12), Cashflow{Float64, Rational{Int64}}(-0.0028493311657012427, 31//2), Cashflow{Float64, Rational{Int64}}(-0.0028331613441325196, 187//12), Cashflow{Float64, Rational{Int64}}(-0.002817401719508703, 47//3), Cashflow{Float64, Rational{Int64}}(-0.0028020500852618748, 63//4), Cashflow{Float64, Rational{Int64}}(-0.002787104344907078, 95//6), Cashflow{Float64, Rational{Int64}}(-0.0027725625130955237, 191//12), Cashflow{Float64, Rational{Int64}}(-0.5617474374389465, 16//1)]
+ ⋮
  [Cashflow{Float64, Rational{Int64}}(-0.004989026914463392, 1//12), Cashflow{Float64, Rational{Int64}}(-0.005072503613158184, 1//6), Cashflow{Float64, Rational{Int64}}(-0.005157007583915993, 1//4), Cashflow{Float64, Rational{Int64}}(-0.005242076337285006, 1//3), Cashflow{Float64, Rational{Int64}}(-0.0053272085834838116, 5//12), Cashflow{Float64, Rational{Int64}}(-0.005411862934794599, 1//2), Cashflow{Float64, Rational{Int64}}(-0.0054954569390823806, 7//12), Cashflow{Float64, Rational{Int64}}(-0.00557736649771718, 2//3), Cashflow{Float64, Rational{Int64}}(-0.005656925723839015, 3//4), Cashflow{Float64, Rational{Int64}}(-0.005733427299288154, 5//6)  …  Cashflow{Float64, Rational{Int64}}(-0.003404660033356735, 53//4), Cashflow{Float64, Rational{Int64}}(-0.0033708218012461827, 40//3), Cashflow{Float64, Rational{Int64}}(-0.003337581040356867, 161//12), Cashflow{Float64, Rational{Int64}}(-0.0033049298363434097, 27//2), Cashflow{Float64, Rational{Int64}}(-0.003272860428437546, 163//12), Cashflow{Float64, Rational{Int64}}(-0.0032413652074448113, 41//3), Cashflow{Float64, Rational{Int64}}(-0.003210436713800933, 55//4), Cashflow{Float64, Rational{Int64}}(-0.003180067635691048, 83//6), Cashflow{Float64, Rational{Int64}}(-0.0031502508072285204, 167//12), Cashflow{Float64, Rational{Int64}}(-0.4672090174521514, 14//1)]
  [Cashflow{Float64, Rational{Int64}}(-0.00481332732100046, 1//12), Cashflow{Float64, Rational{Int64}}(-0.004916762617369714, 1//6), Cashflow{Float64, Rational{Int64}}(-0.005022383704013293, 1//4), Cashflow{Float64, Rational{Int64}}(-0.005129594803825976, 1//3), Cashflow{Float64, Rational{Int64}}(-0.0052377293885511635, 5//12), Cashflow{Float64, Rational{Int64}}(-0.005346046016977911, 1//2), Cashflow{Float64, Rational{Int64}}(-0.00545372475908839, 7//12), Cashflow{Float64, Rational{Int64}}(-0.0055598643674477045, 2//3), Cashflow{Float64, Rational{Int64}}(-0.005663480372766219, 3//4), Cashflow{Float64, Rational{Int64}}(-0.005763504295428749, 5//6)  …  Cashflow{Float64, Rational{Int64}}(-0.006786789334747034, 37//4), Cashflow{Float64, Rational{Int64}}(-0.006678902764107166, 28//3), Cashflow{Float64, Rational{Int64}}(-0.006570743488049318, 113//12), Cashflow{Float64, Rational{Int64}}(-0.006462374548703682, 19//2), Cashflow{Float64, Rational{Int64}}(-0.006353857780024903, 115//12), Cashflow{Float64, Rational{Int64}}(-0.006245253761982951, 29//3), Cashflow{Float64, Rational{Int64}}(-0.006136621780119885, 39//4), Cashflow{Float64, Rational{Int64}}(-0.006028019790513907, 59//6), Cashflow{Float64, Rational{Int64}}(-0.005919504390143346, 119//12), Cashflow{Float64, Rational{Int64}}(-0.35934756328783796, 10//1)]
  [Cashflow{Float64, Rational{Int64}}(-0.004961099093861061, 1//12), Cashflow{Float64, Rational{Int64}}(-0.005055658321176967, 1//6), Cashflow{Float64, Rational{Int64}}(-0.0051517659271625785, 1//4), Cashflow{Float64, Rational{Int64}}(-0.005248894972452931, 1//3), Cashflow{Float64, Rational{Int64}}(-0.0053464662084109875, 5//12), Cashflow{Float64, Rational{Int64}}(-0.005443845753613525, 1//2), Cashflow{Float64, Rational{Int64}}(-0.005540343217294943, 7//12), Cashflow{Float64, Rational{Int64}}(-0.0056352103608925804, 2//3), Cashflow{Float64, Rational{Int64}}(-0.005727640395032597, 3//4), Cashflow{Float64, Rational{Int64}}(-0.0058167680149368624, 5//6)  …  Cashflow{Float64, Rational{Int64}}(-0.00448186407908259, 45//4), Cashflow{Float64, Rational{Int64}}(-0.004420023164615087, 34//3), Cashflow{Float64, Rational{Int64}}(-0.004359312015469468, 137//12), Cashflow{Float64, Rational{Int64}}(-0.004299710096059417, 23//2), Cashflow{Float64, Rational{Int64}}(-0.004241197285320075, 139//12), Cashflow{Float64, Rational{Int64}}(-0.0041837538685546224, 35//3), Cashflow{Float64, Rational{Int64}}(-0.0041273605294409816, 47//4), Cashflow{Float64, Rational{Int64}}(-0.0040719983421960235, 71//6), Cashflow{Float64, Rational{Int64}}(-0.004017648763896468, 143//12), Cashflow{Float64, Rational{Int64}}(-0.3913747165242466, 12//1)]
- [Cashflow{Float64, Rational{Int64}}(-0.004144410382128681, 1//12), Cashflow{Float64, Rational{Int64}}(-0.004315318017074089, 1//6), Cashflow{Float64, Rational{Int64}}(-0.004504093438676603, 1//4), Cashflow{Float64, Rational{Int64}}(-0.00471071623903657, 1//3), Cashflow{Float64, Rational{Int64}}(-0.004934713168882003, 5//12), Cashflow{Float64, Rational{Int64}}(-0.0051749370878303915, 1//2), Cashflow{Float64, Rational{Int64}}(-0.005429266292843056, 7//12), Cashflow{Float64, Rational{Int64}}(-0.005694197226230727, 2//3), Cashflow{Float64, Rational{Int64}}(-0.005964295051005587, 3//4), Cashflow{Float64, Rational{Int64}}(-0.006231455978636931, 5//6)  …  Cashflow{Float64, Rational{Int64}}(-0.007040339849056201, 5//4), Cashflow{Float64, Rational{Int64}}(-0.0070309918151435, 4//3), Cashflow{Float64, Rational{Int64}}(-0.006960391349463677, 17//12), Cashflow{Float64, Rational{Int64}}(-0.006830278507743372, 3//2), Cashflow{Float64, Rational{Int64}}(-0.006643759757520943, 19//12), Cashflow{Float64, Rational{Int64}}(-0.006405206284366148, 5//3), Cashflow{Float64, Rational{Int64}}(-0.006120116156813356, 7//4), Cashflow{Float64, Rational{Int64}}(-0.0057949431751937105, 11//6), Cashflow{Float64, Rational{Int64}}(-0.005436895608924536, 23//12), Cashflow{Float64, Rational{Int64}}(-0.9015948971297525, 2//1)]
- [Cashflow{Float64, Rational{Int64}}(-0.004144410382128681, 1//12), Cashflow{Float64, Rational{Int64}}(-0.004315318017074089, 1//6), Cashflow{Float64, Rational{Int64}}(-0.004504093438676603, 1//4), Cashflow{Float64, Rational{Int64}}(-0.00471071623903657, 1//3), Cashflow{Float64, Rational{Int64}}(-0.004934713168882003, 5//12), Cashflow{Float64, Rational{Int64}}(-0.0051749370878303915, 1//2), Cashflow{Float64, Rational{Int64}}(-0.005429266292843056, 7//12), Cashflow{Float64, Rational{Int64}}(-0.005694197226230727, 2//3), Cashflow{Float64, Rational{Int64}}(-0.005964295051005587, 3//4), Cashflow{Float64, Rational{Int64}}(-0.006231455978636931, 5//6)  …  Cashflow{Float64, Rational{Int64}}(-0.007040339849056201, 5//4), Cashflow{Float64, Rational{Int64}}(-0.0070309918151435, 4//3), Cashflow{Float64, Rational{Int64}}(-0.006960391349463677, 17//12), Cashflow{Float64, Rational{Int64}}(-0.006830278507743372, 3//2), Cashflow{Float64, Rational{Int64}}(-0.006643759757520943, 19//12), Cashflow{Float64, Rational{Int64}}(-0.006405206284366148, 5//3), Cashflow{Float64, Rational{Int64}}(-0.006120116156813356, 7//4), Cashflow{Float64, Rational{Int64}}(-0.0057949431751937105, 11//6), Cashflow{Float64, Rational{Int64}}(-0.005436895608924536, 23//12), Cashflow{Float64, Rational{Int64}}(-0.9015948971297525, 2//1)]
- [Cashflow{Float64, Rational{Int64}}(-0.004783377181503488, 1//12), Cashflow{Float64, Rational{Int64}}(-0.004839628938067403, 1//6), Cashflow{Float64, Rational{Int64}}(-0.004896115454239143, 1//4), Cashflow{Float64, Rational{Int64}}(-0.004952522042686588, 1//3), Cashflow{Float64, Rational{Int64}}(-0.005008516357927531, 5//12), Cashflow{Float64, Rational{Int64}}(-0.005063748136459031, 1//2), Cashflow{Float64, Rational{Int64}}(-0.005117849072112032, 7//12), Cashflow{Float64, Rational{Int64}}(-0.005170432840042458, 2//3), Cashflow{Float64, Rational{Int64}}(-0.005221095283163374, 3//4), Cashflow{Float64, Rational{Int64}}(-0.0052694147752224245, 5//6)  …  Cashflow{Float64, Rational{Int64}}(-0.0034052147073842754, 77//4), Cashflow{Float64, Rational{Int64}}(-0.0034222845055589825, 58//3), Cashflow{Float64, Rational{Int64}}(-0.0034401086494695596, 233//12), Cashflow{Float64, Rational{Int64}}(-0.003458703030723001, 39//2), Cashflow{Float64, Rational{Int64}}(-0.003478084148257083, 235//12), Cashflow{Float64, Rational{Int64}}(-0.0034982691293209437, 59//3), Cashflow{Float64, Rational{Int64}}(-0.0035192757511736806, 79//4), Cashflow{Float64, Rational{Int64}}(-0.0035411224635144953, 119//6), Cashflow{Float64, Rational{Int64}}(-0.003563828411657379, 239//12), Cashflow{Float64, Rational{Int64}}(-0.697536591529004, 20//1)]
- [Cashflow{Float64, Rational{Int64}}(-0.004969120405811204, 1//12), Cashflow{Float64, Rational{Int64}}(-0.005047050365765408, 1//6), Cashflow{Float64, Rational{Int64}}(-0.005125802688680543, 1//4), Cashflow{Float64, Rational{Int64}}(-0.005204945068597846, 1//3), Cashflow{Float64, Rational{Int64}}(-0.005284011648055461, 5//12), Cashflow{Float64, Rational{Int64}}(-0.005362502043055925, 1//2), Cashflow{Float64, Rational{Int64}}(-0.005439880651722219, 7//12), Cashflow{Float64, Rational{Int64}}(-0.005515576287951582, 2//3), Cashflow{Float64, Rational{Int64}}(-0.005588982183192956, 3//4), Cashflow{Float64, Rational{Int64}}(-0.005659456401106093, 5//6)  …  Cashflow{Float64, Rational{Int64}}(-0.003095135904573605, 57//4), Cashflow{Float64, Rational{Int64}}(-0.0030702310298667437, 43//3), Cashflow{Float64, Rational{Int64}}(-0.003045806631755013, 173//12), Cashflow{Float64, Rational{Int64}}(-0.0030218578210388625, 29//2), Cashflow{Float64, Rational{Int64}}(-0.0029983798227155747, 175//12), Cashflow{Float64, Rational{Int64}}(-0.0029753679754469797, 44//3), Cashflow{Float64, Rational{Int64}}(-0.0029528177310823808, 59//4), Cashflow{Float64, Rational{Int64}}(-0.0029307246542385214, 89//6), Cashflow{Float64, Rational{Int64}}(-0.0029090844219367973, 179//12), Cashflow{Float64, Rational{Int64}}(-0.513456896562433, 15//1)]
- [Cashflow{Float64, Rational{Int64}}(-0.004557385177676505, 1//12), Cashflow{Float64, Rational{Int64}}(-0.004664387545950275, 1//6), Cashflow{Float64, Rational{Int64}}(-0.0047742008193853965, 1//4), Cashflow{Float64, Rational{Int64}}(-0.00488614452367044, 1//3), Cashflow{Float64, Rational{Int64}}(-0.004999441950790049, 5//12), Cashflow{Float64, Rational{Int64}}(-0.0051132127602090665, 1//2), Cashflow{Float64, Rational{Int64}}(-0.005226466320959016, 7//12), Cashflow{Float64, Rational{Int64}}(-0.005338096093052123, 2//3), Cashflow{Float64, Rational{Int64}}(-0.005446875388809937, 3//4), Cashflow{Float64, Rational{Int64}}(-0.005551454897149994, 5//6)  …  Cashflow{Float64, Rational{Int64}}(-0.009612003204621645, 29//4), Cashflow{Float64, Rational{Int64}}(-0.009517691790623088, 22//3), Cashflow{Float64, Rational{Int64}}(-0.009421239317538287, 89//12), Cashflow{Float64, Rational{Int64}}(-0.009322735198487444, 15//2), Cashflow{Float64, Rational{Int64}}(-0.009222270238825802, 91//12), Cashflow{Float64, Rational{Int64}}(-0.009119936465989032, 23//3), Cashflow{Float64, Rational{Int64}}(-0.009015826957992887, 31//4), Cashflow{Float64, Rational{Int64}}(-0.008910035671122777, 47//6), Cashflow{Float64, Rational{Int64}}(-0.008802657267349105, 95//12), Cashflow{Float64, Rational{Int64}}(-0.4224849041397684, 8//1)]
- ⋮
- [Cashflow{Float64, Rational{Int64}}(-0.0049038424385172375, 1//12), Cashflow{Float64, Rational{Int64}}(-0.005003342312704534, 1//6), Cashflow{Float64, Rational{Int64}}(-0.005104701202457077, 1//4), Cashflow{Float64, Rational{Int64}}(-0.005207358411037622, 1//3), Cashflow{Float64, Rational{Int64}}(-0.005310692394094387, 5//12), Cashflow{Float64, Rational{Int64}}(-0.005414017645807302, 1//2), Cashflow{Float64, Rational{Int64}}(-0.005516582099269058, 7//12), Cashflow{Float64, Rational{Int64}}(-0.005617565161865263, 2//3), Cashflow{Float64, Rational{Int64}}(-0.005716076516180846, 3//4), Cashflow{Float64, Rational{Int64}}(-0.0058111558260197415, 5//6)  …  Cashflow{Float64, Rational{Int64}}(-0.005407598148241427, 41//4), Cashflow{Float64, Rational{Int64}}(-0.005320442564745627, 31//3), Cashflow{Float64, Rational{Int64}}(-0.0052350166727639195, 125//12), Cashflow{Float64, Rational{Int64}}(-0.005151284793128043, 21//2), Cashflow{Float64, Rational{Int64}}(-0.005069212027467017, 127//12), Cashflow{Float64, Rational{Int64}}(-0.004988764241340426, 32//3), Cashflow{Float64, Rational{Int64}}(-0.0049099080477190945, 43//4), Cashflow{Float64, Rational{Int64}}(-0.004832610790807698, 65//6), Cashflow{Float64, Rational{Int64}}(-0.004756840530202081, 131//12), Cashflow{Float64, Rational{Int64}}(-0.3673579326275773, 11//1)]
- [Cashflow{Float64, Rational{Int64}}(-0.00419222997633213, 1//12), Cashflow{Float64, Rational{Int64}}(-0.004294485538085034, 1//6), Cashflow{Float64, Rational{Int64}}(-0.00440032720940759, 1//4), Cashflow{Float64, Rational{Int64}}(-0.0045087902482982755, 1//3), Cashflow{Float64, Rational{Int64}}(-0.004618734211714481, 5//12), Cashflow{Float64, Rational{Int64}}(-0.004728822405187647, 1//2), Cashflow{Float64, Rational{Int64}}(-0.004837502211883185, 7//12), Cashflow{Float64, Rational{Int64}}(-0.0049429872815796435, 2//3), Cashflow{Float64, Rational{Int64}}(-0.0050432428255826655, 3//4), Cashflow{Float64, Rational{Int64}}(-0.0051359755663768995, 5//6)  …  Cashflow{Float64, Rational{Int64}}(-0.01221783636993319, 17//4), Cashflow{Float64, Rational{Int64}}(-0.012348041850912319, 13//3), Cashflow{Float64, Rational{Int64}}(-0.012457251832534334, 53//12), Cashflow{Float64, Rational{Int64}}(-0.012545111548720702, 9//2), Cashflow{Float64, Rational{Int64}}(-0.012611387748361194, 55//12), Cashflow{Float64, Rational{Int64}}(-0.01265596763494828, 14//3), Cashflow{Float64, Rational{Int64}}(-0.012678856503834704, 19//4), Cashflow{Float64, Rational{Int64}}(-0.012680174171184718, 29//6), Cashflow{Float64, Rational{Int64}}(-0.012660150307376739, 59//12), Cashflow{Float64, Rational{Int64}}(-0.6659856353990624, 5//1)]
- [Cashflow{Float64, Rational{Int64}}(-0.00410544862419315, 1//12), Cashflow{Float64, Rational{Int64}}(-0.0042013195952498835, 1//6), Cashflow{Float64, Rational{Int64}}(-0.00430085710341196, 1//4), Cashflow{Float64, Rational{Int64}}(-0.004402868331095022, 1//3), Cashflow{Float64, Rational{Int64}}(-0.004505923207647822, 5//12), Cashflow{Float64, Rational{Int64}}(-0.00460832149181867, 1//2), Cashflow{Float64, Rational{Int64}}(-0.004708060388526365, 7//12), Cashflow{Float64, Rational{Int64}}(-0.004802804419212901, 2//3), Cashflow{Float64, Rational{Int64}}(-0.004889859894500556, 3//4), Cashflow{Float64, Rational{Int64}}(-0.004966157109422133, 5//6)  …  Cashflow{Float64, Rational{Int64}}(-0.008088137962470572, 13//4), Cashflow{Float64, Rational{Int64}}(-0.008442126655031376, 10//3), Cashflow{Float64, Rational{Int64}}(-0.008793665130530155, 41//12), Cashflow{Float64, Rational{Int64}}(-0.009141204196901878, 7//2), Cashflow{Float64, Rational{Int64}}(-0.009483166407634995, 43//12), Cashflow{Float64, Rational{Int64}}(-0.009817960195971354, 11//3), Cashflow{Float64, Rational{Int64}}(-0.010143994647909188, 15//4), Cashflow{Float64, Rational{Int64}}(-0.010459694678548759, 23//6), Cashflow{Float64, Rational{Int64}}(-0.01076351636019754, 47//12), Cashflow{Float64, Rational{Int64}}(-0.8062440741066449, 4//1)]
- [Cashflow{Float64, Rational{Int64}}(-0.00419222997633213, 1//12), Cashflow{Float64, Rational{Int64}}(-0.004294485538085034, 1//6), Cashflow{Float64, Rational{Int64}}(-0.00440032720940759, 1//4), Cashflow{Float64, Rational{Int64}}(-0.0045087902482982755, 1//3), Cashflow{Float64, Rational{Int64}}(-0.004618734211714481, 5//12), Cashflow{Float64, Rational{Int64}}(-0.004728822405187647, 1//2), Cashflow{Float64, Rational{Int64}}(-0.004837502211883185, 7//12), Cashflow{Float64, Rational{Int64}}(-0.0049429872815796435, 2//3), Cashflow{Float64, Rational{Int64}}(-0.0050432428255826655, 3//4), Cashflow{Float64, Rational{Int64}}(-0.0051359755663768995, 5//6)  …  Cashflow{Float64, Rational{Int64}}(-0.01221783636993319, 17//4), Cashflow{Float64, Rational{Int64}}(-0.012348041850912319, 13//3), Cashflow{Float64, Rational{Int64}}(-0.012457251832534334, 53//12), Cashflow{Float64, Rational{Int64}}(-0.012545111548720702, 9//2), Cashflow{Float64, Rational{Int64}}(-0.012611387748361194, 55//12), Cashflow{Float64, Rational{Int64}}(-0.01265596763494828, 14//3), Cashflow{Float64, Rational{Int64}}(-0.012678856503834704, 19//4), Cashflow{Float64, Rational{Int64}}(-0.012680174171184718, 29//6), Cashflow{Float64, Rational{Int64}}(-0.012660150307376739, 59//12), Cashflow{Float64, Rational{Int64}}(-0.6659856353990624, 5//1)]
- [Cashflow{Float64, Rational{Int64}}(-0.0040787064420970826, 1//12), Cashflow{Float64, Rational{Int64}}(-0.004181837084799977, 1//6), Cashflow{Float64, Rational{Int64}}(-0.004290237133783712, 1//4), Cashflow{Float64, Rational{Int64}}(-0.004402449495381768, 1//3), Cashflow{Float64, Rational{Int64}}(-0.00451663974771565, 5//12), Cashflow{Float64, Rational{Int64}}(-0.004630522083421415, 1//2), Cashflow{Float64, Rational{Int64}}(-0.004741279733252552, 7//12), Cashflow{Float64, Rational{Int64}}(-0.00484548256916171, 2//3), Cashflow{Float64, Rational{Int64}}(-0.004939006489146975, 3//4), Cashflow{Float64, Rational{Int64}}(-0.005016961898414784, 5//6)  …  Cashflow{Float64, Rational{Int64}}(-0.0034881369196172805, 9//4), Cashflow{Float64, Rational{Int64}}(-0.0034750286149361565, 7//3), Cashflow{Float64, Rational{Int64}}(-0.0034894594281216834, 29//12), Cashflow{Float64, Rational{Int64}}(-0.0035317716401467763, 5//2), Cashflow{Float64, Rational{Int64}}(-0.0036029399996526067, 31//12), Cashflow{Float64, Rational{Int64}}(-0.0037046064641791895, 8//3), Cashflow{Float64, Rational{Int64}}(-0.0038391371219646596, 11//4), Cashflow{Float64, Rational{Int64}}(-0.00400970300555729, 17//6), Cashflow{Float64, Rational{Int64}}(-0.004220386926584579, 35//12), Cashflow{Float64, Rational{Int64}}(-0.9066566084455148, 3//1)]
- [Cashflow{Float64, Rational{Int64}}(-0.00469206916013884, 1//12), Cashflow{Float64, Rational{Int64}}(-0.004797944275763207, 1//6), Cashflow{Float64, Rational{Int64}}(-0.00490632362599739, 1//4), Cashflow{Float64, Rational{Int64}}(-0.0050165731210517475, 1//3), Cashflow{Float64, Rational{Int64}}(-0.005127976422810296, 5//12), Cashflow{Float64, Rational{Int64}}(-0.005239729406817578, 1//2), Cashflow{Float64, Rational{Int64}}(-0.00535093528564478, 7//12), Cashflow{Float64, Rational{Int64}}(-0.005460600611106549, 2//3), Cashflow{Float64, Rational{Int64}}(-0.005567632398211778, 3//4), Cashflow{Float64, Rational{Int64}}(-0.0056708366385607965, 5//6)  …  Cashflow{Float64, Rational{Int64}}(-0.008258197444484435, 33//4), Cashflow{Float64, Rational{Int64}}(-0.008152106726561411, 25//3), Cashflow{Float64, Rational{Int64}}(-0.008044931783812803, 101//12), Cashflow{Float64, Rational{Int64}}(-0.00793675620948152, 17//2), Cashflow{Float64, Rational{Int64}}(-0.007827663182837102, 103//12), Cashflow{Float64, Rational{Int64}}(-0.007717735341455881, 26//3), Cashflow{Float64, Rational{Int64}}(-0.007607054657307641, 35//4), Cashflow{Float64, Rational{Int64}}(-0.007495702316979209, 53//6), Cashflow{Float64, Rational{Int64}}(-0.0073837586063478095, 107//12), Cashflow{Float64, Rational{Int64}}(-0.37840410914288675, 9//1)]
+ [Cashflow{Float64, Rational{Int64}}(-0.004301332491386756, 1//12), Cashflow{Float64, Rational{Int64}}(-0.0044071184208873074, 1//6), Cashflow{Float64, Rational{Int64}}(-0.00451629225141493, 1//4), Cashflow{Float64, Rational{Int64}}(-0.0046280247264367715, 1//3), Cashflow{Float64, Rational{Int64}}(-0.004741347452432045, 5//12), Cashflow{Float64, Rational{Int64}}(-0.004855138848072489, 1//2), Cashflow{Float64, Rational{Int64}}(-0.004968110976452113, 7//12), Cashflow{Float64, Rational{Int64}}(-0.0050787978823524, 2//3), Cashflow{Float64, Rational{Int64}}(-0.0051855461888944306, 3//4), Cashflow{Float64, Rational{Int64}}(-0.005286508851390791, 5//6)  …  Cashflow{Float64, Rational{Int64}}(-0.011780863294736791, 21//4), Cashflow{Float64, Rational{Int64}}(-0.011738264026137453, 16//3), Cashflow{Float64, Rational{Int64}}(-0.01169163300621344, 65//12), Cashflow{Float64, Rational{Int64}}(-0.011641008699292944, 11//2), Cashflow{Float64, Rational{Int64}}(-0.011586434517280465, 67//12), Cashflow{Float64, Rational{Int64}}(-0.011527958764806496, 17//3), Cashflow{Float64, Rational{Int64}}(-0.01146563457221412, 23//4), Cashflow{Float64, Rational{Int64}}(-0.011399519816458797, 35//6), Cashflow{Float64, Rational{Int64}}(-0.011329677030052618, 71//12), Cashflow{Float64, Rational{Int64}}(-0.5650948727319837, 6//1)]
  [Cashflow{Float64, Rational{Int64}}(-0.004891215295878957, 1//12), Cashflow{Float64, Rational{Int64}}(-0.004958966692784059, 1//6), Cashflow{Float64, Rational{Int64}}(-0.005027230356527339, 1//4), Cashflow{Float64, Rational{Int64}}(-0.005095628499248275, 1//3), Cashflow{Float64, Rational{Int64}}(-0.005163757905081053, 5//12), Cashflow{Float64, Rational{Int64}}(-0.0052311893693252655, 1//2), Cashflow{Float64, Rational{Int64}}(-0.0052974673461451335, 7//12), Cashflow{Float64, Rational{Int64}}(-0.005362109830380762, 2//3), Cashflow{Float64, Rational{Int64}}(-0.0054246084999782515, 3//4), Cashflow{Float64, Rational{Int64}}(-0.005484429146402067, 5//6)  …  Cashflow{Float64, Rational{Int64}}(-0.00281549132409045, 65//4), Cashflow{Float64, Rational{Int64}}(-0.0028050122556286493, 49//3), Cashflow{Float64, Rational{Int64}}(-0.00279493303752313, 197//12), Cashflow{Float64, Rational{Int64}}(-0.0027852535075186717, 33//2), Cashflow{Float64, Rational{Int64}}(-0.0027759736354747693, 199//12), Cashflow{Float64, Rational{Int64}}(-0.002767093526022738, 50//3), Cashflow{Float64, Rational{Int64}}(-0.0027586134213474886, 67//4), Cashflow{Float64, Rational{Int64}}(-0.0027505337040978593, 101//6), Cashflow{Float64, Rational{Int64}}(-0.002742854900433503, 203//12), Cashflow{Float64, Rational{Int64}}(-0.6089189939944261, 17//1)]
- [Cashflow{Float64, Rational{Int64}}(-0.004085858465737679, 1//12), Cashflow{Float64, Rational{Int64}}(-0.004224514759559243, 1//6), Cashflow{Float64, Rational{Int64}}(-0.004388271423025512, 1//4), Cashflow{Float64, Rational{Int64}}(-0.004579427370077135, 1//3), Cashflow{Float64, Rational{Int64}}(-0.004800700750370862, 5//12), Cashflow{Float64, Rational{Int64}}(-0.0050552759234296805, 1//2), Cashflow{Float64, Rational{Int64}}(-0.005346855772250516, 7//12), Cashflow{Float64, Rational{Int64}}(-0.005679718326711681, 2//3), Cashflow{Float64, Rational{Int64}}(-0.006058775775797353, 3//4), Cashflow{Float64, Rational{Int64}}(-0.006489632610658917, 5//6), Cashflow{Float64, Rational{Int64}}(-0.0069786376879914045, 11//12), Cashflow{Float64, Rational{Int64}}(-0.9520883422854205, 1//1)]
- [Cashflow{Float64, Rational{Int64}}(-0.0040787064420970826, 1//12), Cashflow{Float64, Rational{Int64}}(-0.004181837084799977, 1//6), Cashflow{Float64, Rational{Int64}}(-0.004290237133783712, 1//4), Cashflow{Float64, Rational{Int64}}(-0.004402449495381768, 1//3), Cashflow{Float64, Rational{Int64}}(-0.00451663974771565, 5//12), Cashflow{Float64, Rational{Int64}}(-0.004630522083421415, 1//2), Cashflow{Float64, Rational{Int64}}(-0.004741279733252552, 7//12), Cashflow{Float64, Rational{Int64}}(-0.00484548256916171, 2//3), Cashflow{Float64, Rational{Int64}}(-0.004939006489146975, 3//4), Cashflow{Float64, Rational{Int64}}(-0.005016961898414784, 5//6)  …  Cashflow{Float64, Rational{Int64}}(-0.0034881369196172805, 9//4), Cashflow{Float64, Rational{Int64}}(-0.0034750286149361565, 7//3), Cashflow{Float64, Rational{Int64}}(-0.0034894594281216834, 29//12), Cashflow{Float64, Rational{Int64}}(-0.0035317716401467763, 5//2), Cashflow{Float64, Rational{Int64}}(-0.0036029399996526067, 31//12), Cashflow{Float64, Rational{Int64}}(-0.0037046064641791895, 8//3), Cashflow{Float64, Rational{Int64}}(-0.0038391371219646596, 11//4), Cashflow{Float64, Rational{Int64}}(-0.00400970300555729, 17//6), Cashflow{Float64, Rational{Int64}}(-0.004220386926584579, 35//12), Cashflow{Float64, Rational{Int64}}(-0.9066566084455148, 3//1)]</code></pre>
+ [Cashflow{Float64, Rational{Int64}}(-0.00469206916013884, 1//12), Cashflow{Float64, Rational{Int64}}(-0.004797944275763207, 1//6), Cashflow{Float64, Rational{Int64}}(-0.00490632362599739, 1//4), Cashflow{Float64, Rational{Int64}}(-0.0050165731210517475, 1//3), Cashflow{Float64, Rational{Int64}}(-0.005127976422810296, 5//12), Cashflow{Float64, Rational{Int64}}(-0.005239729406817578, 1//2), Cashflow{Float64, Rational{Int64}}(-0.00535093528564478, 7//12), Cashflow{Float64, Rational{Int64}}(-0.005460600611106549, 2//3), Cashflow{Float64, Rational{Int64}}(-0.005567632398211778, 3//4), Cashflow{Float64, Rational{Int64}}(-0.0056708366385607965, 5//6)  …  Cashflow{Float64, Rational{Int64}}(-0.008258197444484435, 33//4), Cashflow{Float64, Rational{Int64}}(-0.008152106726561411, 25//3), Cashflow{Float64, Rational{Int64}}(-0.008044931783812803, 101//12), Cashflow{Float64, Rational{Int64}}(-0.00793675620948152, 17//2), Cashflow{Float64, Rational{Int64}}(-0.007827663182837102, 103//12), Cashflow{Float64, Rational{Int64}}(-0.007717735341455881, 26//3), Cashflow{Float64, Rational{Int64}}(-0.007607054657307641, 35//4), Cashflow{Float64, Rational{Int64}}(-0.007495702316979209, 53//6), Cashflow{Float64, Rational{Int64}}(-0.0073837586063478095, 107//12), Cashflow{Float64, Rational{Int64}}(-0.37840410914288675, 9//1)]
+ [Cashflow{Float64, Rational{Int64}}(-0.004557385177676505, 1//12), Cashflow{Float64, Rational{Int64}}(-0.004664387545950275, 1//6), Cashflow{Float64, Rational{Int64}}(-0.0047742008193853965, 1//4), Cashflow{Float64, Rational{Int64}}(-0.00488614452367044, 1//3), Cashflow{Float64, Rational{Int64}}(-0.004999441950790049, 5//12), Cashflow{Float64, Rational{Int64}}(-0.0051132127602090665, 1//2), Cashflow{Float64, Rational{Int64}}(-0.005226466320959016, 7//12), Cashflow{Float64, Rational{Int64}}(-0.005338096093052123, 2//3), Cashflow{Float64, Rational{Int64}}(-0.005446875388809937, 3//4), Cashflow{Float64, Rational{Int64}}(-0.005551454897149994, 5//6)  …  Cashflow{Float64, Rational{Int64}}(-0.009612003204621645, 29//4), Cashflow{Float64, Rational{Int64}}(-0.009517691790623088, 22//3), Cashflow{Float64, Rational{Int64}}(-0.009421239317538287, 89//12), Cashflow{Float64, Rational{Int64}}(-0.009322735198487444, 15//2), Cashflow{Float64, Rational{Int64}}(-0.009222270238825802, 91//12), Cashflow{Float64, Rational{Int64}}(-0.009119936465989032, 23//3), Cashflow{Float64, Rational{Int64}}(-0.009015826957992887, 31//4), Cashflow{Float64, Rational{Int64}}(-0.008910035671122777, 47//6), Cashflow{Float64, Rational{Int64}}(-0.008802657267349105, 95//12), Cashflow{Float64, Rational{Int64}}(-0.4224849041397684, 8//1)]
+ [Cashflow{Float64, Rational{Int64}}(-0.004989026914463392, 1//12), Cashflow{Float64, Rational{Int64}}(-0.005072503613158184, 1//6), Cashflow{Float64, Rational{Int64}}(-0.005157007583915993, 1//4), Cashflow{Float64, Rational{Int64}}(-0.005242076337285006, 1//3), Cashflow{Float64, Rational{Int64}}(-0.0053272085834838116, 5//12), Cashflow{Float64, Rational{Int64}}(-0.005411862934794599, 1//2), Cashflow{Float64, Rational{Int64}}(-0.0054954569390823806, 7//12), Cashflow{Float64, Rational{Int64}}(-0.00557736649771718, 2//3), Cashflow{Float64, Rational{Int64}}(-0.005656925723839015, 3//4), Cashflow{Float64, Rational{Int64}}(-0.005733427299288154, 5//6)  …  Cashflow{Float64, Rational{Int64}}(-0.003404660033356735, 53//4), Cashflow{Float64, Rational{Int64}}(-0.0033708218012461827, 40//3), Cashflow{Float64, Rational{Int64}}(-0.003337581040356867, 161//12), Cashflow{Float64, Rational{Int64}}(-0.0033049298363434097, 27//2), Cashflow{Float64, Rational{Int64}}(-0.003272860428437546, 163//12), Cashflow{Float64, Rational{Int64}}(-0.0032413652074448113, 41//3), Cashflow{Float64, Rational{Int64}}(-0.003210436713800933, 55//4), Cashflow{Float64, Rational{Int64}}(-0.003180067635691048, 83//6), Cashflow{Float64, Rational{Int64}}(-0.0031502508072285204, 167//12), Cashflow{Float64, Rational{Int64}}(-0.4672090174521514, 14//1)]
+ [Cashflow{Float64, Rational{Int64}}(-0.004989026914463392, 1//12), Cashflow{Float64, Rational{Int64}}(-0.005072503613158184, 1//6), Cashflow{Float64, Rational{Int64}}(-0.005157007583915993, 1//4), Cashflow{Float64, Rational{Int64}}(-0.005242076337285006, 1//3), Cashflow{Float64, Rational{Int64}}(-0.0053272085834838116, 5//12), Cashflow{Float64, Rational{Int64}}(-0.005411862934794599, 1//2), Cashflow{Float64, Rational{Int64}}(-0.0054954569390823806, 7//12), Cashflow{Float64, Rational{Int64}}(-0.00557736649771718, 2//3), Cashflow{Float64, Rational{Int64}}(-0.005656925723839015, 3//4), Cashflow{Float64, Rational{Int64}}(-0.005733427299288154, 5//6)  …  Cashflow{Float64, Rational{Int64}}(-0.003404660033356735, 53//4), Cashflow{Float64, Rational{Int64}}(-0.0033708218012461827, 40//3), Cashflow{Float64, Rational{Int64}}(-0.003337581040356867, 161//12), Cashflow{Float64, Rational{Int64}}(-0.0033049298363434097, 27//2), Cashflow{Float64, Rational{Int64}}(-0.003272860428437546, 163//12), Cashflow{Float64, Rational{Int64}}(-0.0032413652074448113, 41//3), Cashflow{Float64, Rational{Int64}}(-0.003210436713800933, 55//4), Cashflow{Float64, Rational{Int64}}(-0.003180067635691048, 83//6), Cashflow{Float64, Rational{Int64}}(-0.0031502508072285204, 167//12), Cashflow{Float64, Rational{Int64}}(-0.4672090174521514, 14//1)]</code></pre>
 </div>
 </div>
 <p>And running <code>consolidate</code> groups the cashflows into <code>timepoint =&gt; amount</code> pairs.</p>
 <div id="26" class="cell" data-execution_count="1">
 <pre class="julia cell-code"><code>consolidate(cashflow_vectors)</code></pre>
 <div class="cell-output cell-output-display" data-execution_count="1">
-<pre><code>Transducers.GroupByViewDict{Rational{Int64}, Float64, Transducers.DefaultInitOf{typeof(+)}, Dict{Rational{Int64}, Float64}}(20//3 =&gt; -574.8324079281175, 125//12 =&gt; -241.1696732314489, 29//4 =&gt; -497.03326211602706, 229//12 =&gt; -16.711216722636454, 9//4 =&gt; -570.044199445447, 71//4 =&gt; -44.59029794105508, 10//3 =&gt; -712.2651281702854, 109//6 =&gt; -31.05748309142672, 95//12 =&gt; -463.40979206902296, 19//6 =&gt; -688.5587291862178…)</code></pre>
+<pre><code>Transducers.GroupByViewDict{Rational{Int64}, Float64, Transducers.DefaultInitOf{typeof(+)}, Dict{Rational{Int64}, Float64}}(167//12 =&gt; -115.38828289652774, 6 =&gt; -3476.5426192700997, 77//12 =&gt; -588.1804546360012, 19//3 =&gt; -591.4184331554764, 53//4 =&gt; -122.23788146540367, 121//12 =&gt; -255.05654804592595, 233//12 =&gt; -17.24182455114121, 43//4 =&gt; -232.76355469942777, 23//4 =&gt; -668.5867059421439, 101//12 =&gt; -398.5126457294305…)</code></pre>
 </div>
 </div>
 </div>
@@ -533,7 +534,7 @@ end
     value_gradient_and_hessian(z -&gt; annuities(z, liabilities), AutoForwardDiff(), zeros)
 end</code></pre>
 <div class="cell-output cell-output-display" data-execution_count="1">
-<pre><code>(-102328.52372383716, [11636.309877244716, 29678.498028401784, 29919.13931775178, 255931.8072543008, 122809.94477798014, 6302.0579889192395], [-166819.54600246763 195662.16534738286 … 10078.782086885505 -42885.84485590186; 195662.1653473826 -1.677357952645578e6 … 2.4707903206570814e6 1.2646954100423595e6; … ; 10078.782086885418 2.4707903206570838e6 … -3.70168599962765e7 -2.7889326620361377e6; -42885.844855901894 1.2646954100423595e6 … -2.7889326620361432e6 -2.124227159787981e7])</code></pre>
+<pre><code>(-102342.70578791756, [11361.401670472067, 30022.260938377476, 29342.067950043573, 256814.9352377915, 123982.85851618621, 6569.901583081439], [-166563.37510676673 197408.151177275 … 8650.57215904071 -42216.368452116374; 197408.1511772747 -1.6782897101469159e6 … 2.497091583151462e6 1.2707944285740166e6; … ; 8650.572159040628 2.4970915831514634e6 … -3.730447366845256e7 -2.7456109908992173e6; -42216.3684521164 1.2707944285740163e6 … -2.745610990899224e6 -2.155782542620245e7])</code></pre>
 </div>
 </div>
 <section id="gradients-and-hessians-in-alm" class="level3">
@@ -543,31 +544,31 @@ end</code></pre>
 <div id="32" class="cell" data-execution_count="1">
 <pre class="julia cell-code"><code>vgh_liab[1]</code></pre>
 <div class="cell-output cell-output-display" data-execution_count="1">
-<pre><code>-102328.52372383716</code></pre>
+<pre><code>-102342.70578791756</code></pre>
 </div>
 </div>
-<p>The second element of <code>vgh_liab</code> is the partial derivative with respect to each of the inputs (here, just the <code>zeros</code> rates that dictate the curve). The sum of the partials is the effective duration of the liabilities.</p>
+<p>The second element of <code>vgh_liab</code> is the partial derivative with respect to each of the inputs (here, just the <code>zeros</code> rates that dictate the curve). The sum of the partials is the (dollar) sensitivity of the liabilities to a parallel shift in rates — a dollar duration, which becomes the effective duration once divided by the value (shown below).</p>
 <div id="34" class="cell" data-execution_count="1">
 <pre class="julia cell-code"><code>@show sum(vgh_liab[2])
 vgh_liab[2]</code></pre>
 <div class="cell-output cell-output-stdout">
-<pre><code>sum(vgh_liab[2]) = 456277.75724459847</code></pre>
+<pre><code>sum(vgh_liab[2]) = 458093.42589595227</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>6-element Vector{Float64}:
-  11636.309877244716
-  29678.498028401784
-  29919.13931775178
- 255931.8072543008
- 122809.94477798014
-   6302.0579889192395</code></pre>
+  11361.401670472067
+  30022.260938377476
+  29342.067950043573
+ 256814.9352377915
+ 123982.85851618621
+   6569.901583081439</code></pre>
 </div>
 </div>
-<p>This is the sensitivity relative to a full unit change in rates (e.g.&nbsp;<code>1.0</code>). So if we wanted to estimate the dollar impact of a 50bps change, we would take <code>0.005</code> times the gradient/hessian. Also note these are ‘dollar durations’ but we could divide by the price to get <code>effective</code> or percentage durations:</p>
+<p>This is the sensitivity relative to a full unit change in rates (e.g.&nbsp;<code>1.0</code>). So if we wanted to estimate the dollar impact of a 50bps change, we would take <code>0.005</code> times the gradient (and for the second-order refinement, add <code>½ × 0.005²</code> times the hessian). Also note these are ‘dollar durations’ but we could divide by the price to get <code>effective</code> or percentage durations:</p>
 <div id="36" class="cell" data-execution_count="1">
 <pre class="julia cell-code"><code>-sum(vgh_liab[2]) / vgh_liab[1]</code></pre>
 <div class="cell-output cell-output-display" data-execution_count="1">
-<pre><code>4.45894986695982</code></pre>
+<pre><code>4.476073036853733</code></pre>
 </div>
 </div>
 <p>Additionally, note that this is the dynamic duration of the liabilities, not the static duration which ignores the effect of the interest-sensitive behavior of the liabilities.</p>
@@ -586,25 +587,25 @@ vgh_liab[2]</code></pre>
     @show DifferentiationInterface.gradient(static,AutoForwardDiff(),zeros) |&gt; sum
 end</code></pre>
 <div class="cell-output cell-output-stdout">
-<pre><code>DifferentiationInterface.gradient(dynamic, AutoForwardDiff(), zeros) |&gt; sum = 2.732406888412598
-DifferentiationInterface.gradient(static, AutoForwardDiff(), zeros) |&gt; sum = 2.7688749148072453</code></pre>
+<pre><code>DifferentiationInterface.gradient(dynamic, AutoForwardDiff(), zeros) |&gt; sum = 0.9687122313982464
+DifferentiationInterface.gradient(static, AutoForwardDiff(), zeros) |&gt; sum = 0.9739909475447536</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="1">
-<pre><code>2.7688749148072453</code></pre>
+<pre><code>0.9739909475447536</code></pre>
 </div>
 </div>
-<p>Due to the steepness of the surrender function, the policy exiting sooner, on average, results in a higher change in value than if the policy was not sensitive to the change in rates. The increase in value from earlier cashflows outweighs the greater discount rate.</p>
+<p>Due to the steepness of the surrender function, a rise in rates causes the policy to exit sooner on average, shortening the liability and partially offsetting the discounting effect. The dynamic sensitivity is therefore smaller in magnitude than the static sensitivity, which ignores the interest-sensitive behavior.</p>
 <p>The third element of <code>vgh_liab</code> is the Hessian matrix, containing all second partial derivatives with respect to the yield curve inputs:</p>
 <div id="40" class="cell" data-execution_count="1">
 <pre class="julia cell-code"><code>vgh_liab[3]</code></pre>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>6×6 Matrix{Float64}:
-     -1.6682e5    1.95662e5  -2.20034e5  …  10078.8        -42885.8
-      1.95662e5  -1.67736e6   2.87794e6         2.47079e6       1.2647e6
-     -2.20034e5   2.87794e6  -9.92475e6        -4.19372e6      -2.75732e6
- 655808.0        -3.32037e6   1.27207e7         1.88258e7       8.07639e6
-  10078.8         2.47079e6  -4.19372e6        -3.70169e7      -2.78893e6
- -42885.8         1.2647e6   -2.75732e6  …     -2.78893e6      -2.12423e7</code></pre>
+     -1.66563e5   1.97408e5  -2.21248e5  …  8650.57       -42216.4
+      1.97408e5  -1.67829e6   2.8781e6         2.49709e6       1.27079e6
+     -2.21248e5   2.8781e6   -9.92224e6       -4.25376e6      -2.7637e6
+      6.56561e5  -3.34274e6   1.27569e7        1.89899e7       8.12233e6
+   8650.57        2.49709e6  -4.25376e6       -3.73045e7      -2.74561e6
+ -42216.4         1.27079e6  -2.7637e6   …    -2.74561e6      -2.15578e7</code></pre>
 </div>
 </div>
 <p>This matrix captures the convexity characteristics of the liability portfolio. The diagonal elements represent “key rate convexities”—how much the duration at each key rate changes as that specific rate moves:</p>
@@ -612,18 +613,18 @@ DifferentiationInterface.gradient(static, AutoForwardDiff(), zeros) |&gt; sum = 
 <pre class="julia cell-code"><code>@show diag(vgh_liab[3])
 @show sum(diag(vgh_liab[3]))  # Total dollar convexity</code></pre>
 <div class="cell-output cell-output-stdout">
-<pre><code>diag(vgh_liab[3]) = [-166819.54600246763, -1.677357952645578e6, -9.924753422840605e6, -2.8678672363150164e7, -3.70168599962765e7, -2.124227159787981e7]
-sum(diag(vgh_liab[3])) = -9.870673487879513e7</code></pre>
+<pre><code>diag(vgh_liab[3]) = [-166563.37510676673, -1.6782897101469159e6, -9.922238670227138e6, -2.8780943566115417e7, -3.730447366845256e7, -2.155782542620245e7]
+sum(diag(vgh_liab[3])) = -9.941033441625124e7</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="1">
-<pre><code>-9.870673487879513e7</code></pre>
+<pre><code>-9.941033441625124e7</code></pre>
 </div>
 </div>
 <p>Like duration, we can convert dollar convexity to percentage convexity by dividing by the portfolio value:</p>
 <div id="44" class="cell" data-execution_count="1">
 <pre class="julia cell-code"><code>sum(diag(vgh_liab[3])) / vgh_liab[1]</code></pre>
 <div class="cell-output cell-output-display" data-execution_count="1">
-<pre><code>964.60626310982</code></pre>
+<pre><code>971.3475293711406</code></pre>
 </div>
 </div>
 <p>The off-diagonal elements show cross-convexities—how the sensitivity to one key rate changes when a different key rate moves. For most portfolios, these cross-terms are smaller than the diagonal terms but can be significant for complex instruments.</p>
@@ -641,11 +642,11 @@ sum(diag(vgh_liab[3])) = -9.870673487879513e7</code></pre>
     @show hessian(static,AutoForwardDiff(),zeros) |&gt; diag |&gt; sum
 end</code></pre>
 <div class="cell-output cell-output-stdout">
-<pre><code>(hessian(dynamic, AutoForwardDiff(), zeros) |&gt; diag) |&gt; sum = -117.02641335978038
-(hessian(static, AutoForwardDiff(), zeros) |&gt; diag) |&gt; sum = -8.079255691536465</code></pre>
+<pre><code>(hessian(dynamic, AutoForwardDiff(), zeros) |&gt; diag) |&gt; sum = -3.810430821139908
+(hessian(static, AutoForwardDiff(), zeros) |&gt; diag) |&gt; sum = -0.9675282917862529</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="1">
-<pre><code>-8.079255691536465</code></pre>
+<pre><code>-0.9675282917862529</code></pre>
 </div>
 </div>
 <p>The dynamic convexity differs from static convexity because the surrender function creates path-dependent behavior. As rates change, not only do the discount factors change, but the timing and magnitude of cashflows shift as well. This interaction between discount rate changes and cashflow timing changes produces the additional convexity captured in the dynamic measurement. Note how the convexity is larger in the dynamic case.</p>
@@ -741,7 +742,7 @@ end</code></pre>
 
     # Gradient component (krd) constraints
     for j in 1:length(vgh_liabs[2])
-        gradient_sum = sum(w[i] * vgh_assets[i][2][j] for i in 1:n) - sum(vgh_liabs[2][j])
+        gradient_sum = sum(w[i] * vgh_assets[i][2][j] for i in 1:n) + vgh_liabs[2][j]
 
         @constraint(model, gradient_sum &gt;= constraints[:krd][:lower])
         @constraint(model, gradient_sum &lt;= constraints[:krd][:upper])
@@ -749,8 +750,8 @@ end</code></pre>
 
     # total duration constraint 
     duration_gap = sum(w[i] * sum(vgh_assets[i][2]) for i in 1:n) + sum(vgh_liabs[2])
-    @constraint(model, duration_gap &lt;= constraints[:krd][:upper])
-    @constraint(model, duration_gap &gt;= constraints[:krd][:lower])
+    @constraint(model, duration_gap &lt;= constraints[:duration][:upper])
+    @constraint(model, duration_gap &gt;= constraints[:duration][:lower])
 
     # Solve
     optimize!(model)
@@ -778,7 +779,7 @@ constraints = Dict(
 result = optimize_portfolio(asset_universe, vgh_assets, liabilities, vgh_liab, constraints)
 </code></pre>
 <div class="cell-output cell-output-display" data-execution_count="1">
-<pre><code>(status = :optimal, weights = [-0.0, -0.0, 6793.6048719011615, 39929.46788297203, -0.0, -0.0, -0.0, -0.0, -0.0, 13308.854985882586, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, 42396.59598308138], objective_value = 3928.5514273869967)</code></pre>
+<pre><code>(status = :optimal, weights = [-0.0, 45506.60314564737, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, 56936.10264227019, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0], objective_value = 3465.2857362022587)</code></pre>
 </div>
 </div>
 </section>
@@ -874,10 +875,10 @@ end
 <div id="58" class="cell" data-execution_count="1">
 <pre class="julia cell-code"><code>@btime value_gradient_and_hessian(z -&gt; annuities(z, liabilities), AutoForwardDiff(), zeros)</code></pre>
 <div class="cell-output cell-output-stdout">
-<pre><code>  4.687 s (126812827 allocations: 35.87 GiB)</code></pre>
+<pre><code>  5.341 s (165702693 allocations: 42.52 GiB)</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="1">
-<pre><code>(-102328.52372383716, [11636.309877244716, 29678.498028401784, 29919.13931775178, 255931.8072543008, 122809.94477798014, 6302.0579889192395], [-166819.54600246763 195662.16534738286 … 10078.782086885505 -42885.84485590186; 195662.1653473826 -1.677357952645578e6 … 2.4707903206570814e6 1.2646954100423595e6; … ; 10078.782086885418 2.4707903206570838e6 … -3.70168599962765e7 -2.7889326620361377e6; -42885.844855901894 1.2646954100423595e6 … -2.7889326620361432e6 -2.124227159787981e7])</code></pre>
+<pre><code>(-102342.70578791756, [11361.401670472067, 30022.260938377476, 29342.067950043573, 256814.9352377915, 123982.85851618621, 6569.901583081439], [-166563.37510676673 197408.151177275 … 8650.57215904071 -42216.368452116374; 197408.1511772747 -1.6782897101469159e6 … 2.497091583151462e6 1.2707944285740166e6; … ; 8650.572159040628 2.4970915831514634e6 … -3.730447366845256e7 -2.7456109908992173e6; -42216.3684521164 1.2707944285740163e6 … -2.745610990899224e6 -2.155782542620245e7])</code></pre>
 </div>
 </div>
 <div class="callout callout-style-default callout-note callout-titled">
@@ -895,21 +896,22 @@ end
 <div id="60" class="cell" data-execution_count="1">
 <pre class="julia cell-code"><code>versioninfo()</code></pre>
 <div class="cell-output cell-output-stdout">
-<pre><code>Julia Version 1.12.5
-Commit 5fe89b8ddc1 (2026-02-09 16:05 UTC)
+<pre><code>Julia Version 1.13.1
+Commit 96ca370cf0e (2026-09-25 19:34 UTC)
 Build Info:
   Official https://julialang.org release
 Platform Info:
-  OS: macOS (arm64-apple-darwin24.0.0)
+  OS: macOS (arm64-apple-darwin27.0.0)
   CPU: 14 × Apple M4 Max
   WORD_SIZE: 64
-  LLVM: libLLVM-18.1.7 (ORCJIT, apple-m4)
+  LLVM: libLLVM-20.1.8 (ORCJIT, apple-m4)
   GC: Built with stock GC
-Threads: 10 default, 1 interactive, 10 GC (on 10 virtual cores)
+Threads: 14 default, 1 interactive, 14 GC (on 14 virtual cores)
 Environment:
-  JULIA_NUM_THREADS = auto
+  JULIA_LOAD_PATH = @:@stdlib
+  JULIA_PKG_PRECOMPILE_AUTO = 0
   JULIA_PROJECT = @.
-  JULIA_LOAD_PATH = @:@stdlib</code></pre>
+  JULIA_NUM_THREADS = auto</code></pre>
 </div>
 </div>
 </div>
@@ -1020,7 +1022,7 @@ macro unroll(N::Int, loop)
     out
 end</code></pre>
 <div class="cell-output cell-output-display" data-execution_count="1">
-<pre><code>Main.Notebook.@unroll</code></pre>
+<pre><code>@unroll (macro with 1 method)</code></pre>
 </div>
 </div>
 </div>
@@ -1056,10 +1058,10 @@ function (d::DeferredAnnuity)(curve)
 <div id="66" class="cell" data-execution_count="1">
 <pre class="julia cell-code"><code>@btime value_gradient_and_hessian(z -&gt; annuities(z, liabilities), AutoForwardDiff(), zeros)</code></pre>
 <div class="cell-output cell-output-stdout">
-<pre><code>  1.968 s (600187 allocations: 5.39 GiB)</code></pre>
+<pre><code>  1.994 s (600217 allocations: 5.42 GiB)</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="1">
-<pre><code>(-102328.52372383716, [11636.309877244716, 29678.498028401784, 29919.13931775178, 255931.8072543008, 122809.94477798014, 6302.0579889192395], [-166819.54600246763 195662.16534738286 … 10078.782086885505 -42885.84485590186; 195662.1653473826 -1.677357952645578e6 … 2.4707903206570814e6 1.2646954100423595e6; … ; 10078.782086885418 2.4707903206570838e6 … -3.70168599962765e7 -2.7889326620361377e6; -42885.844855901894 1.2646954100423595e6 … -2.7889326620361432e6 -2.124227159787981e7])</code></pre>
+<pre><code>(-102342.70578791756, [11361.401670472067, 30022.260938377476, 29342.067950043573, 256814.9352377915, 123982.85851618621, 6569.901583081439], [-166563.37510676673 197408.151177275 … 8650.57215904071 -42216.368452116374; 197408.1511772747 -1.6782897101469159e6 … 2.497091583151462e6 1.2707944285740166e6; … ; 8650.572159040628 2.4970915831514634e6 … -3.730447366845256e7 -2.7456109908992173e6; -42216.3684521164 1.2707944285740163e6 … -2.745610990899224e6 -2.155782542620245e7])</code></pre>
 </div>
 </div>
 

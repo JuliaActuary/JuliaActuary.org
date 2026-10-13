@@ -24,14 +24,14 @@ ul.task-list li input[type="checkbox"] {
 </style>
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="../../site_libs/quarto-nav/headroom.min.js"></script>
 <script src="../../site_libs/clipboard/clipboard.min.js"></script>
 <script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
-<link href="../..//assets/favicon.ico" rel="icon">
+<link href="../..//assets/logos/favicon.ico" rel="icon">
 <script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
@@ -70,7 +70,7 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
 
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -315,7 +315,7 @@ function project(
     end
 end</code></pre>
 <div class="cell-output cell-output-display" data-execution_count="1">
-<pre><code>Main.Notebook.project</code></pre>
+<pre><code>project (generic function with 1 method)</code></pre>
 </div>
 </div>
 <div id="16" class="cell" data-execution_count="1">
@@ -325,10 +325,12 @@ function run_inner(policy, assumptions, result)
         A = innerloop_assumption(assumptions)
         p = project(policy, A; start_time=result.timestep + 1)
 
-        # calculate the reserves as the present value of the 
+        # calculate the reserves as the present value of the
         # cashflows within the inner loop projections
         # discounted at the reserve interest rate
-        reserves = -pv(A.int_reserve, [modelpoint.net_cf for modelpoint in p])
+        # (an annual rate, converted to match the monthly timesteps)
+        i_monthly = (1 + A.int_reserve)^(1 / 12) - 1
+        reserves = -pv(i_monthly, [modelpoint.net_cf for modelpoint in p])
         capital = reserves * A.capital_factor
         (; reserves, capital)
     else
@@ -357,11 +359,12 @@ function run_inner_stochastic(policy, assumptions, result)
         n = 100
 
         reserves = let
-            i = A.int_reserve
-            f = pv(i + 0.005 * randn(), [modelpoint.net_cf for modelpoint in p])
-
-            -sum(f for _ in 1:n) / n
-
+            cfs = [modelpoint.net_cf for modelpoint in p]
+            -sum(1:n) do _
+                # shock the annual rate each scenario, then convert to monthly
+                i = (1 + A.int_reserve + 0.005 * randn())^(1 / 12) - 1
+                pv(i, cfs)
+            end / n
         end
         capital = reserves * A.capital_factor
         (; reserves, capital)
@@ -391,11 +394,11 @@ end</code></pre>
 <div id="22" class="cell" data-execution_count="1">
 <pre class="julia cell-code"><code>project(p, assumptions) |&gt; DataFrame</code></pre>
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div><div style="float: left;"><span>120×7 DataFrame</span></div><div style="float: right;"><span style="font-style: italic;">95 rows omitted</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
+<div><div style="float: left;"><span>120×7 DataFrame</span></div><div style="float: right; font-style: italic;"><span>95 rows omitted</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
 <table class="data-frame caption-top table table-sm table-striped small">
 <thead>
-<tr class="header">
-<th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
+<tr class="columnLabelRow header">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th">timestep</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th">premium</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th">death</th>
@@ -404,8 +407,8 @@ end</code></pre>
 <th style="text-align: left;" data-quarto-table-cell-role="th">inforce</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th">q</th>
 </tr>
-<tr class="subheader headerLastRow even">
-<th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
+<tr class="columnLabelRow even">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
 <th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
@@ -416,8 +419,8 @@ end</code></pre>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">1</td>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">1</td>
 <td style="text-align: right;">1</td>
 <td style="text-align: right;">108.333</td>
 <td style="text-align: right;">0.001</td>
@@ -426,8 +429,8 @@ end</code></pre>
 <td style="text-align: right;">0.999</td>
 <td style="text-align: right;">0.001</td>
 </tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">2</td>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">2</td>
 <td style="text-align: right;">2</td>
 <td style="text-align: right;">108.225</td>
 <td style="text-align: right;">0.000999</td>
@@ -436,8 +439,8 @@ end</code></pre>
 <td style="text-align: right;">0.998001</td>
 <td style="text-align: right;">0.001</td>
 </tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">3</td>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">3</td>
 <td style="text-align: right;">3</td>
 <td style="text-align: right;">108.117</td>
 <td style="text-align: right;">0.000998001</td>
@@ -446,8 +449,8 @@ end</code></pre>
 <td style="text-align: right;">0.997003</td>
 <td style="text-align: right;">0.001</td>
 </tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">4</td>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">4</td>
 <td style="text-align: right;">4</td>
 <td style="text-align: right;">108.009</td>
 <td style="text-align: right;">0.000997003</td>
@@ -456,8 +459,8 @@ end</code></pre>
 <td style="text-align: right;">0.996006</td>
 <td style="text-align: right;">0.001</td>
 </tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">5</td>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">5</td>
 <td style="text-align: right;">5</td>
 <td style="text-align: right;">107.901</td>
 <td style="text-align: right;">0.000996006</td>
@@ -466,8 +469,8 @@ end</code></pre>
 <td style="text-align: right;">0.99501</td>
 <td style="text-align: right;">0.001</td>
 </tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">6</td>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">6</td>
 <td style="text-align: right;">6</td>
 <td style="text-align: right;">107.793</td>
 <td style="text-align: right;">0.00099501</td>
@@ -476,8 +479,8 @@ end</code></pre>
 <td style="text-align: right;">0.994015</td>
 <td style="text-align: right;">0.001</td>
 </tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">7</td>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">7</td>
 <td style="text-align: right;">7</td>
 <td style="text-align: right;">107.685</td>
 <td style="text-align: right;">0.000994015</td>
@@ -486,8 +489,8 @@ end</code></pre>
 <td style="text-align: right;">0.993021</td>
 <td style="text-align: right;">0.001</td>
 </tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">8</td>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">8</td>
 <td style="text-align: right;">8</td>
 <td style="text-align: right;">107.577</td>
 <td style="text-align: right;">0.000993021</td>
@@ -496,8 +499,8 @@ end</code></pre>
 <td style="text-align: right;">0.992028</td>
 <td style="text-align: right;">0.001</td>
 </tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">9</td>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">9</td>
 <td style="text-align: right;">9</td>
 <td style="text-align: right;">107.47</td>
 <td style="text-align: right;">0.000992028</td>
@@ -506,8 +509,8 @@ end</code></pre>
 <td style="text-align: right;">0.991036</td>
 <td style="text-align: right;">0.001</td>
 </tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">10</td>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">10</td>
 <td style="text-align: right;">10</td>
 <td style="text-align: right;">107.362</td>
 <td style="text-align: right;">0.000991036</td>
@@ -516,8 +519,8 @@ end</code></pre>
 <td style="text-align: right;">0.990045</td>
 <td style="text-align: right;">0.001</td>
 </tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">11</td>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">11</td>
 <td style="text-align: right;">11</td>
 <td style="text-align: right;">107.255</td>
 <td style="text-align: right;">0.000990045</td>
@@ -526,8 +529,8 @@ end</code></pre>
 <td style="text-align: right;">0.989055</td>
 <td style="text-align: right;">0.001</td>
 </tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">12</td>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">12</td>
 <td style="text-align: right;">12</td>
 <td style="text-align: right;">107.148</td>
 <td style="text-align: right;">0.000989055</td>
@@ -536,8 +539,8 @@ end</code></pre>
 <td style="text-align: right;">0.988066</td>
 <td style="text-align: right;">0.001</td>
 </tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">13</td>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">13</td>
 <td style="text-align: right;">13</td>
 <td style="text-align: right;">107.04</td>
 <td style="text-align: right;">0.000988066</td>
@@ -556,8 +559,8 @@ end</code></pre>
 <td style="text-align: right;">⋮</td>
 <td style="text-align: right;">⋮</td>
 </tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">109</td>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">109</td>
 <td style="text-align: right;">109</td>
 <td style="text-align: right;">97.2377</td>
 <td style="text-align: right;">0.000897579</td>
@@ -566,8 +569,8 @@ end</code></pre>
 <td style="text-align: right;">0.896682</td>
 <td style="text-align: right;">0.001</td>
 </tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">110</td>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">110</td>
 <td style="text-align: right;">110</td>
 <td style="text-align: right;">97.1405</td>
 <td style="text-align: right;">0.000896682</td>
@@ -576,8 +579,8 @@ end</code></pre>
 <td style="text-align: right;">0.895785</td>
 <td style="text-align: right;">0.001</td>
 </tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">111</td>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">111</td>
 <td style="text-align: right;">111</td>
 <td style="text-align: right;">97.0434</td>
 <td style="text-align: right;">0.000895785</td>
@@ -586,8 +589,8 @@ end</code></pre>
 <td style="text-align: right;">0.894889</td>
 <td style="text-align: right;">0.001</td>
 </tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">112</td>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">112</td>
 <td style="text-align: right;">112</td>
 <td style="text-align: right;">96.9463</td>
 <td style="text-align: right;">0.000894889</td>
@@ -596,8 +599,8 @@ end</code></pre>
 <td style="text-align: right;">0.893994</td>
 <td style="text-align: right;">0.001</td>
 </tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">113</td>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">113</td>
 <td style="text-align: right;">113</td>
 <td style="text-align: right;">96.8494</td>
 <td style="text-align: right;">0.000893994</td>
@@ -606,8 +609,8 @@ end</code></pre>
 <td style="text-align: right;">0.8931</td>
 <td style="text-align: right;">0.001</td>
 </tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">114</td>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">114</td>
 <td style="text-align: right;">114</td>
 <td style="text-align: right;">96.7525</td>
 <td style="text-align: right;">0.0008931</td>
@@ -616,8 +619,8 @@ end</code></pre>
 <td style="text-align: right;">0.892207</td>
 <td style="text-align: right;">0.001</td>
 </tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">115</td>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">115</td>
 <td style="text-align: right;">115</td>
 <td style="text-align: right;">96.6558</td>
 <td style="text-align: right;">0.000892207</td>
@@ -626,8 +629,8 @@ end</code></pre>
 <td style="text-align: right;">0.891315</td>
 <td style="text-align: right;">0.001</td>
 </tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">116</td>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">116</td>
 <td style="text-align: right;">116</td>
 <td style="text-align: right;">96.5591</td>
 <td style="text-align: right;">0.000891315</td>
@@ -636,8 +639,8 @@ end</code></pre>
 <td style="text-align: right;">0.890424</td>
 <td style="text-align: right;">0.001</td>
 </tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">117</td>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">117</td>
 <td style="text-align: right;">117</td>
 <td style="text-align: right;">96.4626</td>
 <td style="text-align: right;">0.000890424</td>
@@ -646,8 +649,8 @@ end</code></pre>
 <td style="text-align: right;">0.889533</td>
 <td style="text-align: right;">0.001</td>
 </tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">118</td>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">118</td>
 <td style="text-align: right;">118</td>
 <td style="text-align: right;">96.3661</td>
 <td style="text-align: right;">0.000889533</td>
@@ -656,8 +659,8 @@ end</code></pre>
 <td style="text-align: right;">0.888644</td>
 <td style="text-align: right;">0.001</td>
 </tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">119</td>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">119</td>
 <td style="text-align: right;">119</td>
 <td style="text-align: right;">96.2697</td>
 <td style="text-align: right;">0.000888644</td>
@@ -666,8 +669,8 @@ end</code></pre>
 <td style="text-align: right;">0.887755</td>
 <td style="text-align: right;">0.001</td>
 </tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">120</td>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">120</td>
 <td style="text-align: right;">120</td>
 <td style="text-align: right;">96.1735</td>
 <td style="text-align: right;">0.000887755</td>
@@ -685,11 +688,11 @@ end</code></pre>
 <div id="24" class="cell" data-execution_count="1">
 <pre class="julia cell-code"><code>project(p, assumptions; additional_processing=run_inner) |&gt; DataFrame</code></pre>
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div><div style="float: left;"><span>120×9 DataFrame</span></div><div style="float: right;"><span style="font-style: italic;">95 rows omitted</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
+<div><div style="float: left;"><span>120×9 DataFrame</span></div><div style="float: right; font-style: italic;"><span>95 rows omitted</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
 <table class="data-frame caption-top table table-sm table-striped small">
 <thead>
-<tr class="header">
-<th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
+<tr class="columnLabelRow header">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th">timestep</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th">premium</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th">death</th>
@@ -700,8 +703,8 @@ end</code></pre>
 <th style="text-align: left;" data-quarto-table-cell-role="th">reserves</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th">capital</th>
 </tr>
-<tr class="subheader headerLastRow even">
-<th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
+<tr class="columnLabelRow even">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
 <th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
@@ -714,8 +717,8 @@ end</code></pre>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">1</td>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">1</td>
 <td style="text-align: right;">1</td>
 <td style="text-align: right;">108.333</td>
 <td style="text-align: right;">0.001</td>
@@ -723,11 +726,11 @@ end</code></pre>
 <td style="text-align: right;">8.33333</td>
 <td style="text-align: right;">0.999</td>
 <td style="text-align: right;">0.001</td>
-<td style="text-align: right;">504.61</td>
-<td style="text-align: right;">50.461</td>
+<td style="text-align: right;">1175.91</td>
+<td style="text-align: right;">117.591</td>
 </tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">2</td>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">2</td>
 <td style="text-align: right;">2</td>
 <td style="text-align: right;">108.225</td>
 <td style="text-align: right;">0.000999</td>
@@ -735,11 +738,11 @@ end</code></pre>
 <td style="text-align: right;">8.325</td>
 <td style="text-align: right;">0.998001</td>
 <td style="text-align: right;">0.001</td>
-<td style="text-align: right;">503.148</td>
-<td style="text-align: right;">50.3148</td>
+<td style="text-align: right;">1166.43</td>
+<td style="text-align: right;">116.643</td>
 </tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">3</td>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">3</td>
 <td style="text-align: right;">3</td>
 <td style="text-align: right;">108.117</td>
 <td style="text-align: right;">0.000998001</td>
@@ -747,11 +750,11 @@ end</code></pre>
 <td style="text-align: right;">8.31667</td>
 <td style="text-align: right;">0.997003</td>
 <td style="text-align: right;">0.001</td>
-<td style="text-align: right;">501.668</td>
-<td style="text-align: right;">50.1668</td>
+<td style="text-align: right;">1156.94</td>
+<td style="text-align: right;">115.694</td>
 </tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">4</td>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">4</td>
 <td style="text-align: right;">4</td>
 <td style="text-align: right;">108.009</td>
 <td style="text-align: right;">0.000997003</td>
@@ -759,11 +762,11 @@ end</code></pre>
 <td style="text-align: right;">8.30836</td>
 <td style="text-align: right;">0.996006</td>
 <td style="text-align: right;">0.001</td>
-<td style="text-align: right;">500.169</td>
-<td style="text-align: right;">50.0169</td>
+<td style="text-align: right;">1147.45</td>
+<td style="text-align: right;">114.745</td>
 </tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">5</td>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">5</td>
 <td style="text-align: right;">5</td>
 <td style="text-align: right;">107.901</td>
 <td style="text-align: right;">0.000996006</td>
@@ -771,11 +774,11 @@ end</code></pre>
 <td style="text-align: right;">8.30005</td>
 <td style="text-align: right;">0.99501</td>
 <td style="text-align: right;">0.001</td>
-<td style="text-align: right;">498.652</td>
-<td style="text-align: right;">49.8652</td>
+<td style="text-align: right;">1137.95</td>
+<td style="text-align: right;">113.795</td>
 </tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">6</td>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">6</td>
 <td style="text-align: right;">6</td>
 <td style="text-align: right;">107.793</td>
 <td style="text-align: right;">0.00099501</td>
@@ -783,11 +786,11 @@ end</code></pre>
 <td style="text-align: right;">8.29175</td>
 <td style="text-align: right;">0.994015</td>
 <td style="text-align: right;">0.001</td>
-<td style="text-align: right;">497.117</td>
-<td style="text-align: right;">49.7117</td>
+<td style="text-align: right;">1128.45</td>
+<td style="text-align: right;">112.845</td>
 </tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">7</td>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">7</td>
 <td style="text-align: right;">7</td>
 <td style="text-align: right;">107.685</td>
 <td style="text-align: right;">0.000994015</td>
@@ -795,11 +798,11 @@ end</code></pre>
 <td style="text-align: right;">8.28346</td>
 <td style="text-align: right;">0.993021</td>
 <td style="text-align: right;">0.001</td>
-<td style="text-align: right;">495.561</td>
-<td style="text-align: right;">49.5561</td>
+<td style="text-align: right;">1118.94</td>
+<td style="text-align: right;">111.894</td>
 </tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">8</td>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">8</td>
 <td style="text-align: right;">8</td>
 <td style="text-align: right;">107.577</td>
 <td style="text-align: right;">0.000993021</td>
@@ -807,11 +810,11 @@ end</code></pre>
 <td style="text-align: right;">8.27517</td>
 <td style="text-align: right;">0.992028</td>
 <td style="text-align: right;">0.001</td>
-<td style="text-align: right;">493.986</td>
-<td style="text-align: right;">49.3986</td>
+<td style="text-align: right;">1109.43</td>
+<td style="text-align: right;">110.943</td>
 </tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">9</td>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">9</td>
 <td style="text-align: right;">9</td>
 <td style="text-align: right;">107.47</td>
 <td style="text-align: right;">0.000992028</td>
@@ -819,11 +822,11 @@ end</code></pre>
 <td style="text-align: right;">8.2669</td>
 <td style="text-align: right;">0.991036</td>
 <td style="text-align: right;">0.001</td>
-<td style="text-align: right;">492.391</td>
-<td style="text-align: right;">49.2391</td>
+<td style="text-align: right;">1099.9</td>
+<td style="text-align: right;">109.99</td>
 </tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">10</td>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">10</td>
 <td style="text-align: right;">10</td>
 <td style="text-align: right;">107.362</td>
 <td style="text-align: right;">0.000991036</td>
@@ -831,11 +834,11 @@ end</code></pre>
 <td style="text-align: right;">8.25863</td>
 <td style="text-align: right;">0.990045</td>
 <td style="text-align: right;">0.001</td>
-<td style="text-align: right;">490.775</td>
-<td style="text-align: right;">49.0775</td>
+<td style="text-align: right;">1090.38</td>
+<td style="text-align: right;">109.038</td>
 </tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">11</td>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">11</td>
 <td style="text-align: right;">11</td>
 <td style="text-align: right;">107.255</td>
 <td style="text-align: right;">0.000990045</td>
@@ -843,11 +846,11 @@ end</code></pre>
 <td style="text-align: right;">8.25037</td>
 <td style="text-align: right;">0.989055</td>
 <td style="text-align: right;">0.001</td>
-<td style="text-align: right;">489.138</td>
-<td style="text-align: right;">48.9138</td>
+<td style="text-align: right;">1080.84</td>
+<td style="text-align: right;">108.084</td>
 </tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">12</td>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">12</td>
 <td style="text-align: right;">12</td>
 <td style="text-align: right;">107.148</td>
 <td style="text-align: right;">0.000989055</td>
@@ -855,11 +858,11 @@ end</code></pre>
 <td style="text-align: right;">8.24212</td>
 <td style="text-align: right;">0.988066</td>
 <td style="text-align: right;">0.001</td>
-<td style="text-align: right;">487.479</td>
-<td style="text-align: right;">48.7479</td>
+<td style="text-align: right;">1071.3</td>
+<td style="text-align: right;">107.13</td>
 </tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">13</td>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">13</td>
 <td style="text-align: right;">13</td>
 <td style="text-align: right;">107.04</td>
 <td style="text-align: right;">0.000988066</td>
@@ -867,8 +870,8 @@ end</code></pre>
 <td style="text-align: right;">8.23388</td>
 <td style="text-align: right;">0.987078</td>
 <td style="text-align: right;">0.001</td>
-<td style="text-align: right;">485.799</td>
-<td style="text-align: right;">48.5799</td>
+<td style="text-align: right;">1061.76</td>
+<td style="text-align: right;">106.176</td>
 </tr>
 <tr class="even">
 <td style="text-align: right;">⋮</td>
@@ -882,8 +885,8 @@ end</code></pre>
 <td style="text-align: right;">⋮</td>
 <td style="text-align: right;">⋮</td>
 </tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">109</td>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">109</td>
 <td style="text-align: right;">109</td>
 <td style="text-align: right;">97.2377</td>
 <td style="text-align: right;">0.000897579</td>
@@ -891,11 +894,11 @@ end</code></pre>
 <td style="text-align: right;">7.47983</td>
 <td style="text-align: right;">0.896682</td>
 <td style="text-align: right;">0.001</td>
-<td style="text-align: right;">101.795</td>
-<td style="text-align: right;">10.1795</td>
+<td style="text-align: right;">113.263</td>
+<td style="text-align: right;">11.3263</td>
 </tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">110</td>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">110</td>
 <td style="text-align: right;">110</td>
 <td style="text-align: right;">97.1405</td>
 <td style="text-align: right;">0.000896682</td>
@@ -903,11 +906,11 @@ end</code></pre>
 <td style="text-align: right;">7.47235</td>
 <td style="text-align: right;">0.895785</td>
 <td style="text-align: right;">0.001</td>
-<td style="text-align: right;">93.3884</td>
-<td style="text-align: right;">9.33884</td>
+<td style="text-align: right;">103.009</td>
+<td style="text-align: right;">10.3009</td>
 </tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">111</td>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">111</td>
 <td style="text-align: right;">111</td>
 <td style="text-align: right;">97.0434</td>
 <td style="text-align: right;">0.000895785</td>
@@ -915,11 +918,11 @@ end</code></pre>
 <td style="text-align: right;">7.46487</td>
 <td style="text-align: right;">0.894889</td>
 <td style="text-align: right;">0.001</td>
-<td style="text-align: right;">84.8223</td>
-<td style="text-align: right;">8.48223</td>
+<td style="text-align: right;">92.7472</td>
+<td style="text-align: right;">9.27472</td>
 </tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">112</td>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">112</td>
 <td style="text-align: right;">112</td>
 <td style="text-align: right;">96.9463</td>
 <td style="text-align: right;">0.000894889</td>
@@ -927,11 +930,11 @@ end</code></pre>
 <td style="text-align: right;">7.45741</td>
 <td style="text-align: right;">0.893994</td>
 <td style="text-align: right;">0.001</td>
-<td style="text-align: right;">76.0936</td>
-<td style="text-align: right;">7.60936</td>
+<td style="text-align: right;">82.4766</td>
+<td style="text-align: right;">8.24766</td>
 </tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">113</td>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">113</td>
 <td style="text-align: right;">113</td>
 <td style="text-align: right;">96.8494</td>
 <td style="text-align: right;">0.000893994</td>
@@ -939,11 +942,11 @@ end</code></pre>
 <td style="text-align: right;">7.44995</td>
 <td style="text-align: right;">0.8931</td>
 <td style="text-align: right;">0.001</td>
-<td style="text-align: right;">67.199</td>
-<td style="text-align: right;">6.7199</td>
+<td style="text-align: right;">72.1973</td>
+<td style="text-align: right;">7.21973</td>
 </tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">114</td>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">114</td>
 <td style="text-align: right;">114</td>
 <td style="text-align: right;">96.7525</td>
 <td style="text-align: right;">0.0008931</td>
@@ -951,11 +954,11 @@ end</code></pre>
 <td style="text-align: right;">7.4425</td>
 <td style="text-align: right;">0.892207</td>
 <td style="text-align: right;">0.001</td>
-<td style="text-align: right;">58.1351</td>
-<td style="text-align: right;">5.81351</td>
+<td style="text-align: right;">61.9094</td>
+<td style="text-align: right;">6.19094</td>
 </tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">115</td>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">115</td>
 <td style="text-align: right;">115</td>
 <td style="text-align: right;">96.6558</td>
 <td style="text-align: right;">0.000892207</td>
@@ -963,11 +966,11 @@ end</code></pre>
 <td style="text-align: right;">7.43506</td>
 <td style="text-align: right;">0.891315</td>
 <td style="text-align: right;">0.001</td>
-<td style="text-align: right;">48.8986</td>
-<td style="text-align: right;">4.88986</td>
+<td style="text-align: right;">51.6129</td>
+<td style="text-align: right;">5.16129</td>
 </tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">116</td>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">116</td>
 <td style="text-align: right;">116</td>
 <td style="text-align: right;">96.5591</td>
 <td style="text-align: right;">0.000891315</td>
@@ -975,11 +978,11 @@ end</code></pre>
 <td style="text-align: right;">7.42762</td>
 <td style="text-align: right;">0.890424</td>
 <td style="text-align: right;">0.001</td>
-<td style="text-align: right;">39.4858</td>
-<td style="text-align: right;">3.94858</td>
+<td style="text-align: right;">41.3078</td>
+<td style="text-align: right;">4.13078</td>
 </tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">117</td>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">117</td>
 <td style="text-align: right;">117</td>
 <td style="text-align: right;">96.4626</td>
 <td style="text-align: right;">0.000890424</td>
@@ -987,11 +990,11 @@ end</code></pre>
 <td style="text-align: right;">7.4202</td>
 <td style="text-align: right;">0.889533</td>
 <td style="text-align: right;">0.001</td>
-<td style="text-align: right;">29.8932</td>
-<td style="text-align: right;">2.98932</td>
+<td style="text-align: right;">30.9939</td>
+<td style="text-align: right;">3.09939</td>
 </tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">118</td>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">118</td>
 <td style="text-align: right;">118</td>
 <td style="text-align: right;">96.3661</td>
 <td style="text-align: right;">0.000889533</td>
@@ -999,11 +1002,11 @@ end</code></pre>
 <td style="text-align: right;">7.41278</td>
 <td style="text-align: right;">0.888644</td>
 <td style="text-align: right;">0.001</td>
-<td style="text-align: right;">20.1172</td>
-<td style="text-align: right;">2.01172</td>
+<td style="text-align: right;">20.6714</td>
+<td style="text-align: right;">2.06714</td>
 </tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">119</td>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">119</td>
 <td style="text-align: right;">119</td>
 <td style="text-align: right;">96.2697</td>
 <td style="text-align: right;">0.000888644</td>
@@ -1011,11 +1014,11 @@ end</code></pre>
 <td style="text-align: right;">7.40536</td>
 <td style="text-align: right;">0.887755</td>
 <td style="text-align: right;">0.001</td>
-<td style="text-align: right;">10.1541</td>
-<td style="text-align: right;">1.01541</td>
+<td style="text-align: right;">10.3401</td>
+<td style="text-align: right;">1.03401</td>
 </tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">120</td>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">120</td>
 <td style="text-align: right;">120</td>
 <td style="text-align: right;">96.1735</td>
 <td style="text-align: right;">0.000887755</td>
@@ -1035,11 +1038,11 @@ end</code></pre>
 <div id="26" class="cell" data-execution_count="1">
 <pre class="julia cell-code"><code>project(p, assumptions; additional_processing=run_inner_stochastic) |&gt; DataFrame</code></pre>
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div><div style="float: left;"><span>120×9 DataFrame</span></div><div style="float: right;"><span style="font-style: italic;">95 rows omitted</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
+<div><div style="float: left;"><span>120×9 DataFrame</span></div><div style="float: right; font-style: italic;"><span>95 rows omitted</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
 <table class="data-frame caption-top table table-sm table-striped small">
 <thead>
-<tr class="header">
-<th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
+<tr class="columnLabelRow header">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th">timestep</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th">premium</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th">death</th>
@@ -1050,8 +1053,8 @@ end</code></pre>
 <th style="text-align: left;" data-quarto-table-cell-role="th">reserves</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th">capital</th>
 </tr>
-<tr class="subheader headerLastRow even">
-<th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
+<tr class="columnLabelRow even">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
 <th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
@@ -1064,8 +1067,8 @@ end</code></pre>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">1</td>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">1</td>
 <td style="text-align: right;">1</td>
 <td style="text-align: right;">108.333</td>
 <td style="text-align: right;">0.001</td>
@@ -1073,11 +1076,11 @@ end</code></pre>
 <td style="text-align: right;">8.33333</td>
 <td style="text-align: right;">0.999</td>
 <td style="text-align: right;">0.001</td>
-<td style="text-align: right;">469.564</td>
-<td style="text-align: right;">46.9564</td>
+<td style="text-align: right;">1176.38</td>
+<td style="text-align: right;">117.638</td>
 </tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">2</td>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">2</td>
 <td style="text-align: right;">2</td>
 <td style="text-align: right;">108.225</td>
 <td style="text-align: right;">0.000999</td>
@@ -1085,11 +1088,11 @@ end</code></pre>
 <td style="text-align: right;">8.325</td>
 <td style="text-align: right;">0.998001</td>
 <td style="text-align: right;">0.001</td>
-<td style="text-align: right;">427.807</td>
-<td style="text-align: right;">42.7807</td>
+<td style="text-align: right;">1169.29</td>
+<td style="text-align: right;">116.929</td>
 </tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">3</td>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">3</td>
 <td style="text-align: right;">3</td>
 <td style="text-align: right;">108.117</td>
 <td style="text-align: right;">0.000998001</td>
@@ -1097,11 +1100,11 @@ end</code></pre>
 <td style="text-align: right;">8.31667</td>
 <td style="text-align: right;">0.997003</td>
 <td style="text-align: right;">0.001</td>
-<td style="text-align: right;">643.963</td>
-<td style="text-align: right;">64.3963</td>
+<td style="text-align: right;">1160.1</td>
+<td style="text-align: right;">116.01</td>
 </tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">4</td>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">4</td>
 <td style="text-align: right;">4</td>
 <td style="text-align: right;">108.009</td>
 <td style="text-align: right;">0.000997003</td>
@@ -1109,11 +1112,11 @@ end</code></pre>
 <td style="text-align: right;">8.30836</td>
 <td style="text-align: right;">0.996006</td>
 <td style="text-align: right;">0.001</td>
-<td style="text-align: right;">661.838</td>
-<td style="text-align: right;">66.1838</td>
+<td style="text-align: right;">1149.18</td>
+<td style="text-align: right;">114.918</td>
 </tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">5</td>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">5</td>
 <td style="text-align: right;">5</td>
 <td style="text-align: right;">107.901</td>
 <td style="text-align: right;">0.000996006</td>
@@ -1121,11 +1124,11 @@ end</code></pre>
 <td style="text-align: right;">8.30005</td>
 <td style="text-align: right;">0.99501</td>
 <td style="text-align: right;">0.001</td>
-<td style="text-align: right;">437.843</td>
-<td style="text-align: right;">43.7843</td>
+<td style="text-align: right;">1140.68</td>
+<td style="text-align: right;">114.068</td>
 </tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">6</td>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">6</td>
 <td style="text-align: right;">6</td>
 <td style="text-align: right;">107.793</td>
 <td style="text-align: right;">0.00099501</td>
@@ -1133,11 +1136,11 @@ end</code></pre>
 <td style="text-align: right;">8.29175</td>
 <td style="text-align: right;">0.994015</td>
 <td style="text-align: right;">0.001</td>
-<td style="text-align: right;">495.741</td>
-<td style="text-align: right;">49.5741</td>
+<td style="text-align: right;">1130.31</td>
+<td style="text-align: right;">113.031</td>
 </tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">7</td>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">7</td>
 <td style="text-align: right;">7</td>
 <td style="text-align: right;">107.685</td>
 <td style="text-align: right;">0.000994015</td>
@@ -1145,11 +1148,11 @@ end</code></pre>
 <td style="text-align: right;">8.28346</td>
 <td style="text-align: right;">0.993021</td>
 <td style="text-align: right;">0.001</td>
-<td style="text-align: right;">513.549</td>
-<td style="text-align: right;">51.3549</td>
+<td style="text-align: right;">1118.52</td>
+<td style="text-align: right;">111.852</td>
 </tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">8</td>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">8</td>
 <td style="text-align: right;">8</td>
 <td style="text-align: right;">107.577</td>
 <td style="text-align: right;">0.000993021</td>
@@ -1157,11 +1160,11 @@ end</code></pre>
 <td style="text-align: right;">8.27517</td>
 <td style="text-align: right;">0.992028</td>
 <td style="text-align: right;">0.001</td>
-<td style="text-align: right;">498.503</td>
-<td style="text-align: right;">49.8503</td>
+<td style="text-align: right;">1109.71</td>
+<td style="text-align: right;">110.971</td>
 </tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">9</td>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">9</td>
 <td style="text-align: right;">9</td>
 <td style="text-align: right;">107.47</td>
 <td style="text-align: right;">0.000992028</td>
@@ -1169,11 +1172,11 @@ end</code></pre>
 <td style="text-align: right;">8.2669</td>
 <td style="text-align: right;">0.991036</td>
 <td style="text-align: right;">0.001</td>
-<td style="text-align: right;">696.595</td>
-<td style="text-align: right;">69.6595</td>
+<td style="text-align: right;">1097.51</td>
+<td style="text-align: right;">109.751</td>
 </tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">10</td>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">10</td>
 <td style="text-align: right;">10</td>
 <td style="text-align: right;">107.362</td>
 <td style="text-align: right;">0.000991036</td>
@@ -1181,11 +1184,11 @@ end</code></pre>
 <td style="text-align: right;">8.25863</td>
 <td style="text-align: right;">0.990045</td>
 <td style="text-align: right;">0.001</td>
-<td style="text-align: right;">559.726</td>
-<td style="text-align: right;">55.9726</td>
+<td style="text-align: right;">1090.7</td>
+<td style="text-align: right;">109.07</td>
 </tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">11</td>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">11</td>
 <td style="text-align: right;">11</td>
 <td style="text-align: right;">107.255</td>
 <td style="text-align: right;">0.000990045</td>
@@ -1193,11 +1196,11 @@ end</code></pre>
 <td style="text-align: right;">8.25037</td>
 <td style="text-align: right;">0.989055</td>
 <td style="text-align: right;">0.001</td>
-<td style="text-align: right;">461.742</td>
-<td style="text-align: right;">46.1742</td>
+<td style="text-align: right;">1081.11</td>
+<td style="text-align: right;">108.111</td>
 </tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">12</td>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">12</td>
 <td style="text-align: right;">12</td>
 <td style="text-align: right;">107.148</td>
 <td style="text-align: right;">0.000989055</td>
@@ -1205,11 +1208,11 @@ end</code></pre>
 <td style="text-align: right;">8.24212</td>
 <td style="text-align: right;">0.988066</td>
 <td style="text-align: right;">0.001</td>
-<td style="text-align: right;">438.812</td>
-<td style="text-align: right;">43.8812</td>
+<td style="text-align: right;">1074.57</td>
+<td style="text-align: right;">107.457</td>
 </tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">13</td>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">13</td>
 <td style="text-align: right;">13</td>
 <td style="text-align: right;">107.04</td>
 <td style="text-align: right;">0.000988066</td>
@@ -1217,8 +1220,8 @@ end</code></pre>
 <td style="text-align: right;">8.23388</td>
 <td style="text-align: right;">0.987078</td>
 <td style="text-align: right;">0.001</td>
-<td style="text-align: right;">358.665</td>
-<td style="text-align: right;">35.8665</td>
+<td style="text-align: right;">1063.01</td>
+<td style="text-align: right;">106.301</td>
 </tr>
 <tr class="even">
 <td style="text-align: right;">⋮</td>
@@ -1232,8 +1235,8 @@ end</code></pre>
 <td style="text-align: right;">⋮</td>
 <td style="text-align: right;">⋮</td>
 </tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">109</td>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">109</td>
 <td style="text-align: right;">109</td>
 <td style="text-align: right;">97.2377</td>
 <td style="text-align: right;">0.000897579</td>
@@ -1241,11 +1244,11 @@ end</code></pre>
 <td style="text-align: right;">7.47983</td>
 <td style="text-align: right;">0.896682</td>
 <td style="text-align: right;">0.001</td>
-<td style="text-align: right;">102.602</td>
-<td style="text-align: right;">10.2602</td>
+<td style="text-align: right;">113.286</td>
+<td style="text-align: right;">11.3286</td>
 </tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">110</td>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">110</td>
 <td style="text-align: right;">110</td>
 <td style="text-align: right;">97.1405</td>
 <td style="text-align: right;">0.000896682</td>
@@ -1253,11 +1256,11 @@ end</code></pre>
 <td style="text-align: right;">7.47235</td>
 <td style="text-align: right;">0.895785</td>
 <td style="text-align: right;">0.001</td>
-<td style="text-align: right;">95.0433</td>
-<td style="text-align: right;">9.50433</td>
+<td style="text-align: right;">103.041</td>
+<td style="text-align: right;">10.3041</td>
 </tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">111</td>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">111</td>
 <td style="text-align: right;">111</td>
 <td style="text-align: right;">97.0434</td>
 <td style="text-align: right;">0.000895785</td>
@@ -1265,11 +1268,11 @@ end</code></pre>
 <td style="text-align: right;">7.46487</td>
 <td style="text-align: right;">0.894889</td>
 <td style="text-align: right;">0.001</td>
-<td style="text-align: right;">86.3731</td>
-<td style="text-align: right;">8.63731</td>
+<td style="text-align: right;">92.7658</td>
+<td style="text-align: right;">9.27658</td>
 </tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">112</td>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">112</td>
 <td style="text-align: right;">112</td>
 <td style="text-align: right;">96.9463</td>
 <td style="text-align: right;">0.000894889</td>
@@ -1277,11 +1280,11 @@ end</code></pre>
 <td style="text-align: right;">7.45741</td>
 <td style="text-align: right;">0.893994</td>
 <td style="text-align: right;">0.001</td>
-<td style="text-align: right;">75.6823</td>
-<td style="text-align: right;">7.56823</td>
+<td style="text-align: right;">82.4517</td>
+<td style="text-align: right;">8.24517</td>
 </tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">113</td>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">113</td>
 <td style="text-align: right;">113</td>
 <td style="text-align: right;">96.8494</td>
 <td style="text-align: right;">0.000893994</td>
@@ -1289,11 +1292,11 @@ end</code></pre>
 <td style="text-align: right;">7.44995</td>
 <td style="text-align: right;">0.8931</td>
 <td style="text-align: right;">0.001</td>
-<td style="text-align: right;">67.5874</td>
-<td style="text-align: right;">6.75874</td>
+<td style="text-align: right;">72.1992</td>
+<td style="text-align: right;">7.21992</td>
 </tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">114</td>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">114</td>
 <td style="text-align: right;">114</td>
 <td style="text-align: right;">96.7525</td>
 <td style="text-align: right;">0.0008931</td>
@@ -1301,11 +1304,11 @@ end</code></pre>
 <td style="text-align: right;">7.4425</td>
 <td style="text-align: right;">0.892207</td>
 <td style="text-align: right;">0.001</td>
-<td style="text-align: right;">58.4231</td>
-<td style="text-align: right;">5.84231</td>
+<td style="text-align: right;">61.9001</td>
+<td style="text-align: right;">6.19001</td>
 </tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">115</td>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">115</td>
 <td style="text-align: right;">115</td>
 <td style="text-align: right;">96.6558</td>
 <td style="text-align: right;">0.000892207</td>
@@ -1313,11 +1316,11 @@ end</code></pre>
 <td style="text-align: right;">7.43506</td>
 <td style="text-align: right;">0.891315</td>
 <td style="text-align: right;">0.001</td>
-<td style="text-align: right;">49.3718</td>
-<td style="text-align: right;">4.93718</td>
+<td style="text-align: right;">51.6143</td>
+<td style="text-align: right;">5.16143</td>
 </tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">116</td>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">116</td>
 <td style="text-align: right;">116</td>
 <td style="text-align: right;">96.5591</td>
 <td style="text-align: right;">0.000891315</td>
@@ -1325,11 +1328,11 @@ end</code></pre>
 <td style="text-align: right;">7.42762</td>
 <td style="text-align: right;">0.890424</td>
 <td style="text-align: right;">0.001</td>
-<td style="text-align: right;">39.5306</td>
-<td style="text-align: right;">3.95306</td>
+<td style="text-align: right;">41.302</td>
+<td style="text-align: right;">4.1302</td>
 </tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">117</td>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">117</td>
 <td style="text-align: right;">117</td>
 <td style="text-align: right;">96.4626</td>
 <td style="text-align: right;">0.000890424</td>
@@ -1337,11 +1340,11 @@ end</code></pre>
 <td style="text-align: right;">7.4202</td>
 <td style="text-align: right;">0.889533</td>
 <td style="text-align: right;">0.001</td>
-<td style="text-align: right;">29.9714</td>
-<td style="text-align: right;">2.99714</td>
+<td style="text-align: right;">30.9985</td>
+<td style="text-align: right;">3.09985</td>
 </tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">118</td>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">118</td>
 <td style="text-align: right;">118</td>
 <td style="text-align: right;">96.3661</td>
 <td style="text-align: right;">0.000889533</td>
@@ -1349,11 +1352,11 @@ end</code></pre>
 <td style="text-align: right;">7.41278</td>
 <td style="text-align: right;">0.888644</td>
 <td style="text-align: right;">0.001</td>
-<td style="text-align: right;">19.91</td>
-<td style="text-align: right;">1.991</td>
+<td style="text-align: right;">20.6697</td>
+<td style="text-align: right;">2.06697</td>
 </tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">119</td>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">119</td>
 <td style="text-align: right;">119</td>
 <td style="text-align: right;">96.2697</td>
 <td style="text-align: right;">0.000888644</td>
@@ -1361,11 +1364,11 @@ end</code></pre>
 <td style="text-align: right;">7.40536</td>
 <td style="text-align: right;">0.887755</td>
 <td style="text-align: right;">0.001</td>
-<td style="text-align: right;">10.1969</td>
-<td style="text-align: right;">1.01969</td>
+<td style="text-align: right;">10.3402</td>
+<td style="text-align: right;">1.03402</td>
 </tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">120</td>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">120</td>
 <td style="text-align: right;">120</td>
 <td style="text-align: right;">96.1735</td>
 <td style="text-align: right;">0.000887755</td>

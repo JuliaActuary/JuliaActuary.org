@@ -7,3 +7,7 @@ LsqFit = "2fda8390-95c7-5789-9bda-21331edee243"
 MortalityTables = "4780e19d-04b9-53dc-86c2-9e9aa59b5a12"
 Optim = "429524aa-4258-5aef-a3af-852621145aeb"
 Survival = "8a913413-2070-5976-9d4c-2b364fdc2f7f"
+
+[compat]
+MortalityTables = "3"
+julia = "1.10"

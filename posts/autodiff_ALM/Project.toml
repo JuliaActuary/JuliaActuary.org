@@ -12,3 +12,7 @@ LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 MicroCollections = "128add7d-3638-4c79-886c-908ea0c25c34"
 OhMyThreads = "67456a42-1dca-4109-a031-0a68de7e3ad5"
 Transducers = "28d57a85-8fef-5791-bfe6-a80928e7c999"
+
+[compat]
+FinanceCore = "3"
+julia = "1.10"

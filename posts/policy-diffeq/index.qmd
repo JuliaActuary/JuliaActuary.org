@@ -62,7 +62,7 @@ function policy_projection(state, p, t)
 
     # calculated variables
     cur_date = p.issue_date + Day(t)
-    dur = duration(p.issue_date, cur_date)
+    dur = policy_duration(p.issue_date, cur_date)
     att_age = p.issue_age + dur - 1
 
     # lapse if AV <= 0 

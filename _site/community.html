@@ -31,7 +31,7 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<link href=".//assets/favicon.ico" rel="icon">
+<link href=".//assets/logos/favicon.ico" rel="icon">
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
@@ -221,43 +221,18 @@ ul.task-list li input[type="checkbox"] {
 <section id="help-mode" class="level3">
 <h3 class="anchored" data-anchor-id="help-mode">Help mode</h3>
 <p>You can also access help text when using the packages in the REPL by <a href="https://docs.julialang.org/en/v1/stdlib/REPL/index.html#Help-mode-1">activating help mode</a>, e.g.:</p>
-<pre class="julia-repl"><code>julia&gt; ? survival
-    survival(mortality_vector,to_age)
-    survival(mortality_vector,from_age,to_age)
+<pre class="julia-repl"><code>julia&gt; using MortalityTables
 
+help?&gt; survival</code></pre>
+<p>The help text describes survival for a rate vector or a parametric mortality law. For tables, pass <code>table.ultimate</code> or <code>table.select[issue_age]</code>. Fractional ages use <code>UniformDeaths()</code>, <code>ConstantForce()</code>, or <code>Balducci()</code>:</p>
+<pre class="julia-repl"><code>julia&gt; qs = UltimateMortality([0.1, 0.3, 0.6, 1.0]);
 
-  Returns the survival through attained age to_age. The start of the 
-  calculation is either the start of the vector, or attained age `from_age` 
-  and `to_age` need to be Integers. 
+julia&gt; survival(qs, 0, 1)
+0.9
 
-  Add a DeathDistribution as the last argument to handle floating point 
-  and non-whole ages:
-
-    survival(mortality_vector,to_age,::DeathDistribution)
-    survival(mortality_vector,from_age,to_age,::DeathDistribution)
-
-
-  If given a negative to_age, it will return 1.0. Aside from simplifying the code, 
-  this makes sense as for something to exist in order to decrement in the first place, 
-  it must have existed and survived to the point of being able to be decremented.
-
-  Examples
-  ≡≡≡≡≡≡≡≡≡≡
-
-  julia&gt; qs = UltimateMortality([0.1,0.3,0.6,1]);
-
-  julia&gt; survival(qs,0)
-  1.0
-  julia&gt; survival(qs,1)
-  0.9
-
-  julia&gt; survival(qs,1,1)
-  1.0
-  julia&gt; survival(qs,1,2)
-  0.7
-
-  julia&gt; survival(qs,0.5,Uniform())
-  0.95</code></pre>
+julia&gt; survival(qs, 0, 0.5, UniformDeaths())
+0.95</code></pre>
+<p>An age outside a table raises <code>BoundsError</code>. A reversed interval returns the reciprocal survival factor, which can exceed one; it is an accumulation factor, not a probability. See the <a href="https://docs.juliaactuary.org/MortalityTables/stable/">MortalityTables documentation</a>.</p>
 </section>
 </section>
 <section id="contributing" class="level2">
