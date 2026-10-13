@@ -1,5 +1,5 @@
 [metadata]
-date = "2026-10-09"
+date = "2026-10-12"
 python = "3.12.12"
 quantlib = "1.43"
 hardware = "Apple M4 Max"
@@ -28,11 +28,11 @@ flat_price_30y = 119.18906457200795
 flat_duration_30y = 18.818971962356684
 
 [nanoseconds]
-price_cached = 162.3496249958407
-price_recomputed = 1042.895414866507
-duration = 920.9874159423634
-convexity = 924.4692500215024
-krd_5y_rebuild = 906085.8339071274
-krd_5y_reuse = 194415.3750082478
-krd_30y_rebuild = 1118136.8748657405
-krd_30y_reuse = 570668.3319294825
+price_cached = 178.61393751809373
+price_recomputed = 1110.3187501430511
+duration = 985.4208338074386
+convexity = 1000.2571661025285
+krd_5y_rebuild = 964737.6658394933
+krd_5y_reuse = 206328.62497586757
+krd_30y_rebuild = 1160978.7499764934
+krd_30y_reuse = 608897.1679564565

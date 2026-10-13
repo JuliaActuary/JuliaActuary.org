@@ -13,11 +13,6 @@ TOML = "fa267f1f-6049-4f14-aa54-33bafae1ed76"
 ActuaryUtilities = "=6.0.0"
 BenchmarkTools = "=1.8.0"
 FinanceCore = "=3.0.0"
-FinanceModels = "=7.0.0"
+FinanceModels = "=7.0.1"
 ForwardDiff = "1"
 julia = "1.13"
-
-# Release-candidate sources, pinned so this post is runnable before registration.
-[sources]
-ActuaryUtilities = {url = "https://github.com/JuliaActuary/ActuaryUtilities.jl", rev = "2661464980691c0d19f665a75668fe5fe419461f"}
-FinanceModels = {url = "https://github.com/JuliaActuary/FinanceModels.jl", rev = "607261c292f5caa193a03ba21cefd2a36c31d6a7"}

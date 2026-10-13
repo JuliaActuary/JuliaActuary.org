@@ -33,7 +33,7 @@ ul.task-list li input[type="checkbox"] {
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
-<link href="../..//assets/favicon.ico" rel="icon">
+<link href="../..//assets/logos/favicon.ico" rel="icon">
 <script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
@@ -222,7 +222,7 @@ ul.task-list li input[type="checkbox"] {
 <figcaption>Actuarial and trading workflows share cashflows, curves and risk measures. This is a conceptual diagram, not a measured capability comparison.</figcaption>
 </figure>
 </div>
-<p>This October 2026 update uses FinanceCore 3.0, FinanceModels 7.0 and ActuaryUtilities 6.0, including the pinned release-candidate commits listed in the <a href="#reproducing-the-comparison">reproduction instructions</a>.</p>
+<p>This October 2026 update uses the registered releases FinanceCore 3.0.0, FinanceModels 7.0.1 and ActuaryUtilities 6.0.0, pinned in the <a href="#reproducing-the-comparison">reproduction environment</a>.</p>
 <section id="example-fixed-bond-analytics" class="level2">
 <h2 class="anchored" data-anchor-id="example-fixed-bond-analytics">Example: fixed bond analytics</h2>
 <p>Most bond analytics is a cashflow vector and a yield curve. Price, duration, convexity, key-rate durations, sensitivity to a calibrated curve, arbitrary-precision validation — all of those are things you <em>decide</em> to compute from those two inputs. The interesting design question is how much code each decision costs, and how much new machinery each new computation requires.</p>
@@ -849,10 +849,10 @@ julia_ns = Dict(
 )</code></pre>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>Dict{String, Float64} with 5 entries:
-  "krd_5y"    =&gt; 229.951
-  "price"     =&gt; 24.5491
-  "duration"  =&gt; 24.5316
-  "krd_30y"   =&gt; 1179.1
+  "krd_5y"    =&gt; 230.394
+  "price"     =&gt; 24.5562
+  "duration"  =&gt; 24.5562
+  "krd_30y"   =&gt; 1187.5
   "convexity" =&gt; 24.5562</code></pre>
 </div>
 </div>
@@ -874,27 +874,27 @@ julia_ns = Dict(
 <tbody>
 <tr class="odd">
 <td>Price / cached QL NPV</td>
-<td style="text-align: right;">24.5</td>
-<td style="text-align: right;">162.3</td>
-<td style="text-align: right;">6.6×</td>
+<td style="text-align: right;">24.6</td>
+<td style="text-align: right;">178.6</td>
+<td style="text-align: right;">7.3×</td>
 </tr>
 <tr class="even">
 <td>Price / forced QL reprice</td>
-<td style="text-align: right;">24.5</td>
-<td style="text-align: right;">1042.9</td>
-<td style="text-align: right;">42.5×</td>
+<td style="text-align: right;">24.6</td>
+<td style="text-align: right;">1110.3</td>
+<td style="text-align: right;">45.2×</td>
 </tr>
 <tr class="odd">
 <td>Modified duration</td>
-<td style="text-align: right;">24.5</td>
-<td style="text-align: right;">921.0</td>
-<td style="text-align: right;">37.5×</td>
+<td style="text-align: right;">24.6</td>
+<td style="text-align: right;">985.4</td>
+<td style="text-align: right;">40.1×</td>
 </tr>
 <tr class="even">
 <td>Continuous-zero convexity</td>
 <td style="text-align: right;">24.6</td>
-<td style="text-align: right;">924.5</td>
-<td style="text-align: right;">37.6×</td>
+<td style="text-align: right;">1000.3</td>
+<td style="text-align: right;">40.7×</td>
 </tr>
 </tbody>
 </table>
@@ -920,16 +920,16 @@ julia_ns = Dict(
 <tr class="odd">
 <td>5y</td>
 <td style="text-align: right;">0.230</td>
-<td style="text-align: right;">194.415</td>
-<td style="text-align: right;">906.086</td>
-<td style="text-align: right;">845.5×</td>
+<td style="text-align: right;">206.329</td>
+<td style="text-align: right;">964.738</td>
+<td style="text-align: right;">895.5×</td>
 </tr>
 <tr class="even">
 <td>30y</td>
-<td style="text-align: right;">1.179</td>
-<td style="text-align: right;">570.668</td>
-<td style="text-align: right;">1118.137</td>
-<td style="text-align: right;">484.0×</td>
+<td style="text-align: right;">1.188</td>
+<td style="text-align: right;">608.897</td>
+<td style="text-align: right;">1160.979</td>
+<td style="text-align: right;">512.8×</td>
 </tr>
 </tbody>
 </table>
@@ -966,15 +966,15 @@ maximum(abs.(krds_analytic .- krds_ad))</code></pre>
 </section>
 <section id="reproducing-the-comparison" class="level2">
 <h2 class="anchored" data-anchor-id="reproducing-the-comparison">Reproducing the comparison</h2>
-<p>The <a href="Project.toml">Julia environment</a> pins the FinanceModels 7.0 and ActuaryUtilities 6.0 candidate commits, so it can be instantiated before their registry releases. It requires Julia 1.13 or later within the 1.x series. The <a href="quantlib_reference.py">QuantLib reference script</a> is runnable independently with the <a href="requirements.txt">pinned Python dependency</a>. It regenerates the <a href="quantlib-results.toml">reference values and timings</a>, including the date, Python version, QuantLib version and machine model.</p>
+<p>The <a href="Project.toml">Julia environment</a> pins FinanceCore 3.0.0, FinanceModels 7.0.1 and ActuaryUtilities 6.0.0 from the Julia registry. It requires Julia 1.13 or later within the 1.x series. The <a href="quantlib_reference.py">QuantLib reference script</a> is runnable independently with the <a href="requirements.txt">pinned Python dependency</a>. It regenerates the <a href="quantlib-results.toml">reference values and timings</a>, including the date, Python version, QuantLib version and machine model.</p>
 <p>From this post’s directory:</p>
 <pre class="sh"><code>python3 -m venv .venv
 .venv/bin/python -m pip install -r requirements.txt
 .venv/bin/python quantlib_reference.py
 julia --project=. reproduce.jl</code></pre>
 <p><a href="reproduce.jl">reproduce.jl</a> executes the Julia chunks, including the comparisons with the saved Python results, and writes <a href="julia-results.toml">julia-results.toml</a>, which records all resolved Julia package versions. Use <code>quarto render posts/quantlib-comparison/index.qmd</code> from the website root to rebuild the page. Python snippets in this post are explanatory; Quarto executes the Julia chunks and reads the separately generated Python reference file. Rerun both sides on the same machine before comparing timings; a Julia-only render still reads the saved Python measurements.</p>
-<p>Reference machine: <strong>Apple M4 Max</strong>, macOS-27.0.1-arm64-arm-64bit. Python <strong>3.12.12</strong>, QuantLib <strong>1.43</strong>; Python measurements dated 2026-10-09.</p>
-<p>This render: Julia <strong>1.13.1</strong>, FinanceCore <strong>3.0.0</strong>, FinanceModels <strong>7.0.0</strong>, ActuaryUtilities <strong>6.0.0</strong>, BenchmarkTools <strong>1.8.0</strong>, ForwardDiff <strong>1.4.6</strong>. Julia CPU: Apple M4 Max; 14 Julia threads. The benchmarked analytics are serial.</p>
+<p>Reference machine: <strong>Apple M4 Max</strong>, macOS-27.0.1-arm64-arm-64bit. Python <strong>3.12.12</strong>, QuantLib <strong>1.43</strong>; Python measurements dated 2026-10-12.</p>
+<p>This render: Julia <strong>1.13.1</strong>, FinanceCore <strong>3.0.0</strong>, FinanceModels <strong>7.0.1</strong>, ActuaryUtilities <strong>6.0.0</strong>, BenchmarkTools <strong>1.8.0</strong>, ForwardDiff <strong>1.4.6</strong>. Julia CPU: Apple M4 Max; 14 Julia threads. The benchmarked analytics are serial.</p>
 </section>
 <section id="when-youd-reach-for-quantlib-instead" class="level2">
 <h2 class="anchored" data-anchor-id="when-youd-reach-for-quantlib-instead">When you’d reach for QuantLib instead</h2>

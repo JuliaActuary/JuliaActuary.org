@@ -31,7 +31,7 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<link href=".//assets/favicon.ico" rel="icon">
+<link href=".//assets/logos/favicon.ico" rel="icon">
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
@@ -197,7 +197,8 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#the-life-modeling-problem" id="toc-the-life-modeling-problem" class="nav-link active" data-scroll-target="#the-life-modeling-problem">The Life Modeling Problem</a>
+  <li><a href="#current-package-benchmarks" id="toc-current-package-benchmarks" class="nav-link active" data-scroll-target="#current-package-benchmarks">Current package benchmarks</a></li>
+  <li><a href="#the-life-modeling-problem" id="toc-the-life-modeling-problem" class="nav-link" data-scroll-target="#the-life-modeling-problem">The Life Modeling Problem</a>
   <ul class="collapse">
   <li><a href="#benchmarks" id="toc-benchmarks" class="nav-link" data-scroll-target="#benchmarks">Benchmarks</a></li>
   <li><a href="#discussion" id="toc-discussion" class="nav-link" data-scroll-target="#discussion">Discussion</a></li>
@@ -253,6 +254,11 @@ window.Quarto = {
 </header>
 
 
+<section id="current-package-benchmarks" class="level2">
+<h2 class="anchored" data-anchor-id="current-package-benchmarks">Current package benchmarks</h2>
+<p>The <a href="./posts/2026-fall-releases/index.html#performance-and-tradeoffs">fall 2026 release benchmarks</a> compare FinanceCore 3, FinanceModels 7, ActuaryUtilities 6 and MortalityTables 3 with the preceding releases. They include scripts, environments and raw results, with Julia timings taken from the minimum of warmed BenchmarkTools trials across repeated runs. The <a href="./posts/quantlib-comparison/index.html">QuantLib comparison</a> covers matched cashflow and sensitivity calculations.</p>
+<p>The cross-language measurements below are historical results from the linked benchmark studies. They have not been rerun for the current package releases; their speed ratios describe those original environments.</p>
+</section>
 <section id="the-life-modeling-problem" class="level2 page-columns page-full">
 <h2 class="anchored" data-anchor-id="the-life-modeling-problem">The Life Modeling Problem</h2>
 <p>Inspired by the discussion in the <a href="https://github.com/actuarialopensource">ActuarialOpenSource</a> GitHub community discussion, folks started submitted solutions to what someone referred to as the “Life Modeling Problem”. This user <a href="https://github.com/orgs/actuarialopensource/teams/common-room/discussions/5">submitted a short snippet</a> for consideration of a representative problem.</p>
@@ -282,9 +288,9 @@ Table&nbsp;1: Benchmarks for the Life Modeling Problem in nanoseconds (lower tim
 </tr>
 <tr class="columnLabelRow even">
 <th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="InlineStrings.String15">String15</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="InlineStrings.String15">String15</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="InlineStrings.String15">String15</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="DataStrings.DataString">DataStri…</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="DataStrings.DataString">DataStri…</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="DataStrings.DataString">DataStri…</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th" title="Union{Missing, Float64}">Float64?</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>

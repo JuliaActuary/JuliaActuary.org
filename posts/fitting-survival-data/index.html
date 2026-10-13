@@ -8,7 +8,7 @@
 
 <meta name="description" content="JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.">
 
-<title>Fitting survival data with MortaltityTables.jl – JuliaActuary</title>
+<title>Fitting survival data with MortalityTables.jl – JuliaActuary</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -31,7 +31,7 @@ ul.task-list li input[type="checkbox"] {
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
-<link href="../..//assets/favicon.ico" rel="icon">
+<link href="../..//assets/logos/favicon.ico" rel="icon">
 <script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
@@ -163,7 +163,7 @@ ul.task-list li input[type="checkbox"] {
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">Fitting survival data with MortaltityTables.jl</h1>
+      <h1 class="title">Fitting survival data with MortalityTables.jl</h1>
                   <div>
         <div class="description">
           JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.
@@ -207,6 +207,7 @@ ul.task-list li input[type="checkbox"] {
     using Survival
 end
 
+# Apply the site's custom Makie plot theme (cassette futurism).
 include(joinpath(@__DIR__, "..", "..", "assets", "themes", "cassette_futurism.jl"))
 set_theme!(cassette_futurism_theme())</code></pre>
 </div>
@@ -361,29 +362,31 @@ plt</code></pre>
 <h3 class="anchored" data-anchor-id="maximum-likelihood-estimation">Maximum Likelihood estimation</h3>
 <p>Generate 100 sample datapoints:</p>
 <div id="14" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>t = rand(Weibull(fit1.param[2], fit1.param[1]), 100)</code></pre>
+<pre class="julia cell-code"><code># MortalityTables.Weibull(m, σ) has S(x) = exp(-(x/m)^(m/σ)), which in
+# Distributions.jl parameterization is Weibull(shape = m/σ, scale = m)
+t = rand(Weibull(fit1.param[1] / fit1.param[2], fit1.param[1]), 100)</code></pre>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>100-element Vector{Float64}:
-  5.861961403313465
- 11.888125688001178
-  6.327083786718294
-  8.70693035997539
-  7.602651313753518
-  8.15348212482864
- 10.095004066320902
-  6.3642823231725085
-  8.715216131746105
-  4.170061614784922
+  4.399979544008741
+  4.693808880233822
+ 12.318449825867855
+  5.394392475814005
+  3.930616637905562
+  7.324515361499734
+  6.0211495938933
+  8.212655922356479
+  5.398605247730258
+  4.224732200821012
   ⋮
- 10.235937747778024
-  3.5935729613035723
- 11.722598382089496
-  8.121992286428716
- 14.089688478610189
-  5.576118865264992
-  3.7253155497083332
-  2.9516616043274806
-  8.688805246364376</code></pre>
+  8.339674211714042
+ 10.838251985737328
+  4.364910403782084
+  4.42191483320106
+ 12.03459201049906
+  5.062339613254776
+  4.201038541988235
+  3.036281099171572
+  9.709501453759087</code></pre>
 </div>
 </div>
 </section>
@@ -393,7 +396,7 @@ plt</code></pre>
 <pre class="julia cell-code"><code>#No censored data
 fit_mle(Weibull, t)</code></pre>
 <div class="cell-output cell-output-display" data-execution_count="1">
-<pre><code>Distributions.Weibull{Float64}(α=2.967209124932327, θ=8.149553138772609)</code></pre>
+<pre><code>Distributions.Weibull{Float64}(α=2.9146414287544875, θ=7.4731035169321975)</code></pre>
 </div>
 </div>
 </section>
@@ -435,17 +438,17 @@ opt = Optim.optimize(
 <pre><code> * Status: success
 
  * Candidate solution
-    Final objective value:     2.335854e+02
+    Final objective value:     2.270703e+02
 
  * Found with
     Algorithm:     Fminbox with L-BFGS
 
  * Convergence measures
-    |x - x'|               = 8.21e-08 ≰ 0.0e+00
-    |x - x'|/|x'|          = 9.95e-09 ≰ 0.0e+00
-    |f(x) - f(x')|         = 0.00e+00 ≤ 0.0e+00
-    |f(x) - f(x')|/|f(x')| = 0.00e+00 ≤ 0.0e+00
-    |g(x)|                 = 1.60e-09 ≤ 1.0e-08
+    |x - x'|               = 6.27e-08 ≰ 0.0e+00
+    |x - x'|/|x'|          = 8.28e-09 ≰ 0.0e+00
+    |f(x) - f(x')|         = 1.42e-13 ≰ 0.0e+00
+    |f(x) - f(x')|/|f(x')| = 6.26e-16 ≰ 0.0e+00
+    |g(x)|                 = 1.62e-09 ≤ 1.0e-08
 
  * Work counters
     Seconds run:   1  (vs limit Inf)
@@ -460,8 +463,8 @@ opt = Optim.optimize(
 <pre class="julia cell-code"><code>Optim.minimizer(opt)</code></pre>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>2-element Vector{Float64}:
- 8.253145299392791
- 2.942260672059159</code></pre>
+ 7.5744579570073265
+ 2.9027926419820798</code></pre>
 </div>
 </div>
 </section>

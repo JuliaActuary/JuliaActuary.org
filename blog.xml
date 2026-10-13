@@ -2819,7 +2819,7 @@ Table&nbsp;5: Extrapolated cost of the paper’s full configuration — 190,000 
 <figcaption>Actuarial and trading workflows share cashflows, curves and risk measures. This is a conceptual diagram, not a measured capability comparison.</figcaption>
 </figure>
 </div>
-<p>This October 2026 update uses FinanceCore 3.0, FinanceModels 7.0 and ActuaryUtilities 6.0, including the pinned release-candidate commits listed in the reproduction instructions.</p>
+<p>This October 2026 update uses the registered releases FinanceCore 3.0.0, FinanceModels 7.0.1 and ActuaryUtilities 6.0.0, pinned in the reproduction environment.</p>
 <section id="example-fixed-bond-analytics" class="level2">
 <h2 class="anchored" data-anchor-id="example-fixed-bond-analytics">Example: fixed bond analytics</h2>
 <p>Most bond analytics is a cashflow vector and a yield curve. Price, duration, convexity, key-rate durations, sensitivity to a calibrated curve, arbitrary-precision validation — all of those are things you <em>decide</em> to compute from those two inputs. The interesting design question is how much code each decision costs, and how much new machinery each new computation requires.</p>
@@ -3446,10 +3446,10 @@ julia_ns = Dict(
 )</code></pre>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>Dict{String, Float64} with 5 entries:
-  "krd_5y"    =&gt; 229.951
-  "price"     =&gt; 24.5491
-  "duration"  =&gt; 24.5316
-  "krd_30y"   =&gt; 1179.1
+  "krd_5y"    =&gt; 230.394
+  "price"     =&gt; 24.5562
+  "duration"  =&gt; 24.5562
+  "krd_30y"   =&gt; 1187.5
   "convexity" =&gt; 24.5562</code></pre>
 </div>
 </div>
@@ -3471,27 +3471,27 @@ julia_ns = Dict(
 <tbody>
 <tr class="odd">
 <td>Price / cached QL NPV</td>
-<td style="text-align: right;">24.5</td>
-<td style="text-align: right;">162.3</td>
-<td style="text-align: right;">6.6×</td>
+<td style="text-align: right;">24.6</td>
+<td style="text-align: right;">178.6</td>
+<td style="text-align: right;">7.3×</td>
 </tr>
 <tr class="even">
 <td>Price / forced QL reprice</td>
-<td style="text-align: right;">24.5</td>
-<td style="text-align: right;">1042.9</td>
-<td style="text-align: right;">42.5×</td>
+<td style="text-align: right;">24.6</td>
+<td style="text-align: right;">1110.3</td>
+<td style="text-align: right;">45.2×</td>
 </tr>
 <tr class="odd">
 <td>Modified duration</td>
-<td style="text-align: right;">24.5</td>
-<td style="text-align: right;">921.0</td>
-<td style="text-align: right;">37.5×</td>
+<td style="text-align: right;">24.6</td>
+<td style="text-align: right;">985.4</td>
+<td style="text-align: right;">40.1×</td>
 </tr>
 <tr class="even">
 <td>Continuous-zero convexity</td>
 <td style="text-align: right;">24.6</td>
-<td style="text-align: right;">924.5</td>
-<td style="text-align: right;">37.6×</td>
+<td style="text-align: right;">1000.3</td>
+<td style="text-align: right;">40.7×</td>
 </tr>
 </tbody>
 </table>
@@ -3517,16 +3517,16 @@ julia_ns = Dict(
 <tr class="odd">
 <td>5y</td>
 <td style="text-align: right;">0.230</td>
-<td style="text-align: right;">194.415</td>
-<td style="text-align: right;">906.086</td>
-<td style="text-align: right;">845.5×</td>
+<td style="text-align: right;">206.329</td>
+<td style="text-align: right;">964.738</td>
+<td style="text-align: right;">895.5×</td>
 </tr>
 <tr class="even">
 <td>30y</td>
-<td style="text-align: right;">1.179</td>
-<td style="text-align: right;">570.668</td>
-<td style="text-align: right;">1118.137</td>
-<td style="text-align: right;">484.0×</td>
+<td style="text-align: right;">1.188</td>
+<td style="text-align: right;">608.897</td>
+<td style="text-align: right;">1160.979</td>
+<td style="text-align: right;">512.8×</td>
 </tr>
 </tbody>
 </table>
@@ -3563,15 +3563,15 @@ maximum(abs.(krds_analytic .- krds_ad))</code></pre>
 </section>
 <section id="reproducing-the-comparison" class="level2">
 <h2 class="anchored" data-anchor-id="reproducing-the-comparison">Reproducing the comparison</h2>
-<p>The <a href="Project.toml">Julia environment</a> pins the FinanceModels 7.0 and ActuaryUtilities 6.0 candidate commits, so it can be instantiated before their registry releases. It requires Julia 1.13 or later within the 1.x series. The <a href="quantlib_reference.py">QuantLib reference script</a> is runnable independently with the <a href="requirements.txt">pinned Python dependency</a>. It regenerates the <a href="quantlib-results.toml">reference values and timings</a>, including the date, Python version, QuantLib version and machine model.</p>
+<p>The <a href="Project.toml">Julia environment</a> pins FinanceCore 3.0.0, FinanceModels 7.0.1 and ActuaryUtilities 6.0.0 from the Julia registry. It requires Julia 1.13 or later within the 1.x series. The <a href="quantlib_reference.py">QuantLib reference script</a> is runnable independently with the <a href="requirements.txt">pinned Python dependency</a>. It regenerates the <a href="quantlib-results.toml">reference values and timings</a>, including the date, Python version, QuantLib version and machine model.</p>
 <p>From this post’s directory:</p>
 <pre class="sh"><code>python3 -m venv .venv
 .venv/bin/python -m pip install -r requirements.txt
 .venv/bin/python quantlib_reference.py
 julia --project=. reproduce.jl</code></pre>
 <p><a href="reproduce.jl">reproduce.jl</a> executes the Julia chunks, including the comparisons with the saved Python results, and writes <a href="julia-results.toml">julia-results.toml</a>, which records all resolved Julia package versions. Use <code>quarto render posts/quantlib-comparison/index.qmd</code> from the website root to rebuild the page. Python snippets in this post are explanatory; Quarto executes the Julia chunks and reads the separately generated Python reference file. Rerun both sides on the same machine before comparing timings; a Julia-only render still reads the saved Python measurements.</p>
-<p>Reference machine: <strong>Apple M4 Max</strong>, macOS-27.0.1-arm64-arm-64bit. Python <strong>3.12.12</strong>, QuantLib <strong>1.43</strong>; Python measurements dated 2026-10-09.</p>
-<p>This render: Julia <strong>1.13.1</strong>, FinanceCore <strong>3.0.0</strong>, FinanceModels <strong>7.0.0</strong>, ActuaryUtilities <strong>6.0.0</strong>, BenchmarkTools <strong>1.8.0</strong>, ForwardDiff <strong>1.4.6</strong>. Julia CPU: Apple M4 Max; 14 Julia threads. The benchmarked analytics are serial.</p>
+<p>Reference machine: <strong>Apple M4 Max</strong>, macOS-27.0.1-arm64-arm-64bit. Python <strong>3.12.12</strong>, QuantLib <strong>1.43</strong>; Python measurements dated 2026-10-12.</p>
+<p>This render: Julia <strong>1.13.1</strong>, FinanceCore <strong>3.0.0</strong>, FinanceModels <strong>7.0.1</strong>, ActuaryUtilities <strong>6.0.0</strong>, BenchmarkTools <strong>1.8.0</strong>, ForwardDiff <strong>1.4.6</strong>. Julia CPU: Apple M4 Max; 14 Julia threads. The benchmarked analytics are serial.</p>
 </section>
 <section id="when-youd-reach-for-quantlib-instead" class="level2">
 <h2 class="anchored" data-anchor-id="when-youd-reach-for-quantlib-instead">When you’d reach for QuantLib instead</h2>
@@ -3605,6 +3605,19 @@ julia --project=. reproduce.jl</code></pre>
 
 
 
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Historical release announcement
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This August 2023 article describes the original FinanceModels 4 interface. Its extension hooks, projection examples and non-linear bootstrap calls are historical. For FinanceModels 7, use the <a href="../../packages.html#financemodels.jl">current package examples</a>, <a href="https://docs.juliaactuary.org/FinanceModels/stable/migration/">migration guide</a> and <a href="../../posts/2026-fall-releases/index.html">fall 2026 release overview</a>. The current hooks are <code>FinanceModels.default_variables</code> and <code>FinanceModels.default_optimizer</code>; valuation uses <code>present_value(ctx, contract)</code>.</p>
+</div>
+</div>
 <p>Yields.jl has evolved into FinanceModels.jl. The benefits are:</p>
 <ul>
 <li>Provide a composable set of <strong>contracts</strong> and <strong><code>Quotes</code></strong></li>
@@ -3931,7 +3944,7 @@ end</code></pre>
 </section>
 <section id="migration-guide" class="level2">
 <h2 class="anchored" data-anchor-id="migration-guide">Migration Guide</h2>
-<p>For those looking to upgrade from Yields (v3.x.x) to FinanceModels (v4+), there is a <a href="https://juliaactuary.github.io/FinanceModels.jl/dev/migration/">migration guide here</a>. Associated packages <a href="https://github.com/JuliaActuary/ActuaryUtilities.jl/pull/101#issue-1773044104">ActuaryUtilities.jl</a> and <a href="https://github.com/JuliaActuary/FinanceCore.jl/compare/v1.1.0...v2.0.0">FinanceCore.jl</a> had major version releases for minor breaking changes where most code should remain unaffected (FinanceCore is not intended to be user-facing).</p>
+<p>For those looking to upgrade from Yields (v3.x.x) to FinanceModels (v4+), there is a <a href="https://docs.juliaactuary.org/FinanceModels/stable/migration/">migration guide here</a>. Associated packages <a href="https://github.com/JuliaActuary/ActuaryUtilities.jl/pull/101#issue-1773044104">ActuaryUtilities.jl</a> and <a href="https://github.com/JuliaActuary/FinanceCore.jl/compare/v1.1.0...v2.0.0">FinanceCore.jl</a> had major version releases for minor breaking changes where most code should remain unaffected (FinanceCore is not intended to be user-facing).</p>
 <p>Some tutorials or examples on the site may still use Yields.jl - that’s okay as they will still work given Julia’s strong degree of reproducibility and dependency management tools. Please open an issue on the <a href="https://github.com/JuliaActuary/JuliaActuary.org">JuliaActuary.org repository</a> if you have trouble with any of the old example code.</p>
 </section>
 <section id="conclusion" class="level2">
@@ -4121,7 +4134,7 @@ end</code></pre>
 
 
 
-<p>The previously published article titled <a href="../../blog/julia-actuaries">Julia for Actuaries</a> gave a longer introduction to why Julia works so well in actuarial workflows. In summary: Julia’s attributes are “evident in its pragmatic, productivity-focused design choices, pleasant syntax, rich ecosystem, thriving communities, and its ability to be both very general purpose and power cutting edge computing”.</p>
+<p>The previously published article titled <a href="../../posts/julia-for-actuaries/index.html">Julia for Actuaries</a> gave a longer introduction to why Julia works so well in actuarial workflows. In summary: Julia’s attributes are “evident in its pragmatic, productivity-focused design choices, pleasant syntax, rich ecosystem, thriving communities, and its ability to be both very general purpose and power cutting edge computing”.</p>
 <p>This is the second in the following trilogy of articles:</p>
 <ol type="1">
 <li>Why Julia works so well for actuaries</li>
@@ -4137,7 +4150,7 @@ end</code></pre>
 <li><p><strong>High performant Julia code, instead of needing libraries written in C/Cython/etc.</strong> For lots of problems, especially “toy” problems as you learn a language, the speed of Matlab/Python/R is fast enough. However, in real usage, particularly actuarial problems, you might find that when you need the performance, it’s too late<sup>1</sup></p></li>
 <li><p><strong>The language, tooling, and ecosystem is very modern, mature, and powerful.</strong> A built-in package manager, packages that work together without needing to know about each other, differentiable programming, meta-programming (macros), first-class GPU/parallel support, and wide range of packages relevant to actuarial workloads.</p></li>
 </ol>
-<p>More detail of why Julia works so well in actuarial contexts was discussed in the prior article, <a href="../../blog/julia-actuaries">Julia for Actuaries</a>. The rest of this article is going to focus on getting oriented to using Julia, and the next article in the series will introduce actuarial packages available.</p>
+<p>More detail of why Julia works so well in actuarial contexts was discussed in the prior article, <a href="../../posts/julia-for-actuaries/index.html">Julia for Actuaries</a>. The rest of this article is going to focus on getting oriented to using Julia, and the next article in the series will introduce actuarial packages available.</p>
 </section>
 <section id="the-language-itself" class="level2">
 <h2 class="anchored" data-anchor-id="the-language-itself">The language itself</h2>
@@ -4387,13 +4400,13 @@ BenchmarkTools.Trial: 10000 samples with 994 evaluations.
 </section>
 <section id="processing-volume" class="level3">
 <h3 class="anchored" data-anchor-id="processing-volume">Processing volume</h3>
-<p>There’s a cottage industry devoted to inforce compression and model simplifications to get runtime and budgets down to a reasonable level. However, as the capacity for computing has grown, the company and regulatory demands have grown. E.g in the US reserving has transition from net-premium reserve to integrated ALM (CFT) to deterministic scenarios sets (CFT w NY7 + others) to truly stochastic (Stochastic PBR). “What Intel giveth, the NAIC taketh away.”[^1].</p>
+<p>There’s a cottage industry devoted to inforce compression and model simplifications to get runtime and budgets down to a reasonable level. However, as the capacity for computing has grown, the company and regulatory demands have grown. E.g in the US reserving has transition from net-premium reserve to integrated ALM (CFT) to deterministic scenarios sets (CFT w NY7 + others) to truly stochastic (Stochastic PBR). “What Intel giveth, the NAIC taketh away.”<sup>1</sup>.</p>
 <p>So again, performance matters!</p>
 </section>
 <section id="readability-and-expressiveness" class="level3">
 <h3 class="anchored" data-anchor-id="readability-and-expressiveness">Readability and Expressiveness</h3>
-<p>Actuaries, even the <a href="../../blog/coding-for-the-future/">10x Actuary</a>, aren’t pure computer scientists and computational efficiency has never been <em>so</em> critical that they sacrifice everything else to get it. So the industry never turned to the 40-year king of performance computation, <a href="https://en.wikipedia.org/wiki/Fortran">Fortran</a>. The syntax is very “close to the machine”. I’s a bit rough to read to anyone not well versed.</p>
-<p>Interestingly, <a href="https://en.wikipedia.org/wiki/APL_(programming_language)">APL</a> took off and was one of the dominant languages used by actuaries before the advent of <a href="../../blog/coding-for-the-future/#the_10x_actuary">vendor-supplied modeling solutions</a>.</p>
+<p>Actuaries, even the <a href="../../posts/coding-the-future/index.html">10x Actuary</a>, aren’t pure computer scientists and computational efficiency has never been <em>so</em> critical that they sacrifice everything else to get it. So the industry never turned to the 40-year king of performance computation, <a href="https://en.wikipedia.org/wiki/Fortran">Fortran</a>. The syntax is very “close to the machine”. I’s a bit rough to read to anyone not well versed.</p>
+<p>Interestingly, <a href="https://en.wikipedia.org/wiki/APL_(programming_language)">APL</a> took off and was one of the dominant languages used by actuaries before the advent of <a href="../../posts/coding-the-future/index.html#the-10x-actuary">vendor-supplied modeling solutions</a>.</p>
 <p>Counting the occurrences of a string looks like this in APL:</p>
 <pre><code>csubs←{0=x←⊃⍸⍺⍷⍵:0 ⋄ 1+⍺∇(¯1+x+⍴⍺)↓⍵}</code></pre>
 <p>whereas in Fortran it would be:</p>
@@ -4412,7 +4425,7 @@ BenchmarkTools.Trial: 10000 samples with 994 evaluations.
   end do
 end function</code></pre>
 <p>Maybe more readable to the modern eye than APL, but many actuaries would still recognize what’s going on with the first code example.</p>
-<p>Why did APL take off for Actuaries and not APL? I think <a href="https://en.wikipedia.org/wiki/Expressive_power_%28computer_science%29">expressiveness</a> and the ability to have a language inspired by mathematical notation were attractive. It’s not pleasant to write a lot of boiler-plate simply to achieve a simple objective.</p>
+<p>Why did APL take off for Actuaries and not Fortran? I think <a href="https://en.wikipedia.org/wiki/Expressive_power_%28computer_science%29">expressiveness</a> and the ability to have a language inspired by mathematical notation were attractive. It’s not pleasant to write a lot of boiler-plate simply to achieve a simple objective.</p>
 <p>What is boiler-plate? It’s writing a lot of code supporting the main idea, but straying from a simple mathematical formulation. For example, in high performance object-oriented languages (C#/C++/Java), the idiomatic code might involve a special class. See, for example this C# code to count substrings:</p>
 <pre class="csharp"><code>using System;
  
@@ -4445,8 +4458,8 @@ class SubStringTestClass
 </section>
 <section id="benchmarks" class="level2 page-columns page-full">
 <h2 class="anchored" data-anchor-id="benchmarks">Benchmarks</h2>
-<p>After the original user submitted a proposal, others chimed in and submitted versions in their favorite languages. I have collected those versions, and run them on a consistent set of hardware[^3].</p>
-<p>Some “submissions” were excluded because they involved an entirely different approach, such as <a href="https://en.wikipedia.org/wiki/Memoization">memoizing</a> the function calls[^2].</p>
+<p>After the original user submitted a proposal, others chimed in and submitted versions in their favorite languages. I have collected those versions, and run them on a consistent set of hardware<sup>2</sup>.</p>
+<p>Some “submissions” were excluded because they involved an entirely different approach, such as <a href="https://en.wikipedia.org/wiki/Memoization">memoizing</a> the function calls<sup>3</sup>.</p>
 <div class="cell" data-execution_count="1">
 <div id="tbl-life-modeling-benchmark" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-execution_count="1">
 <figure class="quarto-float quarto-float-tbl figure">
@@ -4469,211 +4482,9 @@ Table&nbsp;1: Benchmarks for the Life Modeling Problem in nanoseconds (lower tim
 </tr>
 <tr class="columnLabelRow even">
 <th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="InlineStrings.String15">String15</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="InlineStrings.String15">String15</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="InlineStrings.String15">String15</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="Union{Missing, Float64}">Float64?</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
-</tr>
-</thead>
-<tbody>
-<tr class="dataRow odd">
-<td class="rowLabel" style="text-align: right; font-weight: bold;">1</td>
-<td style="text-align: left;">Julia</td>
-<td style="text-align: left;">Accumulator</td>
-<td style="text-align: left;">npv9</td>
-<td style="text-align: right;">6.388</td>
-<td style="text-align: right;">6.375</td>
-<td style="text-align: right;">1.0</td>
-</tr>
-<tr class="dataRow even">
-<td class="rowLabel" style="text-align: right; font-weight: bold;">2</td>
-<td style="text-align: left;">Rust</td>
-<td style="text-align: left;">Accumulator</td>
-<td style="text-align: left;">npv3</td>
-<td style="text-align: right;">7.0</td>
-<td style="text-align: right;">7.0</td>
-<td style="text-align: right;">1.09804</td>
-</tr>
-<tr class="dataRow odd">
-<td class="rowLabel" style="text-align: right; font-weight: bold;">3</td>
-<td style="text-align: left;">Julia</td>
-<td style="text-align: left;">Accumulator</td>
-<td style="text-align: left;">npv8</td>
-<td style="text-align: right;">7.372</td>
-<td style="text-align: right;">7.375</td>
-<td style="text-align: right;">1.15686</td>
-</tr>
-<tr class="dataRow even">
-<td class="rowLabel" style="text-align: right; font-weight: bold;">4</td>
-<td style="text-align: left;">Julia</td>
-<td style="text-align: left;">Accumulator</td>
-<td style="text-align: left;">npv7</td>
-<td style="text-align: right;">7.92</td>
-<td style="text-align: right;">7.917</td>
-<td style="text-align: right;">1.24188</td>
-</tr>
-<tr class="dataRow odd">
-<td class="rowLabel" style="text-align: right; font-weight: bold;">5</td>
-<td style="text-align: left;">Julia</td>
-<td style="text-align: left;">Accumulator</td>
-<td style="text-align: left;">npv6</td>
-<td style="text-align: right;">9.037</td>
-<td style="text-align: right;">9.009</td>
-<td style="text-align: right;">1.41318</td>
-</tr>
-<tr class="dataRow even">
-<td class="rowLabel" style="text-align: right; font-weight: bold;">6</td>
-<td style="text-align: left;">Julia</td>
-<td style="text-align: left;">Accumulator</td>
-<td style="text-align: left;">npv4</td>
-<td style="text-align: right;">10.764</td>
-<td style="text-align: right;">10.761</td>
-<td style="text-align: right;">1.688</td>
-</tr>
-<tr class="dataRow odd">
-<td class="rowLabel" style="text-align: right; font-weight: bold;">7</td>
-<td style="text-align: left;">Julia</td>
-<td style="text-align: left;">Accumulator</td>
-<td style="text-align: left;">npv5</td>
-<td style="text-align: right;">11.49</td>
-<td style="text-align: right;">11.469</td>
-<td style="text-align: right;">1.79906</td>
-</tr>
-<tr class="dataRow even">
-<td class="rowLabel" style="text-align: right; font-weight: bold;">8</td>
-<td style="text-align: left;">Rust</td>
-<td style="text-align: left;">Accumulator</td>
-<td style="text-align: left;">npv2</td>
-<td style="text-align: right;">14.0</td>
-<td style="text-align: right;">14.0</td>
-<td style="text-align: right;">2.19608</td>
-</tr>
-<tr class="dataRow odd">
-<td class="rowLabel" style="text-align: right; font-weight: bold;">9</td>
-<td style="text-align: left;">Julia</td>
-<td style="text-align: left;">Accumulator</td>
-<td style="text-align: left;">npv3</td>
-<td style="text-align: right;">14.507</td>
-<td style="text-align: right;">14.487</td>
-<td style="text-align: right;">2.27247</td>
-</tr>
-<tr class="dataRow even">
-<td class="rowLabel" style="text-align: right; font-weight: bold;">10</td>
-<td style="text-align: left;">Rust</td>
-<td style="text-align: left;">Accumulator</td>
-<td style="text-align: left;">npv1</td>
-<td style="text-align: right;">22.0</td>
-<td style="text-align: right;">22.0</td>
-<td style="text-align: right;">3.45098</td>
-</tr>
-<tr class="dataRow odd">
-<td class="rowLabel" style="text-align: right; font-weight: bold;">11</td>
-<td style="text-align: left;">Julia</td>
-<td style="text-align: left;">Vectorized</td>
-<td style="text-align: left;">npv2</td>
-<td style="text-align: right;">235.758</td>
-<td style="text-align: right;">218.391</td>
-<td style="text-align: right;">34.2574</td>
-</tr>
-<tr class="dataRow even">
-<td class="rowLabel" style="text-align: right; font-weight: bold;">12</td>
-<td style="text-align: left;">Julia</td>
-<td style="text-align: left;">Vectorized</td>
-<td style="text-align: left;">npv1</td>
-<td style="text-align: right;">235.322</td>
-<td style="text-align: right;">228.198</td>
-<td style="text-align: right;">35.7958</td>
-</tr>
-<tr class="dataRow odd">
-<td class="rowLabel" style="text-align: right; font-weight: bold;">13</td>
-<td style="text-align: left;">Python (Numba)</td>
-<td style="text-align: left;">Accumulator</td>
-<td style="text-align: left;">npv_numba</td>
-<td style="text-align: right; font-style: italic;">missing</td>
-<td style="text-align: right;">626.0</td>
-<td style="text-align: right;">98.1961</td>
-</tr>
-<tr class="dataRow even">
-<td class="rowLabel" style="text-align: right; font-weight: bold;">14</td>
-<td style="text-align: left;">Python</td>
-<td style="text-align: left;">Accumulator</td>
-<td style="text-align: left;">npv_loop</td>
-<td style="text-align: right; font-style: italic;">missing</td>
-<td style="text-align: right;">2314.0</td>
-<td style="text-align: right;">362.98</td>
-</tr>
-<tr class="dataRow odd">
-<td class="rowLabel" style="text-align: right; font-weight: bold;">15</td>
-<td style="text-align: left;">Python (NumPy)</td>
-<td style="text-align: left;">Vectorized</td>
-<td style="text-align: left;">npv</td>
-<td style="text-align: right; font-style: italic;">missing</td>
-<td style="text-align: right;">14261.0</td>
-<td style="text-align: right;">2237.02</td>
-</tr>
-<tr class="dataRow even">
-<td class="rowLabel" style="text-align: right; font-weight: bold;">16</td>
-<td style="text-align: left;">R</td>
-<td style="text-align: left;">Vectorized</td>
-<td style="text-align: left;">npv base</td>
-<td style="text-align: right;">4264.0</td>
-<td style="text-align: right;">46617.0</td>
-<td style="text-align: right;">7312.47</td>
-</tr>
-<tr class="dataRow odd">
-<td class="rowLabel" style="text-align: right; font-weight: bold;">17</td>
-<td style="text-align: left;">R</td>
-<td style="text-align: left;">Accumulator</td>
-<td style="text-align: left;">npv_loop</td>
-<td style="text-align: right;">4346.0</td>
-<td style="text-align: right;">62275.7</td>
-<td style="text-align: right;">9768.74</td>
-</tr>
-<tr class="dataRow even">
-<td class="rowLabel" style="text-align: right; font-weight: bold;">18</td>
-<td style="text-align: left;">R (data.table)</td>
-<td style="text-align: left;">Vectorized</td>
-<td style="text-align: left;">npv</td>
-<td style="text-align: right;">770554.0</td>
-<td style="text-align: right;">8.42767e5</td>
-<td style="text-align: right;">1.32199e5</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</figure>
-</div>
-</div>
-<p>To aid in visualizing results with such vast different orders of magnitude, this graph includes a physical length comparison to serve as a reference. The computation time is represented by the distance that light travels in the time for the computation to complete (comparing a nanosecond to one foot length <a href="https://www.youtube.com/watch?v=9eyFDBPk4Yw">goes at least back to Admiral Grace Hopper</a>).</p>
-<div class="cell" data-execution_count="1">
-<div id="tbl-life-modeling-benchmark-blog" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-execution_count="1">
-<figure class="quarto-float quarto-float-tbl figure">
-<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-life-modeling-benchmark-blog-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;2: Benchmarks for the Life Modeling Problem in nanoseconds (lower times are better).
-</figcaption>
-<div aria-describedby="tbl-life-modeling-benchmark-blog-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<div class="cell-output cell-output-display" data-execution_count="1">
-<div><div style="float: left;"><span>18×6 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
-<table class="data-frame do-not-create-environment cell caption-top table table-sm table-striped small">
-<thead>
-<tr class="columnLabelRow header">
-<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">lang</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">algorithm</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">function_name</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">median</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">mean</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">relative_mean</th>
-</tr>
-<tr class="columnLabelRow even">
-<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="InlineStrings.String15">String15</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="InlineStrings.String15">String15</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="InlineStrings.String15">String15</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="DataStrings.DataString">DataStri…</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="DataStrings.DataString">DataStri…</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="DataStrings.DataString">DataStri…</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th" title="Union{Missing, Float64}">Float64?</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
@@ -4875,7 +4686,7 @@ Figure&nbsp;1
 </blockquote>
 <p>All of the submissions and algorithms above worked, and fast enough that it gave an answer in very little time. And much of the time, the volume of data to process is small enough that it doesn’t matter.</p>
 <p>But remember the CUNA Mutual example from above: Let’s say that CUNA’s runtime is already as fast as it can be, and index it to the fastest result in the benchmarks below. The difference between the fastest “couple of days” run and the slowest would be over <strong>721 years</strong>. So it’s important to use tools and approaches that are performant for actuarial work.</p>
-<p>So for little one-off tasks it doesn’t make a big difference what tool or algorithm is used. More often than not, your one-off calculations or checks will be done fast enough that it’s not important to be picky. But if wanting to scale your work to a broader application within your company or the industry, I think it’s important to be performance-minded[^4].</p>
+<p>So for little one-off tasks it doesn’t make a big difference what tool or algorithm is used. More often than not, your one-off calculations or checks will be done fast enough that it’s not important to be picky. But if wanting to scale your work to a broader application within your company or the industry, I think it’s important to be performance-minded<sup>4</sup>.</p>
 </section>
 <section id="takeaway-2" class="level3">
 <h3 class="anchored" data-anchor-id="takeaway-2">Takeaway #2</h3>
@@ -4883,7 +4694,7 @@ Figure&nbsp;1
 <p>“If all you have is a dataframe, everything looks like a join”</p>
 </blockquote>
 <p>I’ve seen this several times in practice. Where a stacked dataframe of mortality rates is joined up with policy data in a complicated series of <code>%&gt;%</code>s (pipes), <code>inner_joins</code> and <code>mutates</code>.</p>
-<p>Don’t get me wrong, I think code is often still a better approach than spreadsheets[^5].</p>
+<p>Don’t get me wrong, I think code is often still a better approach than spreadsheets<sup>5</sup>.</p>
 <p>However, like the old proverb that “if all you have is a hammer, everything looks like a nail” - sometimes the tool you have just isn’t right for the job. That’s the lesson of the R <a href="https://cran.r-project.org/web/packages/data.table/vignettes/datatable-intro.html">data.table</a> result above. Even with the fastest dataframe implementation in R, it vastly trails other submissions.</p>
 <section id="algorithm-choice" class="level4">
 <h4 class="anchored" data-anchor-id="algorithm-choice">Algorithm choice</h4>
@@ -4907,7 +4718,7 @@ Figure&nbsp;1
 <h5 class="anchored" data-anchor-id="flexibility">Flexibility</h5>
 <p>R scores well here - <a href="http://adv-r.had.co.nz/Computing-on-the-language.html#nse">non-standard evaluation</a> lets you, essentially, inspect the written code without evaluating it. This is a nice feature that enables a lot of creativity and pleasantries (like ggplot knowing what to label the axes without you telling it).</p>
 <p>R works in notebook environments and from a REPL.</p>
-<p>One negative about R’s flexibility is the fact that the language is <a href="https://www.r-project.org/Licenses/AGPL-3">GPL licensed</a>, meaning that there are quite a few restrictions. For example, if you distribute an application that relies on R (e.g.&nbsp;it becomes part of your sales platform distributed to agents) you would need to be able to provide the source code for your application to the said users[^6]. The other languages discussed on this page have much more permissive licenses.</p>
+<p>One negative about R’s flexibility is the fact that the language is <a href="https://www.r-project.org/Licenses/AGPL-3">GPL licensed</a>, meaning that there are quite a few restrictions. For example, if you distribute an application that relies on R (e.g.&nbsp;it becomes part of your sales platform distributed to agents) you would need to be able to provide the source code for your application to the said users<sup>6</sup>. The other languages discussed on this page have much more permissive licenses.</p>
 </section>
 <section id="readability" class="level5">
 <h5 class="anchored" data-anchor-id="readability">Readability</h5>
@@ -4942,7 +4753,7 @@ microbenchmark::microbenchmark(base_r_npv(q,w,P,S,r))</code></pre>
 </section>
 <section id="flexibility-1" class="level5">
 <h5 class="anchored" data-anchor-id="flexibility-1">Flexibility</h5>
-<p>Rust is statically compiled (you write script, have computer run script, see results). It doesn’t have a REPL or ability to be used in an interactive way (e.g.&nbsp;notebook environments).</p>
+<p>Rust is statically compiled (you write a program, compile it, and then run it to see results). It doesn’t have an official REPL and interactive use (e.g.&nbsp;notebook environments) is uncommon, though third-party tools like <a href="https://github.com/evcxr/evcxr">evcxr</a> provide a REPL and Jupyter kernel.</p>
 </section>
 <section id="readability-1" class="level5">
 <h5 class="anchored" data-anchor-id="readability-1">Readability</h5>
@@ -4997,7 +4808,7 @@ let r: f64 = 0.02;
 <section id="flexibility-2" class="level5">
 <h5 class="anchored" data-anchor-id="flexibility-2">Flexibility</h5>
 <p>Python wins large points for interactive usage in the REPL, notebooks, and wide variety of environments that support running Python code. However, within the language itself I have to deduct points for the ease of inspecting/evaluating code.</p>
-<p>What I mean by that, is that if you look at the code example below, in order to test the code you have to turn it into string and then call the <code>timeit</code> function to read and parse the string. In none of the other tested languages was that sort of boiler-plate required.</p>
+<p>What I mean by that, is that if you look at the code example below, the idiomatic standalone <code>timeit</code> pattern turns the code into a string which the <code>timeit</code> function then reads and parses (<code>timeit</code> can also accept a callable, and IPython/Jupyter offer <code>%timeit</code>, but the string form is the common standalone-script pattern). In none of the other tested languages was that sort of boiler-plate typical.</p>
 <p>Python scores partial points for meta-programming: decorators (<code>@</code> syntax) is syntactic sugar for macro-like modifications to functions, but Python metaprogramming is <a href="https://softwareengineering.stackexchange.com/a/253377/37060">fundamentally limited</a> by the language design.</p>
 <p>Python has perhaps the most robust ecosystem of all the languages discussed here, but in many ways its limiting: once you get deep into an ecosystem (e.g.&nbsp;NumPy), you are sort of at the mercy of package developers to ensure that the packages are compatible. As a key example, many common types and data structures are not shareable between libraries: there are <a href="https://data-apis.org/">efforts</a> to standardize data types/classes for better compatibility across the Python ecosystem, but may require fundamental changes to the language or ecosystem to accomplish.</p>
 <p>On the subject of Python packages: environment and package management in Python is notoriously painful:</p>
@@ -5032,7 +4843,7 @@ def npv(q,w,P,S,r):
 benchmark = '''npv(q,w,P,S,r)'''
 
 print(timeit.timeit(stmt=benchmark,setup=setup,number = 1000000))</code></pre>
-<p>To do non standard things like benchmarking (or The benchmarking setup with Python’s <code>timeit</code> is definitely the most painful, needing to wrap the whole thing in a string. And then only get a single number result, without normalizing for the number of runs is very annoying.</p>
+<p>The benchmarking setup with Python’s <code>timeit</code> was the most painful of the languages compared here: the common pattern wraps the code in a string, and the result is a single total time that you have to normalize by the number of runs yourself.</p>
 </section>
 </section>
 <section id="julia" class="level4">
@@ -5073,7 +4884,7 @@ function npv1(q,w,P,S,r)
     return sum(ncf .* d)
 end
 
-@benchmark npv($q,$w,$P,$S,$r)</code></pre>
+@benchmark npv1($q,$w,$P,$S,$r)</code></pre>
 <p>And the <code>Accumulator</code> version:</p>
 <pre class="julia"><code>function npv5(q,w,P,S,r,term=nothing)
     term = term === nothing ? length(q) : term
@@ -5095,13 +4906,12 @@ end</code></pre>
 <section id="more-flexibility-more-performance-from-julia" class="level2">
 <h2 class="anchored" data-anchor-id="more-flexibility-more-performance-from-julia">More flexibility, more performance from Julia</h2>
 <p>I wanted to go a little bit deeper and show how 1) Julia just runs fast even if your not explicitly focused on performance. But for where it <em>really</em> matters, you can go even deeper. This is a little advanced, but I think it can be useful to introduce some basics as to why some languages and approaches are going to be fundamentally slower than others.</p>
-<p>Notes: The accumulator approach vectors and allocations talk about stack/heap? pick a faster approach and explain why it’s even faster.</p>
 </section>
 <section id="colophon" class="level2">
 <h2 class="anchored" data-anchor-id="colophon">Colophon</h2>
 <section id="code" class="level3">
 <h3 class="anchored" data-anchor-id="code">Code</h3>
-<p>All of the benchmarked code can be found in the <a href="https://github.com/JuliaActuary/Learn/tree/master/LifeModelingProblemBenchmarks">JuliaActuary Learn repository</a>. Please file an issue or submit a PR request there for issues/suggestions.</p>
+<p>All of the benchmarked code can be found in the <a href="https://github.com/JuliaActuary/Learn/tree/master/Benchmarks/LifeModelingProblem">JuliaActuary Learn repository</a>. Please file an issue or submit a PR request there for issues/suggestions.</p>
 </section>
 <section id="hardware" class="level3">
 <h3 class="anchored" data-anchor-id="hardware">Hardware</h3>
@@ -5134,17 +4944,22 @@ Platform Info:
 </section>
 <section id="footnotes" class="level2">
 <h2 class="anchored" data-anchor-id="footnotes">Footnotes</h2>
-<p>[^1] A take on <a href="https://en.wikipedia.org/wiki/Andy_and_Bill%27s_law">Andy and Bill’s law</a></p>
-<p>[^2] If benchmarking memoization, it’s essentially benchmarking how long it takes to perform hashing in a language. While interesting, especially in the context of <a href="https://scattered-thoughts.net/writing/an-opinionated-map-of-incremental-and-streaming-systems">incremental computing</a>, it’s not the core issue at hand. Incremental computing libraries exist for all of the modern languages discussed here.</p>
-<p>[^3] Note that not all languages have both a mean and median result in their benchmarking libraries. Mean is a better representation for a garbage-collected modern language, because sometimes the computation just takes longer than the median result. Where the mean is not available in the graph below, median is substituted.</p>
-<p>[^4] Don’t <a href="https://en.wikipedia.org/wiki/Program_optimization#When_to_optimizer">prematurely optimize</a>. But in the long run avoid, <a href="https://www.nature.com/articles/d41586-019-02310-3">re-writing your code in a faster language too many times!</a></p>
-<p>[^5] I’ve seen 50+ line, irregular Excel formulas. To Nick: it probably started out as a good idea but it was a beast to understand and modify! At least with code you can look at the code with variable names and syntax highlighting! Comments, if you are lucky!</p>
-<p>[^6] This is not legal advice, consult a lawyer for more details.</p>
 
 
 </section>
 
- ]]></description>
+
+<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>A take on <a href="https://en.wikipedia.org/wiki/Andy_and_Bill%27s_law">Andy and Bill’s law</a>↩︎</p></li>
+<li id="fn2"><p>Note that not all languages have both a mean and median result in their benchmarking libraries. Mean is a better representation for a garbage-collected modern language, because sometimes the computation just takes longer than the median result. Where the mean is not available in the graph below, median is substituted.↩︎</p></li>
+<li id="fn3"><p>If benchmarking memoization, it’s essentially benchmarking how long it takes to perform hashing in a language. While interesting, especially in the context of <a href="https://scattered-thoughts.net/writing/an-opinionated-map-of-incremental-and-streaming-systems">incremental computing</a>, it’s not the core issue at hand. Incremental computing libraries exist for all of the modern languages discussed here.↩︎</p></li>
+<li id="fn4"><p>Don’t <a href="https://en.wikipedia.org/wiki/Program_optimization#When_to_optimizer">prematurely optimize</a>. But in the long run avoid, <a href="https://www.nature.com/articles/d41586-019-02310-3">re-writing your code in a faster language too many times!</a>↩︎</p></li>
+<li id="fn5"><p>I’ve seen 50+ line, irregular Excel formulas. To Nick: it probably started out as a good idea but it was a beast to understand and modify! At least with code you can look at the code with variable names and syntax highlighting! Comments, if you are lucky!↩︎</p></li>
+<li id="fn6"><p>This is not legal advice, consult a lawyer for more details.↩︎</p></li>
+</ol>
+</section></div> ]]></description>
   <category>code</category>
   <category>blog</category>
   <guid>https://JuliaActuary.org/posts/life-modeling-problem/</guid>
@@ -5236,7 +5051,7 @@ Platform Info:
 <section id="future-articles" class="level2">
 <h2 class="anchored" data-anchor-id="future-articles">Future Articles</h2>
 <p>The forthcoming series of articles will help illustrate what this can look like in practice: examining the business case, acquainting with ways of interacting with problems outside of spreadsheets and dataframes, and approaching work in a way that removes the boring parts and focuses on the concepts and insights.</p>
-<p>The <a href="../../blog/julia-actuaries/">next article in this series</a> will discuss what tools enable an actuary to deliver on the vision outlined in this article. In particular, it will highlight the Julia programming language, a tool well positioned to enable actuaries to develop the analysis, systems, and models of tomorrow.</p>
+<p>The <a href="../../posts/julia-for-actuaries/index.html">next article in this series</a> will discuss what tools enable an actuary to deliver on the vision outlined in this article. In particular, it will highlight the Julia programming language, a tool well positioned to enable actuaries to develop the analysis, systems, and models of tomorrow.</p>
 </section>
 <section id="footnotes" class="level1">
 <h1>Footnotes</h1>

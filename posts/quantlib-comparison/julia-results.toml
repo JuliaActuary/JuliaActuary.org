@@ -7,10 +7,10 @@ threads = 14
 
 [nanoseconds]
 convexity = 24.556224899598394
-duration = 24.53159478435306
-krd_30y = 1179.1
-krd_5y = 229.9512195121951
-price = 24.549098196392787
+duration = 24.556224899598394
+krd_30y = 1187.5
+krd_5y = 230.39366515837105
+price = 24.556224899598394
 
 [packages]
 ADTypes = "1.24.0"
@@ -55,9 +55,9 @@ EnumX = "1.0.7"
 ExprTools = "0.1.11"
 FastClosures = "0.3.2"
 FileWatching = "1.11.0"
-FillArrays = "1.17.1"
+FillArrays = "1.18.0"
 FinanceCore = "3.0.0"
-FinanceModels = "7.0.0"
+FinanceModels = "7.0.1"
 FindFirstFunctions = "3.4.0"
 FiniteDiff = "2.33.0"
 FlexiGroups = "0.1.31"
@@ -98,7 +98,7 @@ OpenLibm_jll = "0.8.7+0"
 OpenSpecFun_jll = "0.5.6+0"
 Optim = "2.3.2"
 Optimization = "5.9.1"
-OptimizationBase = "5.7.0"
+OptimizationBase = "5.8.0"
 OptimizationOptimJL = "0.4.21"
 OrderedCollections = "2.0.2"
 PDMats = "0.11.41"

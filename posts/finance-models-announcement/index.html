@@ -33,7 +33,7 @@ ul.task-list li input[type="checkbox"] {
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
-<link href="../..//assets/favicon.ico" rel="icon">
+<link href="../..//assets/logos/favicon.ico" rel="icon">
 <script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
@@ -207,6 +207,19 @@ ul.task-list li input[type="checkbox"] {
 
 
 
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Historical release announcement
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This August 2023 article describes the original FinanceModels 4 interface. Its extension hooks, projection examples and non-linear bootstrap calls are historical. For FinanceModels 7, use the <a href="../../packages.html#financemodels.jl">current package examples</a>, <a href="https://docs.juliaactuary.org/FinanceModels/stable/migration/">migration guide</a> and <a href="../../posts/2026-fall-releases/index.html">fall 2026 release overview</a>. The current hooks are <code>FinanceModels.default_variables</code> and <code>FinanceModels.default_optimizer</code>; valuation uses <code>present_value(ctx, contract)</code>.</p>
+</div>
+</div>
 <p>Yields.jl has evolved into FinanceModels.jl. The benefits are:</p>
 <ul>
 <li>Provide a composable set of <strong>contracts</strong> and <strong><code>Quotes</code></strong></li>
@@ -533,7 +546,7 @@ end</code></pre>
 </section>
 <section id="migration-guide" class="level2">
 <h2 class="anchored" data-anchor-id="migration-guide">Migration Guide</h2>
-<p>For those looking to upgrade from Yields (v3.x.x) to FinanceModels (v4+), there is a <a href="https://juliaactuary.github.io/FinanceModels.jl/dev/migration/">migration guide here</a>. Associated packages <a href="https://github.com/JuliaActuary/ActuaryUtilities.jl/pull/101#issue-1773044104">ActuaryUtilities.jl</a> and <a href="https://github.com/JuliaActuary/FinanceCore.jl/compare/v1.1.0...v2.0.0">FinanceCore.jl</a> had major version releases for minor breaking changes where most code should remain unaffected (FinanceCore is not intended to be user-facing).</p>
+<p>For those looking to upgrade from Yields (v3.x.x) to FinanceModels (v4+), there is a <a href="https://docs.juliaactuary.org/FinanceModels/stable/migration/">migration guide here</a>. Associated packages <a href="https://github.com/JuliaActuary/ActuaryUtilities.jl/pull/101#issue-1773044104">ActuaryUtilities.jl</a> and <a href="https://github.com/JuliaActuary/FinanceCore.jl/compare/v1.1.0...v2.0.0">FinanceCore.jl</a> had major version releases for minor breaking changes where most code should remain unaffected (FinanceCore is not intended to be user-facing).</p>
 <p>Some tutorials or examples on the site may still use Yields.jl - that’s okay as they will still work given Julia’s strong degree of reproducibility and dependency management tools. Please open an issue on the <a href="https://github.com/JuliaActuary/JuliaActuary.org">JuliaActuary.org repository</a> if you have trouble with any of the old example code.</p>
 </section>
 <section id="conclusion" class="level2">

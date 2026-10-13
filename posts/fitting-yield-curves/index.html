@@ -31,7 +31,7 @@ ul.task-list li input[type="checkbox"] {
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
-<link href="../..//assets/favicon.ico" rel="icon">
+<link href="../..//assets/logos/favicon.ico" rel="icon">
 <script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
@@ -201,6 +201,7 @@ ul.task-list li input[type="checkbox"] {
 <pre class="julia cell-code"><code>using FinanceModels
 using CairoMakie
 
+# Apply the site's custom Makie plot theme (cassette futurism).
 include(joinpath(@__DIR__, "..", "..", "assets", "themes", "cassette_futurism.jl"))
 set_theme!(cassette_futurism_theme())</code></pre>
 </div>
@@ -223,7 +224,7 @@ mats = [1 / 12, 2 / 12, 3 / 12, 6 / 12, 1, 2, 3, 5, 7, 10, 20, 30]</code></pre>
  30.0</code></pre>
 </div>
 </div>
-<p>The above rates and associated maturities represent prices of zero coupon bonds, which we use as the financial instrument that we will fit the curve to:</p>
+<p>The above rates and associated maturities represent yields of zero coupon bonds (from which the corresponding prices follow), which we use as the financial instrument that we will fit the curve to:</p>
 <div id="8" class="cell" data-execution_count="1">
 <pre class="julia cell-code"><code>quotes = ZCBYield.(rates, mats)</code></pre>
 <div class="cell-output cell-output-display" data-execution_count="1">
@@ -242,22 +243,23 @@ mats = [1 / 12, 2 / 12, 3 / 12, 6 / 12, 1, 2, 3, 5, 7, 10, 20, 30]</code></pre>
  Quote{Float64, Cashflow{Float64, Float64}}(0.4852941873885002, Cashflow{Float64, Float64}(1.0, 30.0))</code></pre>
 </div>
 </div>
-<p>Fitting is then calling <code>fit</code> along with the desired curve construction technique. Here are several variants:</p>
+<p>With FinanceModels 7, <code>Fit.Bootstrap()</code> supports linear interpolation. Quadratic and cubic splines use a loss fit over all quotes. Here are six alternatives:</p>
 <div id="10" class="cell" data-execution_count="1">
 <pre class="julia cell-code"><code>ns = fit(Yield.NelsonSiegel(), quotes);
 nss = fit(Yield.NelsonSiegelSvensson(), quotes);
 sw = fit(Yield.SmithWilson(ufr=0.05, α=0.1), quotes);
 bl = fit(Spline.Linear(), quotes, Fit.Bootstrap());
-bq = fit(Spline.Quadratic(), quotes, Fit.Bootstrap());
-bc = fit(Spline.Cubic(), quotes, Fit.Bootstrap());</code></pre>
+bq = fit(Spline.Quadratic(), quotes, Fit.Loss(x -&gt; x^2));
+bc = fit(Spline.Cubic(), quotes, Fit.Loss(x -&gt; x^2));</code></pre>
 </div>
-<p>That’s it! We’ve fit the rates using six different techniques. These can now be used in a variety of ways, such as calculating the <code>present_value</code>, <code>duration</code>, or <code>convexity</code> of different cashflows if you imported <a href="https://github.com/JuliaActuary/ActuaryUtilities.jl">ActuaryUtilities.jl</a>”</p>
+<p>These curves can discount cashflows with <code>present_value</code>, or supply <code>duration</code> and <code>convexity</code> calculations in <a href="https://docs.juliaactuary.org/ActuaryUtilities/stable/">ActuaryUtilities</a>. The fitted spline curves use flat-forward extrapolation after the final 30-year knot. Their zero rates approach that forward rate; they do not continue the final interpolation polynomial.</p>
+<p>For direct interpolation of observed zero rates, use <code>ZeroRateCurve(rates, mats, Spline.Cubic())</code>. A loss fit is useful when fitting the prices of coupon-bearing instruments as well.</p>
 <section id="visualizing-the-results" class="level2">
 <h2 class="anchored" data-anchor-id="visualizing-the-results">Visualizing the results</h2>
 <div id="12" class="cell" data-execution_count="1">
 <pre class="julia cell-code"><code>const CURVES = [
-    (bc,  "Bootstrap (Cubic)"),
-    (bq,  "Bootstrap (Quadratic)"),
+    (bc,  "Loss fit (Cubic)"),
+    (bq,  "Loss fit (Quadratic)"),
     (bl,  "Bootstrap (Linear)"),
     (ns,  "NelsonSiegel"),
     (nss, "NelsonSiegelSvensson"),
