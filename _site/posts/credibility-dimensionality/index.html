@@ -1,0 +1,1775 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.16">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.">
+
+<title>Credibility as the Cells Multiply – JuliaActuary</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../..//assets/favicon.ico" rel="icon">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-a0731b9a3a5d496010872d775e5d9bc3.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-98ac2d5361ef6f18cc0525d38bedc462.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&amp;family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/highlight/styles/github.min.css">
+<script src="../../assets/highlight/highlight.min.js"></script>
+<script src="../../assets/highlight/languages/julia.min.js"></script>
+<script src="../../assets/highlight/languages/julia-repl.min.js"></script>
+<script src="../../assets/highlight/languages/python.min.js"></script>
+<script src="../../assets/highlight/languages/r.min.js"></script>
+<script>hljs.highlightAll();</script>
+<script data-goatcounter="https://juliaactuary.goatcounter.com/count" async="" src="//gc.zgo.at/count.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed fullcontent quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../assets/logos/android-chrome-512x512.png" alt="JuliaActuary Logo" class="navbar-logo light-content">
+    <img src="../../assets/logos/android-chrome-512x512.png" alt="JuliaActuary Logo" class="navbar-logo dark-content">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">JuliaActuary</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../packages.html"> 
+<span class="menu-text">Packages</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://docs.juliaactuary.org"> 
+<span class="menu-text">Docs</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://modernfinancialmodeling.com"> 
+<span class="menu-text">Book</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../learn.html"> 
+<span class="menu-text">Learn</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../examples.html"> 
+<span class="menu-text">Examples</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../benchmarks.html"> 
+<span class="menu-text">Benchmarks</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../community.html"> 
+<span class="menu-text">Community</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/JuliaActuary"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="../../all-posts.xml"> <i class="bi bi-rss" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Credibility as the Cells Multiply</h1>
+            <p class="subtitle lead">Credibility when claims are scarce, continued: how much experience it takes to split rates by sex, then by risk class, then by product</p>
+                  <div>
+        <div class="description">
+          JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">statistics</div>
+                <div class="quarto-category">experience-analysis</div>
+                <div class="quarto-category">bayesian</div>
+                <div class="quarto-category">credibility</div>
+                <div class="quarto-category">modeling</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<p>A block of life business produces about ninety death claims a year. The pricing committee wants rates that separate male from female. It also wants three risk classes: preferred, standard, and substandard. It also wants three products: fully underwritten term, simplified-issue whole life, and guaranteed-issue final expense. Each request is reasonable on its own. Together they spread the ninety claims across eighteen cells.</p>
+<p>This post measures how much experience each of those splits needs. It continues <a href="../../posts/credibility-sparse-data/index.html"><em>Credibility When Claims Are Scarce</em></a>, which compared traditional credibility formulas with a hierarchical Bayesian model on one rating dimension. You do not need to read that post first. Everything here starts from scratch. But its conclusion is our starting point: when claims are scarce, a hierarchical model learns more from them than the traditional formulas do, and it reports what it still does not know. So we set the traditional formulas aside and ask a new question about the same kind of model. As you add rating dimensions, when does the posterior settle a question? And which questions settle first?</p>
+<p>We go slowly, in small steps: a known truth, one portfolio you can count by hand, three models, and then a sweep of portfolio sizes from about twelve expected claims to several thousand.</p>
+<section id="the-experiment" class="level2">
+<h2 class="anchored" data-anchor-id="the-experiment">The experiment</h2>
+<p>The setup, in brief:</p>
+<ul>
+<li>One <strong>aggregate expected table</strong>. It is unisex, class-blind, and product-blind. We measure every cell as actual-to-expected (A/E) against it. The table knows none of the structure. The structure is what the models must learn.</li>
+<li>Three views of the same block: <strong>sex</strong> (2 cells), <strong>sex × class</strong> (6 cells), and <strong>sex × class × product</strong> (18 cells).</li>
+<li>A ladder of portfolio sizes, measured in <strong>expected claims on the table basis</strong>: from 12.5 to 6,400, doubling at each rung. The smallest rung matches the N=500 block of part one, which produced about a dozen claims.</li>
+<li><strong>Conclusions defined in advance.</strong> Before we fit anything, we write down what “the data supports a conclusion” means. Each definition is a statement about the posterior, with a visible threshold.</li>
+<li>Ground truth is known, because we simulate it. The models never see it. At the end, we compare what each model concluded, and when, with the truth.</li>
+</ul>
+<p>A note on the unit, for readers of the earlier credibility posts. Those posts argued against claim-count <em>thresholds</em>: rules that give data no weight until a fixed number of claims arrives. This post does not revive them. Every portfolio on the ladder produces a full posterior, including the twelve-claim one. No rule below requires a minimum count before the data can speak. Claims play a different role here. They are the unit in which exposure carries information about rates. A policy-year with little chance of a claim teaches almost nothing. What matters about 25,000 policy-years is that the table expects them to produce about 100 claims. That second number is the one the arithmetic uses. The thresholds later in the post are decision rules. We choose them and write them down. They state when a posterior is strong enough to act on. They never state when data is allowed to count.</p>
+<div id="4" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>packages and plot theme</summary>
+<pre class="julia cell-code"><code>using Random, Distributions, DataFrames, DataFramesMeta, StatsBase, Statistics, Printf
+using Turing, MCMCChains, StatsFuns, ThreadsX, KernelDensity
+using Logging
+Logging.disable_logging(Logging.Warn) # quiet Turing's per-fit chatter
+
+using CairoMakie
+# Apply the site's custom Makie plot theme (cassette futurism).
+include(joinpath(@__DIR__, "..", "..", "assets", "themes", "cassette_futurism.jl"))
+set_theme!(cassette_futurism_theme())</code></pre>
+</details>
+</div>
+</section>
+<section id="ground-truth" class="level2">
+<h2 class="anchored" data-anchor-id="ground-truth">Ground truth</h2>
+<p>The truth is multiplicative, with one exception. We point at the exception when we reach it. Each cell’s true mortality is the table rate times a level, a sex factor, a class factor, and a product factor. On the log scale, the factors add:</p>
+<div id="6" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>const SEXES    = ["Female", "Male"]
+const CLASSES  = ["Preferred", "Standard", "Substandard"]
+const PRODUCTS = ["Term", "SI Whole Life", "Guaranteed Issue"]
+
+const LEVEL     = 0.90                # the whole block runs at 90% of the table
+const SEX_EFF   = (-0.15, 0.15)       # log scale: Female, Male
+const CLASS_EFF = (-0.35, 0.0, 0.35)  # log scale: Preferred, Standard, Substandard
+const PROD_EFF  = (-0.40, 0.0, 0.40)  # log scale: Term, SI WL, Guaranteed Issue
+const KAPPA     = (1.0, 1.0, 0.4)     # how much of the class effect survives, per product
+
+# each cell's share of the portfolio's table-expected claims
+const SEX_SHARE     = (0.45, 0.55)
+const PROD_SHARE    = (0.45, 0.25, 0.30)
+const CLASS_IN_PROD = ((0.50, 0.38, 0.12),   # class mix within Term
+                       (0.25, 0.55, 0.20),   # within SI Whole Life
+                       (0.10, 0.55, 0.35))   # within Guaranteed Issue
+
+cells = DataFrame([(sex=s, cls=r, prod=p,
+                    share=SEX_SHARE[s] * PROD_SHARE[p] * CLASS_IN_PROD[p][r],
+                    θ=LEVEL * exp(SEX_EFF[s] + KAPPA[p] * CLASS_EFF[r] + PROD_EFF[p]))
+                   for s in 1:2, r in 1:3, p in 1:3] |&gt; vec)
+
+const IDX = [findfirst(i -&gt; cells.sex[i] == s &amp;&amp; cells.cls[i] == r &amp;&amp; cells.prod[i] == p,
+                       1:nrow(cells)) for s in 1:2, r in 1:3, p in 1:3]</code></pre>
+</div>
+<p>The values are deliberately ordinary. Males run about 1.35× female mortality. Substandard runs about 2.01× preferred. Guaranteed issue runs about 2.23× term. The exception is <code>KAPPA</code>. In the two underwritten products, the class effect applies in full. In guaranteed issue, <code>KAPPA</code> cuts it to 40%. So the substandard-to-preferred ratio is about 2.0 where underwriting happened, and it compresses to about 1.32 in guaranteed issue. The story behind this is ordinary too. Risk class is the <em>output</em> of underwriting. In a product that no one underwrites, the labels carry less information. This is the one true interaction in the book. Much of the post asks how many claims it takes to see it.</p>
+<p>The mix is unbalanced, as real books are. Term skews preferred. Guaranteed issue has almost no preferred lives. The sex mix is 55/45, and it is independent of class and product. That independence keeps one comparison clean. FIG. 01 shows all eighteen cells: the true multiplier, and below it the cell’s share of the portfolio’s expected claims.</p>
+<div id="8" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>FIG. 01 plotting code</summary>
+<pre class="julia cell-code"><code>let
+    f = Figure(size=(780, 400))
+    lim = maximum(abs, log.(cells.θ))
+    hm = nothing
+    for s in 1:2
+        ax = Axis(f[1, s];
+            subtitle=SEXES[s],
+            xticks=(1:3, ["Term", "SI WL", "GI"]),
+            yticks=(1:3, ["Pref", "Std", "Sub"]),
+            xlabel="product", ylabel=s == 1 ? "risk class" : "")
+        z = [log(cells.θ[IDX[s, r, p]]) for p in 1:3, r in 1:3]
+        hm = heatmap!(ax, 1:3, 1:3, z; colormap=:vik, colorrange=(-lim, lim))
+        for p in 1:3, r in 1:3
+            i = IDX[s, r, p]
+            text!(ax, p, r;
+                text="$(round(cells.θ[i], digits=2))×\n$(round(100 * cells.share[i], digits=1))%",
+                align=(:center, :center), fontsize=11,
+                color=abs(log(cells.θ[i])) &gt; 0.55 ? :white : CF_INK)
+        end
+        s == 2 &amp;&amp; hideydecorations!(ax; grid=false)
+    end
+    Colorbar(f[1, 3], hm; label="log multiplier vs table")
+    Label(f[0, :], "FIG. 01 — TRUE MULTIPLIERS AND CLAIM SHARES ACROSS EIGHTEEN CELLS";
+        halign=:left, fontsize=15, tellwidth=false)
+    f
+end</code></pre>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-5-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Note two cells now. Guaranteed-issue preferred runs <em>worse</em> than pure multiplication predicts, because its class discount is mostly gone. And the smallest cell in the book — female, preferred, guaranteed issue, at 1.4% of expected claims — has a true multiplier of 1.0. The cell that sits almost exactly on the table is the one that can never produce enough claims to show it.</p>
+<blockquote class="blockquote">
+<p><em>Aside: why this post has no ages. An experience study reduces each cell to two numbers: actual claims, and expected claims on the table basis. For Poisson claim counts, those two numbers carry all the information. Simulate individual lives with age curves and sum them, and you get the same distribution of cell totals as one Poisson draw per cell. The age mix is absorbed into the cell’s expected claims. So we set each cell’s share of expected claims directly, and we measure portfolio size in expected claims rather than policy counts. For scale: if the average expected rate is four claims per thousand policy-years, then 100 expected claims is about 25,000 policy-years.</em></p>
+</blockquote>
+<p>Before any statistics, do one piece of arithmetic. Cutting a portfolio finer does not create claims. It divides them. FIG. 02 takes a portfolio of 200 expected claims. It shows how many claims land in each unit as the block is cut from one piece into eighteen.</p>
+<div id="10" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>FIG. 02 plotting code</summary>
+<pre class="julia cell-code"><code>let
+    Eref = 200.0
+    stages = [
+        ("portfolio\n(1)", [1.0]),
+        ("by sex\n(2)", [sum(cells.share[cells.sex .== s]) for s in 1:2]),
+        ("sex × class\n(6)", [sum(cells.share[(cells.sex .== s) .&amp; (cells.cls .== r)])
+                              for s in 1:2 for r in 1:3]),
+        ("sex × class × product\n(18)", collect(cells.share)),
+    ]
+    f = Figure(size=(720, 420))
+    ax = Axis(f[1, 1];
+        title="FIG. 02 — EXPECTED CLAIMS PER UNIT AS THE BLOCK IS CUT FINER",
+        subtitle="a portfolio of $(Int(Eref)) expected claims",
+        xticks=(1:4, first.(stages)), ylabel="expected claims in the unit",
+        yscale=log10, xticklabelsize=11)
+    for (k, (_, shares)) in enumerate(stages)
+        n = length(shares)
+        xs = k .+ 0.32 .* ((1:n) .- (n + 1) / 2) ./ max(n / 2, 1)
+        scatter!(ax, xs, Eref .* shares; color=(CF_BLUE, 0.75), markersize=10,
+            strokecolor=CF_INK, strokewidth=0.5)
+        lo = minimum(Eref .* shares)
+        text!(ax, k, lo; text="smallest: $(round(lo, digits=1))",
+            align=(:center, :top), offset=(0, -10), fontsize=11, color=CF_INK_SOFT)
+    end
+    ylims!(ax, 1.2, 320)
+    f
+end</code></pre>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-6-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The 200 claims become 110 and 90 at the sex margin. At six cells, the units hold single and double digits. The smallest of the eighteen cells expects 2.7. Nothing statistical has happened yet. This is division. The rest of the post asks what the data can still teach after the division. The answer turns on one feature of this figure: the <em>margins</em> (110 and 90) keep almost all their claims, no matter how many cells sit under them.</p>
+<p>Now we put the truth away. From here, the models see cell claim counts and table-expected claims. Nothing else. We bring the truth back at the end to grade them.</p>
+</section>
+<section id="one-portfolio-one-hundred-expected-claims" class="level2">
+<h2 class="anchored" data-anchor-id="one-portfolio-one-hundred-expected-claims">One portfolio, one hundred expected claims</h2>
+<p>To simulate a portfolio, we draw one Poisson count per cell. The mean is the cell’s expected claims times its true multiplier.</p>
+<div id="12" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>const SEED = 20260807
+const LADDER = 12.5 .* 2.0 .^ (0:9)   # portfolio sizes, in expected claims
+
+simulate(E_total, rng) = [rand(rng, Poisson(E_total * r.share * r.θ)) for r in eachrow(cells)]
+
+const E_SHOW = 100.0
+A100 = simulate(E_SHOW, Xoshiro(SEED))
+E100 = E_SHOW .* cells.share
+(total_claims = sum(A100), cells_with_zero_claims = sum(A100 .== 0))</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>(total_claims = 96, cells_with_zero_claims = 2)</code></pre>
+</div>
+</div>
+<p>One hundred expected claims produced 96 actual claims. The block runs below its table. FIG. 03 shows the spread across the eighteen cells. 2 cells produced no claims at all.</p>
+<div id="14" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>FIG. 03 plotting code</summary>
+<pre class="julia cell-code"><code>let
+    ord = sort(1:nrow(cells);
+        by=i -&gt; (cells.prod[i], cells.cls[i], cells.sex[i]))
+    labs = ["$(["Term", "SI WL", "GI"][cells.prod[i]]) · $(["Pref", "Std", "Sub"][cells.cls[i]]) · $(["F", "M"][cells.sex[i]])"
+            for i in ord]
+    pcols = [CF_BLUE, CF_AMBER, CF_PLUM]
+    xmax = max(4.3, 1.25 * maximum(A100 ./ E100))
+    f = Figure(size=(720, 500))
+    ax = Axis(f[1, 1];
+        title="FIG. 03 — OBSERVED A/E BY CELL, ONE PORTFOLIO AT 100 EXPECTED CLAIMS",
+        xlabel="observed A/E vs table (label shows actual / expected claims)",
+        yticks=(1:18, labs), yticklabelsize=10, limits=((-0.1, xmax), (0.2, 18.8)))
+    hlines!(ax, [6.5, 12.5]; color=CF_RULE, linewidth=1)
+    vlines!(ax, [sum(A100) / sum(E100)]; color=CF_INK_SOFT, linestyle=:dot, linewidth=1.5)
+    for (row, i) in enumerate(ord)
+        scatter!(ax, [A100[i] / E100[i]], [row]; color=pcols[cells.prod[i]],
+            markersize=11, strokecolor=CF_INK, strokewidth=0.5)
+        text!(ax, 0.99 * xmax, row; text="$(A100[i]) / $(round(E100[i], digits=1))",
+            align=(:right, :center), fontsize=10, color=CF_INK_SOFT)
+    end
+    text!(ax, sum(A100) / sum(E100), 18.6; text=" portfolio A/E",
+        align=(:left, :top), fontsize=11, color=CF_INK_SOFT)
+    f
+end</code></pre>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-8-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The raw cell A/Es run from zero to about 3.6. At face value, they imply rate differences no one would file. No one takes them at face value. The question is what we can conclude instead. Before we build any model, one comparison is worth doing by hand.</p>
+<div id="16" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>AM, AF = sum(A100[cells.sex .== 2]), sum(A100[cells.sex .== 1])
+EM, EF = sum(E100[cells.sex .== 2]), sum(E100[cells.sex .== 1])
+observed_sex_ratio = (AM / EM) / (AF / EF)
+sd_of_log_ratio = sqrt(1 / AM + 1 / AF)
+(male_claims = AM, female_claims = AF,
+ observed_sex_ratio = round(observed_sex_ratio, digits=2),
+ sd_of_log_ratio = round(sd_of_log_ratio, digits=2))</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>(male_claims = 70, female_claims = 26, observed_sex_ratio = 2.2, sd_of_log_ratio = 0.23)</code></pre>
+</div>
+</div>
+<p>Of the 96 claims, 70 are male and 26 are female. The observed ratio of the two A/E ratios is 2.2. How firm is that number? For Poisson counts, the log of an observed rate has a standard deviation of about <span class="math inline">\(1/\sqrt{A}\)</span>, where <span class="math inline">\(A\)</span> is the claim count. So the log of a <em>ratio</em> of two rates has a standard deviation of about <span class="math inline">\(\sqrt{1/A_1 + 1/A_2}\)</span>. With 70 claims on one side and 26 on the other, that is about 0.23. The true log ratio is <span class="math inline">\(0.30\)</span>, though the models do not know it. One standard deviation of noise is most of the effect. So arithmetic alone says: at about ninety claims, the direction of the sex difference is close to settled, but only close. Its size is open.</p>
+<p>Remember the quantity <span class="math inline">\(\sqrt{1/A_1 + 1/A_2}\)</span>. Claims on each side of a comparison are the unit of information in this post. Every result below is this calculation in a different form.</p>
+</section>
+<section id="what-counts-as-a-conclusion" class="level2">
+<h2 class="anchored" data-anchor-id="what-counts-as-a-conclusion">What counts as a conclusion</h2>
+<p>The question “when can we draw conclusions?” has no answer until we name the conclusions. We track five questions. Each is a ratio of true cell rates, weighted by the book’s expected-claims mix. The fixed weights make every model answer the identical question, coarse or fine:</p>
+<div id="18" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>grp(s, r, p) = [i for i in 1:nrow(cells) if (s === nothing || cells.sex[i] == s) &amp;&amp;
+                                            (r === nothing || cells.cls[i] == r) &amp;&amp;
+                                            (p === nothing || cells.prod[i] == p)]
+wmean(θv, idx) = sum(cells.share[i] * θv[i] for i in idx) / sum(cells.share[i] for i in idx)
+
+# male / female, standardized over the class-and-product mix
+sex_ratio(θv) = wmean(θv, grp(2, nothing, nothing)) / wmean(θv, grp(1, nothing, nothing))
+
+# substandard / preferred within Term, standardized over sex
+class_ratio(θv) = wmean(θv, grp(nothing, 3, 1)) / wmean(θv, grp(nothing, 1, 1))
+
+# (substandard/preferred in GI) relative to (substandard/preferred in Term)
+interaction_ratio(θv) = (wmean(θv, grp(nothing, 3, 3)) / wmean(θv, grp(nothing, 1, 3))) /
+                        (wmean(θv, grp(nothing, 3, 1)) / wmean(θv, grp(nothing, 1, 1)))
+
+# (substandard/preferred among males) relative to (same among females) — truly 1.0
+null_ratio(θv) = (wmean(θv, grp(2, 3, nothing)) / wmean(θv, grp(2, 1, nothing))) /
+                 (wmean(θv, grp(1, 3, nothing)) / wmean(θv, grp(1, 1, nothing)))
+
+# the smallest cell in the book, on its own
+tiny_cell(θv) = θv[IDX[1, 1, 3]]</code></pre>
+</div>
+<div id="20" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>DataFrame(
+    question=["sex ratio (M/F)", "class ratio (Sub/Pref, within Term)",
+        "interaction (class ratio in GI ÷ in Term)", "null check (class ratio in M ÷ in F)",
+        "smallest cell (F · Pref · GI)"],
+    truth=round.([sex_ratio(cells.θ), class_ratio(cells.θ), interaction_ratio(cells.θ),
+            null_ratio(cells.θ), tiny_cell(cells.θ)], digits=3))</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div><div style="float: left;"><span>5×2 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
+<table class="data-frame caption-top table table-sm table-striped small">
+<thead>
+<tr class="columnLabelRow header">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">question</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">truth</th>
+</tr>
+<tr class="columnLabelRow even">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String">String</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
+</tr>
+</thead>
+<tbody>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">1</td>
+<td style="text-align: left;">sex ratio (M/F)</td>
+<td style="text-align: right;">1.35</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">2</td>
+<td style="text-align: left;">class ratio (Sub/Pref, within Term)</td>
+<td style="text-align: right;">2.014</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">3</td>
+<td style="text-align: left;">interaction (class ratio in GI ÷ in Term)</td>
+<td style="text-align: right;">0.657</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">4</td>
+<td style="text-align: left;">null check (class ratio in M ÷ in F)</td>
+<td style="text-align: right;">1.0</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">5</td>
+<td style="text-align: left;">smallest cell (F · Pref · GI)</td>
+<td style="text-align: right;">1.005</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p>The null check needs a word. The truth holds no sex-by-class interaction, so the fourth ratio is exactly 1.0. It is on the list <em>because</em> nothing is there. A model that reaches confident conclusions about it is making structure out of noise. We will count how often that happens.</p>
+<p>Next, we define what it means for the data to <em>support a conclusion</em>. There are three grades. Each is harder than the one before. Each is a plain statement about the posterior distribution:</p>
+<div id="22" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>const P_DIR = 0.95        # direction: ≥95% of posterior mass on one side of 1
+const P_MAT = 0.90        # materiality: ≥90% of mass beyond the relevant bound below
+const MAT_SEX = 1.10      # a sex differential is worth acting on beyond +10%
+const MAT_CLASS = 1.25    # a class differential is worth acting on beyond +25%
+const MAT_INT = 0.90      # an interaction matters if it moves a differential ≥10%
+const TOL_PRECISION = 2 * log(1.10)  # priced: 90% interval within ±10% of its midpoint</code></pre>
+</div>
+<ol type="1">
+<li><strong>Direction.</strong> The posterior puts at least 95% of its mass on one side of 1. We are willing to say <em>which way</em> the difference goes.</li>
+<li><strong>Materiality.</strong> At least 90% of the mass lies beyond a bound that matters for pricing. We are willing to say the effect is <em>large enough to act on</em>. The bounds above are judgment calls. That is why they are named constants: the judgment sits in the code, where you can see it.</li>
+<li><strong>Precision.</strong> The 90% credible interval spans less than ±10% around its midpoint. The estimate is tight enough to <em>price with</em>, not only to point a direction.</li>
+</ol>
+<p>There is no hypothesis test in this post. We read probabilities off posteriors and compare them with thresholds chosen in advance. If your thresholds differ, read the figures against yours. Thresholds change the cost of a conclusion. They do not change the shape of the answer.</p>
+</section>
+<section id="three-models" class="level2">
+<h2 class="anchored" data-anchor-id="three-models">Three models</h2>
+<p>We use three models, in increasing order of structure. Given a portfolio, each model produces posterior draws of all eighteen cell multipliers. The five question functions then apply to each draw. So the same machinery scores every model.</p>
+<p><strong>No pooling.</strong> Each cell is estimated from its own claims alone, with a prior worth one claim at the table rate. This has a closed form, so it needs no MCMC. With a <span class="math inline">\(\mathrm{Gamma}(1,1)\)</span> prior on a cell’s multiplier <span class="math inline">\(\theta\)</span>, observing <span class="math inline">\(A\)</span> claims against <span class="math inline">\(E\)</span> expected gives the posterior <span class="math inline">\(\mathrm{Gamma}(1 + A,\; 1/(1+E))\)</span>:</p>
+<div id="24" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>nopool_draws(A, E; ndraws=2_000, rng=Xoshiro(0)) =
+    reduce(hcat, [rand(rng, Gamma(1 + A[i], 1 / (1 + E[i])), ndraws) for i in eachindex(A)])</code></pre>
+</div>
+<p>No pooling believes each cell’s data and nothing else. It is in the lineup because its failures teach as much as the structured models’ successes.</p>
+<p><strong>Main effects only.</strong> One model per granularity. Each says the dimensions multiply: a sex factor, a class factor, a product factor, and no dependence on the combination. On the log scale, the factors add:</p>
+<div id="26" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code># During warmup NUTS occasionally proposes parameter values extreme enough to
+# overflow exp(); an infinite or NaN rate would make Poisson() throw rather
+# than letting the sampler reject the step. Bounding the log rate (and turning
+# a NaN proposal into a hopeless one) keeps such steps ordinary rejections.
+rate(E, η) = ifelse(isnan(η), one(η) * 1e30, E * exp(clamp(η, -30.0, 30.0)))
+
+@model function m1d(A, E, sx)
+    μ ~ Normal(0, 1)
+    s ~ filldist(Normal(0, 0.5), 2)
+    η = [μ + s[sx[i]] for i in eachindex(A)]
+    for i in eachindex(A)
+        A[i] ~ Poisson(rate(E[i], η[i]))
+    end
+    return η
+end
+
+@model function m2d(A, E, sx, rc)
+    μ ~ Normal(0, 1)
+    s ~ filldist(Normal(0, 0.5), 2)
+    r ~ filldist(Normal(0, 0.5), 3)
+    η = [μ + s[sx[i]] + r[rc[i]] for i in eachindex(A)]
+    for i in eachindex(A)
+        A[i] ~ Poisson(rate(E[i], η[i]))
+    end
+    return η
+end
+
+@model function m3d(A, E, sx, rc, pr)
+    μ ~ Normal(0, 1)
+    s ~ filldist(Normal(0, 0.5), 2)
+    r ~ filldist(Normal(0, 0.5), 3)
+    p ~ filldist(Normal(0, 0.5), 3)
+    η = [μ + s[sx[i]] + r[rc[i]] + p[pr[i]] for i in eachindex(A)]
+    for i in eachindex(A)
+        A[i] ~ Poisson(rate(E[i], η[i]))
+    end
+    return η
+end</code></pre>
+</div>
+<p>The priors are weakly informative. <span class="math inline">\(\mathrm{Normal}(0, 1)\)</span> on the level says the block is probably within a factor of about 2.7 of its table. <span class="math inline">\(\mathrm{Normal}(0, 0.5)\)</span> on each effect says differences of tens of percent are plausible, and differences of many hundreds of percent are not.</p>
+<p><strong>Main effects plus shrunk interactions.</strong> This is the hierarchical model, and the one we lean on. It keeps the multiplicative skeleton. It adds all three two-way interaction tables. Each table draws from its own zero-centered distribution, and the data estimates each table’s scale:</p>
+<p><span class="math display">\[
+\log \theta_{srp} \;=\;
+\underbrace{\textcolor{#1F4E79}{\mu + s_s + r_r + p_p}}_{\textcolor{#1F4E79}{\text{main effects: the dimensions multiply}}}
+\;+\;
+\underbrace{\textcolor{#3F7D4E}{\sigma_{sr} z^{sr}_{sr} + \sigma_{sp} z^{sp}_{sp} + \sigma_{rp} z^{rp}_{rp}}}_{\textcolor{#3F7D4E}{\text{interactions: shrunk toward zero unless the claims say otherwise}}}
+\]</span></p>
+<div id="28" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>@model function m3dint(A, E, sx, rc, pr)
+    μ ~ Normal(0, 1)
+    s ~ filldist(Normal(0, 0.5), 2)
+    r ~ filldist(Normal(0, 0.5), 3)
+    p ~ filldist(Normal(0, 0.5), 3)
+    σsr ~ Exponential(0.15)
+    zsr ~ filldist(Normal(0, 1), 2, 3)
+    σsp ~ Exponential(0.15)
+    zsp ~ filldist(Normal(0, 1), 2, 3)
+    σrp ~ Exponential(0.15)
+    zrp ~ filldist(Normal(0, 1), 3, 3)
+    η = [μ + s[sx[i]] + r[rc[i]] + p[pr[i]] +
+         σsr * zsr[sx[i], rc[i]] + σsp * zsp[sx[i], pr[i]] + σrp * zrp[rc[i], pr[i]]
+         for i in eachindex(A)]
+    for i in eachindex(A)
+        A[i] ~ Poisson(rate(E[i], η[i]))
+    end
+    return η
+end</code></pre>
+</div>
+<p>The <span class="math inline">\(\mathrm{Exponential}(0.15)\)</span> priors on the interaction scales say: interactions probably shift the multiplicative story by fifteen percent or less, but the claims can argue for more. Each interaction table gets its <em>own</em> scale, on purpose. Two of the three tables are truly zero in our ground truth. With one shared scale, the two empty tables would pull it down and over-shrink the one real signal. A separate dial per table lets the data promote one interaction without promoting them all. (We leave the three-way interaction out. Eighteen cells cannot inform eighteen more free parameters. The caveats return to this.)</p>
+<blockquote class="blockquote">
+<p><em>Aside: two technical notes. First, nothing in these models pins down</em> <span class="math inline">\(\mu\)</span> <em>and the effect vectors separately. Add a constant to</em> <span class="math inline">\(\mu\)</span><em>, subtract it from every</em> <span class="math inline">\(s\)</span><em>, and all cell rates stay the same. The proper priors keep the sampler well behaved. And we never report those parameters alone. Every tracked quantity is a ratio of cell rates, which this ambiguity cannot touch. Second, we write the interactions as</em> <span class="math inline">\(\sigma \cdot z\)</span> <em>with standardized</em> <span class="math inline">\(z\)</span><em>. This is the <a href="https://mc-stan.org/docs/stan-users-guide/reparameterization.html">non-centered parameterization</a>. It keeps hierarchical scales sampling well when data is thin.</em></p>
+</blockquote>
+<p>The fitting machinery is shared by everything below. We fit coarse models to coarsely summed data. Then we copy their answers out to the eighteen fine cells. A 2-cell model’s male estimate becomes its estimate for all nine male cells. The question functions then apply to every model in the same way:</p>
+<div id="30" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>const KEY2 = unique(collect(zip(cells.sex, cells.cls)))
+const ID2 = [findfirst(==(sc), KEY2) for sc in zip(cells.sex, cells.cls)]
+const SX2, RC2 = [k[1] for k in KEY2], [k[2] for k in KEY2]
+coarsen(x, ids, n) = [sum(x[ids .== j]) for j in 1:n]
+
+function fit_theta(model, rng; ids=nothing, warmup=500, draws=500, target=0.9, nchains=1)
+    spl = NUTS(warmup, target)
+    ch = nchains == 1 ?
+         Chains(sample(rng, model, spl, draws; progress=false, verbose=false)) :
+         Chains(sample(rng, model, spl, MCMCThreads(), draws, nchains;
+             progress=false, verbose=false))
+    gq = returned(model, MCMCChains.get_sections(ch, :parameters))
+    θ = Matrix(reduce(hcat, [exp.(g) for g in vec(gq)])')  # one row per posterior draw
+    ess = [x for x in skipmissing(DataFrame(summarystats(ch)).ess_bulk) if !isnan(x)]
+    (θ=ids === nothing ? θ : θ[:, ids], chain=ch,
+        ndiv=Int(sum(ch[:numerical_error])), miness=isempty(ess) ? Inf : minimum(ess))
+end
+
+fit_retry(model, seed; kwargs...) = try
+    fit_theta(model, Xoshiro(seed); kwargs...)
+catch
+    fit_theta(model, Xoshiro(seed + 10_000); kwargs...)  # rare sampler failure: retry once
+end</code></pre>
+</div>
+<p>We fit all four MCMC models to the 100-claim portfolio, with four chains each. Then we check the standard sampler diagnostics before we trust anything downstream:</p>
+<div id="32" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>showcase fits and MCMC diagnostics code</summary>
+<pre class="julia cell-code"><code>A100_1, E100_1 = coarsen(A100, cells.sex, 2), coarsen(E100, cells.sex, 2)
+A100_2, E100_2 = coarsen(A100, ID2, 6), coarsen(E100, ID2, 6)
+show100 = (
+    b1=fit_theta(m1d(A100_1, E100_1, [1, 2]), Xoshiro(SEED + 1);
+        ids=cells.sex, warmup=1000, draws=1000, nchains=4),
+    b2=fit_theta(m2d(A100_2, E100_2, SX2, RC2), Xoshiro(SEED + 2);
+        ids=ID2, warmup=1000, draws=1000, nchains=4),
+    b3=fit_theta(m3d(A100, E100, cells.sex, cells.cls, cells.prod), Xoshiro(SEED + 3);
+        warmup=1000, draws=1000, nchains=4),
+    hier=fit_theta(m3dint(A100, E100, cells.sex, cells.cls, cells.prod), Xoshiro(SEED + 4);
+        warmup=1000, draws=1000, nchains=4),
+)
+nopool100 = nopool_draws(A100, E100; ndraws=4_000, rng=Xoshiro(SEED + 5))
+DataFrame([(model=String(k),
+            max_R̂=round(maximum(x for x in skipmissing(DataFrame(summarystats(f.chain)).rhat)
+                                if !isnan(x)), digits=3),
+            min_ESS=round(Int, f.miness), divergences="$(f.ndiv)/4000")
+           for (k, f) in pairs(show100)])</code></pre>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div><div style="float: left;"><span>4×4 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
+<table class="data-frame caption-top table table-sm table-striped small">
+<thead>
+<tr class="columnLabelRow header">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">model</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">max_R̂</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">min_ESS</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">divergences</th>
+</tr>
+<tr class="columnLabelRow even">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String">String</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String">String</th>
+</tr>
+</thead>
+<tbody>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">1</td>
+<td style="text-align: left;">b1</td>
+<td style="text-align: right;">1.007</td>
+<td style="text-align: right;">1107</td>
+<td style="text-align: left;">0/4000</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">2</td>
+<td style="text-align: left;">b2</td>
+<td style="text-align: right;">1.002</td>
+<td style="text-align: right;">1142</td>
+<td style="text-align: left;">0/4000</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">3</td>
+<td style="text-align: left;">b3</td>
+<td style="text-align: right;">1.004</td>
+<td style="text-align: right;">1579</td>
+<td style="text-align: left;">0/4000</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">4</td>
+<td style="text-align: left;">hier</td>
+<td style="text-align: right;">1.004</td>
+<td style="text-align: right;">2294</td>
+<td style="text-align: left;">0/4000</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p>The chains agree. Effective sample sizes are healthy. Divergent transitions are rare. One more check before the results. We fit the hierarchical model to a larger portfolio. Then we look at what it believes about the two interaction tables we know are empty, and the one we know is not.</p>
+<div id="34" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>negative-control fit at 800 expected claims</summary>
+<pre class="julia cell-code"><code>A800 = simulate(800.0, Xoshiro(SEED + 6))
+E800 = 800.0 .* cells.share
+hier800 = fit_theta(m3dint(A800, E800, cells.sex, cells.cls, cells.prod), Xoshiro(SEED + 7);
+    warmup=1000, draws=1000, nchains=4)
+(σ_sex_class = round(mean(vec(hier800.chain[:σsr])), digits=3),
+ σ_sex_product = round(mean(vec(hier800.chain[:σsp])), digits=3),
+ σ_class_product = round(mean(vec(hier800.chain[:σrp])), digits=3))</code></pre>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>(σ_sex_class = 0.07, σ_sex_product = 0.092, σ_class_product = 0.075)</code></pre>
+</div>
+</div>
+<p>At 800 expected claims, the two empty tables’ scales sit near zero. The class-by-product scale, where the compression lives, has started to lift away from them. The model does what the prior structure intends. It holds interactions at zero until the claims argue otherwise, one table at a time.</p>
+<p>That is the whole machine. Now we ask the questions.</p>
+</section>
+<section id="the-sex-ratio-in-one-two-and-three-dimensions" class="level2">
+<h2 class="anchored" data-anchor-id="the-sex-ratio-in-one-two-and-three-dimensions">The sex ratio in one, two, and three dimensions</h2>
+<p>The committee’s worry is that each new rating dimension spreads the same claims thinner. Here is the first result, and the quietest one. Take the 100-claim portfolio from FIG. 03. Estimate the sex ratio three ways: with the 2-cell model, the 6-cell model, and the 18-cell hierarchical model.</p>
+<div id="36" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>FIG. 04 plotting code</summary>
+<pre class="julia cell-code"><code>rs_draws(θm) = [sex_ratio(view(θm, d, :)) for d in axes(θm, 1)]
+let
+    specs = [("sex only (2 cells)", rs_draws(show100.b1.θ), CF_BLUE),
+        ("sex × class (6 cells)", rs_draws(show100.b2.θ), CF_AMBER),
+        ("sex × class × product (18 cells)", rs_draws(show100.hier.θ), CF_PLUM)]
+    f = Figure(size=(720, 420))
+    ax = Axis(f[1, 1];
+        title="FIG. 04 — POSTERIOR OF THE SEX RATIO UNDER ONE, TWO, AND THREE DIMENSIONS",
+        subtitle="the same $(sum(A100))-claim portfolio, three model granularities",
+        xlabel="male / female A/E ratio", ylabel="posterior density")
+    for (lab, v, col) in specs
+        k = kde(v)
+        band!(ax, k.x, zero(k.density), k.density; color=(col, 0.15))
+        lines!(ax, k.x, k.density; color=col, linewidth=2.5,
+            label="$lab   P(ratio &gt; 1) = $(round(mean(v .&gt; 1), digits=2))")
+    end
+    vlines!(ax, [sex_ratio(cells.θ)]; color=CF_INK, linewidth=2.5,
+        label="truth ($(round(sex_ratio(cells.θ), digits=2)))")
+    vlines!(ax, [1.0]; color=CF_INK_SOFT, linestyle=:dot, linewidth=1.5)
+    xlims!(ax, 0.6, 2.6)
+    axislegend(ax; position=:rt)
+    f
+end</code></pre>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-19-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The three curves nearly coincide. Cutting the block from two cells to eighteen did not blur the sex comparison. The reason is the arithmetic of FIG. 02. Every cell belongs to one sex or the other. So the sex <em>margin</em> keeps almost all its claims, however finely we cut the block below it. The extra structure changes the margin’s precision only at the edges. It spends a little to estimate class and product effects. It recovers a little by explaining mix noise. The figure shows the net effect is barely visible.</p>
+<p>Note also how closely the three models agree on the <em>probability</em> of the direction. The legend values differ by a point or two. All sit near the value the hand calculation predicted for this claim count. Whether one ninety-claim portfolio clears the 95% rule is luck of the draw. The sweep below shows where the typical portfolio stands. The models do not add certainty the claims do not contain. They locate, in agreement, how much is there.</p>
+</section>
+<section id="the-smallest-cells" class="level2">
+<h2 class="anchored" data-anchor-id="the-smallest-cells">The smallest cells</h2>
+<p>The margin kept its precision. The cells are another matter. FIG. 05 compares, cell by cell, what no pooling and the hierarchical model estimate from the same 100-claim portfolio.</p>
+<div id="38" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>FIG. 05 plotting code</summary>
+<pre class="julia cell-code"><code>let
+    np = vec(mean(nopool100, dims=1))
+    hi = vec(mean(show100.hier.θ, dims=1))
+    pcols = [CF_BLUE, CF_AMBER, CF_PLUM]
+    f = Figure(size=(720, 460))
+    ax = Axis(f[1, 1];
+        title="FIG. 05 — CELL ESTIMATES: NO POOLING VERSUS THE HIERARCHICAL MODEL",
+        subtitle="posterior means at 100 expected claims; marker size follows the cell's claim count",
+        xlabel="no-pooling estimate", ylabel="hierarchical estimate",
+        limits=((-0.05, 2.9), (-0.05, 2.9)))
+    ablines!(ax, 0, 1; color=CF_INK_SOFT, linestyle=:dash, linewidth=1.5)
+    for p in 1:3
+        idx = [i for i in 1:nrow(cells) if cells.prod[i] == p]
+        scatter!(ax, np[idx], hi[idx]; color=(pcols[p], 0.8),
+            markersize=6 .+ 3 .* sqrt.(A100[idx]), strokecolor=CF_INK, strokewidth=0.5,
+            label=PRODUCTS[p])
+    end
+    t = IDX[1, 1, 3]
+    scatter!(ax, [np[t]], [hi[t]]; color=:transparent, markersize=18,
+        strokecolor=CF_RED, strokewidth=2, label="smallest cell (F · Pref · GI)")
+    text!(ax, 2.85, 0.35; text="points below the line:\nraw estimate pulled down\ntoward the structure",
+        align=(:right, :bottom), fontsize=11, color=CF_INK_SOFT)
+    axislegend(ax; position=:lt)
+    f
+end</code></pre>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-20-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>On the diagonal, the two methods agree. Off it, the hierarchical model has overridden a cell’s raw experience with what the rest of the book implies. The override is not timid. For cells with zero claims, the no-pooling estimate comes almost entirely from its weak per-cell prior. The hierarchical model places those cells near the multiplicative prediction. At the other extreme, it pulls the wildest raw A/Es a long way toward the rest of the book.</p>
+<p>The smallest cell makes the point sharpest. Female preferred guaranteed-issue expects 1.4 claims in this portfolio. It produced 0. On its own data, the 90% interval runs from 0.02 to 1.31. That range excludes almost nothing an actuary would care about. The hierarchical model puts the same cell at 0.33 to 1.38. The narrower interval is not free information. It is the multiplicative assumption at work. The model asserts that this cell resembles the book’s structure. Here the assumption nearly holds — the cell’s truth is 1.0 — so the trade is cheap. Later we see what happens where the assumption fails.</p>
+</section>
+<section id="the-sweep" class="level2">
+<h2 class="anchored" data-anchor-id="the-sweep">The sweep</h2>
+<p>One portfolio at one size shows behavior. It cannot show <em>when conclusions arrive</em>. For that, we run the ladder: ten portfolio sizes from 12.5 to 6400 expected claims, with thirty simulated portfolios at each size. Every portfolio gets all five models: the closed-form no-pooling posterior, plus four MCMC fits. The five question functions summarize each fit.</p>
+<div id="40" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>const QUESTIONS = (
+    (est="sex", f=sex_ratio, side=:above, mat=MAT_SEX),
+    (est="class", f=class_ratio, side=:above, mat=MAT_CLASS),
+    (est="interaction", f=interaction_ratio, side=:below, mat=MAT_INT),
+    (est="null", f=null_ratio, side=:none, mat=MAT_CLASS),
+    (est="cell", f=tiny_cell, side=:none, mat=NaN),
+)
+
+function question_rows(E_total, rep, model, θm)
+    map(QUESTIONS) do q
+        v = [q.f(view(θm, d, :)) for d in axes(θm, 1)]
+        q05, q95 = quantile(v, 0.05), quantile(v, 0.95)
+        pdir = q.side == :above ? mean(v .&gt; 1) : q.side == :below ? mean(v .&lt; 1) : NaN
+        pmat = q.side == :above ? mean(v .&gt; q.mat) :
+               q.side == :below ? mean(v .&lt; q.mat) :
+               q.est == "null" ? max(mean(v .&gt; q.mat), mean(v .&lt; 1 / q.mat)) : NaN
+        (E=E_total, rep=rep, model=model, est=q.est,
+            mean=mean(v), q05=q05, q95=q95, logw=log(q95 / q05), pdir=pdir, pmat=pmat)
+    end
+end
+
+function run_rep(iE, rep)
+    E_total = LADDER[iE]
+    A3 = simulate(E_total, Xoshiro(1_000 * iE + rep))
+    E3 = E_total .* cells.share
+    base = SEED + 1_000 * iE + 10 * rep
+    fits = (
+        nopool=(θ=nopool_draws(A3, E3; rng=Xoshiro(base)), ndiv=0, miness=Inf),
+        b1=fit_retry(m1d(coarsen(A3, cells.sex, 2), coarsen(E3, cells.sex, 2), [1, 2]),
+            base + 1; ids=cells.sex),
+        b2=fit_retry(m2d(coarsen(A3, ID2, 6), coarsen(E3, ID2, 6), SX2, RC2),
+            base + 2; ids=ID2),
+        b3=fit_retry(m3d(A3, E3, cells.sex, cells.cls, cells.prod), base + 3),
+        hier=fit_retry(m3dint(A3, E3, cells.sex, cells.cls, cells.prod), base + 4),
+    )
+    rows = reduce(vcat, [collect(question_rows(E_total, rep, String(name), f.θ))
+                         for (name, f) in pairs(fits)])
+    ri = [interaction_ratio(view(fits.hier.θ, d, :)) for d in 1:2:size(fits.hier.θ, 1)]
+    (rows=rows, ri=ri, iE=iE,
+        ndiv=sum(f.ndiv for f in fits), min_ess=minimum(f.miness for f in fits))
+end</code></pre>
+</div>
+<div id="42" class="cell" data-execution_count="1">
+<pre class="julia cell-code"><code>const REPS = 30
+sweep_time = @elapsed study = ThreadsX.map(g -&gt; run_rep(g...),
+    [(iE, rep) for iE in eachindex(LADDER) for rep in 1:REPS]);
+length(study)</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>300</code></pre>
+</div>
+</div>
+<div id="44" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>sweep bookkeeping code</summary>
+<pre class="julia cell-code"><code>rows_df = DataFrame(reduce(vcat, [s.rows for s in study]))
+med = combine(groupby(rows_df, [:model, :est, :E]),
+    :logw =&gt; median =&gt; :logw,
+    :logw =&gt; (x -&gt; quantile(x, 0.25)) =&gt; :logw_lo,
+    :logw =&gt; (x -&gt; quantile(x, 0.75)) =&gt; :logw_hi,
+    :pdir =&gt; median =&gt; :pdir, :pmat =&gt; median =&gt; :pmat,
+    :mean =&gt; median =&gt; :mean)
+sort!(med, [:model, :est, :E])
+mcurve(model, est) = med[(med.model .== model) .&amp;&amp; (med.est .== est), :]
+medval(model, est, E, col) = only(med[(med.model .== model) .&amp;&amp; (med.est .== est) .&amp;&amp; (med.E .== E), col])
+fmtE(E) = E == floor(E) ? string(Int(E)) : string(E)
+null_rate(mname) = [mean(rows_df[(rows_df.model .== mname) .&amp;&amp; (rows_df.est .== "null") .&amp;&amp;
+                                 (rows_df.E .== E), :pmat] .≥ P_MAT) for E in LADDER]
+total_div = sum(s.ndiv for s in study)
+worst_ess = minimum(s.min_ess for s in study)
+nmcmc = 4 * length(study);</code></pre>
+</details>
+</div>
+<p>The 1200 sweep fits use a single chain of 500 draws each, as a shortcut. Across all of them, 11 draws hit a divergence. The smallest effective sample size in any fit was about 12. That is adequate for the median-of-thirty summaries we read below. Any single fit’s interval endpoints carry some Monte Carlo noise.</p>
+<p>The sweep’s first output is precision: the width of the 90% interval for each question, at each portfolio size. Beside the simulation results, we draw the hand arithmetic as a dash-dot line. It is <span class="math inline">\(\sqrt{\sum 1/A_g}\)</span> with each side’s true expected claim count, converted to an interval width. The line involves no model fitting. It is the claims-on-each-side calculation and nothing more.</p>
+<div id="46" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>FIG. 06 plotting code</summary>
+<pre class="julia cell-code"><code>aunit(idx) = sum(cells.share[i] * cells.θ[i] for i in idx)  # true claims per unit of portfolio E
+const GRP_SEX = (grp(2, nothing, nothing), grp(1, nothing, nothing))
+const GRP_CLASS = (grp(nothing, 3, 1), grp(nothing, 1, 1))
+const GRP_INT = (grp(nothing, 3, 1), grp(nothing, 1, 1), grp(nothing, 3, 3), grp(nothing, 1, 3))
+sumrecip(groups) = sum(1 / aunit(g) for g in groups)
+analytic_logw(E, groups) = 2 * quantile(Normal(), 0.95) * sqrt(sumrecip(groups) / E)
+
+let
+    panels = [("sex ratio", "sex", GRP_SEX, true),
+        ("class ratio (within Term)", "class", GRP_CLASS, false),
+        ("interaction ratio", "interaction", GRP_INT, false)]
+    f = Figure(size=(860, 400))
+    axs = Axis[]
+    for (i, (ttl, est, groups, with_b1)) in enumerate(panels)
+        ax = Axis(f[1, i];
+            subtitle=ttl, xscale=log10, yscale=log10,
+            xticks=([12.5, 50, 200, 800, 3200], ["12.5", "50", "200", "800", "3200"]),
+            xlabel="portfolio expected claims",
+            ylabel=i == 1 ? "width of 90% interval (log scale of ratio)" : "")
+        push!(axs, ax)
+        h = mcurve("hier", est)
+        band!(ax, h.E, h.logw_lo, h.logw_hi; color=(CF_GREEN, 0.18))
+        lines!(ax, h.E, h.logw; color=CF_GREEN, linewidth=2.5, label="hierarchical")
+        n = mcurve("nopool", est)
+        lines!(ax, n.E, n.logw; color=CF_INK_SOFT, linewidth=2, label="no pooling")
+        with_b1 &amp;&amp; lines!(ax, mcurve("b1", est).E, mcurve("b1", est).logw;
+            color=CF_BLUE, linewidth=2, linestyle=:dash, label="sex-only model")
+        lines!(ax, LADDER, analytic_logw.(LADDER, Ref(groups));
+            color=CF_INK, linewidth=1.5, linestyle=:dashdot, label="claims arithmetic")
+        hlines!(ax, [TOL_PRECISION]; color=CF_RED, linestyle=:dash, linewidth=1.5,
+            label="±10% pricing tolerance")
+        i &gt; 1 &amp;&amp; hideydecorations!(ax; grid=false)
+    end
+    Label(f[0, :], "FIG. 06 — WIDTH OF THE 90% INTERVAL VERSUS EXPECTED CLAIMS";
+        halign=:left, fontsize=15, tellwidth=false)
+    Legend(f[2, :], axs[1]; orientation=:horizontal, framevisible=false, nbanks=1)
+    f
+end</code></pre>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-24-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Three readings, one per panel:</p>
+<ul>
+<li><strong>Sex.</strong> The hierarchical curve, the sex-only curve, and the dash-dot arithmetic line lie almost on top of one another, down the whole ladder. This is FIG. 04 at every size. The margin keeps its claims. So the eighteen-cell model prices the sex difference about as precisely as a model that has never heard of class or product. Only no pooling pays a visible penalty, because it alone refuses to add cells together.</li>
+<li><strong>Class.</strong> The same story, one level down. The within-Term class comparison touches only Term’s preferred and substandard cells. Its claims are a fraction of the portfolio’s, so every curve sits higher than in the sex panel. The interactions section adds one more observation about this comparison.</li>
+<li><strong>Interaction.</strong> This comparison touches four small corner groups. The no-pooling curve is extremely wide at small sizes. The hierarchical curve sits <em>below</em> the arithmetic line on the left of the panel. There it is narrower than the claims alone can justify. That is the skeptical prior speaking, not the data. In that region, the model’s conclusions are the prior’s conclusions. As claims accumulate, the green curve converges to the arithmetic line. The data takes over, and the width you have is the width the claims can pay for.</li>
+</ul>
+<p>The second output is conclusions. FIG. 07 tracks the posterior probability behind the direction and materiality statements for the hierarchical model. The red lines are the thresholds we fixed in advance.</p>
+<div id="48" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>FIG. 07 plotting code</summary>
+<pre class="julia cell-code"><code>let
+    panels = [("sex ratio — P(&gt;1), P(&gt;$(MAT_SEX))", "sex"),
+        ("class ratio — P(&gt;1), P(&gt;$(MAT_CLASS))", "class"),
+        ("interaction — P(&lt;1), P(&lt;$(MAT_INT))", "interaction")]
+    f = Figure(size=(860, 400))
+    axs = Axis[]
+    for (i, (ttl, est)) in enumerate(panels)
+        ax = Axis(f[1, i];
+            subtitle=ttl, subtitlesize=12, xscale=log10,
+            xticks=([12.5, 50, 200, 800, 3200], ["12.5", "50", "200", "800", "3200"]),
+            xlabel="portfolio expected claims",
+            ylabel=i == 1 ? "posterior probability (median of 30 runs)" : "",
+            limits=(nothing, (0.0, 1.04)))
+        push!(axs, ax)
+        h = mcurve("hier", est)
+        lines!(ax, h.E, h.pdir; color=CF_GREEN, linewidth=2.5, label="direction")
+        lines!(ax, h.E, h.pmat; color=CF_GREEN, linewidth=2, linestyle=:dash,
+            label="materiality")
+        hlines!(ax, [P_DIR]; color=CF_RED, linestyle=:dash, linewidth=1.5,
+            label="0.95 (direction rule)")
+        hlines!(ax, [P_MAT]; color=CF_RED, linestyle=:dot, linewidth=1.5,
+            label="0.90 (materiality rule)")
+        i &gt; 1 &amp;&amp; hideydecorations!(ax; grid=false)
+    end
+    Label(f[0, :], "FIG. 07 — POSTERIOR PROBABILITY OF EACH CONCLUSION VERSUS EXPECTED CLAIMS";
+        halign=:left, fontsize=15, tellwidth=false)
+    Legend(f[2, :], axs[1]; orientation=:horizontal, framevisible=false)
+    f
+end</code></pre>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-25-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The curves climb at very different rates. The sex and class directions typically settle within the first two hundred claims. Their materiality statements follow soon after, because both true effects sit well beyond their bounds. That the two settle at similar times is worth noticing. The class comparison touches about a quarter of the book’s claims, but its effect is much larger. The two facts nearly cancel. The exact costs appear in the final section. The interaction curves are the slow ones. At 800 expected claims — a large portfolio for most experience studies — the median probability of compression in guaranteed issue has reached only about 0.77. That is well short of the rule. The compression is real, and it is not small. It is expensive. The next section shows why, in the model’s own terms.</p>
+</section>
+<section id="interactions" class="level2">
+<h2 class="anchored" data-anchor-id="interactions">Interactions</h2>
+<p>Watch the interaction posterior develop. FIG. 08 pools the thirty runs at each rung. It draws the posterior of the interaction ratio — the guaranteed-issue class difference relative to the underwritten one — at every portfolio size.</p>
+<div id="50" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>FIG. 08 plotting code</summary>
+<pre class="julia cell-code"><code>let
+    ri_pool = Dict(iE =&gt; reduce(vcat, [s.ri for s in study if s.iE == iE])
+                   for iE in eachindex(LADDER))
+    f = Figure(size=(860, 480))
+    ax = Axis(f[1, 1];
+        title="FIG. 08 — POSTERIOR OF THE INTERACTION RATIO AT EACH PORTFOLIO SIZE",
+        xscale=log10,
+        xticks=([0.5, 0.657, 1.0, 1.5, 2.0], ["0.5", "0.66", "1.0", "1.5", "2.0"]),
+        xlabel="interaction ratio (draws pooled across the 30 runs)",
+        yticks=(1:length(LADDER), fmtE.(LADDER)), ylabel="portfolio expected claims")
+    vlines!(ax, [1.0]; color=CF_INK_SOFT, linestyle=:dot, linewidth=1.5)
+    vlines!(ax, [interaction_ratio(cells.θ)]; color=CF_INK, linestyle=:dash, linewidth=2)
+    text!(ax, interaction_ratio(cells.θ), length(LADDER) + 0.9;
+        text="truth $(round(interaction_ratio(cells.θ), digits=2))",
+        align=(:center, :bottom), fontsize=11, color=CF_INK)
+    text!(ax, 1.0, length(LADDER) + 0.9; text="no interaction",
+        align=(:left, :bottom), fontsize=11, color=CF_INK_SOFT)
+    for iE in eachindex(LADDER)
+        k = kde(log.(clamp.(ri_pool[iE], 0.05, 20.0)))
+        xs, dens = exp.(k.x), k.density ./ maximum(k.density)
+        keep = (xs .&gt; 0.28) .&amp; (xs .&lt; 2.6)
+        α = 0.25 + 0.55 * (iE - 1) / (length(LADDER) - 1)
+        band!(ax, xs[keep], fill(Float64(iE), sum(keep)), iE .+ 0.88 .* dens[keep];
+            color=(CF_GREEN, 0.45 * α))
+        lines!(ax, xs[keep], iE .+ 0.88 .* dens[keep]; color=(CF_GREEN, min(1.0, α + 0.25)),
+            linewidth=1.8)
+    end
+    xlims!(ax, 0.28, 2.6)
+    ylims!(ax, 0.6, length(LADDER) + 2.2)
+    f
+end</code></pre>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-26-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>At the bottom of the ladder, the posterior is a lump centered on 1.0. That is the prior. It declines to infer an interaction from a dozen claims. Up the rungs, the lump loosens, drifts left, and tightens again around the truth near 0.66. The commitment comes high on the ladder, at roughly ten times the claims the marginal questions needed. The final section states the exact cost. Note what the model never does on the way up. It never asserts the <em>wrong</em> thing with confidence. The skeptical prior has a cost, paid in claims. FIG. 09 shows what it buys.</p>
+<p>First, one more thing the sweep can show: what happens if we leave the dimension out. The two-dimensional model answers the class question with no product dimension at all. It converges quickly, to 2.44. The truth within Term is 2.01. The gap is not estimation error. The model answers a different question. Preferred lives concentrate in Term, a low-mortality product. Substandard lives concentrate in guaranteed issue, a high-mortality one. So the product-blind class ratio blends product mortality into the class difference, and it lands near 2.4. That number is <em>correct for the blended question</em>. It is wrong for the underwritten difference a pricing actuary means. The three-dimensional main-effects model separates product but forces one common class effect everywhere. It settles at 1.73: closer, but still a compromise across products with different true differences. Only the interaction model recovers the within-Term truth. Sometimes you add a dimension not because the data can afford it, but because the coarse answer answers the wrong question. More claims do not shrink the coarse model’s error, because that error is not noise.</p>
+<p>Now the opposite risk. The null-check ratio — the class difference among males relative to females — is exactly 1.0 in truth. FIG. 09 counts how often each model reaches a confident materiality conclusion about it anyway.</p>
+<div id="52" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>FIG. 09 plotting code</summary>
+<pre class="julia cell-code"><code>null_np, null_hier = null_rate("nopool"), null_rate("hier")
+let
+    f = Figure(size=(720, 400))
+    ax = Axis(f[1, 1];
+        title="FIG. 09 — CONCLUSION RATE ON A CONTRAST WHOSE TRUE VALUE IS ONE",
+        subtitle="share of the 30 runs concluding the null sex-by-class interaction is material",
+        xscale=log10, xticks=([12.5, 50, 200, 800, 3200], ["12.5", "50", "200", "800", "3200"]),
+        xlabel="portfolio expected claims", ylabel="share of runs",
+        limits=(nothing, (-0.03, max(0.5, 1.2 * maximum(null_np)))))
+    for (vals, col, lab) in [(null_np, CF_INK_SOFT, "no pooling"), (null_hier, CF_GREEN, "hierarchical")]
+        scatterlines!(ax, LADDER, vals; color=col, linewidth=2.5, markersize=9, label=lab)
+    end
+    axislegend(ax; position=:rt)
+    f
+end</code></pre>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-27-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>No pooling, working cell by cell, finds “material” interactions that do not exist. At its worst rung, it does so in 10% of the runs. The hierarchical model’s rate never exceeds 0%. The reason is the same one that made it slow to confirm the <em>real</em> interaction. Interactions start at zero and must earn their way in with claims. Slowness to conclude and resistance to false conclusions are not two properties. They are one property, seen from two sides.</p>
+<p>This tradeoff has a name in the statistics literature. Gelman, Hill, and Vehtari give a rule of thumb: an interaction needs about sixteen times the data of a main effect of the same size. Our book’s version of the number is 14×. It is the same arithmetic, with our mix. The next section shows the arithmetic itself.</p>
+</section>
+<section id="why-this-happens" class="level2">
+<h2 class="anchored" data-anchor-id="why-this-happens">Why this happens</h2>
+<p>Every curve above is one small formula in different forms. Here it is, step by step.</p>
+<p>Start with one group of cells that holds <span class="math inline">\(A\)</span> actual claims in total. With a nearly flat prior, the posterior of the group’s log rate is roughly normal, with standard deviation <span class="math inline">\(1/\sqrt{A}\)</span>. One claim is one unit of information about a log rate, and information adds. Every question in this post is a log <em>ratio</em> built from groups. The sex ratio compares two margins. The interaction compares four corners. Uncertainty adds in quadrature across the groups in the comparison:</p>
+<p><span class="math display">\[
+\operatorname{sd}\bigl(\log \hat R\bigr) \;\approx\; \sqrt{\;\sum_{\text{groups } g \text{ in the comparison}} \frac{1}{A_g}\;}
+\]</span></p>
+<p>That is the dash-dot line in FIG. 06. It explains the whole shape of the sweep:</p>
+<ul>
+<li><strong>Margins keep their claims.</strong> The sex comparison’s two groups are the male cells and the female cells. All of them. Add class, add product, add ten more dimensions: the two margin totals do not change, so the sex ratio’s precision does not change either. That is why the three curves of FIG. 04 coincide. It is also why “how many cells do we have?” was the wrong form of the committee’s worry.</li>
+<li><strong>Restrictions spend claims.</strong> The within-Term class ratio touches only Term’s preferred and substandard cells: about 28% of the book’s claims. A large true ratio (2.0) partly compensates, because the distance to resolve is large. Two things together decide which effects settle first: the claims on each side, and the log distance to cover.</li>
+<li><strong>Interactions pay four corners.</strong> The interaction ratio sums <span class="math inline">\(1/A\)</span> over four corner groups, several of them small. In this book, that sum is about 14 times the sex comparison’s. That is the entire reason the interaction was the slow curve everywhere above.</li>
+</ul>
+<p>The same formula gives the cost of a conclusion directly. To settle a <em>direction</em> at 95%, the true log ratio must exceed 1.645 standard deviations. To certify <em>±10% precision</em> at 90%, the standard deviation must fit inside <span class="math inline">\(\log(1.10)/1.645\)</span>. For a balanced comparison with <span class="math inline">\(A\)</span> claims per side, both rules solve to the same expression: <span class="math inline">\(A \geq 2\,(1.645/\log \rho)^2\)</span>. For the direction question, <span class="math inline">\(\rho\)</span> is the true ratio. For the precision question, <span class="math inline">\(\rho = 1.10\)</span>:</p>
+<div id="54" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>rules-of-thumb table code</summary>
+<pre class="julia cell-code"><code>z95 = quantile(Normal(), 0.95)
+claims_per_side(ρ) = ceil(Int, 2 * (z95 / log(ρ))^2)
+DataFrame(
+    question=["direction of a 2.0× effect", "direction of a 1.5× effect",
+        "direction of a 1.35× effect", "direction of a 1.10× effect",
+        "any effect priced to ±10% (90% CI)"],
+    claims_per_side=[claims_per_side(2.0), claims_per_side(1.5), claims_per_side(1.35),
+        claims_per_side(1.10), claims_per_side(1.10)])</code></pre>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div><div style="float: left;"><span>5×2 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
+<table class="data-frame caption-top table table-sm table-striped small">
+<thead>
+<tr class="columnLabelRow header">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">question</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">claims_per_side</th>
+</tr>
+<tr class="columnLabelRow even">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String">String</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
+</tr>
+</thead>
+<tbody>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">1</td>
+<td style="text-align: left;">direction of a 2.0× effect</td>
+<td style="text-align: right;">12</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">2</td>
+<td style="text-align: left;">direction of a 1.5× effect</td>
+<td style="text-align: right;">33</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">3</td>
+<td style="text-align: left;">direction of a 1.35× effect</td>
+<td style="text-align: right;">61</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">4</td>
+<td style="text-align: left;">direction of a 1.10× effect</td>
+<td style="text-align: right;">596</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">5</td>
+<td style="text-align: left;">any effect priced to ±10% (90% CI)</td>
+<td style="text-align: right;">596</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p>Sit with two things in this table. First, detection cost falls with the <em>square</em> of the log effect. Halve the effect, and you roughly quadruple the claims. That is how the 2.0× class difference kept pace with the 1.35× sex difference in FIG. 07 while it worked from a quarter of the claims. Second, the last two rows match on purpose. Detecting the direction of a 10% effect and pricing any effect to within 10% are the same statistical distance. So they carry the same cost: about six hundred claims on each side.</p>
+<p>Readers of part one will remember the number 1,082. It is the classic limited-fluctuation standard for full credibility of one cell. These are the same kind of calculation. The difference is what the claims requirement attaches to. A per-cell standard multiplies as cells do. Eighteen cells at 1,082 claims each is roughly 19,500 claims before every cell stands alone. The multiplicative model attaches the cost to each <em>question</em> instead. The margins never lost their claims, so they answer the marginal questions early.</p>
+</section>
+<section id="what-each-conclusion-costs" class="level2">
+<h2 class="anchored" data-anchor-id="what-each-conclusion-costs">What each conclusion costs</h2>
+<p>Now we can state the costs. For each conclusion, FIG. 10 marks the portfolio size, in expected claims, where the hierarchical model’s median run first satisfies the rule and keeps satisfying it up the ladder. We interpolate between rungs. The hollow markers are the claims arithmetic’s predictions, computed before any model ran.</p>
+<div id="56" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>crossing computation code</summary>
+<pre class="julia cell-code"><code>function crossing_at(Es, vals, thresh; dir=:up)
+    ok = dir == :up ? (vals .≥ thresh) : (vals .≤ thresh)
+    idx = findfirst(i -&gt; all(ok[i:end]), eachindex(ok))
+    idx === nothing &amp;&amp; return NaN
+    idx == 1 &amp;&amp; return Es[1]
+    x1, x2, y1, y2 = log(Es[idx-1]), log(Es[idx]), vals[idx-1], vals[idx]
+    exp(x1 + (thresh - y1) / (y2 - y1) * (x2 - x1))
+end
+xover(model, est, col, thresh; dir=:up) =
+    (d = mcurve(model, est); crossing_at(d.E, d[!, col], thresh; dir))
+
+z90 = quantile(Normal(), 0.90)
+Ecross(dist, z, groups) = z^2 * sumrecip(groups) / dist^2
+RS_T, RC_T, RI_T = sex_ratio(cells.θ), class_ratio(cells.θ), interaction_ratio(cells.θ)
+fmtclaims(x) = isnan(x) ? "more than $(Int(LADDER[end]))" : string(round(Int, x))</code></pre>
+</details>
+</div>
+<div id="58" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>FIG. 10 plotting code</summary>
+<pre class="julia cell-code"><code>cr_int_dir = xover("hier", "interaction", :pdir, P_DIR)
+
+bill = DataFrame(
+    conclusion=["class — direction", "sex — direction", "class — material (&gt;1.25×)",
+        "sex — material (&gt;1.10×)", "interaction — direction",
+        "interaction — material (&lt;0.90×)", "sex — priced to ±10%",
+        "smallest cell — priced to ±10%", "smallest cell — ±10%, no pooling"],
+    empirical=[xover("hier", "class", :pdir, P_DIR), xover("hier", "sex", :pdir, P_DIR),
+        xover("hier", "class", :pmat, P_MAT), xover("hier", "sex", :pmat, P_MAT),
+        cr_int_dir, xover("hier", "interaction", :pmat, P_MAT),
+        xover("hier", "sex", :logw, TOL_PRECISION; dir=:down),
+        xover("hier", "cell", :logw, TOL_PRECISION; dir=:down),
+        xover("nopool", "cell", :logw, TOL_PRECISION; dir=:down)],
+    arithmetic=[Ecross(log(RC_T), z95, GRP_CLASS), Ecross(log(RS_T), z95, GRP_SEX),
+        Ecross(log(RC_T / MAT_CLASS), z90, GRP_CLASS), Ecross(log(RS_T / MAT_SEX), z90, GRP_SEX),
+        Ecross(abs(log(RI_T)), z95, GRP_INT), Ecross(abs(log(RI_T / MAT_INT)), z90, GRP_INT),
+        Ecross(log(1.10), z95, GRP_SEX), NaN,
+        z95^2 / aunit([IDX[1, 1, 3]]) / log(1.10)^2])
+sort!(bill, :empirical)
+
+let
+    n = nrow(bill)
+    f = Figure(size=(760, 460))
+    ax = Axis(f[1, 1];
+        title="FIG. 10 — EXPECTED CLAIMS REQUIRED FOR EACH CONCLUSION",
+        subtitle="filled: measured (median run) · hollow: claims arithmetic",
+        subtitlesize=12,
+        xscale=log10, xticks=([25, 100, 400, 1600, 6400, 25000],
+            ["25", "100", "400", "1600", "6400", "25000"]),
+        xlabel="portfolio expected claims",
+        yticks=(1:n, reverse(bill.conclusion)), yticklabelsize=11,
+        limits=((14, 40000), (0.4, n + 0.6)))
+    for (row, i) in enumerate(reverse(1:n))
+        y = row
+        emp, ana = bill.empirical[i], bill.arithmetic[i]
+        col = bill.conclusion[i] == "smallest cell — ±10%, no pooling" ? CF_INK_SOFT : CF_GREEN
+        if !isnan(ana)
+            scatter!(ax, [ana], [y]; color=:transparent, marker=:circle, markersize=13,
+                strokecolor=CF_INK, strokewidth=1.5)
+        end
+        if isnan(emp)
+            text!(ax, 6400, y; text="not reached on the ladder →",
+                align=(:right, :center), fontsize=11, color=col)
+        else
+            lines!(ax, [14, emp], [y, y]; color=(col, 0.35), linewidth=1.5)
+            scatter!(ax, [emp], [y]; color=col, markersize=13,
+                strokecolor=CF_INK, strokewidth=0.5)
+        end
+    end
+    f
+end</code></pre>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-30-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="60" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>the bill as a table</summary>
+<pre class="julia cell-code"><code>DataFrame(conclusion=bill.conclusion,
+    measured=fmtclaims.(bill.empirical),
+    claims_arithmetic=fmtclaims.(bill.arithmetic))</code></pre>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div><div style="float: left;"><span>9×3 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
+<table class="data-frame caption-top table table-sm table-striped small">
+<thead>
+<tr class="columnLabelRow header">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">conclusion</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">measured</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">claims_arithmetic</th>
+</tr>
+<tr class="columnLabelRow even">
+<th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String">String</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String">String</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String">String</th>
+</tr>
+</thead>
+<tbody>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">1</td>
+<td style="text-align: left;">class — direction</td>
+<td style="text-align: left;">115</td>
+<td style="text-align: left;">173</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">2</td>
+<td style="text-align: left;">sex — direction</td>
+<td style="text-align: left;">150</td>
+<td style="text-align: left;">140</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">3</td>
+<td style="text-align: left;">class — material (&gt;1.25×)</td>
+<td style="text-align: left;">164</td>
+<td style="text-align: left;">226</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">4</td>
+<td style="text-align: left;">sex — material (&gt;1.10×)</td>
+<td style="text-align: left;">194</td>
+<td style="text-align: left;">182</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">5</td>
+<td style="text-align: left;">sex — priced to ±10%</td>
+<td style="text-align: left;">1397</td>
+<td style="text-align: left;">1386</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">6</td>
+<td style="text-align: left;">interaction — direction</td>
+<td style="text-align: left;">2556</td>
+<td style="text-align: left;">998</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">7</td>
+<td style="text-align: left;">interaction — material (&lt;0.90×)</td>
+<td style="text-align: left;">3745</td>
+<td style="text-align: left;">1080</td>
+</tr>
+<tr class="dataRow even">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">8</td>
+<td style="text-align: left;">smallest cell — priced to ±10%</td>
+<td style="text-align: left;">more than 6400</td>
+<td style="text-align: left;">more than 6400</td>
+</tr>
+<tr class="dataRow odd">
+<td class="rowLabel" style="text-align: right; font-weight: bold;">9</td>
+<td style="text-align: left;">smallest cell — ±10%, no pooling</td>
+<td style="text-align: left;">more than 6400</td>
+<td style="text-align: left;">21960</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p>The filled and hollow markers mostly agree. That is the quiet point of the whole exercise. The cost of each conclusion was computable from claim counts and effect sizes before we drew a single posterior, and the simulation confirms the computation. Where the markers differ, the differences inform. The hierarchical model reaches the interaction conclusions <em>later</em> than the arithmetic suggests. The skeptical prior holds back a while longer, as FIG. 08 showed. It reaches the class conclusions <em>earlier</em>. While the interactions stay shrunk, the shared class effect lets substandard-versus-preferred claims from every product inform the within-Term answer. That is the same use of structure that supports the smallest cell, in a smaller amount. And the smallest cell mirrors the story. On its own claims, a ±10% certificate for that cell costs roughly 22 thousand expected claims. That is off the right edge of the figure, past any size this block will reach. At the top rung of the ladder, the no-pooling interval for the cell still spans about ±19%. The hierarchical interval spans about ±13%. The cell produced the same claims under both models. The difference is that the hierarchical certificate rests on the structural assumption. It is only as good as that assumption.</p>
+<p>One more sensitivity, in numbers. These costs scale with the square of the confidence you demand. Requiring 99% instead of 95% on a direction multiplies the claims by <span class="math inline">\((2.326/1.645)^2 \approx 2\)</span>. Half the cost of certainty sits in the last few points of it.</p>
+</section>
+<section id="what-this-does-not-establish" class="level2">
+<h2 class="anchored" data-anchor-id="what-this-does-not-establish">What this does not establish</h2>
+<p>The results above are real. So are the following limits.</p>
+<p><strong>The structure is the subsidy, and it can be wrong.</strong> The hierarchical model prices eighteen cells on a few hundred claims because it assumes the cells share a multiplicative skeleton. In this simulation, the skeleton is nearly true, because we built the truth. The two-dimensional model’s class ratio is the warning. A structured model converges <em>fast</em> to a <em>wrong</em> answer when its structure omits something real. More claims do not fix it. The shrunk interaction blocks are our hedge. They let the data overturn pure multiplication, at the claim costs measured above. A book that is further from multiplicative than ours would pay those costs more often.</p>
+<p><strong>Below a dozen claims per side, the prior is most of the conclusion.</strong> At the bottom rungs, the hierarchical intervals are visibly narrower than the claims arithmetic allows. The difference is prior information, not data. Our priors are weakly informative, and we did not tune them to the truth. A reader who defends different priors should expect different small-portfolio behavior. By a few dozen claims per side, the curves converge to the arithmetic, and the priors stop mattering much.</p>
+<p><strong>The three-way interaction is excluded by construction.</strong> If the sex difference itself worked differently in guaranteed issue, this model could not see it. With eighteen cells, that exclusion is nearly forced. The honest statement: conclusions about three-way structure are not merely expensive here. They are unavailable.</p>
+<p><strong>One truth, one mix, thresholds by judgment.</strong> We simulated one ground truth and one book composition. Our decision thresholds — 95%, 90%, ±10%, and the materiality bounds — are defensible, not canonical. The claims arithmetic travels to other books: recompute <span class="math inline">\(\sum 1/A_g\)</span> with your mix. The specific crossing numbers do not travel. And everything is measured against the aggregate table. An A/E study inherits whatever the table gets wrong.</p>
+</section>
+<section id="conclusion" class="level2">
+<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
+<p>Return to the committee. The block produces about ninety claims a year. What can we say with them, and what must wait?</p>
+<p>On this book’s evidence: one or two years of claims settle the directions of the large differences, sex and class. Two or three years settle their materiality and rough size. For those conclusions, the move from two cells to eighteen was close to free. They live on margins, and margins keep their claims no matter how many cells sit under them. The finer grain is not close to free. The interaction — class means less where no one underwrites — costs 2556 expected claims under a model honest enough not to invent it earlier. And the smallest cell never supports itself at any size an ordinary block reaches. What we can say about it, we say on the strength of the structural assumption.</p>
+<p>So “how much data do we need?” has no single number, and the cell count was never the thing to fear. The workable question is the one this post computed: <em>which comparisons does the conclusion touch, and how many claims sit on each side?</em> That arithmetic fits on a note card. It predicted nearly every crossing in the sweep. The hierarchical model is what lets a real book act on it. The model collects the marginal conclusions early. It holds the cell-level conclusions open. And at every portfolio size, it says which is which.</p>
+</section>
+<section id="further-reading" class="level2">
+<h2 class="anchored" data-anchor-id="further-reading">Further reading</h2>
+<ul>
+<li><a href="../../posts/credibility-sparse-data/index.html">Credibility When Claims Are Scarce</a> — part one: hierarchical Bayes against limited fluctuation and Bühlmann–Straub on a single dimension.</li>
+<li><a href="../../posts/bayes-vs-limited-fluctuation/index.html">Bayesian vs Limited Fluctuation Experience Analysis</a> — where the 1,082-claim standard comes from.</li>
+<li>Gelman et al., <em>Bayesian Data Analysis</em>, ch.&nbsp;5 — hierarchical models and partial pooling.</li>
+<li>Gelman, Hill &amp; Vehtari, <em>Regression and Other Stories</em> — including the “sixteen times the sample size for an interaction” argument that our four-corner arithmetic reproduces.</li>
+<li>McElreath, <em>Statistical Rethinking</em>, ch.&nbsp;8 — interactions, and why they deserve more suspicion than main effects.</li>
+<li>American Academy of Actuaries / ASB, <a href="https://www.actuarialstandardsboard.org/asops/credibility-procedures/">ASOP No.&nbsp;25, <em>Credibility Procedures</em></a> — the professional standard governing how such judgments are documented.</li>
+</ul>
+</section>
+<section id="footnotes-and-colophon" class="level2">
+<h2 class="anchored" data-anchor-id="footnotes-and-colophon">Footnotes and colophon</h2>
+<p>We produced the simulation, the fits, and the figures with the code shown on this page, in Julia with <a href="https://turing.ml">Turing.jl</a>, <a href="https://dataframes.juliadata.org">DataFrames.jl</a>, and <a href="https://makie.org">Makie.jl</a>. The sweep fits 1200 MCMC models (plus 300 closed-form ones) in about 13.5 minutes on a laptop. Every random draw is seeded, so the page reproduces exactly.</p>
+<p><em>Disclosure: this post was written by AI (Anthropic’s Claude) and reviewed by a human.</em></p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/JuliaActuary\.org");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

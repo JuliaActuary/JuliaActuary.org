@@ -1,0 +1,919 @@
+---
+title: "Credibility as the Cells Multiply"
+subtitle: "Credibility when claims are scarce, continued: how much experience it takes to split rates by sex, then by risk class, then by product"
+categories: [statistics, experience-analysis, bayesian, credibility, modeling]
+---
+
+```{julia}
+#| echo: false
+#| output: false
+using Pkg
+Pkg.activate(".")
+Pkg.instantiate()
+```
+
+A block of life business produces about ninety death claims a year. The pricing committee wants rates that separate male from female. It also wants three risk classes: preferred, standard, and substandard. It also wants three products: fully underwritten term, simplified-issue whole life, and guaranteed-issue final expense. Each request is reasonable on its own. Together they spread the ninety claims across eighteen cells.
+
+This post measures how much experience each of those splits needs. It continues [*Credibility When Claims Are Scarce*](/posts/credibility-sparse-data/index.html), which compared traditional credibility formulas with a hierarchical Bayesian model on one rating dimension. You do not need to read that post first. Everything here starts from scratch. But its conclusion is our starting point: when claims are scarce, a hierarchical model learns more from them than the traditional formulas do, and it reports what it still does not know. So we set the traditional formulas aside and ask a new question about the same kind of model. As you add rating dimensions, when does the posterior settle a question? And which questions settle first?
+
+We go slowly, in small steps: a known truth, one portfolio you can count by hand, three models, and then a sweep of portfolio sizes from about twelve expected claims to several thousand.
+
+## The experiment
+
+The setup, in brief:
+
+- One **aggregate expected table**. It is unisex, class-blind, and product-blind. We measure every cell as actual-to-expected (A/E) against it. The table knows none of the structure. The structure is what the models must learn.
+- Three views of the same block: **sex** (2 cells), **sex × class** (6 cells), and **sex × class × product** (18 cells).
+- A ladder of portfolio sizes, measured in **expected claims on the table basis**: from 12.5 to 6,400, doubling at each rung. The smallest rung matches the N=500 block of part one, which produced about a dozen claims.
+- **Conclusions defined in advance.** Before we fit anything, we write down what "the data supports a conclusion" means. Each definition is a statement about the posterior, with a visible threshold.
+- Ground truth is known, because we simulate it. The models never see it. At the end, we compare what each model concluded, and when, with the truth.
+
+A note on the unit, for readers of the earlier credibility posts. Those posts argued against claim-count *thresholds*: rules that give data no weight until a fixed number of claims arrives. This post does not revive them. Every portfolio on the ladder produces a full posterior, including the twelve-claim one. No rule below requires a minimum count before the data can speak. Claims play a different role here. They are the unit in which exposure carries information about rates. A policy-year with little chance of a claim teaches almost nothing. What matters about 25,000 policy-years is that the table expects them to produce about 100 claims. That second number is the one the arithmetic uses. The thresholds later in the post are decision rules. We choose them and write them down. They state when a posterior is strong enough to act on. They never state when data is allowed to count.
+
+```{julia}
+#| code-fold: true
+#| code-summary: "packages and plot theme"
+#| output: false
+using Random, Distributions, DataFrames, DataFramesMeta, StatsBase, Statistics, Printf
+using Turing, MCMCChains, StatsFuns, ThreadsX, KernelDensity
+using Logging
+Logging.disable_logging(Logging.Warn) # quiet Turing's per-fit chatter
+
+using CairoMakie
+# Apply the site's custom Makie plot theme (cassette futurism).
+include(joinpath(@__DIR__, "..", "..", "assets", "themes", "cassette_futurism.jl"))
+set_theme!(cassette_futurism_theme())
+```
+
+## Ground truth
+
+The truth is multiplicative, with one exception. We point at the exception when we reach it. Each cell's true mortality is the table rate times a level, a sex factor, a class factor, and a product factor. On the log scale, the factors add:
+
+```{julia}
+#| output: false
+const SEXES    = ["Female", "Male"]
+const CLASSES  = ["Preferred", "Standard", "Substandard"]
+const PRODUCTS = ["Term", "SI Whole Life", "Guaranteed Issue"]
+
+const LEVEL     = 0.90                # the whole block runs at 90% of the table
+const SEX_EFF   = (-0.15, 0.15)       # log scale: Female, Male
+const CLASS_EFF = (-0.35, 0.0, 0.35)  # log scale: Preferred, Standard, Substandard
+const PROD_EFF  = (-0.40, 0.0, 0.40)  # log scale: Term, SI WL, Guaranteed Issue
+const KAPPA     = (1.0, 1.0, 0.4)     # how much of the class effect survives, per product
+
+# each cell's share of the portfolio's table-expected claims
+const SEX_SHARE     = (0.45, 0.55)
+const PROD_SHARE    = (0.45, 0.25, 0.30)
+const CLASS_IN_PROD = ((0.50, 0.38, 0.12),   # class mix within Term
+                       (0.25, 0.55, 0.20),   # within SI Whole Life
+                       (0.10, 0.55, 0.35))   # within Guaranteed Issue
+
+cells = DataFrame([(sex=s, cls=r, prod=p,
+                    share=SEX_SHARE[s] * PROD_SHARE[p] * CLASS_IN_PROD[p][r],
+                    θ=LEVEL * exp(SEX_EFF[s] + KAPPA[p] * CLASS_EFF[r] + PROD_EFF[p]))
+                   for s in 1:2, r in 1:3, p in 1:3] |> vec)
+
+const IDX = [findfirst(i -> cells.sex[i] == s && cells.cls[i] == r && cells.prod[i] == p,
+                       1:nrow(cells)) for s in 1:2, r in 1:3, p in 1:3]
+```
+
+The values are deliberately ordinary. Males run about `{julia} round(exp(SEX_EFF[2] - SEX_EFF[1]), digits=2)`× female mortality. Substandard runs about `{julia} round(exp(CLASS_EFF[3] - CLASS_EFF[1]), digits=2)`× preferred. Guaranteed issue runs about `{julia} round(exp(PROD_EFF[3] - PROD_EFF[1]), digits=2)`× term. The exception is `KAPPA`. In the two underwritten products, the class effect applies in full. In guaranteed issue, `KAPPA` cuts it to 40%. So the substandard-to-preferred ratio is about 2.0 where underwriting happened, and it compresses to about `{julia} round(exp(KAPPA[3] * (CLASS_EFF[3] - CLASS_EFF[1])), digits=2)` in guaranteed issue. The story behind this is ordinary too. Risk class is the *output* of underwriting. In a product that no one underwrites, the labels carry less information. This is the one true interaction in the book. Much of the post asks how many claims it takes to see it.
+
+The mix is unbalanced, as real books are. Term skews preferred. Guaranteed issue has almost no preferred lives. The sex mix is 55/45, and it is independent of class and product. That independence keeps one comparison clean. FIG. 01 shows all eighteen cells: the true multiplier, and below it the cell's share of the portfolio's expected claims.
+
+```{julia}
+#| code-fold: true
+#| code-summary: "FIG. 01 plotting code"
+let
+    f = Figure(size=(780, 400))
+    lim = maximum(abs, log.(cells.θ))
+    hm = nothing
+    for s in 1:2
+        ax = Axis(f[1, s];
+            subtitle=SEXES[s],
+            xticks=(1:3, ["Term", "SI WL", "GI"]),
+            yticks=(1:3, ["Pref", "Std", "Sub"]),
+            xlabel="product", ylabel=s == 1 ? "risk class" : "")
+        z = [log(cells.θ[IDX[s, r, p]]) for p in 1:3, r in 1:3]
+        hm = heatmap!(ax, 1:3, 1:3, z; colormap=:vik, colorrange=(-lim, lim))
+        for p in 1:3, r in 1:3
+            i = IDX[s, r, p]
+            text!(ax, p, r;
+                text="$(round(cells.θ[i], digits=2))×\n$(round(100 * cells.share[i], digits=1))%",
+                align=(:center, :center), fontsize=11,
+                color=abs(log(cells.θ[i])) > 0.55 ? :white : CF_INK)
+        end
+        s == 2 && hideydecorations!(ax; grid=false)
+    end
+    Colorbar(f[1, 3], hm; label="log multiplier vs table")
+    Label(f[0, :], "FIG. 01 — TRUE MULTIPLIERS AND CLAIM SHARES ACROSS EIGHTEEN CELLS";
+        halign=:left, fontsize=15, tellwidth=false)
+    f
+end
+```
+
+Note two cells now. Guaranteed-issue preferred runs *worse* than pure multiplication predicts, because its class discount is mostly gone. And the smallest cell in the book — female, preferred, guaranteed issue, at `{julia} round(100 * cells.share[IDX[1, 1, 3]], digits=1)`% of expected claims — has a true multiplier of `{julia} round(cells.θ[IDX[1, 1, 3]], digits=2)`. The cell that sits almost exactly on the table is the one that can never produce enough claims to show it.
+
+> *Aside: why this post has no ages. An experience study reduces each cell to two numbers: actual claims, and expected claims on the table basis. For Poisson claim counts, those two numbers carry all the information. Simulate individual lives with age curves and sum them, and you get the same distribution of cell totals as one Poisson draw per cell. The age mix is absorbed into the cell's expected claims. So we set each cell's share of expected claims directly, and we measure portfolio size in expected claims rather than policy counts. For scale: if the average expected rate is four claims per thousand policy-years, then 100 expected claims is about 25,000 policy-years.*
+
+Before any statistics, do one piece of arithmetic. Cutting a portfolio finer does not create claims. It divides them. FIG. 02 takes a portfolio of 200 expected claims. It shows how many claims land in each unit as the block is cut from one piece into eighteen.
+
+```{julia}
+#| code-fold: true
+#| code-summary: "FIG. 02 plotting code"
+let
+    Eref = 200.0
+    stages = [
+        ("portfolio\n(1)", [1.0]),
+        ("by sex\n(2)", [sum(cells.share[cells.sex .== s]) for s in 1:2]),
+        ("sex × class\n(6)", [sum(cells.share[(cells.sex .== s) .& (cells.cls .== r)])
+                              for s in 1:2 for r in 1:3]),
+        ("sex × class × product\n(18)", collect(cells.share)),
+    ]
+    f = Figure(size=(720, 420))
+    ax = Axis(f[1, 1];
+        title="FIG. 02 — EXPECTED CLAIMS PER UNIT AS THE BLOCK IS CUT FINER",
+        subtitle="a portfolio of $(Int(Eref)) expected claims",
+        xticks=(1:4, first.(stages)), ylabel="expected claims in the unit",
+        yscale=log10, xticklabelsize=11)
+    for (k, (_, shares)) in enumerate(stages)
+        n = length(shares)
+        xs = k .+ 0.32 .* ((1:n) .- (n + 1) / 2) ./ max(n / 2, 1)
+        scatter!(ax, xs, Eref .* shares; color=(CF_BLUE, 0.75), markersize=10,
+            strokecolor=CF_INK, strokewidth=0.5)
+        lo = minimum(Eref .* shares)
+        text!(ax, k, lo; text="smallest: $(round(lo, digits=1))",
+            align=(:center, :top), offset=(0, -10), fontsize=11, color=CF_INK_SOFT)
+    end
+    ylims!(ax, 1.2, 320)
+    f
+end
+```
+
+The 200 claims become 110 and 90 at the sex margin. At six cells, the units hold single and double digits. The smallest of the eighteen cells expects `{julia} round(200 * minimum(cells.share), digits=1)`. Nothing statistical has happened yet. This is division. The rest of the post asks what the data can still teach after the division. The answer turns on one feature of this figure: the *margins* (110 and 90) keep almost all their claims, no matter how many cells sit under them.
+
+Now we put the truth away. From here, the models see cell claim counts and table-expected claims. Nothing else. We bring the truth back at the end to grade them.
+
+## One portfolio, one hundred expected claims
+
+To simulate a portfolio, we draw one Poisson count per cell. The mean is the cell's expected claims times its true multiplier.
+
+```{julia}
+const SEED = 20260807
+const LADDER = 12.5 .* 2.0 .^ (0:9)   # portfolio sizes, in expected claims
+
+simulate(E_total, rng) = [rand(rng, Poisson(E_total * r.share * r.θ)) for r in eachrow(cells)]
+
+const E_SHOW = 100.0
+A100 = simulate(E_SHOW, Xoshiro(SEED))
+E100 = E_SHOW .* cells.share
+(total_claims = sum(A100), cells_with_zero_claims = sum(A100 .== 0))
+```
+
+One hundred expected claims produced `{julia} sum(A100)` actual claims. The block runs below its table. FIG. 03 shows the spread across the eighteen cells. `{julia} sum(A100 .== 0)` cells produced no claims at all.
+
+```{julia}
+#| code-fold: true
+#| code-summary: "FIG. 03 plotting code"
+let
+    ord = sort(1:nrow(cells);
+        by=i -> (cells.prod[i], cells.cls[i], cells.sex[i]))
+    labs = ["$(["Term", "SI WL", "GI"][cells.prod[i]]) · $(["Pref", "Std", "Sub"][cells.cls[i]]) · $(["F", "M"][cells.sex[i]])"
+            for i in ord]
+    pcols = [CF_BLUE, CF_AMBER, CF_PLUM]
+    xmax = max(4.3, 1.25 * maximum(A100 ./ E100))
+    f = Figure(size=(720, 500))
+    ax = Axis(f[1, 1];
+        title="FIG. 03 — OBSERVED A/E BY CELL, ONE PORTFOLIO AT 100 EXPECTED CLAIMS",
+        xlabel="observed A/E vs table (label shows actual / expected claims)",
+        yticks=(1:18, labs), yticklabelsize=10, limits=((-0.1, xmax), (0.2, 18.8)))
+    hlines!(ax, [6.5, 12.5]; color=CF_RULE, linewidth=1)
+    vlines!(ax, [sum(A100) / sum(E100)]; color=CF_INK_SOFT, linestyle=:dot, linewidth=1.5)
+    for (row, i) in enumerate(ord)
+        scatter!(ax, [A100[i] / E100[i]], [row]; color=pcols[cells.prod[i]],
+            markersize=11, strokecolor=CF_INK, strokewidth=0.5)
+        text!(ax, 0.99 * xmax, row; text="$(A100[i]) / $(round(E100[i], digits=1))",
+            align=(:right, :center), fontsize=10, color=CF_INK_SOFT)
+    end
+    text!(ax, sum(A100) / sum(E100), 18.6; text=" portfolio A/E",
+        align=(:left, :top), fontsize=11, color=CF_INK_SOFT)
+    f
+end
+```
+
+The raw cell A/Es run from zero to about `{julia} round(maximum(A100 ./ E100), digits=1)`. At face value, they imply rate differences no one would file. No one takes them at face value. The question is what we can conclude instead. Before we build any model, one comparison is worth doing by hand.
+
+```{julia}
+AM, AF = sum(A100[cells.sex .== 2]), sum(A100[cells.sex .== 1])
+EM, EF = sum(E100[cells.sex .== 2]), sum(E100[cells.sex .== 1])
+observed_sex_ratio = (AM / EM) / (AF / EF)
+sd_of_log_ratio = sqrt(1 / AM + 1 / AF)
+(male_claims = AM, female_claims = AF,
+ observed_sex_ratio = round(observed_sex_ratio, digits=2),
+ sd_of_log_ratio = round(sd_of_log_ratio, digits=2))
+```
+
+Of the `{julia} sum(A100)` claims, `{julia} AM` are male and `{julia} AF` are female. The observed ratio of the two A/E ratios is `{julia} round(observed_sex_ratio, digits=2)`. How firm is that number? For Poisson counts, the log of an observed rate has a standard deviation of about $1/\sqrt{A}$, where $A$ is the claim count. So the log of a *ratio* of two rates has a standard deviation of about $\sqrt{1/A_1 + 1/A_2}$. With `{julia} AM` claims on one side and `{julia} AF` on the other, that is about `{julia} round(sd_of_log_ratio, digits=2)`. The true log ratio is $0.30$, though the models do not know it. One standard deviation of noise is most of the effect. So arithmetic alone says: at about ninety claims, the direction of the sex difference is close to settled, but only close. Its size is open.
+
+Remember the quantity $\sqrt{1/A_1 + 1/A_2}$. Claims on each side of a comparison are the unit of information in this post. Every result below is this calculation in a different form.
+
+## What counts as a conclusion
+
+The question "when can we draw conclusions?" has no answer until we name the conclusions. We track five questions. Each is a ratio of true cell rates, weighted by the book's expected-claims mix. The fixed weights make every model answer the identical question, coarse or fine:
+
+```{julia}
+#| output: false
+grp(s, r, p) = [i for i in 1:nrow(cells) if (s === nothing || cells.sex[i] == s) &&
+                                            (r === nothing || cells.cls[i] == r) &&
+                                            (p === nothing || cells.prod[i] == p)]
+wmean(θv, idx) = sum(cells.share[i] * θv[i] for i in idx) / sum(cells.share[i] for i in idx)
+
+# male / female, standardized over the class-and-product mix
+sex_ratio(θv) = wmean(θv, grp(2, nothing, nothing)) / wmean(θv, grp(1, nothing, nothing))
+
+# substandard / preferred within Term, standardized over sex
+class_ratio(θv) = wmean(θv, grp(nothing, 3, 1)) / wmean(θv, grp(nothing, 1, 1))
+
+# (substandard/preferred in GI) relative to (substandard/preferred in Term)
+interaction_ratio(θv) = (wmean(θv, grp(nothing, 3, 3)) / wmean(θv, grp(nothing, 1, 3))) /
+                        (wmean(θv, grp(nothing, 3, 1)) / wmean(θv, grp(nothing, 1, 1)))
+
+# (substandard/preferred among males) relative to (same among females) — truly 1.0
+null_ratio(θv) = (wmean(θv, grp(2, 3, nothing)) / wmean(θv, grp(2, 1, nothing))) /
+                 (wmean(θv, grp(1, 3, nothing)) / wmean(θv, grp(1, 1, nothing)))
+
+# the smallest cell in the book, on its own
+tiny_cell(θv) = θv[IDX[1, 1, 3]]
+```
+
+```{julia}
+DataFrame(
+    question=["sex ratio (M/F)", "class ratio (Sub/Pref, within Term)",
+        "interaction (class ratio in GI ÷ in Term)", "null check (class ratio in M ÷ in F)",
+        "smallest cell (F · Pref · GI)"],
+    truth=round.([sex_ratio(cells.θ), class_ratio(cells.θ), interaction_ratio(cells.θ),
+            null_ratio(cells.θ), tiny_cell(cells.θ)], digits=3))
+```
+
+The null check needs a word. The truth holds no sex-by-class interaction, so the fourth ratio is exactly 1.0. It is on the list *because* nothing is there. A model that reaches confident conclusions about it is making structure out of noise. We will count how often that happens.
+
+Next, we define what it means for the data to *support a conclusion*. There are three grades. Each is harder than the one before. Each is a plain statement about the posterior distribution:
+
+```{julia}
+#| output: false
+const P_DIR = 0.95        # direction: ≥95% of posterior mass on one side of 1
+const P_MAT = 0.90        # materiality: ≥90% of mass beyond the relevant bound below
+const MAT_SEX = 1.10      # a sex differential is worth acting on beyond +10%
+const MAT_CLASS = 1.25    # a class differential is worth acting on beyond +25%
+const MAT_INT = 0.90      # an interaction matters if it moves a differential ≥10%
+const TOL_PRECISION = 2 * log(1.10)  # priced: 90% interval within ±10% of its midpoint
+```
+
+1. **Direction.** The posterior puts at least 95% of its mass on one side of 1. We are willing to say *which way* the difference goes.
+2. **Materiality.** At least 90% of the mass lies beyond a bound that matters for pricing. We are willing to say the effect is *large enough to act on*. The bounds above are judgment calls. That is why they are named constants: the judgment sits in the code, where you can see it.
+3. **Precision.** The 90% credible interval spans less than ±10% around its midpoint. The estimate is tight enough to *price with*, not only to point a direction.
+
+There is no hypothesis test in this post. We read probabilities off posteriors and compare them with thresholds chosen in advance. If your thresholds differ, read the figures against yours. Thresholds change the cost of a conclusion. They do not change the shape of the answer.
+
+## Three models
+
+We use three models, in increasing order of structure. Given a portfolio, each model produces posterior draws of all eighteen cell multipliers. The five question functions then apply to each draw. So the same machinery scores every model.
+
+**No pooling.** Each cell is estimated from its own claims alone, with a prior worth one claim at the table rate. This has a closed form, so it needs no MCMC. With a $\mathrm{Gamma}(1,1)$ prior on a cell's multiplier $\theta$, observing $A$ claims against $E$ expected gives the posterior $\mathrm{Gamma}(1 + A,\; 1/(1+E))$:
+
+```{julia}
+#| output: false
+nopool_draws(A, E; ndraws=2_000, rng=Xoshiro(0)) =
+    reduce(hcat, [rand(rng, Gamma(1 + A[i], 1 / (1 + E[i])), ndraws) for i in eachindex(A)])
+```
+
+No pooling believes each cell's data and nothing else. It is in the lineup because its failures teach as much as the structured models' successes.
+
+**Main effects only.** One model per granularity. Each says the dimensions multiply: a sex factor, a class factor, a product factor, and no dependence on the combination. On the log scale, the factors add:
+
+```{julia}
+#| output: false
+# During warmup NUTS occasionally proposes parameter values extreme enough to
+# overflow exp(); an infinite or NaN rate would make Poisson() throw rather
+# than letting the sampler reject the step. Bounding the log rate (and turning
+# a NaN proposal into a hopeless one) keeps such steps ordinary rejections.
+rate(E, η) = ifelse(isnan(η), one(η) * 1e30, E * exp(clamp(η, -30.0, 30.0)))
+
+@model function m1d(A, E, sx)
+    μ ~ Normal(0, 1)
+    s ~ filldist(Normal(0, 0.5), 2)
+    η = [μ + s[sx[i]] for i in eachindex(A)]
+    for i in eachindex(A)
+        A[i] ~ Poisson(rate(E[i], η[i]))
+    end
+    return η
+end
+
+@model function m2d(A, E, sx, rc)
+    μ ~ Normal(0, 1)
+    s ~ filldist(Normal(0, 0.5), 2)
+    r ~ filldist(Normal(0, 0.5), 3)
+    η = [μ + s[sx[i]] + r[rc[i]] for i in eachindex(A)]
+    for i in eachindex(A)
+        A[i] ~ Poisson(rate(E[i], η[i]))
+    end
+    return η
+end
+
+@model function m3d(A, E, sx, rc, pr)
+    μ ~ Normal(0, 1)
+    s ~ filldist(Normal(0, 0.5), 2)
+    r ~ filldist(Normal(0, 0.5), 3)
+    p ~ filldist(Normal(0, 0.5), 3)
+    η = [μ + s[sx[i]] + r[rc[i]] + p[pr[i]] for i in eachindex(A)]
+    for i in eachindex(A)
+        A[i] ~ Poisson(rate(E[i], η[i]))
+    end
+    return η
+end
+```
+
+The priors are weakly informative. $\mathrm{Normal}(0, 1)$ on the level says the block is probably within a factor of about 2.7 of its table. $\mathrm{Normal}(0, 0.5)$ on each effect says differences of tens of percent are plausible, and differences of many hundreds of percent are not.
+
+**Main effects plus shrunk interactions.** This is the hierarchical model, and the one we lean on. It keeps the multiplicative skeleton. It adds all three two-way interaction tables. Each table draws from its own zero-centered distribution, and the data estimates each table's scale:
+
+$$
+\log \theta_{srp} \;=\;
+\underbrace{\textcolor{#1F4E79}{\mu + s_s + r_r + p_p}}_{\textcolor{#1F4E79}{\text{main effects: the dimensions multiply}}}
+\;+\;
+\underbrace{\textcolor{#3F7D4E}{\sigma_{sr} z^{sr}_{sr} + \sigma_{sp} z^{sp}_{sp} + \sigma_{rp} z^{rp}_{rp}}}_{\textcolor{#3F7D4E}{\text{interactions: shrunk toward zero unless the claims say otherwise}}}
+$$
+
+```{julia}
+#| output: false
+@model function m3dint(A, E, sx, rc, pr)
+    μ ~ Normal(0, 1)
+    s ~ filldist(Normal(0, 0.5), 2)
+    r ~ filldist(Normal(0, 0.5), 3)
+    p ~ filldist(Normal(0, 0.5), 3)
+    σsr ~ Exponential(0.15)
+    zsr ~ filldist(Normal(0, 1), 2, 3)
+    σsp ~ Exponential(0.15)
+    zsp ~ filldist(Normal(0, 1), 2, 3)
+    σrp ~ Exponential(0.15)
+    zrp ~ filldist(Normal(0, 1), 3, 3)
+    η = [μ + s[sx[i]] + r[rc[i]] + p[pr[i]] +
+         σsr * zsr[sx[i], rc[i]] + σsp * zsp[sx[i], pr[i]] + σrp * zrp[rc[i], pr[i]]
+         for i in eachindex(A)]
+    for i in eachindex(A)
+        A[i] ~ Poisson(rate(E[i], η[i]))
+    end
+    return η
+end
+```
+
+The $\mathrm{Exponential}(0.15)$ priors on the interaction scales say: interactions probably shift the multiplicative story by fifteen percent or less, but the claims can argue for more. Each interaction table gets its *own* scale, on purpose. Two of the three tables are truly zero in our ground truth. With one shared scale, the two empty tables would pull it down and over-shrink the one real signal. A separate dial per table lets the data promote one interaction without promoting them all. (We leave the three-way interaction out. Eighteen cells cannot inform eighteen more free parameters. The caveats return to this.)
+
+> *Aside: two technical notes. First, nothing in these models pins down* $\mu$ *and the effect vectors separately. Add a constant to* $\mu$*, subtract it from every* $s$*, and all cell rates stay the same. The proper priors keep the sampler well behaved. And we never report those parameters alone. Every tracked quantity is a ratio of cell rates, which this ambiguity cannot touch. Second, we write the interactions as* $\sigma \cdot z$ *with standardized* $z$*. This is the [non-centered parameterization](https://mc-stan.org/docs/stan-users-guide/reparameterization.html). It keeps hierarchical scales sampling well when data is thin.*
+
+The fitting machinery is shared by everything below. We fit coarse models to coarsely summed data. Then we copy their answers out to the eighteen fine cells. A 2-cell model's male estimate becomes its estimate for all nine male cells. The question functions then apply to every model in the same way:
+
+```{julia}
+#| output: false
+const KEY2 = unique(collect(zip(cells.sex, cells.cls)))
+const ID2 = [findfirst(==(sc), KEY2) for sc in zip(cells.sex, cells.cls)]
+const SX2, RC2 = [k[1] for k in KEY2], [k[2] for k in KEY2]
+coarsen(x, ids, n) = [sum(x[ids .== j]) for j in 1:n]
+
+function fit_theta(model, rng; ids=nothing, warmup=500, draws=500, target=0.9, nchains=1)
+    spl = NUTS(warmup, target)
+    ch = nchains == 1 ?
+         Chains(sample(rng, model, spl, draws; progress=false, verbose=false)) :
+         Chains(sample(rng, model, spl, MCMCThreads(), draws, nchains;
+             progress=false, verbose=false))
+    gq = returned(model, MCMCChains.get_sections(ch, :parameters))
+    θ = Matrix(reduce(hcat, [exp.(g) for g in vec(gq)])')  # one row per posterior draw
+    ess = [x for x in skipmissing(DataFrame(summarystats(ch)).ess_bulk) if !isnan(x)]
+    (θ=ids === nothing ? θ : θ[:, ids], chain=ch,
+        ndiv=Int(sum(ch[:numerical_error])), miness=isempty(ess) ? Inf : minimum(ess))
+end
+
+fit_retry(model, seed; kwargs...) = try
+    fit_theta(model, Xoshiro(seed); kwargs...)
+catch
+    fit_theta(model, Xoshiro(seed + 10_000); kwargs...)  # rare sampler failure: retry once
+end
+```
+
+We fit all four MCMC models to the 100-claim portfolio, with four chains each. Then we check the standard sampler diagnostics before we trust anything downstream:
+
+```{julia}
+#| code-fold: true
+#| code-summary: "showcase fits and MCMC diagnostics code"
+A100_1, E100_1 = coarsen(A100, cells.sex, 2), coarsen(E100, cells.sex, 2)
+A100_2, E100_2 = coarsen(A100, ID2, 6), coarsen(E100, ID2, 6)
+show100 = (
+    b1=fit_theta(m1d(A100_1, E100_1, [1, 2]), Xoshiro(SEED + 1);
+        ids=cells.sex, warmup=1000, draws=1000, nchains=4),
+    b2=fit_theta(m2d(A100_2, E100_2, SX2, RC2), Xoshiro(SEED + 2);
+        ids=ID2, warmup=1000, draws=1000, nchains=4),
+    b3=fit_theta(m3d(A100, E100, cells.sex, cells.cls, cells.prod), Xoshiro(SEED + 3);
+        warmup=1000, draws=1000, nchains=4),
+    hier=fit_theta(m3dint(A100, E100, cells.sex, cells.cls, cells.prod), Xoshiro(SEED + 4);
+        warmup=1000, draws=1000, nchains=4),
+)
+nopool100 = nopool_draws(A100, E100; ndraws=4_000, rng=Xoshiro(SEED + 5))
+DataFrame([(model=String(k),
+            max_R̂=round(maximum(x for x in skipmissing(DataFrame(summarystats(f.chain)).rhat)
+                                if !isnan(x)), digits=3),
+            min_ESS=round(Int, f.miness), divergences="$(f.ndiv)/4000")
+           for (k, f) in pairs(show100)])
+```
+
+The chains agree. Effective sample sizes are healthy. Divergent transitions are rare. One more check before the results. We fit the hierarchical model to a larger portfolio. Then we look at what it believes about the two interaction tables we know are empty, and the one we know is not.
+
+```{julia}
+#| code-fold: true
+#| code-summary: "negative-control fit at 800 expected claims"
+A800 = simulate(800.0, Xoshiro(SEED + 6))
+E800 = 800.0 .* cells.share
+hier800 = fit_theta(m3dint(A800, E800, cells.sex, cells.cls, cells.prod), Xoshiro(SEED + 7);
+    warmup=1000, draws=1000, nchains=4)
+(σ_sex_class = round(mean(vec(hier800.chain[:σsr])), digits=3),
+ σ_sex_product = round(mean(vec(hier800.chain[:σsp])), digits=3),
+ σ_class_product = round(mean(vec(hier800.chain[:σrp])), digits=3))
+```
+
+At 800 expected claims, the two empty tables' scales sit near zero. The class-by-product scale, where the compression lives, has started to lift away from them. The model does what the prior structure intends. It holds interactions at zero until the claims argue otherwise, one table at a time.
+
+That is the whole machine. Now we ask the questions.
+
+## The sex ratio in one, two, and three dimensions
+
+The committee's worry is that each new rating dimension spreads the same claims thinner. Here is the first result, and the quietest one. Take the 100-claim portfolio from FIG. 03. Estimate the sex ratio three ways: with the 2-cell model, the 6-cell model, and the 18-cell hierarchical model.
+
+```{julia}
+#| code-fold: true
+#| code-summary: "FIG. 04 plotting code"
+rs_draws(θm) = [sex_ratio(view(θm, d, :)) for d in axes(θm, 1)]
+let
+    specs = [("sex only (2 cells)", rs_draws(show100.b1.θ), CF_BLUE),
+        ("sex × class (6 cells)", rs_draws(show100.b2.θ), CF_AMBER),
+        ("sex × class × product (18 cells)", rs_draws(show100.hier.θ), CF_PLUM)]
+    f = Figure(size=(720, 420))
+    ax = Axis(f[1, 1];
+        title="FIG. 04 — POSTERIOR OF THE SEX RATIO UNDER ONE, TWO, AND THREE DIMENSIONS",
+        subtitle="the same $(sum(A100))-claim portfolio, three model granularities",
+        xlabel="male / female A/E ratio", ylabel="posterior density")
+    for (lab, v, col) in specs
+        k = kde(v)
+        band!(ax, k.x, zero(k.density), k.density; color=(col, 0.15))
+        lines!(ax, k.x, k.density; color=col, linewidth=2.5,
+            label="$lab   P(ratio > 1) = $(round(mean(v .> 1), digits=2))")
+    end
+    vlines!(ax, [sex_ratio(cells.θ)]; color=CF_INK, linewidth=2.5,
+        label="truth ($(round(sex_ratio(cells.θ), digits=2)))")
+    vlines!(ax, [1.0]; color=CF_INK_SOFT, linestyle=:dot, linewidth=1.5)
+    xlims!(ax, 0.6, 2.6)
+    axislegend(ax; position=:rt)
+    f
+end
+```
+
+The three curves nearly coincide. Cutting the block from two cells to eighteen did not blur the sex comparison. The reason is the arithmetic of FIG. 02. Every cell belongs to one sex or the other. So the sex *margin* keeps almost all its claims, however finely we cut the block below it. The extra structure changes the margin's precision only at the edges. It spends a little to estimate class and product effects. It recovers a little by explaining mix noise. The figure shows the net effect is barely visible.
+
+Note also how closely the three models agree on the *probability* of the direction. The legend values differ by a point or two. All sit near the value the hand calculation predicted for this claim count. Whether one ninety-claim portfolio clears the 95% rule is luck of the draw. The sweep below shows where the typical portfolio stands. The models do not add certainty the claims do not contain. They locate, in agreement, how much is there.
+
+## The smallest cells
+
+The margin kept its precision. The cells are another matter. FIG. 05 compares, cell by cell, what no pooling and the hierarchical model estimate from the same 100-claim portfolio.
+
+```{julia}
+#| code-fold: true
+#| code-summary: "FIG. 05 plotting code"
+let
+    np = vec(mean(nopool100, dims=1))
+    hi = vec(mean(show100.hier.θ, dims=1))
+    pcols = [CF_BLUE, CF_AMBER, CF_PLUM]
+    f = Figure(size=(720, 460))
+    ax = Axis(f[1, 1];
+        title="FIG. 05 — CELL ESTIMATES: NO POOLING VERSUS THE HIERARCHICAL MODEL",
+        subtitle="posterior means at 100 expected claims; marker size follows the cell's claim count",
+        xlabel="no-pooling estimate", ylabel="hierarchical estimate",
+        limits=((-0.05, 2.9), (-0.05, 2.9)))
+    ablines!(ax, 0, 1; color=CF_INK_SOFT, linestyle=:dash, linewidth=1.5)
+    for p in 1:3
+        idx = [i for i in 1:nrow(cells) if cells.prod[i] == p]
+        scatter!(ax, np[idx], hi[idx]; color=(pcols[p], 0.8),
+            markersize=6 .+ 3 .* sqrt.(A100[idx]), strokecolor=CF_INK, strokewidth=0.5,
+            label=PRODUCTS[p])
+    end
+    t = IDX[1, 1, 3]
+    scatter!(ax, [np[t]], [hi[t]]; color=:transparent, markersize=18,
+        strokecolor=CF_RED, strokewidth=2, label="smallest cell (F · Pref · GI)")
+    text!(ax, 2.85, 0.35; text="points below the line:\nraw estimate pulled down\ntoward the structure",
+        align=(:right, :bottom), fontsize=11, color=CF_INK_SOFT)
+    axislegend(ax; position=:lt)
+    f
+end
+```
+
+On the diagonal, the two methods agree. Off it, the hierarchical model has overridden a cell's raw experience with what the rest of the book implies. The override is not timid. For cells with zero claims, the no-pooling estimate comes almost entirely from its weak per-cell prior. The hierarchical model places those cells near the multiplicative prediction. At the other extreme, it pulls the wildest raw A/Es a long way toward the rest of the book.
+
+The smallest cell makes the point sharpest. Female preferred guaranteed-issue expects `{julia} round(E100[IDX[1, 1, 3]], digits=1)` claims in this portfolio. It produced `{julia} A100[IDX[1, 1, 3]]`. On its own data, the 90% interval runs from `{julia} round(quantile(nopool100[:, IDX[1, 1, 3]], 0.05), digits=2)` to `{julia} round(quantile(nopool100[:, IDX[1, 1, 3]], 0.95), digits=2)`. That range excludes almost nothing an actuary would care about. The hierarchical model puts the same cell at `{julia} round(quantile(show100.hier.θ[:, IDX[1, 1, 3]], 0.05), digits=2)` to `{julia} round(quantile(show100.hier.θ[:, IDX[1, 1, 3]], 0.95), digits=2)`. The narrower interval is not free information. It is the multiplicative assumption at work. The model asserts that this cell resembles the book's structure. Here the assumption nearly holds — the cell's truth is `{julia} round(cells.θ[IDX[1, 1, 3]], digits=2)` — so the trade is cheap. Later we see what happens where the assumption fails.
+
+## The sweep
+
+One portfolio at one size shows behavior. It cannot show *when conclusions arrive*. For that, we run the ladder: ten portfolio sizes from `{julia} LADDER[1]` to `{julia} Int(LADDER[end])` expected claims, with thirty simulated portfolios at each size. Every portfolio gets all five models: the closed-form no-pooling posterior, plus four MCMC fits. The five question functions summarize each fit.
+
+```{julia}
+#| output: false
+const QUESTIONS = (
+    (est="sex", f=sex_ratio, side=:above, mat=MAT_SEX),
+    (est="class", f=class_ratio, side=:above, mat=MAT_CLASS),
+    (est="interaction", f=interaction_ratio, side=:below, mat=MAT_INT),
+    (est="null", f=null_ratio, side=:none, mat=MAT_CLASS),
+    (est="cell", f=tiny_cell, side=:none, mat=NaN),
+)
+
+function question_rows(E_total, rep, model, θm)
+    map(QUESTIONS) do q
+        v = [q.f(view(θm, d, :)) for d in axes(θm, 1)]
+        q05, q95 = quantile(v, 0.05), quantile(v, 0.95)
+        pdir = q.side == :above ? mean(v .> 1) : q.side == :below ? mean(v .< 1) : NaN
+        pmat = q.side == :above ? mean(v .> q.mat) :
+               q.side == :below ? mean(v .< q.mat) :
+               q.est == "null" ? max(mean(v .> q.mat), mean(v .< 1 / q.mat)) : NaN
+        (E=E_total, rep=rep, model=model, est=q.est,
+            mean=mean(v), q05=q05, q95=q95, logw=log(q95 / q05), pdir=pdir, pmat=pmat)
+    end
+end
+
+function run_rep(iE, rep)
+    E_total = LADDER[iE]
+    A3 = simulate(E_total, Xoshiro(1_000 * iE + rep))
+    E3 = E_total .* cells.share
+    base = SEED + 1_000 * iE + 10 * rep
+    fits = (
+        nopool=(θ=nopool_draws(A3, E3; rng=Xoshiro(base)), ndiv=0, miness=Inf),
+        b1=fit_retry(m1d(coarsen(A3, cells.sex, 2), coarsen(E3, cells.sex, 2), [1, 2]),
+            base + 1; ids=cells.sex),
+        b2=fit_retry(m2d(coarsen(A3, ID2, 6), coarsen(E3, ID2, 6), SX2, RC2),
+            base + 2; ids=ID2),
+        b3=fit_retry(m3d(A3, E3, cells.sex, cells.cls, cells.prod), base + 3),
+        hier=fit_retry(m3dint(A3, E3, cells.sex, cells.cls, cells.prod), base + 4),
+    )
+    rows = reduce(vcat, [collect(question_rows(E_total, rep, String(name), f.θ))
+                         for (name, f) in pairs(fits)])
+    ri = [interaction_ratio(view(fits.hier.θ, d, :)) for d in 1:2:size(fits.hier.θ, 1)]
+    (rows=rows, ri=ri, iE=iE,
+        ndiv=sum(f.ndiv for f in fits), min_ess=minimum(f.miness for f in fits))
+end
+```
+
+```{julia}
+const REPS = 30
+sweep_time = @elapsed study = ThreadsX.map(g -> run_rep(g...),
+    [(iE, rep) for iE in eachindex(LADDER) for rep in 1:REPS]);
+length(study)
+```
+
+```{julia}
+#| code-fold: true
+#| code-summary: "sweep bookkeeping code"
+rows_df = DataFrame(reduce(vcat, [s.rows for s in study]))
+med = combine(groupby(rows_df, [:model, :est, :E]),
+    :logw => median => :logw,
+    :logw => (x -> quantile(x, 0.25)) => :logw_lo,
+    :logw => (x -> quantile(x, 0.75)) => :logw_hi,
+    :pdir => median => :pdir, :pmat => median => :pmat,
+    :mean => median => :mean)
+sort!(med, [:model, :est, :E])
+mcurve(model, est) = med[(med.model .== model) .&& (med.est .== est), :]
+medval(model, est, E, col) = only(med[(med.model .== model) .&& (med.est .== est) .&& (med.E .== E), col])
+fmtE(E) = E == floor(E) ? string(Int(E)) : string(E)
+null_rate(mname) = [mean(rows_df[(rows_df.model .== mname) .&& (rows_df.est .== "null") .&&
+                                 (rows_df.E .== E), :pmat] .≥ P_MAT) for E in LADDER]
+total_div = sum(s.ndiv for s in study)
+worst_ess = minimum(s.min_ess for s in study)
+nmcmc = 4 * length(study);
+```
+
+The `{julia} nmcmc` sweep fits use a single chain of 500 draws each, as a shortcut. Across all of them, `{julia} total_div` draws hit a divergence. The smallest effective sample size in any fit was about `{julia} round(Int, worst_ess)`. That is adequate for the median-of-thirty summaries we read below. Any single fit's interval endpoints carry some Monte Carlo noise.
+
+The sweep's first output is precision: the width of the 90% interval for each question, at each portfolio size. Beside the simulation results, we draw the hand arithmetic as a dash-dot line. It is $\sqrt{\sum 1/A_g}$ with each side's true expected claim count, converted to an interval width. The line involves no model fitting. It is the claims-on-each-side calculation and nothing more.
+
+```{julia}
+#| code-fold: true
+#| code-summary: "FIG. 06 plotting code"
+aunit(idx) = sum(cells.share[i] * cells.θ[i] for i in idx)  # true claims per unit of portfolio E
+const GRP_SEX = (grp(2, nothing, nothing), grp(1, nothing, nothing))
+const GRP_CLASS = (grp(nothing, 3, 1), grp(nothing, 1, 1))
+const GRP_INT = (grp(nothing, 3, 1), grp(nothing, 1, 1), grp(nothing, 3, 3), grp(nothing, 1, 3))
+sumrecip(groups) = sum(1 / aunit(g) for g in groups)
+analytic_logw(E, groups) = 2 * quantile(Normal(), 0.95) * sqrt(sumrecip(groups) / E)
+
+let
+    panels = [("sex ratio", "sex", GRP_SEX, true),
+        ("class ratio (within Term)", "class", GRP_CLASS, false),
+        ("interaction ratio", "interaction", GRP_INT, false)]
+    f = Figure(size=(860, 400))
+    axs = Axis[]
+    for (i, (ttl, est, groups, with_b1)) in enumerate(panels)
+        ax = Axis(f[1, i];
+            subtitle=ttl, xscale=log10, yscale=log10,
+            xticks=([12.5, 50, 200, 800, 3200], ["12.5", "50", "200", "800", "3200"]),
+            xlabel="portfolio expected claims",
+            ylabel=i == 1 ? "width of 90% interval (log scale of ratio)" : "")
+        push!(axs, ax)
+        h = mcurve("hier", est)
+        band!(ax, h.E, h.logw_lo, h.logw_hi; color=(CF_GREEN, 0.18))
+        lines!(ax, h.E, h.logw; color=CF_GREEN, linewidth=2.5, label="hierarchical")
+        n = mcurve("nopool", est)
+        lines!(ax, n.E, n.logw; color=CF_INK_SOFT, linewidth=2, label="no pooling")
+        with_b1 && lines!(ax, mcurve("b1", est).E, mcurve("b1", est).logw;
+            color=CF_BLUE, linewidth=2, linestyle=:dash, label="sex-only model")
+        lines!(ax, LADDER, analytic_logw.(LADDER, Ref(groups));
+            color=CF_INK, linewidth=1.5, linestyle=:dashdot, label="claims arithmetic")
+        hlines!(ax, [TOL_PRECISION]; color=CF_RED, linestyle=:dash, linewidth=1.5,
+            label="±10% pricing tolerance")
+        i > 1 && hideydecorations!(ax; grid=false)
+    end
+    Label(f[0, :], "FIG. 06 — WIDTH OF THE 90% INTERVAL VERSUS EXPECTED CLAIMS";
+        halign=:left, fontsize=15, tellwidth=false)
+    Legend(f[2, :], axs[1]; orientation=:horizontal, framevisible=false, nbanks=1)
+    f
+end
+```
+
+Three readings, one per panel:
+
+- **Sex.** The hierarchical curve, the sex-only curve, and the dash-dot arithmetic line lie almost on top of one another, down the whole ladder. This is FIG. 04 at every size. The margin keeps its claims. So the eighteen-cell model prices the sex difference about as precisely as a model that has never heard of class or product. Only no pooling pays a visible penalty, because it alone refuses to add cells together.
+- **Class.** The same story, one level down. The within-Term class comparison touches only Term's preferred and substandard cells. Its claims are a fraction of the portfolio's, so every curve sits higher than in the sex panel. The interactions section adds one more observation about this comparison.
+- **Interaction.** This comparison touches four small corner groups. The no-pooling curve is extremely wide at small sizes. The hierarchical curve sits *below* the arithmetic line on the left of the panel. There it is narrower than the claims alone can justify. That is the skeptical prior speaking, not the data. In that region, the model's conclusions are the prior's conclusions. As claims accumulate, the green curve converges to the arithmetic line. The data takes over, and the width you have is the width the claims can pay for.
+
+The second output is conclusions. FIG. 07 tracks the posterior probability behind the direction and materiality statements for the hierarchical model. The red lines are the thresholds we fixed in advance.
+
+```{julia}
+#| code-fold: true
+#| code-summary: "FIG. 07 plotting code"
+let
+    panels = [("sex ratio — P(>1), P(>$(MAT_SEX))", "sex"),
+        ("class ratio — P(>1), P(>$(MAT_CLASS))", "class"),
+        ("interaction — P(<1), P(<$(MAT_INT))", "interaction")]
+    f = Figure(size=(860, 400))
+    axs = Axis[]
+    for (i, (ttl, est)) in enumerate(panels)
+        ax = Axis(f[1, i];
+            subtitle=ttl, subtitlesize=12, xscale=log10,
+            xticks=([12.5, 50, 200, 800, 3200], ["12.5", "50", "200", "800", "3200"]),
+            xlabel="portfolio expected claims",
+            ylabel=i == 1 ? "posterior probability (median of 30 runs)" : "",
+            limits=(nothing, (0.0, 1.04)))
+        push!(axs, ax)
+        h = mcurve("hier", est)
+        lines!(ax, h.E, h.pdir; color=CF_GREEN, linewidth=2.5, label="direction")
+        lines!(ax, h.E, h.pmat; color=CF_GREEN, linewidth=2, linestyle=:dash,
+            label="materiality")
+        hlines!(ax, [P_DIR]; color=CF_RED, linestyle=:dash, linewidth=1.5,
+            label="0.95 (direction rule)")
+        hlines!(ax, [P_MAT]; color=CF_RED, linestyle=:dot, linewidth=1.5,
+            label="0.90 (materiality rule)")
+        i > 1 && hideydecorations!(ax; grid=false)
+    end
+    Label(f[0, :], "FIG. 07 — POSTERIOR PROBABILITY OF EACH CONCLUSION VERSUS EXPECTED CLAIMS";
+        halign=:left, fontsize=15, tellwidth=false)
+    Legend(f[2, :], axs[1]; orientation=:horizontal, framevisible=false)
+    f
+end
+```
+
+The curves climb at very different rates. The sex and class directions typically settle within the first two hundred claims. Their materiality statements follow soon after, because both true effects sit well beyond their bounds. That the two settle at similar times is worth noticing. The class comparison touches about a quarter of the book's claims, but its effect is much larger. The two facts nearly cancel. The exact costs appear in the final section. The interaction curves are the slow ones. At `{julia} Int(LADDER[7])` expected claims — a large portfolio for most experience studies — the median probability of compression in guaranteed issue has reached only about `{julia} round(medval("hier", "interaction", LADDER[7], :pdir), digits=2)`. That is well short of the rule. The compression is real, and it is not small. It is expensive. The next section shows why, in the model's own terms.
+
+## Interactions
+
+Watch the interaction posterior develop. FIG. 08 pools the thirty runs at each rung. It draws the posterior of the interaction ratio — the guaranteed-issue class difference relative to the underwritten one — at every portfolio size.
+
+```{julia}
+#| code-fold: true
+#| code-summary: "FIG. 08 plotting code"
+let
+    ri_pool = Dict(iE => reduce(vcat, [s.ri for s in study if s.iE == iE])
+                   for iE in eachindex(LADDER))
+    f = Figure(size=(860, 480))
+    ax = Axis(f[1, 1];
+        title="FIG. 08 — POSTERIOR OF THE INTERACTION RATIO AT EACH PORTFOLIO SIZE",
+        xscale=log10,
+        xticks=([0.5, 0.657, 1.0, 1.5, 2.0], ["0.5", "0.66", "1.0", "1.5", "2.0"]),
+        xlabel="interaction ratio (draws pooled across the 30 runs)",
+        yticks=(1:length(LADDER), fmtE.(LADDER)), ylabel="portfolio expected claims")
+    vlines!(ax, [1.0]; color=CF_INK_SOFT, linestyle=:dot, linewidth=1.5)
+    vlines!(ax, [interaction_ratio(cells.θ)]; color=CF_INK, linestyle=:dash, linewidth=2)
+    text!(ax, interaction_ratio(cells.θ), length(LADDER) + 0.9;
+        text="truth $(round(interaction_ratio(cells.θ), digits=2))",
+        align=(:center, :bottom), fontsize=11, color=CF_INK)
+    text!(ax, 1.0, length(LADDER) + 0.9; text="no interaction",
+        align=(:left, :bottom), fontsize=11, color=CF_INK_SOFT)
+    for iE in eachindex(LADDER)
+        k = kde(log.(clamp.(ri_pool[iE], 0.05, 20.0)))
+        xs, dens = exp.(k.x), k.density ./ maximum(k.density)
+        keep = (xs .> 0.28) .& (xs .< 2.6)
+        α = 0.25 + 0.55 * (iE - 1) / (length(LADDER) - 1)
+        band!(ax, xs[keep], fill(Float64(iE), sum(keep)), iE .+ 0.88 .* dens[keep];
+            color=(CF_GREEN, 0.45 * α))
+        lines!(ax, xs[keep], iE .+ 0.88 .* dens[keep]; color=(CF_GREEN, min(1.0, α + 0.25)),
+            linewidth=1.8)
+    end
+    xlims!(ax, 0.28, 2.6)
+    ylims!(ax, 0.6, length(LADDER) + 2.2)
+    f
+end
+```
+
+At the bottom of the ladder, the posterior is a lump centered on 1.0. That is the prior. It declines to infer an interaction from a dozen claims. Up the rungs, the lump loosens, drifts left, and tightens again around the truth near 0.66. The commitment comes high on the ladder, at roughly ten times the claims the marginal questions needed. The final section states the exact cost. Note what the model never does on the way up. It never asserts the *wrong* thing with confidence. The skeptical prior has a cost, paid in claims. FIG. 09 shows what it buys.
+
+First, one more thing the sweep can show: what happens if we leave the dimension out. The two-dimensional model answers the class question with no product dimension at all. It converges quickly, to `{julia} round(medval("b2", "class", LADDER[end], :mean), digits=2)`. The truth within Term is `{julia} round(class_ratio(cells.θ), digits=2)`. The gap is not estimation error. The model answers a different question. Preferred lives concentrate in Term, a low-mortality product. Substandard lives concentrate in guaranteed issue, a high-mortality one. So the product-blind class ratio blends product mortality into the class difference, and it lands near 2.4. That number is *correct for the blended question*. It is wrong for the underwritten difference a pricing actuary means. The three-dimensional main-effects model separates product but forces one common class effect everywhere. It settles at `{julia} round(medval("b3", "class", LADDER[end], :mean), digits=2)`: closer, but still a compromise across products with different true differences. Only the interaction model recovers the within-Term truth. Sometimes you add a dimension not because the data can afford it, but because the coarse answer answers the wrong question. More claims do not shrink the coarse model's error, because that error is not noise.
+
+Now the opposite risk. The null-check ratio — the class difference among males relative to females — is exactly 1.0 in truth. FIG. 09 counts how often each model reaches a confident materiality conclusion about it anyway.
+
+```{julia}
+#| code-fold: true
+#| code-summary: "FIG. 09 plotting code"
+null_np, null_hier = null_rate("nopool"), null_rate("hier")
+let
+    f = Figure(size=(720, 400))
+    ax = Axis(f[1, 1];
+        title="FIG. 09 — CONCLUSION RATE ON A CONTRAST WHOSE TRUE VALUE IS ONE",
+        subtitle="share of the 30 runs concluding the null sex-by-class interaction is material",
+        xscale=log10, xticks=([12.5, 50, 200, 800, 3200], ["12.5", "50", "200", "800", "3200"]),
+        xlabel="portfolio expected claims", ylabel="share of runs",
+        limits=(nothing, (-0.03, max(0.5, 1.2 * maximum(null_np)))))
+    for (vals, col, lab) in [(null_np, CF_INK_SOFT, "no pooling"), (null_hier, CF_GREEN, "hierarchical")]
+        scatterlines!(ax, LADDER, vals; color=col, linewidth=2.5, markersize=9, label=lab)
+    end
+    axislegend(ax; position=:rt)
+    f
+end
+```
+
+No pooling, working cell by cell, finds "material" interactions that do not exist. At its worst rung, it does so in `{julia} round(Int, 100 * maximum(null_np))`% of the runs. The hierarchical model's rate never exceeds `{julia} round(Int, 100 * maximum(null_hier))`%. The reason is the same one that made it slow to confirm the *real* interaction. Interactions start at zero and must earn their way in with claims. Slowness to conclude and resistance to false conclusions are not two properties. They are one property, seen from two sides.
+
+This tradeoff has a name in the statistics literature. Gelman, Hill, and Vehtari give a rule of thumb: an interaction needs about sixteen times the data of a main effect of the same size. Our book's version of the number is `{julia} round(Int, sumrecip(GRP_INT) / sumrecip(GRP_SEX))`×. It is the same arithmetic, with our mix. The next section shows the arithmetic itself.
+
+## Why this happens
+
+Every curve above is one small formula in different forms. Here it is, step by step.
+
+Start with one group of cells that holds $A$ actual claims in total. With a nearly flat prior, the posterior of the group's log rate is roughly normal, with standard deviation $1/\sqrt{A}$. One claim is one unit of information about a log rate, and information adds. Every question in this post is a log *ratio* built from groups. The sex ratio compares two margins. The interaction compares four corners. Uncertainty adds in quadrature across the groups in the comparison:
+
+$$
+\operatorname{sd}\bigl(\log \hat R\bigr) \;\approx\; \sqrt{\;\sum_{\text{groups } g \text{ in the comparison}} \frac{1}{A_g}\;}
+$$
+
+That is the dash-dot line in FIG. 06. It explains the whole shape of the sweep:
+
+- **Margins keep their claims.** The sex comparison's two groups are the male cells and the female cells. All of them. Add class, add product, add ten more dimensions: the two margin totals do not change, so the sex ratio's precision does not change either. That is why the three curves of FIG. 04 coincide. It is also why "how many cells do we have?" was the wrong form of the committee's worry.
+- **Restrictions spend claims.** The within-Term class ratio touches only Term's preferred and substandard cells: about `{julia} round(Int, 100 * (sum(cells.share[grp(nothing, 3, 1)]) + sum(cells.share[grp(nothing, 1, 1)])))`% of the book's claims. A large true ratio (2.0) partly compensates, because the distance to resolve is large. Two things together decide which effects settle first: the claims on each side, and the log distance to cover.
+- **Interactions pay four corners.** The interaction ratio sums $1/A$ over four corner groups, several of them small. In this book, that sum is about `{julia} round(Int, sumrecip(GRP_INT) / sumrecip(GRP_SEX))` times the sex comparison's. That is the entire reason the interaction was the slow curve everywhere above.
+
+The same formula gives the cost of a conclusion directly. To settle a *direction* at 95%, the true log ratio must exceed 1.645 standard deviations. To certify *±10% precision* at 90%, the standard deviation must fit inside $\log(1.10)/1.645$. For a balanced comparison with $A$ claims per side, both rules solve to the same expression: $A \geq 2\,(1.645/\log \rho)^2$. For the direction question, $\rho$ is the true ratio. For the precision question, $\rho = 1.10$:
+
+```{julia}
+#| code-fold: true
+#| code-summary: "rules-of-thumb table code"
+z95 = quantile(Normal(), 0.95)
+claims_per_side(ρ) = ceil(Int, 2 * (z95 / log(ρ))^2)
+DataFrame(
+    question=["direction of a 2.0× effect", "direction of a 1.5× effect",
+        "direction of a 1.35× effect", "direction of a 1.10× effect",
+        "any effect priced to ±10% (90% CI)"],
+    claims_per_side=[claims_per_side(2.0), claims_per_side(1.5), claims_per_side(1.35),
+        claims_per_side(1.10), claims_per_side(1.10)])
+```
+
+Sit with two things in this table. First, detection cost falls with the *square* of the log effect. Halve the effect, and you roughly quadruple the claims. That is how the 2.0× class difference kept pace with the 1.35× sex difference in FIG. 07 while it worked from a quarter of the claims. Second, the last two rows match on purpose. Detecting the direction of a 10% effect and pricing any effect to within 10% are the same statistical distance. So they carry the same cost: about six hundred claims on each side.
+
+Readers of part one will remember the number 1,082. It is the classic limited-fluctuation standard for full credibility of one cell. These are the same kind of calculation. The difference is what the claims requirement attaches to. A per-cell standard multiplies as cells do. Eighteen cells at 1,082 claims each is roughly 19,500 claims before every cell stands alone. The multiplicative model attaches the cost to each *question* instead. The margins never lost their claims, so they answer the marginal questions early.
+
+## What each conclusion costs
+
+Now we can state the costs. For each conclusion, FIG. 10 marks the portfolio size, in expected claims, where the hierarchical model's median run first satisfies the rule and keeps satisfying it up the ladder. We interpolate between rungs. The hollow markers are the claims arithmetic's predictions, computed before any model ran.
+
+```{julia}
+#| code-fold: true
+#| code-summary: "crossing computation code"
+#| output: false
+function crossing_at(Es, vals, thresh; dir=:up)
+    ok = dir == :up ? (vals .≥ thresh) : (vals .≤ thresh)
+    idx = findfirst(i -> all(ok[i:end]), eachindex(ok))
+    idx === nothing && return NaN
+    idx == 1 && return Es[1]
+    x1, x2, y1, y2 = log(Es[idx-1]), log(Es[idx]), vals[idx-1], vals[idx]
+    exp(x1 + (thresh - y1) / (y2 - y1) * (x2 - x1))
+end
+xover(model, est, col, thresh; dir=:up) =
+    (d = mcurve(model, est); crossing_at(d.E, d[!, col], thresh; dir))
+
+z90 = quantile(Normal(), 0.90)
+Ecross(dist, z, groups) = z^2 * sumrecip(groups) / dist^2
+RS_T, RC_T, RI_T = sex_ratio(cells.θ), class_ratio(cells.θ), interaction_ratio(cells.θ)
+fmtclaims(x) = isnan(x) ? "more than $(Int(LADDER[end]))" : string(round(Int, x))
+```
+
+```{julia}
+#| code-fold: true
+#| code-summary: "FIG. 10 plotting code"
+cr_int_dir = xover("hier", "interaction", :pdir, P_DIR)
+
+bill = DataFrame(
+    conclusion=["class — direction", "sex — direction", "class — material (>1.25×)",
+        "sex — material (>1.10×)", "interaction — direction",
+        "interaction — material (<0.90×)", "sex — priced to ±10%",
+        "smallest cell — priced to ±10%", "smallest cell — ±10%, no pooling"],
+    empirical=[xover("hier", "class", :pdir, P_DIR), xover("hier", "sex", :pdir, P_DIR),
+        xover("hier", "class", :pmat, P_MAT), xover("hier", "sex", :pmat, P_MAT),
+        cr_int_dir, xover("hier", "interaction", :pmat, P_MAT),
+        xover("hier", "sex", :logw, TOL_PRECISION; dir=:down),
+        xover("hier", "cell", :logw, TOL_PRECISION; dir=:down),
+        xover("nopool", "cell", :logw, TOL_PRECISION; dir=:down)],
+    arithmetic=[Ecross(log(RC_T), z95, GRP_CLASS), Ecross(log(RS_T), z95, GRP_SEX),
+        Ecross(log(RC_T / MAT_CLASS), z90, GRP_CLASS), Ecross(log(RS_T / MAT_SEX), z90, GRP_SEX),
+        Ecross(abs(log(RI_T)), z95, GRP_INT), Ecross(abs(log(RI_T / MAT_INT)), z90, GRP_INT),
+        Ecross(log(1.10), z95, GRP_SEX), NaN,
+        z95^2 / aunit([IDX[1, 1, 3]]) / log(1.10)^2])
+sort!(bill, :empirical)
+
+let
+    n = nrow(bill)
+    f = Figure(size=(760, 460))
+    ax = Axis(f[1, 1];
+        title="FIG. 10 — EXPECTED CLAIMS REQUIRED FOR EACH CONCLUSION",
+        subtitle="filled: measured (median run) · hollow: claims arithmetic",
+        subtitlesize=12,
+        xscale=log10, xticks=([25, 100, 400, 1600, 6400, 25000],
+            ["25", "100", "400", "1600", "6400", "25000"]),
+        xlabel="portfolio expected claims",
+        yticks=(1:n, reverse(bill.conclusion)), yticklabelsize=11,
+        limits=((14, 40000), (0.4, n + 0.6)))
+    for (row, i) in enumerate(reverse(1:n))
+        y = row
+        emp, ana = bill.empirical[i], bill.arithmetic[i]
+        col = bill.conclusion[i] == "smallest cell — ±10%, no pooling" ? CF_INK_SOFT : CF_GREEN
+        if !isnan(ana)
+            scatter!(ax, [ana], [y]; color=:transparent, marker=:circle, markersize=13,
+                strokecolor=CF_INK, strokewidth=1.5)
+        end
+        if isnan(emp)
+            text!(ax, 6400, y; text="not reached on the ladder →",
+                align=(:right, :center), fontsize=11, color=col)
+        else
+            lines!(ax, [14, emp], [y, y]; color=(col, 0.35), linewidth=1.5)
+            scatter!(ax, [emp], [y]; color=col, markersize=13,
+                strokecolor=CF_INK, strokewidth=0.5)
+        end
+    end
+    f
+end
+```
+
+```{julia}
+#| code-fold: true
+#| code-summary: "the bill as a table"
+DataFrame(conclusion=bill.conclusion,
+    measured=fmtclaims.(bill.empirical),
+    claims_arithmetic=fmtclaims.(bill.arithmetic))
+```
+
+The filled and hollow markers mostly agree. That is the quiet point of the whole exercise. The cost of each conclusion was computable from claim counts and effect sizes before we drew a single posterior, and the simulation confirms the computation. Where the markers differ, the differences inform. The hierarchical model reaches the interaction conclusions *later* than the arithmetic suggests. The skeptical prior holds back a while longer, as FIG. 08 showed. It reaches the class conclusions *earlier*. While the interactions stay shrunk, the shared class effect lets substandard-versus-preferred claims from every product inform the within-Term answer. That is the same use of structure that supports the smallest cell, in a smaller amount. And the smallest cell mirrors the story. On its own claims, a ±10% certificate for that cell costs roughly `{julia} round(Int, z95^2 / aunit([IDX[1, 1, 3]]) / log(1.10)^2 / 1000)` thousand expected claims. That is off the right edge of the figure, past any size this block will reach. At the top rung of the ladder, the no-pooling interval for the cell still spans about ±`{julia} round(Int, 100 * (exp(medval("nopool", "cell", LADDER[end], :logw) / 2) - 1))`%. The hierarchical interval spans about ±`{julia} round(Int, 100 * (exp(medval("hier", "cell", LADDER[end], :logw) / 2) - 1))`%. The cell produced the same claims under both models. The difference is that the hierarchical certificate rests on the structural assumption. It is only as good as that assumption.
+
+One more sensitivity, in numbers. These costs scale with the square of the confidence you demand. Requiring 99% instead of 95% on a direction multiplies the claims by $(2.326/1.645)^2 \approx 2$. Half the cost of certainty sits in the last few points of it.
+
+## What this does not establish
+
+The results above are real. So are the following limits.
+
+**The structure is the subsidy, and it can be wrong.** The hierarchical model prices eighteen cells on a few hundred claims because it assumes the cells share a multiplicative skeleton. In this simulation, the skeleton is nearly true, because we built the truth. The two-dimensional model's class ratio is the warning. A structured model converges *fast* to a *wrong* answer when its structure omits something real. More claims do not fix it. The shrunk interaction blocks are our hedge. They let the data overturn pure multiplication, at the claim costs measured above. A book that is further from multiplicative than ours would pay those costs more often.
+
+**Below a dozen claims per side, the prior is most of the conclusion.** At the bottom rungs, the hierarchical intervals are visibly narrower than the claims arithmetic allows. The difference is prior information, not data. Our priors are weakly informative, and we did not tune them to the truth. A reader who defends different priors should expect different small-portfolio behavior. By a few dozen claims per side, the curves converge to the arithmetic, and the priors stop mattering much.
+
+**The three-way interaction is excluded by construction.** If the sex difference itself worked differently in guaranteed issue, this model could not see it. With eighteen cells, that exclusion is nearly forced. The honest statement: conclusions about three-way structure are not merely expensive here. They are unavailable.
+
+**One truth, one mix, thresholds by judgment.** We simulated one ground truth and one book composition. Our decision thresholds — 95%, 90%, ±10%, and the materiality bounds — are defensible, not canonical. The claims arithmetic travels to other books: recompute $\sum 1/A_g$ with your mix. The specific crossing numbers do not travel. And everything is measured against the aggregate table. An A/E study inherits whatever the table gets wrong.
+
+## Conclusion
+
+Return to the committee. The block produces about ninety claims a year. What can we say with them, and what must wait?
+
+On this book's evidence: one or two years of claims settle the directions of the large differences, sex and class. Two or three years settle their materiality and rough size. For those conclusions, the move from two cells to eighteen was close to free. They live on margins, and margins keep their claims no matter how many cells sit under them. The finer grain is not close to free. The interaction — class means less where no one underwrites — costs `{julia} fmtclaims(cr_int_dir)` expected claims under a model honest enough not to invent it earlier. And the smallest cell never supports itself at any size an ordinary block reaches. What we can say about it, we say on the strength of the structural assumption.
+
+So "how much data do we need?" has no single number, and the cell count was never the thing to fear. The workable question is the one this post computed: *which comparisons does the conclusion touch, and how many claims sit on each side?* That arithmetic fits on a note card. It predicted nearly every crossing in the sweep. The hierarchical model is what lets a real book act on it. The model collects the marginal conclusions early. It holds the cell-level conclusions open. And at every portfolio size, it says which is which.
+
+## Further reading
+
+- [Credibility When Claims Are Scarce](/posts/credibility-sparse-data/index.html) — part one: hierarchical Bayes against limited fluctuation and Bühlmann–Straub on a single dimension.
+- [Bayesian vs Limited Fluctuation Experience Analysis](/posts/bayes-vs-limited-fluctuation/index.html) — where the 1,082-claim standard comes from.
+- Gelman et al., *Bayesian Data Analysis*, ch. 5 — hierarchical models and partial pooling.
+- Gelman, Hill & Vehtari, *Regression and Other Stories* — including the "sixteen times the sample size for an interaction" argument that our four-corner arithmetic reproduces.
+- McElreath, *Statistical Rethinking*, ch. 8 — interactions, and why they deserve more suspicion than main effects.
+- American Academy of Actuaries / ASB, [ASOP No. 25, *Credibility Procedures*](https://www.actuarialstandardsboard.org/asops/credibility-procedures/) — the professional standard governing how such judgments are documented.
+
+## Footnotes and colophon
+
+We produced the simulation, the fits, and the figures with the code shown on this page, in Julia with [Turing.jl](https://turing.ml), [DataFrames.jl](https://dataframes.juliadata.org), and [Makie.jl](https://makie.org). The sweep fits `{julia} nmcmc` MCMC models (plus `{julia} length(study)` closed-form ones) in about `{julia} round(sweep_time / 60, digits=1)` minutes on a laptop. Every random draw is seeded, so the page reproduces exactly.
+
+*Disclosure: this post was written by AI (Anthropic's Claude) and reviewed by a human.*
