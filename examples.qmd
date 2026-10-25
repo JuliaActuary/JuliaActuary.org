@@ -1,9 +1,11 @@
 ---
 title: "Examples"
+description: "Worked examples for mortality, financial modeling, and insurance analysis."
 listing:
   contents: "posts/**/index.qmd"
   sort: "date desc"
   type: default
+  image-lazy-loading: true
   categories: true
   sort-ui: true
   filter-ui: true

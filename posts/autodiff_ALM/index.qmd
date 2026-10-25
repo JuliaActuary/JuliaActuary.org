@@ -148,6 +148,7 @@ end
 Here's what the surrender rate behavior looks like for different levels of market rates compared to the a 3% crediting rate.
 
 ```{julia}
+#| fig-alt: "Annual surrender rate as a function of the difference between credited and market interest rates."
 let
     cred_rate = 0.03
     mkt_rates = 0.005:0.001:0.08
@@ -208,6 +209,7 @@ Here's a visualization of the liability cashflows, showing that when the interes
 
 
 ```{julia}
+#| fig-alt: "Cumulative liability cashflows under the base scenario and a fifty basis point rate increase."
 let
     d = consolidate([p(c) for p in liabilities])
     ks = collect(keys(d)) |> sort!
@@ -429,6 +431,7 @@ result = optimize_portfolio(asset_universe, vgh_assets, liabilities, vgh_liab, c
 The optimization produces asset weights that hedge the liability portfolio. We can visualize both the resulting cashflow patterns and the key rate duration matching:
 
 ```{julia}
+#| fig-alt: "Comparison of cumulative asset and liability cashflows over time."
 
 let
     d = consolidate([p(c) for p in liabilities])
@@ -467,6 +470,7 @@ end
 
 
 ```{julia}
+#| fig-alt: "Key-rate dollar duration by tenor for optimized assets and liabilities."
 let
     asset_krds = sum(getindex.(vgh_assets,2) .* result.weights)
     liab_krds = -vgh_liab[2]

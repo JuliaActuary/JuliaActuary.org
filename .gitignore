@@ -3,6 +3,8 @@ __site/
 franklin
 franklin.pub
 node_modules/
+.venv/
+__pycache__/
 _rss/
 Manifest.toml
 

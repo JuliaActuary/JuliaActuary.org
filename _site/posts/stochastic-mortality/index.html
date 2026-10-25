@@ -1,13 +1,10 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
-<meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.16">
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-
-<meta name="description" content="JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.">
-
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml"><head>
+<meta charset="utf-8"/>
+<meta content="quarto-1.9.16" name="generator"/>
+<meta content="width=device-width, initial-scale=1.0, user-scalable=yes" name="viewport"/>
+<meta content="JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows." name="description"/>
 <title>Stochastic claims projections demo – JuliaActuary</title>
 <style>
 code{white-space: pre-wrap;}
@@ -21,28 +18,61 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
-
-
 <script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="../../site_libs/quarto-nav/headroom.min.js"></script>
 <script src="../../site_libs/clipboard/clipboard.min.js"></script>
 <script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="../../">
-<link href="../..//assets/logos/favicon.ico" rel="icon">
+<meta content="../../" name="quarto:offset"/>
+<link href="../..//assets/logos/favicon.ico" rel="icon"/>
 <script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
-<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-a0731b9a3a5d496010872d775e5d9bc3.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet"/>
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-be14ce6d32a635bebd8f9e4e558f9eeb.css" id="quarto-text-highlighting-styles" rel="stylesheet"/>
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-98ac2d5361ef6f18cc0525d38bedc462.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet"/>
+<link append-hash="true" data-mode="light" href="../../site_libs/bootstrap/bootstrap-4a135b976b00f53a3a768ff94eb1df18.min.css" id="quarto-bootstrap" rel="stylesheet"/>
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -70,191 +100,173 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&amp;family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&amp;display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../../assets/highlight/styles/github.min.css">
-<script src="../../assets/highlight/highlight.min.js"></script>
-<script src="../../assets/highlight/languages/julia.min.js"></script>
-<script src="../../assets/highlight/languages/julia-repl.min.js"></script>
-<script src="../../assets/highlight/languages/python.min.js"></script>
-<script src="../../assets/highlight/languages/r.min.js"></script>
-<script>hljs.highlightAll();</script>
-<script data-goatcounter="https://juliaactuary.goatcounter.com/count" async="" src="//gc.zgo.at/count.js"></script>
-
-
-<link rel="stylesheet" href="../../styles.css">
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" rel="stylesheet"/>
+<script async="" data-goatcounter="https://juliaactuary.goatcounter.com/count" src="//gc.zgo.at/count.js"></script>
+<link href="../../styles-c416c153cdf24884.css" rel="stylesheet"/>
 </head>
-
 <body class="nav-fixed fullcontent quarto-light">
-
 <div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top quarto-banner">
-    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
-      <div class="navbar-container container-fluid">
-      <div class="navbar-brand-container mx-auto">
-    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
-    <img src="../../assets/logos/android-chrome-512x512.png" alt="JuliaActuary Logo" class="navbar-logo light-content">
-    <img src="../../assets/logos/android-chrome-512x512.png" alt="JuliaActuary Logo" class="navbar-logo dark-content">
-    </a>
-    <a class="navbar-brand" href="../../index.html">
-    <span class="navbar-title">JuliaActuary</span>
-    </a>
-  </div>
-            <div id="quarto-search" class="" title="Search"></div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-  <span class="navbar-toggler-icon"></span>
-</button>
-          <div class="collapse navbar-collapse" id="navbarCollapse">
-            <ul class="navbar-nav navbar-nav-scroll ms-auto">
-  <li class="nav-item">
-    <a class="nav-link" href="../../packages.html"> 
-<span class="menu-text">Packages</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="https://docs.juliaactuary.org"> 
-<span class="menu-text">Docs</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="https://modernfinancialmodeling.com"> 
-<span class="menu-text">Book</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../learn.html"> 
-<span class="menu-text">Learn</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../examples.html"> 
-<span class="menu-text">Examples</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../benchmarks.html"> 
-<span class="menu-text">Benchmarks</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../community.html"> 
-<span class="menu-text">Community</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../blog.html"> 
-<span class="menu-text">Blog</span></a>
-  </li>  
-  <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/JuliaActuary"> <i class="bi bi-github" role="img">
-</i> 
-<span class="menu-text"></span></a>
-  </li>  
-  <li class="nav-item compact">
-    <a class="nav-link" href="../../all-posts.xml"> <i class="bi bi-rss" role="img">
-</i> 
-<span class="menu-text"></span></a>
-  </li>  
-</ul>
-          </div> <!-- /navcollapse -->
-            <div class="quarto-navbar-tools">
+<header class="headroom fixed-top quarto-banner" id="quarto-header">
+<nav class="navbar navbar-expand-lg" data-bs-theme="dark">
+<div class="navbar-container container-fluid">
+<div class="navbar-brand-container mx-auto">
+<a class="navbar-brand navbar-brand-logo" href="../../index.html">
+<img alt="JuliaActuary Logo" class="navbar-logo light-content" src="../../assets/logos/android-chrome-512x512.png"/>
+<img alt="JuliaActuary Logo" class="navbar-logo dark-content" src="../../assets/logos/android-chrome-512x512.png"/>
+</a>
+<a class="navbar-brand" href="../../index.html">
+<span class="navbar-title">JuliaActuary</span>
+</a>
 </div>
-      </div> <!-- /container-fluid -->
-    </nav>
+<div class="" id="quarto-search" title="Search"></div>
+<button aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-bs-target="#navbarCollapse" data-bs-toggle="collapse" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }" role="menu" type="button">
+<span class="navbar-toggler-icon"></span>
+</button>
+<div class="collapse navbar-collapse" id="navbarCollapse">
+<ul class="navbar-nav navbar-nav-scroll ms-auto">
+<li class="nav-item">
+<a class="nav-link" href="../../packages.html">
+<span class="menu-text">Packages</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="https://docs.juliaactuary.org">
+<span class="menu-text">Docs</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="../../learn.html">
+<span class="menu-text">Learn</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="../../examples.html">
+<span class="menu-text">Examples</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="../../community.html">
+<span class="menu-text">Community</span></a>
+</li>
+<li class="nav-item dropdown">
+<a aria-expanded="false" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" id="nav-menu-more" role="link">
+<span class="menu-text">More</span>
+</a>
+<ul aria-labelledby="nav-menu-more" class="dropdown-menu dropdown-menu-end">
+<li>
+<a class="dropdown-item" href="../../benchmarks.html">
+<span class="dropdown-text">Benchmarks</span></a>
+</li>
+<li>
+<a class="dropdown-item" href="../../blog.html">
+<span class="dropdown-text">Blog</span></a>
+</li>
+<li>
+<a class="dropdown-item" href="https://modernfinancialmodeling.com">
+<span class="dropdown-text">Book</span></a>
+</li>
+</ul>
+</li>
+<li class="nav-item compact">
+<a class="nav-link" href="https://github.com/JuliaActuary"> <i aria-label="JuliaActuary on GitHub" class="bi bi-github" role="img">
+</i>
+<span class="menu-text"></span></a>
+</li>
+<li class="nav-item compact">
+<a class="nav-link" href="../../all-posts.xml"> <i aria-label="RSS feed" class="bi bi-rss" role="img">
+</i>
+<span class="menu-text"></span></a>
+</li>
+</ul>
+</div> <!-- /navcollapse -->
+<div class="quarto-navbar-tools">
+</div>
+</div> <!-- /container-fluid -->
+</nav>
 </header>
 <!-- content -->
-<header id="title-block-header" class="quarto-title-block default page-columns page-full">
-  <div class="quarto-title-banner page-columns page-full">
-    <div class="quarto-title column-body">
-      <h1 class="title">Stochastic claims projections demo</h1>
-                  <div>
-        <div class="description">
+<header class="quarto-title-block default page-columns page-full" id="title-block-header">
+<div class="quarto-title-banner page-columns page-full">
+<div class="quarto-title column-body">
+<h1 class="title">Stochastic claims projections demo</h1>
+<div>
+<div class="description">
           JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.
         </div>
-      </div>
-                          <div class="quarto-categories">
-                <div class="quarto-category">modeling</div>
-                <div class="quarto-category">benchmark</div>
-                <div class="quarto-category">tutorial</div>
-              </div>
-                  </div>
-  </div>
-    
-  
-  <div class="quarto-title-meta">
-
-      
-    
-      
-    </div>
-    
-  
-  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+</div>
+<div class="quarto-categories">
+<div class="quarto-category">modeling</div>
+<div class="quarto-category">benchmark</div>
+<div class="quarto-category">tutorial</div>
+</div>
+</div>
+</div>
+<div class="quarto-title-meta">
+</div>
+</header><div class="quarto-container page-columns page-rows-contents page-layout-article page-navbar" id="quarto-content">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    
 <!-- main -->
 <main class="content quarto-banner-title-block" id="quarto-document-content">
-
-
-
-
-
-<div id="4" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>using CSV, DataFrames
-using MortalityTables, ActuaryUtilities
-using Dates
-using OhMyThreads
-using BenchmarkTools
-using CairoMakie
-using Random
-
-# Apply the site's custom Makie plot theme (cassette futurism).
-include(joinpath(@__DIR__, "..", "..", "assets", "themes", "cassette_futurism.jl"))
-set_theme!(cassette_futurism_theme())</code></pre>
+<div class="cell" data-execution_count="1" id="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a aria-hidden="true" href="#cb1-1" tabindex="-1"></a><span class="im">using</span> <span class="bu">CSV</span>, <span class="bu">DataFrames</span></span>
+<span id="cb1-2"><a aria-hidden="true" href="#cb1-2" tabindex="-1"></a><span class="im">using</span> <span class="bu">MortalityTables</span>, <span class="bu">ActuaryUtilities</span></span>
+<span id="cb1-3"><a aria-hidden="true" href="#cb1-3" tabindex="-1"></a><span class="im">using</span> <span class="bu">Dates</span></span>
+<span id="cb1-4"><a aria-hidden="true" href="#cb1-4" tabindex="-1"></a><span class="im">using</span> <span class="bu">OhMyThreads</span></span>
+<span id="cb1-5"><a aria-hidden="true" href="#cb1-5" tabindex="-1"></a><span class="im">using</span> <span class="bu">BenchmarkTools</span></span>
+<span id="cb1-6"><a aria-hidden="true" href="#cb1-6" tabindex="-1"></a><span class="im">using</span> <span class="bu">CairoMakie</span></span>
+<span id="cb1-7"><a aria-hidden="true" href="#cb1-7" tabindex="-1"></a><span class="im">using</span> <span class="bu">Random</span></span>
+<span id="cb1-8"><a aria-hidden="true" href="#cb1-8" tabindex="-1"></a></span>
+<span id="cb1-9"><a aria-hidden="true" href="#cb1-9" tabindex="-1"></a><span class="co"># Apply the site's custom Makie plot theme (cassette futurism).</span></span>
+<span id="cb1-10"><a aria-hidden="true" href="#cb1-10" tabindex="-1"></a><span class="fu">include</span>(<span class="fu">joinpath</span>(<span class="pp">@__DIR__</span>, <span class="st">".."</span>, <span class="st">".."</span>, <span class="st">"assets"</span>, <span class="st">"themes"</span>, <span class="st">"cassette_futurism.jl"</span>))</span>
+<span id="cb1-11"><a aria-hidden="true" href="#cb1-11" tabindex="-1"></a><span class="fu">set_theme!</span>(<span class="fu">cassette_futurism_theme</span>())</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 </div>
 <p>Define a datatype. Not strictly necessary, but will make extending the program with more functions easier.</p>
-<p>Type annotations are optional, but providing them is able to coerce the values to be all plain bits (i.e.&nbsp;simple, non-referenced values like arrays are) when the type is constructed. This lets the policies be stored inline and contiguously in the array (no pointer chasing) and is an example of data-oriented design. It’s much slower without the type annotations (~0.5 million policies per second, roughly 90x slower than the ~45 million per second benchmarked below).</p>
-<div id="6" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>@enum Sex Female = 1 Male = 2
-@enum Risk Standard = 1 Preferred = 2
-
-struct Policy
-    id::Int
-    sex::Sex
-    benefit_base::Float64
-    COLA::Float64
-    mode::Int
-    issue_date::Date
-    issue_age::Int
-    risk::Risk
-end</code></pre>
+<p>Type annotations are optional, but providing them is able to coerce the values to be all plain bits (i.e. simple, non-referenced values like arrays are) when the type is constructed. This lets the policies be stored inline and contiguously in the array (no pointer chasing) and is an example of data-oriented design. It’s much slower without the type annotations (~0.5 million policies per second, roughly 90x slower than the ~45 million per second benchmarked below).</p>
+<div class="cell" data-execution_count="1" id="6">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a aria-hidden="true" href="#cb2-1" tabindex="-1"></a><span class="pp">@enum</span> Sex Female <span class="op">=</span> <span class="fl">1</span> Male <span class="op">=</span> <span class="fl">2</span></span>
+<span id="cb2-2"><a aria-hidden="true" href="#cb2-2" tabindex="-1"></a><span class="pp">@enum</span> Risk Standard <span class="op">=</span> <span class="fl">1</span> Preferred <span class="op">=</span> <span class="fl">2</span></span>
+<span id="cb2-3"><a aria-hidden="true" href="#cb2-3" tabindex="-1"></a></span>
+<span id="cb2-4"><a aria-hidden="true" href="#cb2-4" tabindex="-1"></a><span class="kw">struct</span> Policy</span>
+<span id="cb2-5"><a aria-hidden="true" href="#cb2-5" tabindex="-1"></a>    id<span class="op">::</span><span class="dt">Int</span></span>
+<span id="cb2-6"><a aria-hidden="true" href="#cb2-6" tabindex="-1"></a>    sex<span class="op">::</span><span class="dt">Sex</span></span>
+<span id="cb2-7"><a aria-hidden="true" href="#cb2-7" tabindex="-1"></a>    benefit_base<span class="op">::</span><span class="dt">Float64</span></span>
+<span id="cb2-8"><a aria-hidden="true" href="#cb2-8" tabindex="-1"></a>    COLA<span class="op">::</span><span class="dt">Float64</span></span>
+<span id="cb2-9"><a aria-hidden="true" href="#cb2-9" tabindex="-1"></a>    mode<span class="op">::</span><span class="dt">Int</span></span>
+<span id="cb2-10"><a aria-hidden="true" href="#cb2-10" tabindex="-1"></a>    issue_date<span class="op">::</span><span class="dt">Date</span></span>
+<span id="cb2-11"><a aria-hidden="true" href="#cb2-11" tabindex="-1"></a>    issue_age<span class="op">::</span><span class="dt">Int</span></span>
+<span id="cb2-12"><a aria-hidden="true" href="#cb2-12" tabindex="-1"></a>    risk<span class="op">::</span><span class="dt">Risk</span></span>
+<span id="cb2-13"><a aria-hidden="true" href="#cb2-13" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 </div>
 <p>Load the data:</p>
-<div id="8" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>sample_csv_data =
-    IOBuffer(
-        raw"id,sex,benefit_base,COLA,mode,issue_date,issue_age,risk
-         1,M,100000.0,0.03,12,1999-12-05,30,Std
-         2,F,200000.0,0.03,12,1999-12-05,30,Pref"
-    )
-
-policies = let
-
-    # read CSV directly into a dataframe
-    # df = CSV.read("sample_inforce.csv",DataFrame) # use local string for notebook
-    df = CSV.read(sample_csv_data, DataFrame)
-
-    # map over each row and construct an array of Policy objects
-    map(eachrow(df)) do row
-        Policy(
-            row.id,
-            row.sex == "M" ? Male : Female,
-            row.benefit_base,
-            row.COLA,
-            row.mode,
-            row.issue_date,
-            row.issue_age,
-            row.risk == "Std" ? Standard : Preferred,
-        )
-    end
-
-
-end</code></pre>
+<div class="cell" data-execution_count="1" id="8">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a aria-hidden="true" href="#cb3-1" tabindex="-1"></a>sample_csv_data <span class="op">=</span></span>
+<span id="cb3-2"><a aria-hidden="true" href="#cb3-2" tabindex="-1"></a>    <span class="fu">IOBuffer</span>(</span>
+<span id="cb3-3"><a aria-hidden="true" href="#cb3-3" tabindex="-1"></a>        <span class="st">raw"id,sex,benefit_base,COLA,mode,issue_date,issue_age,risk</span></span>
+<span id="cb3-4"><a aria-hidden="true" href="#cb3-4" tabindex="-1"></a>         <span class="fl">1</span>,M,<span class="fl">100000.0</span>,<span class="fl">0.03</span>,<span class="fl">12</span>,<span class="fl">1999</span><span class="op">-</span><span class="fl">12</span><span class="op">-</span><span class="fl">05</span>,<span class="fl">30</span>,Std</span>
+<span id="cb3-5"><a aria-hidden="true" href="#cb3-5" tabindex="-1"></a>         <span class="fl">2</span>,F,<span class="fl">200000.0</span>,<span class="fl">0.03</span>,<span class="fl">12</span>,<span class="fl">1999</span><span class="op">-</span><span class="fl">12</span><span class="op">-</span><span class="fl">05</span>,<span class="fl">30</span>,Pref<span class="st">"</span></span>
+<span id="cb3-6"><a aria-hidden="true" href="#cb3-6" tabindex="-1"></a>    )</span>
+<span id="cb3-7"><a aria-hidden="true" href="#cb3-7" tabindex="-1"></a></span>
+<span id="cb3-8"><a aria-hidden="true" href="#cb3-8" tabindex="-1"></a>policies <span class="op">=</span> <span class="kw">let</span></span>
+<span id="cb3-9"><a aria-hidden="true" href="#cb3-9" tabindex="-1"></a></span>
+<span id="cb3-10"><a aria-hidden="true" href="#cb3-10" tabindex="-1"></a>    <span class="co"># read CSV directly into a dataframe</span></span>
+<span id="cb3-11"><a aria-hidden="true" href="#cb3-11" tabindex="-1"></a>    <span class="co"># df = CSV.read("sample_inforce.csv",DataFrame) # use local string for notebook</span></span>
+<span id="cb3-12"><a aria-hidden="true" href="#cb3-12" tabindex="-1"></a>    df <span class="op">=</span> CSV.<span class="fu">read</span>(sample_csv_data, DataFrame)</span>
+<span id="cb3-13"><a aria-hidden="true" href="#cb3-13" tabindex="-1"></a></span>
+<span id="cb3-14"><a aria-hidden="true" href="#cb3-14" tabindex="-1"></a>    <span class="co"># map over each row and construct an array of Policy objects</span></span>
+<span id="cb3-15"><a aria-hidden="true" href="#cb3-15" tabindex="-1"></a>    <span class="fu">map</span>(<span class="fu">eachrow</span>(df)) <span class="cf">do</span> row</span>
+<span id="cb3-16"><a aria-hidden="true" href="#cb3-16" tabindex="-1"></a>        <span class="fu">Policy</span>(</span>
+<span id="cb3-17"><a aria-hidden="true" href="#cb3-17" tabindex="-1"></a>            row.id,</span>
+<span id="cb3-18"><a aria-hidden="true" href="#cb3-18" tabindex="-1"></a>            row.sex <span class="op">==</span> <span class="st">"M"</span> ? Male <span class="op">:</span> Female,</span>
+<span id="cb3-19"><a aria-hidden="true" href="#cb3-19" tabindex="-1"></a>            row.benefit_base,</span>
+<span id="cb3-20"><a aria-hidden="true" href="#cb3-20" tabindex="-1"></a>            row.COLA,</span>
+<span id="cb3-21"><a aria-hidden="true" href="#cb3-21" tabindex="-1"></a>            row.mode,</span>
+<span id="cb3-22"><a aria-hidden="true" href="#cb3-22" tabindex="-1"></a>            row.issue_date,</span>
+<span id="cb3-23"><a aria-hidden="true" href="#cb3-23" tabindex="-1"></a>            row.issue_age,</span>
+<span id="cb3-24"><a aria-hidden="true" href="#cb3-24" tabindex="-1"></a>            row.risk <span class="op">==</span> <span class="st">"Std"</span> ? Standard <span class="op">:</span> Preferred,</span>
+<span id="cb3-25"><a aria-hidden="true" href="#cb3-25" tabindex="-1"></a>        )</span>
+<span id="cb3-26"><a aria-hidden="true" href="#cb3-26" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb3-27"><a aria-hidden="true" href="#cb3-27" tabindex="-1"></a></span>
+<span id="cb3-28"><a aria-hidden="true" href="#cb3-28" tabindex="-1"></a></span>
+<span id="cb3-29"><a aria-hidden="true" href="#cb3-29" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>2-element Vector{Policy}:
  Policy(1, Male, 100000.0, 0.03, 12, Date("1999-12-05"), 30, Standard)
@@ -262,133 +274,133 @@ end</code></pre>
 </div>
 </div>
 <p>Define what mortality gets used:</p>
-<div id="10" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>mort = Dict(
-    Male =&gt; MortalityTables.table(988).ultimate,
-    Female =&gt; MortalityTables.table(992).ultimate,
-)
-
-function mortality(pol::Policy, params)
-    return params.mortality[pol.sex]
-end</code></pre>
+<div class="cell" data-execution_count="1" id="10">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a aria-hidden="true" href="#cb5-1" tabindex="-1"></a>mort <span class="op">=</span> <span class="fu">Dict</span>(</span>
+<span id="cb5-2"><a aria-hidden="true" href="#cb5-2" tabindex="-1"></a>    Male <span class="op">=&gt;</span> MortalityTables.<span class="fu">table</span>(<span class="fl">988</span>).ultimate,</span>
+<span id="cb5-3"><a aria-hidden="true" href="#cb5-3" tabindex="-1"></a>    Female <span class="op">=&gt;</span> MortalityTables.<span class="fu">table</span>(<span class="fl">992</span>).ultimate,</span>
+<span id="cb5-4"><a aria-hidden="true" href="#cb5-4" tabindex="-1"></a>)</span>
+<span id="cb5-5"><a aria-hidden="true" href="#cb5-5" tabindex="-1"></a></span>
+<span id="cb5-6"><a aria-hidden="true" href="#cb5-6" tabindex="-1"></a><span class="kw">function</span> <span class="fu">mortality</span>(pol<span class="op">::</span><span class="dt">Policy</span>, params)</span>
+<span id="cb5-7"><a aria-hidden="true" href="#cb5-7" tabindex="-1"></a>    <span class="cf">return</span> params.mortality[pol.sex]</span>
+<span id="cb5-8"><a aria-hidden="true" href="#cb5-8" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>mortality (generic function with 1 method)</code></pre>
 </div>
 </div>
 <p>This defines the core logic of the policy projection and will write the results to the given <code>out</code> container (here, a named tuple of arrays).</p>
 <p>This is using a threaded approach where it could be operating on any of the computer’s available threads, thus acheiving thread-based parallelism (as opposed to multi-processor (multi-machine) or GPU-based computation which requires formulating the problem a bit differently (array/matrix based). For the scale of computation here, I think I’d apply this model of parallelism.</p>
-<div id="12" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>function pol_project!(benefits, lives, policy, params)
-    # some starting values for the given policy
-    dur = policy_duration(policy.issue_date, params.val_date)
-    start_age = policy.issue_age + dur - 1
-    COLA_factor = 1 + policy.COLA
-    cur_benefit = policy.benefit_base * COLA_factor^(dur - 1)
-
-    # get the right mortality vector
-    qs = mortality(policy, params)
-    ω = lastindex(qs)
-
-    # inbounds turns off bounds-checking, which makes hot loops faster — write
-    # the loop without it first to ensure you don't have an out-of-bounds bug.
-    @inbounds for t in 1:min(params.proj_length, ω - start_age + 1)
-        q = qs[start_age + t - 1]        # mortality for the current projection year
-        rand() &lt; q &amp;&amp; return              # death — stop incrementing this life
-
-        # otherwise: pay benefit, add a life, grow the benefit by COLA for next year
-        benefits[t] += cur_benefit
-        lives[t]    += 1
-        cur_benefit *= COLA_factor
-    end
-end</code></pre>
+<div class="cell" data-execution_count="1" id="12">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a aria-hidden="true" href="#cb7-1" tabindex="-1"></a><span class="kw">function</span> <span class="fu">pol_project!</span>(benefits, lives, policy, params)</span>
+<span id="cb7-2"><a aria-hidden="true" href="#cb7-2" tabindex="-1"></a>    <span class="co"># some starting values for the given policy</span></span>
+<span id="cb7-3"><a aria-hidden="true" href="#cb7-3" tabindex="-1"></a>    dur <span class="op">=</span> <span class="fu">policy_duration</span>(policy.issue_date, params.val_date)</span>
+<span id="cb7-4"><a aria-hidden="true" href="#cb7-4" tabindex="-1"></a>    start_age <span class="op">=</span> policy.issue_age <span class="op">+</span> dur <span class="op">-</span> <span class="fl">1</span></span>
+<span id="cb7-5"><a aria-hidden="true" href="#cb7-5" tabindex="-1"></a>    COLA_factor <span class="op">=</span> <span class="fl">1</span> <span class="op">+</span> policy.COLA</span>
+<span id="cb7-6"><a aria-hidden="true" href="#cb7-6" tabindex="-1"></a>    cur_benefit <span class="op">=</span> policy.benefit_base <span class="op">*</span> COLA_factor<span class="op">^</span>(dur <span class="op">-</span> <span class="fl">1</span>)</span>
+<span id="cb7-7"><a aria-hidden="true" href="#cb7-7" tabindex="-1"></a></span>
+<span id="cb7-8"><a aria-hidden="true" href="#cb7-8" tabindex="-1"></a>    <span class="co"># get the right mortality vector</span></span>
+<span id="cb7-9"><a aria-hidden="true" href="#cb7-9" tabindex="-1"></a>    qs <span class="op">=</span> <span class="fu">mortality</span>(policy, params)</span>
+<span id="cb7-10"><a aria-hidden="true" href="#cb7-10" tabindex="-1"></a>    ω <span class="op">=</span> <span class="fu">lastindex</span>(qs)</span>
+<span id="cb7-11"><a aria-hidden="true" href="#cb7-11" tabindex="-1"></a></span>
+<span id="cb7-12"><a aria-hidden="true" href="#cb7-12" tabindex="-1"></a>    <span class="co"># inbounds turns off bounds-checking, which makes hot loops faster — write</span></span>
+<span id="cb7-13"><a aria-hidden="true" href="#cb7-13" tabindex="-1"></a>    <span class="co"># the loop without it first to ensure you don't have an out-of-bounds bug.</span></span>
+<span id="cb7-14"><a aria-hidden="true" href="#cb7-14" tabindex="-1"></a>    <span class="pp">@inbounds</span> <span class="cf">for</span> t <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu">min</span>(params.proj_length, ω <span class="op">-</span> start_age <span class="op">+</span> <span class="fl">1</span>)</span>
+<span id="cb7-15"><a aria-hidden="true" href="#cb7-15" tabindex="-1"></a>        q <span class="op">=</span> qs[start_age <span class="op">+</span> t <span class="op">-</span> <span class="fl">1</span>]        <span class="co"># mortality for the current projection year</span></span>
+<span id="cb7-16"><a aria-hidden="true" href="#cb7-16" tabindex="-1"></a>        <span class="fu">rand</span>() <span class="op">&lt;</span> q <span class="op">&amp;&amp;</span> <span class="cf">return</span>              <span class="co"># death — stop incrementing this life</span></span>
+<span id="cb7-17"><a aria-hidden="true" href="#cb7-17" tabindex="-1"></a></span>
+<span id="cb7-18"><a aria-hidden="true" href="#cb7-18" tabindex="-1"></a>        <span class="co"># otherwise: pay benefit, add a life, grow the benefit by COLA for next year</span></span>
+<span id="cb7-19"><a aria-hidden="true" href="#cb7-19" tabindex="-1"></a>        benefits[t] <span class="op">+=</span> cur_benefit</span>
+<span id="cb7-20"><a aria-hidden="true" href="#cb7-20" tabindex="-1"></a>        lives[t]    <span class="op">+=</span> <span class="fl">1</span></span>
+<span id="cb7-21"><a aria-hidden="true" href="#cb7-21" tabindex="-1"></a>        cur_benefit <span class="op">*=</span> COLA_factor</span>
+<span id="cb7-22"><a aria-hidden="true" href="#cb7-22" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb7-23"><a aria-hidden="true" href="#cb7-23" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>pol_project! (generic function with 1 method)</code></pre>
 </div>
 </div>
 <p>Parameters for our projection:</p>
-<div id="14" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>params = (
-    val_date=Date(2021, 12, 31),
-    proj_length=100,
-    mortality=mort,
-)</code></pre>
+<div class="cell" data-execution_count="1" id="14">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb9-1"><a aria-hidden="true" href="#cb9-1" tabindex="-1"></a>params <span class="op">=</span> (</span>
+<span id="cb9-2"><a aria-hidden="true" href="#cb9-2" tabindex="-1"></a>    val_date<span class="op">=</span><span class="fu">Date</span>(<span class="fl">2021</span>, <span class="fl">12</span>, <span class="fl">31</span>),</span>
+<span id="cb9-3"><a aria-hidden="true" href="#cb9-3" tabindex="-1"></a>    proj_length<span class="op">=</span><span class="fl">100</span>,</span>
+<span id="cb9-4"><a aria-hidden="true" href="#cb9-4" tabindex="-1"></a>    mortality<span class="op">=</span>mort,</span>
+<span id="cb9-5"><a aria-hidden="true" href="#cb9-5" tabindex="-1"></a>)</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>(val_date = Date("2021-12-31"), proj_length = 100, mortality = Dict{Sex, OffsetArrays.OffsetVector{Float64, Vector{Float64}}}(Female =&gt; [0.00745, 0.00745, 0.00745, 0.00745, 0.00745, 0.00745, 0.00745, 0.00745, 0.00745, 0.00745  …  0.376246, 0.386015, 0.393507, 0.398308, 0.4, 0.4, 0.4, 0.4, 0.4, 1.0], Male =&gt; [0.022571, 0.022571, 0.022571, 0.022571, 0.022571, 0.022571, 0.022571, 0.022571, 0.022571, 0.022571  …  0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4]))</code></pre>
 </div>
 </div>
 <p>Check the number of threads we’re using:</p>
-<div id="16" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>Threads.nthreads()</code></pre>
+<div class="cell" data-execution_count="1" id="16">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb11-1"><a aria-hidden="true" href="#cb11-1" tabindex="-1"></a><span class="bu">Threads</span>.<span class="fu">nthreads</span>()</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>14</code></pre>
 </div>
 </div>
-<div id="18" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code># Serial projection — one scenario's worth of work. Each call owns its
-# own (proj_length,) buffers, so there is no thread coordination.
-function project_serial(policies, params)
-    benefits = zeros(params.proj_length)
-    lives    = zeros(Int, params.proj_length)
-    for pol in policies
-        pol_project!(benefits, lives, pol, params)
-    end
-    (; benefits, lives)
-end
-
-# Threaded projection — used for the throughput demo. Policies are
-# chunked, each task accumulates into its own local buffers, and the
-# partial results are summed at the end. No `threadid()` and no shared
-# writes, so it is correct under task migration.
-function project(policies, params)
-    chunks = OhMyThreads.chunks(policies; n = Threads.nthreads())
-    parts  = OhMyThreads.tmap(chunks) do chunk
-        b = zeros(params.proj_length)
-        l = zeros(Int, params.proj_length)
-        for pol in chunk
-            pol_project!(b, l, pol, params)
-        end
-        (b, l)
-    end
-    benefits = sum(p -&gt; p[1], parts)
-    lives    = sum(p -&gt; p[2], parts)
-    (; benefits, lives)
-end</code></pre>
+<div class="cell" data-execution_count="1" id="18">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb13-1"><a aria-hidden="true" href="#cb13-1" tabindex="-1"></a><span class="co"># Serial projection — one scenario's worth of work. Each call owns its</span></span>
+<span id="cb13-2"><a aria-hidden="true" href="#cb13-2" tabindex="-1"></a><span class="co"># own (proj_length,) buffers, so there is no thread coordination.</span></span>
+<span id="cb13-3"><a aria-hidden="true" href="#cb13-3" tabindex="-1"></a><span class="kw">function</span> <span class="fu">project_serial</span>(policies, params)</span>
+<span id="cb13-4"><a aria-hidden="true" href="#cb13-4" tabindex="-1"></a>    benefits <span class="op">=</span> <span class="fu">zeros</span>(params.proj_length)</span>
+<span id="cb13-5"><a aria-hidden="true" href="#cb13-5" tabindex="-1"></a>    lives    <span class="op">=</span> <span class="fu">zeros</span>(<span class="dt">Int</span>, params.proj_length)</span>
+<span id="cb13-6"><a aria-hidden="true" href="#cb13-6" tabindex="-1"></a>    <span class="cf">for</span> pol <span class="kw">in</span> policies</span>
+<span id="cb13-7"><a aria-hidden="true" href="#cb13-7" tabindex="-1"></a>        <span class="fu">pol_project!</span>(benefits, lives, pol, params)</span>
+<span id="cb13-8"><a aria-hidden="true" href="#cb13-8" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb13-9"><a aria-hidden="true" href="#cb13-9" tabindex="-1"></a>    (; benefits, lives)</span>
+<span id="cb13-10"><a aria-hidden="true" href="#cb13-10" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb13-11"><a aria-hidden="true" href="#cb13-11" tabindex="-1"></a></span>
+<span id="cb13-12"><a aria-hidden="true" href="#cb13-12" tabindex="-1"></a><span class="co"># Threaded projection — used for the throughput demo. Policies are</span></span>
+<span id="cb13-13"><a aria-hidden="true" href="#cb13-13" tabindex="-1"></a><span class="co"># chunked, each task accumulates into its own local buffers, and the</span></span>
+<span id="cb13-14"><a aria-hidden="true" href="#cb13-14" tabindex="-1"></a><span class="co"># partial results are summed at the end. No `threadid()` and no shared</span></span>
+<span id="cb13-15"><a aria-hidden="true" href="#cb13-15" tabindex="-1"></a><span class="co"># writes, so it is correct under task migration.</span></span>
+<span id="cb13-16"><a aria-hidden="true" href="#cb13-16" tabindex="-1"></a><span class="kw">function</span> <span class="fu">project</span>(policies, params)</span>
+<span id="cb13-17"><a aria-hidden="true" href="#cb13-17" tabindex="-1"></a>    chunks <span class="op">=</span> OhMyThreads.<span class="fu">chunks</span>(policies; n <span class="op">=</span> <span class="bu">Threads</span>.<span class="fu">nthreads</span>())</span>
+<span id="cb13-18"><a aria-hidden="true" href="#cb13-18" tabindex="-1"></a>    parts  <span class="op">=</span> OhMyThreads.<span class="fu">tmap</span>(chunks) <span class="cf">do</span> chunk</span>
+<span id="cb13-19"><a aria-hidden="true" href="#cb13-19" tabindex="-1"></a>        b <span class="op">=</span> <span class="fu">zeros</span>(params.proj_length)</span>
+<span id="cb13-20"><a aria-hidden="true" href="#cb13-20" tabindex="-1"></a>        l <span class="op">=</span> <span class="fu">zeros</span>(<span class="dt">Int</span>, params.proj_length)</span>
+<span id="cb13-21"><a aria-hidden="true" href="#cb13-21" tabindex="-1"></a>        <span class="cf">for</span> pol <span class="kw">in</span> chunk</span>
+<span id="cb13-22"><a aria-hidden="true" href="#cb13-22" tabindex="-1"></a>            <span class="fu">pol_project!</span>(b, l, pol, params)</span>
+<span id="cb13-23"><a aria-hidden="true" href="#cb13-23" tabindex="-1"></a>        <span class="cf">end</span></span>
+<span id="cb13-24"><a aria-hidden="true" href="#cb13-24" tabindex="-1"></a>        (b, l)</span>
+<span id="cb13-25"><a aria-hidden="true" href="#cb13-25" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb13-26"><a aria-hidden="true" href="#cb13-26" tabindex="-1"></a>    benefits <span class="op">=</span> <span class="fu">sum</span>(p <span class="op">-&gt;</span> p[<span class="fl">1</span>], parts)</span>
+<span id="cb13-27"><a aria-hidden="true" href="#cb13-27" tabindex="-1"></a>    lives    <span class="op">=</span> <span class="fu">sum</span>(p <span class="op">-&gt;</span> p[<span class="fl">2</span>], parts)</span>
+<span id="cb13-28"><a aria-hidden="true" href="#cb13-28" tabindex="-1"></a>    (; benefits, lives)</span>
+<span id="cb13-29"><a aria-hidden="true" href="#cb13-29" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>project (generic function with 1 method)</code></pre>
 </div>
 </div>
 <p>Example of single projection:</p>
-<div id="20" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>project(repeat(policies, 100_000), params)</code></pre>
+<div class="cell" data-execution_count="1" id="20">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb15-1"><a aria-hidden="true" href="#cb15-1" tabindex="-1"></a><span class="fu">project</span>(<span class="fu">repeat</span>(policies, <span class="fl">100_000</span>), params)</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>(benefits = [5.635566702005779e10, 5.6869882111353195e10, 5.72971478023252e10, 5.7689653917967224e10, 5.798750429733895e10, 5.825352629998379e10, 5.844625644056055e10, 5.86221591840469e10, 5.867324481107587e10, 5.867188554409795e10  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [195444, 190927, 186164, 181409, 176492, 171600, 166612, 161693, 156580, 151505  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])</code></pre>
 </div>
 </div>
-<section id="benchmarking" class="level2">
+<section class="level2" id="benchmarking">
 <h2 class="anchored" data-anchor-id="benchmarking">Benchmarking</h2>
 <p>The original benchmark on a MacBook Air M3 laptop projected about 45 million policies per second. This memory-intensive benchmark is not rerun when rendering the page, so that number describes the original environment rather than the current package releases:</p>
-<div id="22" class="cell" data-execution_count="0">
-<pre class="julia cell-code"><code># Skipped at render time — allocating 45M policies + running @benchmark
-# OOMs the Quarto worker. The number is preserved for documentation; the
-# block runs interactively when you open the post locally.
-policies_to_benchmark = 45_000_000
-# adjust the `repeat` depending on how many policies are already in the array
-# to match the target number for the benchmark
-n = policies_to_benchmark ÷ length(policies)
-
-@benchmark project(p, r) setup = (p = repeat($policies, $n); r = $params)</code></pre>
+<div class="cell" data-execution_count="0" id="22">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb17-1"><a aria-hidden="true" href="#cb17-1" tabindex="-1"></a><span class="co"># Skipped at render time — allocating 45M policies + running @benchmark</span></span>
+<span id="cb17-2"><a aria-hidden="true" href="#cb17-2" tabindex="-1"></a><span class="co"># OOMs the Quarto worker. The number is preserved for documentation; the</span></span>
+<span id="cb17-3"><a aria-hidden="true" href="#cb17-3" tabindex="-1"></a><span class="co"># block runs interactively when you open the post locally.</span></span>
+<span id="cb17-4"><a aria-hidden="true" href="#cb17-4" tabindex="-1"></a>policies_to_benchmark <span class="op">=</span> <span class="fl">45_000_000</span></span>
+<span id="cb17-5"><a aria-hidden="true" href="#cb17-5" tabindex="-1"></a><span class="co"># adjust the `repeat` depending on how many policies are already in the array</span></span>
+<span id="cb17-6"><a aria-hidden="true" href="#cb17-6" tabindex="-1"></a><span class="co"># to match the target number for the benchmark</span></span>
+<span id="cb17-7"><a aria-hidden="true" href="#cb17-7" tabindex="-1"></a>n <span class="op">=</span> policies_to_benchmark <span class="op">÷</span> <span class="fu">length</span>(policies)</span>
+<span id="cb17-8"><a aria-hidden="true" href="#cb17-8" tabindex="-1"></a></span>
+<span id="cb17-9"><a aria-hidden="true" href="#cb17-9" tabindex="-1"></a><span class="pp">@benchmark</span> <span class="fu">project</span>(p, r) setup <span class="op">=</span> (p <span class="op">=</span> <span class="fu">repeat</span>(<span class="op">$</span>policies, <span class="op">$</span>n); r <span class="op">=</span> <span class="op">$</span>params)</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 </div>
 </section>
-<section id="stochastic-ensemble" class="level2">
+<section class="level2" id="stochastic-ensemble">
 <h2 class="anchored" data-anchor-id="stochastic-ensemble">Stochastic Ensemble</h2>
 <p>Loop through and calculate the reults <code>n</code> times (this is only running the two policies in the sample data” <code>n</code> times).</p>
-<div id="24" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code># One level of parallelism — across scenarios — with the serial kernel
-# inside. Avoids nested threadpool contention.
-stochastic_proj(policies, params, n) =
-    OhMyThreads.tmap(_ -&gt; project_serial(policies, params), 1:n)
-
-stoch = stochastic_proj(policies, params, 50)</code></pre>
+<div class="cell" data-execution_count="1" id="24">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb18-1"><a aria-hidden="true" href="#cb18-1" tabindex="-1"></a><span class="co"># One level of parallelism — across scenarios — with the serial kernel</span></span>
+<span id="cb18-2"><a aria-hidden="true" href="#cb18-2" tabindex="-1"></a><span class="co"># inside. Avoids nested threadpool contention.</span></span>
+<span id="cb18-3"><a aria-hidden="true" href="#cb18-3" tabindex="-1"></a><span class="fu">stochastic_proj</span>(policies, params, n) <span class="op">=</span></span>
+<span id="cb18-4"><a aria-hidden="true" href="#cb18-4" tabindex="-1"></a>    OhMyThreads.<span class="fu">tmap</span>(_ <span class="op">-&gt;</span> <span class="fu">project_serial</span>(policies, params), <span class="fl">1</span><span class="op">:</span>n)</span>
+<span id="cb18-5"><a aria-hidden="true" href="#cb18-5" tabindex="-1"></a></span>
+<span id="cb18-6"><a aria-hidden="true" href="#cb18-6" tabindex="-1"></a>stoch <span class="op">=</span> <span class="fu">stochastic_proj</span>(policies, params, <span class="fl">50</span>)</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>50-element Vector{@NamedTuple{benefits::Vector{Float64}, lives::Vector{Int64}}}:
  (benefits = [383220.68177215644, 394717.3022253211, 406558.82129208074, 418755.5859308432, 431318.2535087685, 444257.8011140316, 457585.53514745255, 471313.1012018761, 485452.49423793243, 500016.0690650704  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
@@ -413,22 +425,22 @@ stoch = stochastic_proj(policies, params, 50)</code></pre>
  (benefits = [574831.0226582347, 592075.9533379817, 609838.2319381211, 628133.3788962648, 646977.3802631528, 666386.7016710474, 686378.3027211789, 706969.6518028142, 728178.7413568987, 750024.1035976056  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], lives = [2, 2, 2, 2, 2, 2, 2, 2, 2, 2  …  0, 0, 0, 0, 0, 0, 0, 0, 0, 0])</code></pre>
 </div>
 </div>
-<div id="26" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>v = [pv(0.03, s.benefits) for s in stoch]
-hist(v,
-    bins=15;
-    axis=(xlabel="Present Value", ylabel="# scenarios")
-)</code></pre>
+<div class="cell" data-execution_count="1" id="26">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb20-1"><a aria-hidden="true" href="#cb20-1" tabindex="-1"></a>v <span class="op">=</span> [<span class="fu">pv</span>(<span class="fl">0.03</span>, s.benefits) for s <span class="kw">in</span> stoch]</span>
+<span id="cb20-2"><a aria-hidden="true" href="#cb20-2" tabindex="-1"></a><span class="fu">hist</span>(v,</span>
+<span id="cb20-3"><a aria-hidden="true" href="#cb20-3" tabindex="-1"></a>    bins<span class="op">=</span><span class="fl">15</span>;</span>
+<span id="cb20-4"><a aria-hidden="true" href="#cb20-4" tabindex="-1"></a>    axis<span class="op">=</span>(xlabel<span class="op">=</span><span class="st">"Present Value"</span>, ylabel<span class="op">=</span><span class="st">"# scenarios"</span>)</span>
+<span id="cb20-5"><a aria-hidden="true" href="#cb20-5" tabindex="-1"></a>)</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-14-output-1.svg" class="img-fluid figure-img"></p>
+<p><img alt="Distribution of projected present values across stochastic mortality scenarios." class="img-fluid figure-img" decoding="async" height="450" loading="eager" src="index_files/figure-html/cell-14-output-1.svg" width="600"/></p>
 </figure>
 </div>
 </div>
 </div>
 </section>
-<section id="further-optimization" class="level2">
+<section class="level2" id="further-optimization">
 <h2 class="anchored" data-anchor-id="further-optimization">Further Optimization</h2>
 <p>In no particular order:</p>
 <ul>
@@ -436,10 +448,7 @@ hist(v,
 <li>Could make the stochastic set distributed, but at the current speed the overhead of distributed computing is probably more time than it would save. Same thing with GPU projections</li>
 <li>…</li>
 </ul>
-
-
 </section>
-
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
@@ -842,8 +851,4 @@ hist(v,
   });
   </script>
 </div> <!-- /content -->
-
-
-
-
 </body></html>

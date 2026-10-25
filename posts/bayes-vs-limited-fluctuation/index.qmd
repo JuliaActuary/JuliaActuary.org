@@ -193,6 +193,7 @@ The result of the `sample` function is a set of data containing data that is gen
 Run the chain:
 
 ```{julia}
+#| fig-alt: "Prior and posterior distributions of the expected claims rate for a vehicle group."
 
 cp = MCMCChains.Chains(sample(mp, NUTS(), 500; check_model=false)) # this is the line that runs the MCMC sampler
 
@@ -218,6 +219,7 @@ end
 This is a plot of the posterior density for all of the many, many $\mu$ parameters in our model. The black line shows the distribution which comes from our hyperparameters μ and σ. In the event of coming across a new group of interest (in our case, a new make of car), this is the prior distribution for the expected claims rate. The model has learned this from the data itself, and serves to regularize predictions.
 
 ```{julia}
+#| fig-alt: "Posterior claims-rate densities for individual groups alongside the population hyperparameter distribution."
 #| code-fold: true
 #| code-summary: "Utilitiy Function to Plot the Posterior"
 """
@@ -382,6 +384,7 @@ end
 ```
 
 ```{julia}
+#| fig-alt: "Cumulative absolute prediction errors for Bayesian, limited-fluctuation, year-by-year, and naive estimates."
 let df = claims_summary_posterior
     f = Figure()
     ax = Axis(f[1, 1], title="Cumulative Predictive Residual Error", subtitle="(Lower is better predictive accuracy)", xlabel=L"$i^{th}$ vehicle group", ylabel=L"absolute error")
@@ -397,6 +400,7 @@ end
 ```
 
 ```{julia}
+#| fig-alt: "Historical aggregate claims rates and the competing predictions for the following year."
 let
     post = claims_summary_posterior
     X = @chain vcat(train, test) begin

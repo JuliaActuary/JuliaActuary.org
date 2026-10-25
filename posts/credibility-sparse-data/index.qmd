@@ -64,6 +64,7 @@ true_q(age, dur, cls) = min(1.0, LEVEL * base_q(age) * class_factor(dur, cls))
 ```
 
 ```{julia}
+#| fig-alt: "True mortality rates at issue by attained age for five risk classes, compared with the industry table."
 #| code-fold: true
 #| code-summary: "FIG. 01 plotting code"
 let
@@ -93,6 +94,7 @@ end
 Every class sits below the dashed industry table at issue — even table-rated class 5, at 0.70 × 1.40 ≈ 0.98, barely touches it. The class curves then drift toward the block level of 0.70 × table as the factors wear off:
 
 ```{julia}
+#| fig-alt: "Risk-class mortality factors by policy duration, wearing off toward the block level; observed and forecast periods are shaded."
 #| code-fold: true
 #| code-summary: "FIG. 02 plotting code"
 let
@@ -241,6 +243,7 @@ ct500
 Five hundred policies, five years, and the whole block produced `{julia} Int(sum(ct500.A))` death claims. The most-preferred class produced `{julia} Int(ct500.A[1])`. This is not an engineered worst case; across repeated simulations at N=500 the most-preferred class has zero claims about half the time.
 
 ```{julia}
+#| fig-alt: "Actual deaths and industry-table expected claims by risk class over five years in a five-hundred-policy portfolio."
 #| code-fold: true
 #| code-summary: "FIG. 03 plotting code"
 let
@@ -416,6 +419,7 @@ The `estimate` column is each class's **posterior mean** — the probability-wei
 Before comparing estimates, compare how much weight each method gives the data. FIG. 04 shows the credibility weight $Z$ for the two traditional methods at each sample size. (The Bayesian model has no single $Z$ — its shrinkage adapts per class.)
 
 ```{julia}
+#| fig-alt: "Credibility weights by risk class and portfolio size for limited fluctuation and Buhlmann-Straub estimates."
 #| code-fold: true
 #| code-summary: "FIG. 04 plotting code (re-simulates the illustrative seed at each N)"
 illustrative = map((500, 2000, 10000)) do N
@@ -485,6 +489,7 @@ Now bring back the true values. FIG. 05 shows all three methods against the trut
 - The **grey ×** is the observed A/E — that class's deaths divided by its table-expected claims, with no method applied. It is what each method starts from.
 
 ```{julia}
+#| fig-alt: "Posterior risk-class densities at five hundred policies, compared with credibility estimates, observed ratios, and the simulated truth."
 #| code-fold: true
 #| code-summary: "FIG. 05 plotting code"
 let
@@ -524,6 +529,7 @@ Two details are worth a second look. First, the posteriors are widest exactly wh
 The natural follow-up: what happens to those curves when the data arrives? FIG. 06 overlays the N=500 posteriors (dotted outlines) with the posteriors from the N=10,000 block (filled), along with Bühlmann–Straub's N=10,000 estimates (blue triangles) for comparison:
 
 ```{julia}
+#| fig-alt: "Posterior risk-class densities at ten thousand policies, compared with estimates and simulated truth."
 #| code-fold: true
 #| code-summary: "FIG. 06 plotting code"
 bayes10k = illustrative[3].bayes
@@ -571,6 +577,7 @@ FIG. 07 repeats the comparison at all three block sizes, keeping only point esti
 These two marks define the task. First, a method has to move from 1.0 down to the overall level — the dotted line. Second, given enough data, it has to spread away from the dotted line toward the individual truth ticks.
 
 ```{julia}
+#| fig-alt: "Risk-class actual-to-expected estimates for different portfolio sizes, methods, and the simulated truth."
 #| code-fold: true
 #| code-summary: "FIG. 07 plotting code"
 let
@@ -665,6 +672,7 @@ summary
 ```
 
 ```{julia}
+#| fig-alt: "Distributions of estimation and prediction errors across repeated simulations for each method and portfolio size."
 #| code-fold: true
 #| code-summary: "FIG. 08 plotting code"
 let
@@ -761,6 +769,7 @@ end
 ```
 
 ```{julia}
+#| fig-alt: "Learned selection wear-off by policy duration and risk class, with posterior intervals and the simulated truth."
 #| code-fold: true
 #| code-summary: "Wear-off model fit and FIG. 09 plotting code"
 ill10k = illustrative[3]

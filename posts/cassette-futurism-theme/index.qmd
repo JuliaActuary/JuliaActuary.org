@@ -33,6 +33,7 @@ Random.seed!(1969)
 ## Palette swatch
 
 ```{julia}
+#| fig-alt: "Seven plotter-pen palette swatches: red, blue, amber, green, plum, orange, and teal."
 let
     names = ["red", "blue", "amber", "green", "plum", "orange", "teal"]
     fig = Figure(size = (720, 160))
@@ -52,6 +53,7 @@ end
 ## Line plot: trajectories
 
 ```{julia}
+#| fig-alt: "Damped oscillating trajectories with different damping parameters."
 let
     t = range(0, 4π; length = 240)
     fig = Figure(size = (720, 420))
@@ -71,6 +73,7 @@ end
 ## Scatter: bivariate sample
 
 ```{julia}
+#| fig-alt: "Three groups of positively correlated bivariate samples in the cassette palette."
 let
     n = 220
     x = randn(n)
@@ -96,6 +99,7 @@ end
 ## Bars: comparative readouts
 
 ```{julia}
+#| fig-alt: "Comparative masses of the lunar module, command and service module, and Saturn rocket stages."
 let
     cats   = ["LEM", "CSM", "S-IVB", "S-II", "S-IC"]
     values = [4.3, 11.9, 13.5, 36.0, 130.0]  # approximate dry masses
@@ -114,6 +118,7 @@ end
 ## Density: distributions
 
 ```{julia}
+#| fig-alt: "Residual density curves for nominal, off-nominal, and trimmed samples."
 let
     fig = Figure(size = (720, 420))
     ax = Axis(fig[1, 1];
@@ -136,6 +141,7 @@ end
 ## Heatmap: instrument grid
 
 ```{julia}
+#| fig-alt: "Field intensity across a two-dimensional grid, shown as a heatmap with contour lines."
 let
     xs = range(-3, 3; length = 80)
     ys = range(-2, 2; length = 60)
@@ -155,6 +161,7 @@ end
 ## Small multiples
 
 ```{julia}
+#| fig-alt: "Four small-multiple line plots demonstrating a shared instrument-panel theme."
 let
     t = range(0, 6π; length = 300)
     fig = Figure(size = (760, 460))

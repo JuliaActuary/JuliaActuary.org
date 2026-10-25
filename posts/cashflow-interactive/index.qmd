@@ -5,7 +5,7 @@ categories: [actuaryutilities,financemodels,assets]
 
 Scroll down below the sample video to see how to run it.
 
-![](demo.gif)
+![](demo.gif){fig-alt="Recording of a Pluto notebook adjusting cashflows and displaying valuation results."}
 
 
 The recording above shows a [Pluto.jl](https://github.com/fonsp/Pluto.jl) notebook demonstrating some of the basic cashflow-oriented features in `ActuaryUtilities.jl` and `FinanceModels.jl`.

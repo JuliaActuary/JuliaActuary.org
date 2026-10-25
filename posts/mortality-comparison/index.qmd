@@ -5,7 +5,7 @@ categories: [experience-analysis,mortalitytables]
 
 Scroll down below the sample video to see how to run it.
 
-![](demo.gif)
+![](demo.gif){fig-alt="Recording of an interactive comparison of mortality tables and their rates by age."}
 
 The recording above shows a [Pluto.jl](https://github.com/fonsp/Pluto.jl) notebook visualizing the difference between different mortality tables.
 

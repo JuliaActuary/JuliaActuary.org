@@ -161,6 +161,7 @@ end
 ## Plotting some scenarios
 
 ```{julia}
+#| fig-alt: "Simulated paths of four correlated equity fund indices under the AAA economic scenario generator, on a logarithmic scale."
 let 
 	f = Figure()
 	n = 25

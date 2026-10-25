@@ -83,6 +83,7 @@ maximum(abs, fd .- ∂pv)
 ```
 
 ```{julia}
+#| fig-alt: "Change in liability value per one basis point increase in each quoted maturity."
 #| code-fold: true
 #| code-summary: "Plotting code"
 fig = Figure(size = (720, 380))
@@ -127,6 +128,7 @@ forward(c, 40.0, 60.0)
 Here are the one-year forwards of the same cubic curve under each policy, by the start of each year. The curves agree through the 30-year knot; one-year forwards begin to differ when their end date passes it. Beyond it, 6.x's `:extension` keeps climbing:
 
 ```{julia}
+#| fig-alt: "One-year forward rates beyond the final curve knot under different extrapolation policies."
 #| code-fold: true
 #| code-summary: "Plotting code"
 policies = [
@@ -210,6 +212,7 @@ zero_graded = Yield.Blend(curve, ultimate, grade, Yield.ZeroRates())
 ```
 
 ```{julia}
+#| fig-alt: "One-year forwards for the market curve, a forward-rate blend, and a zero-rate blend toward a 3.5 percent ultimate rate."
 #| code-fold: true
 #| code-summary: "Plotting code"
 years = 0:79
@@ -307,6 +310,7 @@ The floater's IR01 is small: a rate rise raises its projected coupons by almost 
 ```
 
 ```{julia}
+#| fig-alt: "Interest-rate and credit-spread sensitivity of the two valuation callbacks."
 #| code-fold: true
 #| code-summary: "Plotting code"
 instruments = ["10-year fixed bond", "5-year floater"]
@@ -335,6 +339,7 @@ liability_kr = duration(DV01(), KeyRates(grid), curve, annuity, annuity_times)
 ```
 
 ```{julia}
+#| fig-alt: "Key-rate DV01 profiles for a ten-year bond, a twenty-five-year annuity, and their combined position."
 #| code-fold: true
 #| code-summary: "Plotting code"
 fig = Figure(size = (720, 400))
@@ -652,6 +657,7 @@ typeof(survival(UltimateMortality(Float32[0.01, 0.02, 0.03]), 0, 2))
 - **Table rates follow their age labels.** Eight mort.SOA.org tables use grouped ages. Table 352 ("1946-49 Basic Table, ANB"), for example, has issue ages 12, 17, 22 and so on. Version 2.x placed those rows at consecutive ages: `select[17]` returned issue age 37's rates. Rates now sit at their labeled ages, with `missing` between groups; CSV tables receive the same correction. The loader also accepts empty metadata elements, making 34 additional bundled tables readable.
 
 ```{julia}
+#| fig-alt: "Select mortality rates in Table 352 by attained age, with one line for each issue age."
 #| code-fold: true
 #| code-summary: "Plotting code"
 t352 = MortalityTables.table(352)
@@ -774,6 +780,7 @@ These October 11 measurements compare FinanceCore 3.0.0, FinanceModels 7.0.0, Ac
 The harness uses BenchmarkTools 1.8 on Julia 1.13.1 and an Apple M4 Max, with one Julia thread and one BLAS thread. Each figure is the **smallest trial minimum across three alternating baseline/release runs**, with a one-second budget per trial and compilation excluded. Other jobs were running on the workstation; minima reduce transient interference, but small differences should be treated cautiously. The [benchmark archive](benchmarks.zip) contains all 87 workloads, both complete environments, raw timings, medians and variation between runs.
 
 ```{julia}
+#| fig-alt: "Benchmark speed relative to the preceding releases on a logarithmic scale; bars on either side of one indicate faster or slower results."
 #| code-fold: true
 #| code-summary: "Plotting code"
 speedups = [

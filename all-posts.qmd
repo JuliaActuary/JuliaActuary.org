@@ -1,9 +1,11 @@
 ---
 title: "All Posts"
+description: "Tutorials, articles, and updates from JuliaActuary."
 listing:
   contents: "posts/**/index.qmd"
   sort: "date desc"
   type: default
+  image-lazy-loading: true
   categories: true
   sort-ui: false
   filter-ui: false

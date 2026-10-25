@@ -53,6 +53,7 @@ To aid in visualizing results with such vast different orders of magnitude, this
 ```{julia}
 #| echo: false
 #| label: fig-life-modeling-benchmark
+#| fig-alt: "Life Modeling Problem runtimes by language and implementation on a logarithmic scale, with light-travel distance comparisons."
 #| column: page-inset
 using CairoMakie
 using DataFrames

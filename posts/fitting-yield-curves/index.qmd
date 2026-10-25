@@ -54,6 +54,7 @@ For direct interpolation of observed zero rates, use `ZeroRateCurve(rates, mats,
 ## Visualizing the results
 
 ```{julia}
+#| fig-alt: "Fitted yield curves across tenors, compared with the observed continuously compounded zero rates."
 const CURVES = [
     (bc,  "Loss fit (Cubic)"),
     (bq,  "Loss fit (Quadratic)"),
@@ -105,4 +106,4 @@ let
 end
 ```
 
-![](anim_fps2.gif)
+![](anim_fps2.gif){fig-alt="Animation of fitted yield curves as the observed rates change."}

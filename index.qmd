@@ -1,37 +1,35 @@
----
-header-includes:
-  - |
-    <script src="https://cdn.jsdelivr.net/npm/swiffy-slider@1.6.0/dist/js/swiffy-slider.min.js" crossorigin="anonymous" defer></script>
-  - |
-    <link href="https://cdn.jsdelivr.net/npm/swiffy-slider@1.6.0/dist/css/swiffy-slider.min.css" rel="stylesheet" crossorigin="anonymous">
-
-
----
-
 ::: {.column-page .hero}
-::: {.column-page .hero-fullwidth}
-Practical, extensible, and open-source actuarial modeling and analysis. 
+[JuliaActuary / Open source]{.hero-label}
+
+# Actuarial modeling, built for Julia. {.unlisted .unnumbered}
+
+::: {.hero-intro}
+Practical, extensible tools for mortality, financial valuation, and experience analysis.
 :::
 
-::: {.grid .column-page .hero-grid}
+::: {.hero-actions}
+[Get started](learn.qmd){.btn .btn-primary}
+[Browse packages](packages.qmd){.btn .btn-outline-light}
+:::
 
+::: {.hero-grid}
 
 ::: {.hero-child}
-### High-Performance Computing
+## Mortality and survival {.unlisted .unnumbered}
 
-Designed for speed and efficiency, enabling high-performance numerical computing, quantitative analysis, modeling, and simulation.
+Work with standard tables, mortality models, and life contingencies.
 :::
 
 ::: {.hero-child}
-### Domain-Specific Ecosystem
+## Financial valuation {.unlisted .unnumbered}
 
-Extensive ecosystem of libraries and tools catering to technical computing, data science, machine learning, and domain-specific tasks in finance and actuarial science.
+Build yield curves, value cashflows, and measure interest-rate risk.
 :::
 
 ::: {.hero-child}
-### Productivity and Interoperability
+## Experience analysis {.unlisted .unnumbered}
 
-Clean, readable syntax, comprehensive documentation, and seamless integration with existing languages and tools enhance productivity and accessibility for a wide range of users.
+Calculate exposures and explore insurance experience with Julia's data ecosystem.
 :::
 
 :::
@@ -47,15 +45,9 @@ It is free, open-source software and you can [join the development on Github](ht
 
 ## Code Examples
 
-```{=html}
-<div class="swiffy-slider slider-item-reveal slider-nav-autoplay slider-nav-autopause slider-nav-dark slider-indicators-dark " data-slider-nav-autoplay-interval="7500">
-    <ul class="slider-container">
-        <li>
-        <div class="code-carousel">
-          <div class="top">
-    <span class="code-example-head" >Getting Mortality Tables</span>
-  </div>
-```
+::: {.panel-tabset .code-examples}
+
+### Mortality tables
 
 ```julia-repl
 julia> using MortalityTables
@@ -76,16 +68,7 @@ MortalityTable (Insured Lives Mortality):
        2015 Valuation Basic Table (VBT) Smoker Distinct Table...
 ```
 
-```{=html}
-       </div>
-        </li>
-        <li>
-        <div class="code-carousel">
-          <div class="top">
-        <span class="code-example-head" >Working with Yield Curves</span>
-  </div>
-
-```
+### Yield curves
 
 ```julia
 using FinanceModels
@@ -100,20 +83,9 @@ zero(curve, 1.5)              # continuously compounded zero rate
 forward(curve, 1.0, 2.0)      # rate between years 1 and 2
 ```
 
-```{=html}
-
-
-        </div></li>
-                <li>
-        <div class="code-carousel">
-                <div class="code-carousel">
-          <div class="top">
-        <span class="code-example-head" >Financial Maths</span>
-  </div>
-```
+### Financial maths
 
 ```julia-repl
-
 julia> using ActuaryUtilities
 
 julia> cashflows = [5, 5, 105]
@@ -132,17 +104,7 @@ julia> round(convexity(discount_rate, cashflows); digits=2)
 10.63
 ```
 
-```{=html}
-
-
-        </div></li>
-                <li>
-        <div class="code-carousel">
-                <div class="code-carousel">
-          <div class="top">
-        <span class="code-example-head" >Life Contingencies</span>
-  </div>
-```
+### Life contingencies
 
 ```julia
 using LifeContingencies
@@ -168,25 +130,7 @@ premium_net(lc)                          # Net whole life premium
 LifeContingencies.V(lc,5)                # Net premium reserve for whole life insurance at time 5
 ```
 
-```{=html}
-
-
-        </div></li>
-
-    </ul>
-
-    <button type="button" class="slider-nav"></button>
-    <button type="button" class="slider-nav slider-nav-next"></button>
-
-    <div class="slider-indicators">
-        <button class="active"></button>
-        <button></button>
-        <button></button>
-        <button></button>
-    </div>
-</div>
-    
-```
+:::
 
 The life-contingency example uses the compatible LifeContingencies 2.5 / FinanceCore 2 / MortalityTables 2 environment. See [package compatibility](packages.qmd#current-releases) before combining it with the newer finance and mortality releases.
 

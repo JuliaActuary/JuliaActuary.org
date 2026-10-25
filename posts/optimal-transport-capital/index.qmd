@@ -106,6 +106,7 @@ println("W₂ between the two aggregate laws (one repricing cycle of drift): ", 
 (For these two distributions the squaring hardly matters — $W_2$ comes to `{julia} musd(radius)` against a $W_1$ of `{julia} musd(wasserstein(agg_prior_basis, agg_current_basis))` — because they differ mostly by a plain shift, and every version of the distance scores a plain shift the same. Still, say which one you used; the formula depends on it.) FIG. 01 shows the two annual distributions and the gap between them.
 
 ```{julia}
+#| fig-alt: "Annual aggregate ceded-loss densities using prior-year and current-year severity assumptions."
 #| code-fold: true
 #| code-summary: "FIG. 01 plotting code"
 let
@@ -177,6 +178,7 @@ The multiplier $(1-\alpha)^{-1/2}$ deserves a slower look, because it is where t
 Now put those in dollars. The same `{julia} musd(radius)` radius adds `{julia} musd((1-0.90)^(-1/2) * radius)` of model-error charge at CTE(0.90), `{julia} musd((1-0.95)^(-1/2) * radius)` at CTE(0.95), and `{julia} musd((1-0.99)^(-1/2) * radius)` at CTE(0.99). Moving a capital standard from the 90th percentile to the 99th changes neither the model nor the radius, yet it roughly triples the price of every dollar of model error. And because the multiplier contains only $\alpha$, none of this is a fact about our book. It is the same arithmetic for anyone whose capital metric lives deep in the tail of a model they know is imperfect.
 
 ```{julia}
+#| fig-alt: "Required assets by conditional-tail-expectation level under the base model and different model-error radii."
 #| code-fold: true
 #| code-summary: "FIG. 02 plotting code"
 let

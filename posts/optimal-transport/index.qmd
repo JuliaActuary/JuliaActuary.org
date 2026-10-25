@@ -96,6 +96,7 @@ DataFrame([summarize("prior", claims_prior), summarize("current", claims_current
 The mean moved `{julia} pct1(mean(claims_current)/mean(claims_prior) - 1)`. But look at where it moved. The median barely stirred (`{julia} pct1(median(claims_current)/median(claims_prior) - 1)`), while the 95th percentile, the 99th, and the largest claim all jumped. FIG. 01 shows the two years on a log scale: the bodies nearly coincide, and the right tail thickens.
 
 ```{julia}
+#| fig-alt: "Prior-year and current-year large-claim severity densities on a logarithmic claim-size scale."
 #| code-fold: true
 #| code-summary: "FIG. 01 plotting code"
 let
@@ -132,6 +133,7 @@ println("annual incurred (ceded) loss, mean: prior law ", musd(mean(agg_prior)),
 ```
 
 ```{julia}
+#| fig-alt: "Simulated annual aggregate ceded-loss densities under prior-year and current-year severity assumptions."
 #| code-fold: true
 #| code-summary: "FIG. 02 plotting code"
 let
@@ -177,6 +179,7 @@ And then there is the Kolmogorov–Smirnov statistic, `{julia} @sprintf("%.3f", 
 FIG. 03 plots the gap between the two quantile curves, rank by rank. The shaded area approximates $W_1$ — the drawing evaluates the step functions on a 2,000-point rank grid, which lands within a tenth of a percent of the exact sorted-sample value — so this figure is the transport bill, itemized.
 
 ```{julia}
+#| fig-alt: "Difference between current-year and prior-year claim quantiles across claimant ranks."
 #| code-fold: true
 #| code-summary: "FIG. 03 plotting code"
 # step quantile (inverse ECDF), the same convention wasserstein uses internally
@@ -265,6 +268,7 @@ println("half vs half:      distance = ", usd(screen_half.observed),
 The year-over-year move clears its floor with room to spare — none of the two thousand re-splits came close. The halves sit `{julia} usd(screen_half.observed)` apart, which sounds alarming (it is half the size of the real move!) and is exactly what shuffling produces on its own. Anyone eyeballing raw distances would have declared a mid-year severity emergency. FIG. 04 shows both comparisons against their nulls.
 
 ```{julia}
+#| fig-alt: "Random re-split distributions of Wasserstein distance with the screening threshold and observed distance marked."
 #| code-fold: true
 #| code-summary: "FIG. 04 plotting code"
 let
@@ -337,6 +341,7 @@ Read the first column of results top to bottom. The drift between laws is `{juli
 The halves column is the control, and it teaches this section's last lesson. Both components straddle zero: the model finds no direction to the mid-year difference, which is the right answer. But the distance row is *not* zero — it cannot be, because a distance is nonnegative, so even pure parameter wiggle keeps its posterior positive. That is not a flaw; it is a reminder to read the decomposition and the materiality probability (`{julia} @sprintf("%.2f", mean(post_half.W .> 10_000))` here, against `{julia} @sprintf("%.2f", mean(post_year.W .> 10_000))` for the real move) rather than staring at the distance alone. FIG. 05 draws both posteriors against the trigger.
 
 ```{julia}
+#| fig-alt: "Posterior distributions of severity drift for split samples and for the prior and current years."
 #| code-fold: true
 #| code-summary: "FIG. 05 plotting code"
 let
@@ -394,6 +399,7 @@ end
 Read down the last column. The multiplier climbs with the rank — a few percent at the 10th percentile, a third at the top — because the drift we measured included tail-thickening, and a rank-preserving map is the only honest way to continue that. FIG. 06 draws the map as the multiplier it applies at each claim size, next to the flat line a uniform factor would draw for the same total ground-up cost.
 
 ```{julia}
+#| fig-alt: "Severity stress multiplier by base claim size for a transport map and a uniform trend with the same ground-up cost."
 #| code-fold: true
 #| code-summary: "FIG. 06 plotting code"
 let
@@ -437,6 +443,7 @@ println("incurred loss per claimant:    prior ", usd(layer_cost(claims_prior)),
 ```
 
 ```{julia}
+#| fig-alt: "Claimant loss-exceedance curves for prior-year, current-year, and transport-stressed ceded losses."
 #| code-fold: true
 #| code-summary: "FIG. 07 plotting code"
 let
@@ -472,6 +479,7 @@ println("  transport stress:", usd(layer_cost(stressed)),
 Both stresses cost the same `{julia} pct1(unif - 1)` ground-up on the file — that is forced, because we calibrated the uniform factor to the transport stress dollar for dollar. The transport stress still prices the layer up `{julia} pct1(layer_cost(stressed)/layer_cost(claims_current) - 1)` against the uniform stress's `{julia} pct1(layer_cost(claims_current .* unif)/layer_cost(claims_current) - 1)`, and the gap widens as the layer rises. FIG. 08 makes the comparison one step cleaner — law against law: the fitted basis, its transported stress, and a uniform factor matched to the same *law-level* ground-up cost of `{julia} pct1(unif_law - 1)`, all through the exact lognormal formula for expected excess cost, so the curves carry no simulation noise and no model misfit.
 
 ```{julia}
+#| fig-alt: "Layer cost trend by attachment point under transport and uniform stresses with equal ground-up cost."
 #| code-fold: true
 #| code-summary: "FIG. 08 plotting code"
 # E[(X − a)⁺] for X ~ LogNormal(μ, σ), closed form

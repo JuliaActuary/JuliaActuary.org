@@ -1,15 +1,12 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
-<meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.16">
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-
-<meta name="author" content="Alec Loudenback">
-<meta name="dcterms.date" content="2020-07-09">
-<meta name="description" content="JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.">
-
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml"><head>
+<meta charset="utf-8"/>
+<meta content="quarto-1.9.16" name="generator"/>
+<meta content="width=device-width, initial-scale=1.0, user-scalable=yes" name="viewport"/>
+<meta content="Alec Loudenback" name="author"/>
+<meta content="2020-07-09" name="dcterms.date"/>
+<meta content="JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows." name="description"/>
 <title>Coding the Future – JuliaActuary</title>
 <style>
 code{white-space: pre-wrap;}
@@ -24,27 +21,25 @@ ul.task-list li input[type="checkbox"] {
   vertical-align: middle;
 }
 </style>
-
-
 <script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="../../site_libs/quarto-nav/headroom.min.js"></script>
 <script src="../../site_libs/clipboard/clipboard.min.js"></script>
 <script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="../../">
-<link href="../..//assets/logos/favicon.ico" rel="icon">
+<meta content="../../" name="quarto:offset"/>
+<link href="../..//assets/logos/favicon.ico" rel="icon"/>
 <script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
-<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-a0731b9a3a5d496010872d775e5d9bc3.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet"/>
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-be14ce6d32a635bebd8f9e4e558f9eeb.css" id="quarto-text-highlighting-styles" rel="stylesheet"/>
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-98ac2d5361ef6f18cc0525d38bedc462.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet"/>
+<link append-hash="true" data-mode="light" href="../../site_libs/bootstrap/bootstrap-4a135b976b00f53a3a768ff94eb1df18.min.css" id="quarto-bootstrap" rel="stylesheet"/>
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -72,155 +67,137 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&amp;family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&amp;display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../../assets/highlight/styles/github.min.css">
-<script src="../../assets/highlight/highlight.min.js"></script>
-<script src="../../assets/highlight/languages/julia.min.js"></script>
-<script src="../../assets/highlight/languages/julia-repl.min.js"></script>
-<script src="../../assets/highlight/languages/python.min.js"></script>
-<script src="../../assets/highlight/languages/r.min.js"></script>
-<script>hljs.highlightAll();</script>
-<script data-goatcounter="https://juliaactuary.goatcounter.com/count" async="" src="//gc.zgo.at/count.js"></script>
-
-
-<link rel="stylesheet" href="../../styles.css">
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" rel="stylesheet"/>
+<script async="" data-goatcounter="https://juliaactuary.goatcounter.com/count" src="//gc.zgo.at/count.js"></script>
+<link href="../../styles-c416c153cdf24884.css" rel="stylesheet"/>
 </head>
-
 <body class="nav-fixed fullcontent quarto-light">
-
 <div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top quarto-banner">
-    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
-      <div class="navbar-container container-fluid">
-      <div class="navbar-brand-container mx-auto">
-    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
-    <img src="../../assets/logos/android-chrome-512x512.png" alt="JuliaActuary Logo" class="navbar-logo light-content">
-    <img src="../../assets/logos/android-chrome-512x512.png" alt="JuliaActuary Logo" class="navbar-logo dark-content">
-    </a>
-    <a class="navbar-brand" href="../../index.html">
-    <span class="navbar-title">JuliaActuary</span>
-    </a>
-  </div>
-            <div id="quarto-search" class="" title="Search"></div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-  <span class="navbar-toggler-icon"></span>
-</button>
-          <div class="collapse navbar-collapse" id="navbarCollapse">
-            <ul class="navbar-nav navbar-nav-scroll ms-auto">
-  <li class="nav-item">
-    <a class="nav-link" href="../../packages.html"> 
-<span class="menu-text">Packages</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="https://docs.juliaactuary.org"> 
-<span class="menu-text">Docs</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="https://modernfinancialmodeling.com"> 
-<span class="menu-text">Book</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../learn.html"> 
-<span class="menu-text">Learn</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../examples.html"> 
-<span class="menu-text">Examples</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../benchmarks.html"> 
-<span class="menu-text">Benchmarks</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../community.html"> 
-<span class="menu-text">Community</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../blog.html"> 
-<span class="menu-text">Blog</span></a>
-  </li>  
-  <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/JuliaActuary"> <i class="bi bi-github" role="img">
-</i> 
-<span class="menu-text"></span></a>
-  </li>  
-  <li class="nav-item compact">
-    <a class="nav-link" href="../../all-posts.xml"> <i class="bi bi-rss" role="img">
-</i> 
-<span class="menu-text"></span></a>
-  </li>  
-</ul>
-          </div> <!-- /navcollapse -->
-            <div class="quarto-navbar-tools">
+<header class="headroom fixed-top quarto-banner" id="quarto-header">
+<nav class="navbar navbar-expand-lg" data-bs-theme="dark">
+<div class="navbar-container container-fluid">
+<div class="navbar-brand-container mx-auto">
+<a class="navbar-brand navbar-brand-logo" href="../../index.html">
+<img alt="JuliaActuary Logo" class="navbar-logo light-content" src="../../assets/logos/android-chrome-512x512.png"/>
+<img alt="JuliaActuary Logo" class="navbar-logo dark-content" src="../../assets/logos/android-chrome-512x512.png"/>
+</a>
+<a class="navbar-brand" href="../../index.html">
+<span class="navbar-title">JuliaActuary</span>
+</a>
 </div>
-      </div> <!-- /container-fluid -->
-    </nav>
+<div class="" id="quarto-search" title="Search"></div>
+<button aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-bs-target="#navbarCollapse" data-bs-toggle="collapse" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }" role="menu" type="button">
+<span class="navbar-toggler-icon"></span>
+</button>
+<div class="collapse navbar-collapse" id="navbarCollapse">
+<ul class="navbar-nav navbar-nav-scroll ms-auto">
+<li class="nav-item">
+<a class="nav-link" href="../../packages.html">
+<span class="menu-text">Packages</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="https://docs.juliaactuary.org">
+<span class="menu-text">Docs</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="../../learn.html">
+<span class="menu-text">Learn</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="../../examples.html">
+<span class="menu-text">Examples</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="../../community.html">
+<span class="menu-text">Community</span></a>
+</li>
+<li class="nav-item dropdown">
+<a aria-expanded="false" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" id="nav-menu-more" role="link">
+<span class="menu-text">More</span>
+</a>
+<ul aria-labelledby="nav-menu-more" class="dropdown-menu dropdown-menu-end">
+<li>
+<a class="dropdown-item" href="../../benchmarks.html">
+<span class="dropdown-text">Benchmarks</span></a>
+</li>
+<li>
+<a class="dropdown-item" href="../../blog.html">
+<span class="dropdown-text">Blog</span></a>
+</li>
+<li>
+<a class="dropdown-item" href="https://modernfinancialmodeling.com">
+<span class="dropdown-text">Book</span></a>
+</li>
+</ul>
+</li>
+<li class="nav-item compact">
+<a class="nav-link" href="https://github.com/JuliaActuary"> <i aria-label="JuliaActuary on GitHub" class="bi bi-github" role="img">
+</i>
+<span class="menu-text"></span></a>
+</li>
+<li class="nav-item compact">
+<a class="nav-link" href="../../all-posts.xml"> <i aria-label="RSS feed" class="bi bi-rss" role="img">
+</i>
+<span class="menu-text"></span></a>
+</li>
+</ul>
+</div> <!-- /navcollapse -->
+<div class="quarto-navbar-tools">
+</div>
+</div> <!-- /container-fluid -->
+</nav>
 </header>
 <!-- content -->
-<header id="title-block-header" class="quarto-title-block default page-columns page-full">
-  <div class="quarto-title-banner page-columns page-full">
-    <div class="quarto-title column-body">
-      <h1 class="title">Coding the Future</h1>
-                  <div>
-        <div class="description">
+<header class="quarto-title-block default page-columns page-full" id="title-block-header">
+<div class="quarto-title-banner page-columns page-full">
+<div class="quarto-title column-body">
+<h1 class="title">Coding the Future</h1>
+<div>
+<div class="description">
           JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.
         </div>
-      </div>
-                          <div class="quarto-categories">
-                <div class="quarto-category">code</div>
-                <div class="quarto-category">industry</div>
-                <div class="quarto-category">blog</div>
-              </div>
-                  </div>
-  </div>
-    
-  
-  <div class="quarto-title-meta">
-
-      <div>
-      <div class="quarto-title-meta-heading">Author</div>
-      <div class="quarto-title-meta-contents">
-               <p>Alec Loudenback </p>
-            </div>
-    </div>
-      
-      <div>
-      <div class="quarto-title-meta-heading">Published</div>
-      <div class="quarto-title-meta-contents">
-        <p class="date">July 9, 2020</p>
-      </div>
-    </div>
-    
-      
-    </div>
-    
-  
-  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+</div>
+<div class="quarto-categories">
+<div class="quarto-category">code</div>
+<div class="quarto-category">industry</div>
+<div class="quarto-category">blog</div>
+</div>
+</div>
+</div>
+<div class="quarto-title-meta">
+<div>
+<div class="quarto-title-meta-heading">Author</div>
+<div class="quarto-title-meta-contents">
+<p>Alec Loudenback </p>
+</div>
+</div>
+<div>
+<div class="quarto-title-meta-heading">Published</div>
+<div class="quarto-title-meta-contents">
+<p class="date">July 9, 2020</p>
+</div>
+</div>
+</div>
+</header><div class="quarto-container page-columns page-rows-contents page-layout-article page-navbar" id="quarto-content">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    
 <!-- main -->
 <main class="content quarto-banner-title-block" id="quarto-document-content">
-
-
-
-
-
 <blockquote class="blockquote">
-<p>“…the insurance business is perhaps the purest example of an ‘information-based’ industry - that is, an industry whose sole activity consists of gathering, processing, and distributing information.” - Martin Campbell-Kelly, writing about the Prudential in the Victorian Era.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
+<p>“…the insurance business is perhaps the purest example of an ‘information-based’ industry - that is, an industry whose sole activity consists of gathering, processing, and distributing information.” - Martin Campbell-Kelly, writing about the Prudential in the Victorian Era.<a class="footnote-ref" href="#fn1" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
 </blockquote>
-<section id="the-insurance-industry-yesterday-today-and-tomorrow" class="level2">
+<section class="level2" id="the-insurance-industry-yesterday-today-and-tomorrow">
 <h2 class="anchored" data-anchor-id="the-insurance-industry-yesterday-today-and-tomorrow">The insurance industry: yesterday, today, and tomorrow</h2>
 <p>It might be odd to say that technology and its use in insurance is on a one-hundred-year cycle, but that seems to be the case.</p>
-<p>130 years ago, actuaries crowded into a room at a meeting of the Actuarial Society of America to watch a demonstration that would revolutionize the industry: Herman Hollerith’s tabulating punch card machine<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>.</p>
-<p>For the next half-century, the increasing automation — from tabulating machines to early-adopting mainframes and computers — was a critical competitive differentiator. Companies like Prudential, MetLife, and others partnered with technology companies in the development of hardware and software<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a>.</p>
+<p>130 years ago, actuaries crowded into a room at a meeting of the Actuarial Society of America to watch a demonstration that would revolutionize the industry: Herman Hollerith’s tabulating punch card machine<a class="footnote-ref" href="#fn2" id="fnref2" role="doc-noteref"><sup>2</sup></a>.</p>
+<p>For the next half-century, the increasing automation — from tabulating machines to early-adopting mainframes and computers — was a critical competitive differentiator. Companies like Prudential, MetLife, and others partnered with technology companies in the development of hardware and software<a class="footnote-ref" href="#fn3" id="fnref3" role="doc-noteref"><sup>3</sup></a>.</p>
 <p>The dramatic embodiment of this information-driven cycle was portrayed in the infamous Billion Dollar Bubble movie, which showcased the power and abstraction of the computer to commit millions of dollars of fraud by creating and maintaining fake insurance policies.</p>
 <p>The movie also starts to hint at the oscillation away from the technological-competitive focus of insurance companies. I argue that the focus on technology was lost over the last 50 years with the rise of Wall Street finance, investment-oriented life insurance, industry consolidation, and the explosion of financial structuring like derivatives, reserve financing, or other advanced forms of reinsurance.</p>
 <p>Value-add came from the C-Suite, not from the underlying business processes, operations, and analysis. The result is, e.g., ever-more complicated reinsurance treaties layered into mainframes and admin systems older than most of the actuaries interfacing with them.</p>
 <p>The pace of <em>strategic value-add</em> isn’t slowing, though it must stretch further (in complexity and risk) to find comparable opportunities as the past. Having more agile, data-oriented operations enables companies to be able to react to and implement those opportunities. <em>Technological value-add</em> can improve a company’s bottom line through lower expenses and higher top-line growth, but often with a more favorable risk profile than some of the “strategic” opportunities.</p>
-<p>Today, there is a trend reverting back to technological value-creation and is evident across many traditional sectors. Tesla claims that it’s a technology company; Amazon is the #1 product retailer because of its vehement focus on internal information sharing<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a>; Airlines are so dependent on their systems that the skies become quieter on the rare occasion that their computers give way.</p>
+<p>Today, there is a trend reverting back to technological value-creation and is evident across many traditional sectors. Tesla claims that it’s a technology company; Amazon is the #1 product retailer because of its vehement focus on internal information sharing<a class="footnote-ref" href="#fn4" id="fnref4" role="doc-noteref"><sup>4</sup></a>; Airlines are so dependent on their systems that the skies become quieter on the rare occasion that their computers give way.</p>
 <p>Why is it, that companies that are so involved in <em>things</em> (cars, shopping) and <em>physical services</em> (flights) are so much more focused on improving their technological operations than insurance companies <em>whose very focus is ‘information-based’</em>? <strong>The market has rewarded those who have prioritized their internal technological solutions.</strong></p>
 <p>Commoditized investing services and low yield environments have reduced insurance companies’ comparative advantage to “manage money”. Yield compression and the explosion of consumer-oriented investment services means a more competitive focus on the ability to manage the entire policy lifecycle efficiently (digitally), perform more real-time analysis of experience and risk management, and handle the growing product and regulatory complexity.</p>
 <p>These are problems that have technological solutions and are waiting for insurance company adoption.</p>
@@ -231,7 +208,7 @@ ul.task-list li input[type="checkbox"] {
 </ol>
 <p>Once those two walls are breached, traditional insurance companies without a strong technology core will struggle to keep up. The key to thriving is not just adding “developers” to an organization; it’s going to be <strong>getting domain experts like actuaries to be an integral part of the technology transformation.</strong></p>
 </section>
-<section id="whats-coding-got-to-do-with-this" class="level2">
+<section class="level2" id="whats-coding-got-to-do-with-this">
 <h2 class="anchored" data-anchor-id="whats-coding-got-to-do-with-this">What’s coding got to do with this?</h2>
 <p>Everything. Programming is the optimal way to interact between the computer and actuary — and importantly between computer and computer. Programming is the actionable expression of ideas, math, analysis, and information. Think of programming as the 21st-century leap in the actuary’s toolkit, just as spreadsheets were in the preceding 40 years. Versus a spreadsheet-oriented workflow:</p>
 <ul>
@@ -245,16 +222,16 @@ ul.task-list li input[type="checkbox"] {
 <p><strong>The actuary of the future needs to have coding as one of their core skills.</strong> Already today, the advances of business processes, insurance products, and financial ingenuity are written with lines of code — <em>not</em> spreadsheets. Not being able to code <em>necessarily</em> means that you are <em>following</em> what others are doing today.</p>
 <p>It’s commonly accepted now that to gather insights from your data, you need to know how to code. Similar to your data, your business architecture, modeling needs, and product peculiarities are often better suited to customized solutions. Why stop at data science when learning how to solve problems with a computer?</p>
 </section>
-<section id="the-10x-actuary" class="level2">
+<section class="level2" id="the-10x-actuary">
 <h2 class="anchored" data-anchor-id="the-10x-actuary">The 10x Actuary</h2>
-<p>As we swing back to a technological focus, we do not leave the finance-driven complexity behind. The increasingly complex business needs will highlight a large productivity difference between an actuary who can code and one who can’t — simply because the former can react, create, synthesize, and model faster than the latter. From the efficiency of transforming administration extracts, summarizing and aggregating valuation output, to analyzing claims data in ways that spreadsheets simply can’t handle, you can become a “<strong>10x Actuary</strong>”<a href="#fn5" class="footnote-ref" id="fnref5" role="doc-noteref"><sup>5</sup></a>.</p>
+<p>As we swing back to a technological focus, we do not leave the finance-driven complexity behind. The increasingly complex business needs will highlight a large productivity difference between an actuary who can code and one who can’t — simply because the former can react, create, synthesize, and model faster than the latter. From the efficiency of transforming administration extracts, summarizing and aggregating valuation output, to analyzing claims data in ways that spreadsheets simply can’t handle, you can become a “<strong>10x Actuary</strong>”<a class="footnote-ref" href="#fn5" id="fnref5" role="doc-noteref"><sup>5</sup></a>.</p>
 <p>Flipping switches in a graphical user interface versus being able to <em>build models</em> is the difference between having a surface-level familiarity and having full command over the analysis and the concepts involved — with the flexibility to do what your software can’t.</p>
 <p>Your current software might be able to perform the first layer of analysis but be at a loss when you want to visualize, perform sensitivity analysis, statistics, stochastic analysis, or process automation. Things that, when done programmatically, are often just a few lines of additional code.</p>
 <p>Do I advocate dropping the license for your software vendor? No, not yet anyway. But the ability to supplement and break out of the modeling box has been an increasingly important part of most actuaries’ work.</p>
 <p>Additionally, code-based solutions can leverage the entire-technology sector’s progress to solve problems that are <em>hard</em> otherwise: scalability, data workflows, integration across functional areas, version control and versioning, model change governance, reproducibility, and more.</p>
 <p>30-40 years ago, there were no vendor-supplied modeling solutions and so you had no choice but to build models internally. This shifted with the advent of vendor-supplied modeling solutions. Today, it’s never been better for companies to leverage open source to support their custom modeling, risk analysis/monitoring, and reporting workflows.</p>
 </section>
-<section id="risk-governance" class="level2">
+<section class="level2" id="risk-governance">
 <h2 class="anchored" data-anchor-id="risk-governance">Risk Governance</h2>
 <p>Code-based workflows are highly conducive to risk governance frameworks as well. If a modern software project has all of the following benefits, then why not a modern insurance product and associated processes?</p>
 <ul>
@@ -265,42 +242,37 @@ ul.task-list li input[type="checkbox"] {
 <li>Minimization of manual overrides, intervention, and opportunity for user error</li>
 <li>Automated trending analysis, system metrics, and summary statistics</li>
 <li>Continuously updated, integrated, and self-generating documentation</li>
-<li>Integration with other business processes through a formal boundary (e.g.&nbsp;via an API)</li>
+<li>Integration with other business processes through a formal boundary (e.g. via an API)</li>
 <li>Tools to manage collaboration in parallel and in sequence</li>
 </ul>
 </section>
-<section id="managing-and-leading-the-transformation" class="level2">
+<section class="level2" id="managing-and-leading-the-transformation">
 <h2 class="anchored" data-anchor-id="managing-and-leading-the-transformation">Managing and Leading the Transformation</h2>
 <p>The ability to understand the concepts, capabilities, challenges, and lingo is not a dichotomy, it’s a spectrum. Most actuaries, even at fairly high levels, are still often involved in analytical work. Still above that, it’s difficult to lead something that you don’t understand.</p>
 <p>Conversely, the skill and practice of coding enhances managerial capabilities. When you are really skilled at pulling apart a problem or process into its constituent parts and designing optimal solutions; that’s a core attribute of leadership: having the vision of where the organization <em>should be</em> instead of thinking about where it is now.</p>
 <p>Nor is the skillset described here limiting in any other aspect of career development any more than mathematical ability, project collaboration, or financial acumen — just to name a few.</p>
 </section>
-<section id="outlook" class="level2">
+<section class="level2" id="outlook">
 <h2 class="anchored" data-anchor-id="outlook">Outlook</h2>
 <p><strong>It will increasingly be essential for companies to modernize to remain competitive. That modernization isn’t built with big black-box software packages; it will be with domain experts who can translate the expertise into new forms of analysis - doing it faster and more robustly than the competition.</strong></p>
 <p>SpaceX doesn’t just hire rocket scientists - they hire rocket scientists who code.</p>
 <p><strong>Be an actuary who codes.</strong></p>
 </section>
-<section id="future-articles" class="level2">
+<section class="level2" id="future-articles">
 <h2 class="anchored" data-anchor-id="future-articles">Future Articles</h2>
 <p>The forthcoming series of articles will help illustrate what this can look like in practice: examining the business case, acquainting with ways of interacting with problems outside of spreadsheets and dataframes, and approaching work in a way that removes the boring parts and focuses on the concepts and insights.</p>
 <p>The <a href="../../posts/julia-for-actuaries/index.html">next article in this series</a> will discuss what tools enable an actuary to deliver on the vision outlined in this article. In particular, it will highlight the Julia programming language, a tool well positioned to enable actuaries to develop the analysis, systems, and models of tomorrow.</p>
 </section>
-<section id="footnotes" class="level1">
+<section class="level1" id="footnotes">
 <h1>Footnotes</h1>
-
-
 </section>
-
-
-<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
-
+<div class="default" id="quarto-appendix"><section class="footnotes footnotes-end-of-document" id="footnotes" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
 <ol>
-<li id="fn1"><p><a href="https://dspace.mit.edu/bitstream/handle/1721.1/2472/swp-3575-28521189.pdf?sequence=1">Co-evolution of Information Processing Technology and Use: Interaction Between the Life Insurance and Tabulating Industries</a><a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn2"><p><a href="https://dspace.mit.edu/bitstream/handle/1721.1/2472/swp-3575-28521189.pdf?sequence=1">Co-evolution of Information Processing Technology and Use: Interaction Between the Life Insurance and Tabulating Industries</a><a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn3"><p><a href="http://ccs.mit.edu/papers/CCSWP153.html">From Tabulators to Early Computers in the U.S. Life Insurance Industry</a><a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn4"><p><a href="https://www.cio.com/article/3218667/have-you-had-your-bezos-moment-what-you-can-learn-from-amazon.html">Have you had your Bezos moment? What you can learn from Amazon</a><a href="#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn5"><p><a href="https://www.ybrikman.com/writing/2013/09/29/the-10x-developer-is-not-myth/">The 10x [Rockstar] developer is NOT a myth</a><a href="#fnref5" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn1"><p><a href="https://dspace.mit.edu/bitstream/handle/1721.1/2472/swp-3575-28521189.pdf?sequence=1">Co-evolution of Information Processing Technology and Use: Interaction Between the Life Insurance and Tabulating Industries</a><a class="footnote-back" href="#fnref1" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p><a href="https://dspace.mit.edu/bitstream/handle/1721.1/2472/swp-3575-28521189.pdf?sequence=1">Co-evolution of Information Processing Technology and Use: Interaction Between the Life Insurance and Tabulating Industries</a><a class="footnote-back" href="#fnref2" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3"><p><a href="http://ccs.mit.edu/papers/CCSWP153.html">From Tabulators to Early Computers in the U.S. Life Insurance Industry</a><a class="footnote-back" href="#fnref3" role="doc-backlink">↩︎</a></p></li>
+<li id="fn4"><p><a href="https://www.cio.com/article/3218667/have-you-had-your-bezos-moment-what-you-can-learn-from-amazon.html">Have you had your Bezos moment? What you can learn from Amazon</a><a class="footnote-back" href="#fnref4" role="doc-backlink">↩︎</a></p></li>
+<li id="fn5"><p><a href="https://www.ybrikman.com/writing/2013/09/29/the-10x-developer-is-not-myth/">The 10x [Rockstar] developer is NOT a myth</a><a class="footnote-back" href="#fnref5" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -704,8 +676,4 @@ ul.task-list li input[type="checkbox"] {
   });
   </script>
 </div> <!-- /content -->
-
-
-
-
 </body></html>

@@ -1,13 +1,10 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
-<meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.16">
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-
-<meta name="description" content="JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.">
-
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml"><head>
+<meta charset="utf-8"/>
+<meta content="quarto-1.9.16" name="generator"/>
+<meta content="width=device-width, initial-scale=1.0, user-scalable=yes" name="viewport"/>
+<meta content="JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows." name="description"/>
 <title>Autodifferentiation and Asset Liability Management (AAD &amp; ALM) – JuliaActuary</title>
 <style>
 code{white-space: pre-wrap;}
@@ -21,28 +18,61 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
-
-
 <script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="../../site_libs/quarto-nav/headroom.min.js"></script>
 <script src="../../site_libs/clipboard/clipboard.min.js"></script>
 <script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="../../">
-<link href="../..//assets/logos/favicon.ico" rel="icon">
+<meta content="../../" name="quarto:offset"/>
+<link href="../..//assets/logos/favicon.ico" rel="icon"/>
 <script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
-<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-a0731b9a3a5d496010872d775e5d9bc3.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet"/>
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-be14ce6d32a635bebd8f9e4e558f9eeb.css" id="quarto-text-highlighting-styles" rel="stylesheet"/>
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-98ac2d5361ef6f18cc0525d38bedc462.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet"/>
+<link append-hash="true" data-mode="light" href="../../site_libs/bootstrap/bootstrap-4a135b976b00f53a3a768ff94eb1df18.min.css" id="quarto-bootstrap" rel="stylesheet"/>
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -70,162 +100,144 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&amp;family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&amp;display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../../assets/highlight/styles/github.min.css">
-<script src="../../assets/highlight/highlight.min.js"></script>
-<script src="../../assets/highlight/languages/julia.min.js"></script>
-<script src="../../assets/highlight/languages/julia-repl.min.js"></script>
-<script src="../../assets/highlight/languages/python.min.js"></script>
-<script src="../../assets/highlight/languages/r.min.js"></script>
-<script>hljs.highlightAll();</script>
-<script data-goatcounter="https://juliaactuary.goatcounter.com/count" async="" src="//gc.zgo.at/count.js"></script>
-
-
-<link rel="stylesheet" href="../../styles.css">
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" rel="stylesheet"/>
+<script async="" data-goatcounter="https://juliaactuary.goatcounter.com/count" src="//gc.zgo.at/count.js"></script>
+<link href="../../styles-c416c153cdf24884.css" rel="stylesheet"/>
 </head>
-
 <body class="nav-fixed fullcontent quarto-light">
-
 <div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top quarto-banner">
-    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
-      <div class="navbar-container container-fluid">
-      <div class="navbar-brand-container mx-auto">
-    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
-    <img src="../../assets/logos/android-chrome-512x512.png" alt="JuliaActuary Logo" class="navbar-logo light-content">
-    <img src="../../assets/logos/android-chrome-512x512.png" alt="JuliaActuary Logo" class="navbar-logo dark-content">
-    </a>
-    <a class="navbar-brand" href="../../index.html">
-    <span class="navbar-title">JuliaActuary</span>
-    </a>
-  </div>
-            <div id="quarto-search" class="" title="Search"></div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-  <span class="navbar-toggler-icon"></span>
-</button>
-          <div class="collapse navbar-collapse" id="navbarCollapse">
-            <ul class="navbar-nav navbar-nav-scroll ms-auto">
-  <li class="nav-item">
-    <a class="nav-link" href="../../packages.html"> 
-<span class="menu-text">Packages</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="https://docs.juliaactuary.org"> 
-<span class="menu-text">Docs</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="https://modernfinancialmodeling.com"> 
-<span class="menu-text">Book</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../learn.html"> 
-<span class="menu-text">Learn</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../examples.html"> 
-<span class="menu-text">Examples</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../benchmarks.html"> 
-<span class="menu-text">Benchmarks</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../community.html"> 
-<span class="menu-text">Community</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../blog.html"> 
-<span class="menu-text">Blog</span></a>
-  </li>  
-  <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/JuliaActuary"> <i class="bi bi-github" role="img">
-</i> 
-<span class="menu-text"></span></a>
-  </li>  
-  <li class="nav-item compact">
-    <a class="nav-link" href="../../all-posts.xml"> <i class="bi bi-rss" role="img">
-</i> 
-<span class="menu-text"></span></a>
-  </li>  
-</ul>
-          </div> <!-- /navcollapse -->
-            <div class="quarto-navbar-tools">
+<header class="headroom fixed-top quarto-banner" id="quarto-header">
+<nav class="navbar navbar-expand-lg" data-bs-theme="dark">
+<div class="navbar-container container-fluid">
+<div class="navbar-brand-container mx-auto">
+<a class="navbar-brand navbar-brand-logo" href="../../index.html">
+<img alt="JuliaActuary Logo" class="navbar-logo light-content" src="../../assets/logos/android-chrome-512x512.png"/>
+<img alt="JuliaActuary Logo" class="navbar-logo dark-content" src="../../assets/logos/android-chrome-512x512.png"/>
+</a>
+<a class="navbar-brand" href="../../index.html">
+<span class="navbar-title">JuliaActuary</span>
+</a>
 </div>
-      </div> <!-- /container-fluid -->
-    </nav>
+<div class="" id="quarto-search" title="Search"></div>
+<button aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-bs-target="#navbarCollapse" data-bs-toggle="collapse" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }" role="menu" type="button">
+<span class="navbar-toggler-icon"></span>
+</button>
+<div class="collapse navbar-collapse" id="navbarCollapse">
+<ul class="navbar-nav navbar-nav-scroll ms-auto">
+<li class="nav-item">
+<a class="nav-link" href="../../packages.html">
+<span class="menu-text">Packages</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="https://docs.juliaactuary.org">
+<span class="menu-text">Docs</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="../../learn.html">
+<span class="menu-text">Learn</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="../../examples.html">
+<span class="menu-text">Examples</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="../../community.html">
+<span class="menu-text">Community</span></a>
+</li>
+<li class="nav-item dropdown">
+<a aria-expanded="false" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" id="nav-menu-more" role="link">
+<span class="menu-text">More</span>
+</a>
+<ul aria-labelledby="nav-menu-more" class="dropdown-menu dropdown-menu-end">
+<li>
+<a class="dropdown-item" href="../../benchmarks.html">
+<span class="dropdown-text">Benchmarks</span></a>
+</li>
+<li>
+<a class="dropdown-item" href="../../blog.html">
+<span class="dropdown-text">Blog</span></a>
+</li>
+<li>
+<a class="dropdown-item" href="https://modernfinancialmodeling.com">
+<span class="dropdown-text">Book</span></a>
+</li>
+</ul>
+</li>
+<li class="nav-item compact">
+<a class="nav-link" href="https://github.com/JuliaActuary"> <i aria-label="JuliaActuary on GitHub" class="bi bi-github" role="img">
+</i>
+<span class="menu-text"></span></a>
+</li>
+<li class="nav-item compact">
+<a class="nav-link" href="../../all-posts.xml"> <i aria-label="RSS feed" class="bi bi-rss" role="img">
+</i>
+<span class="menu-text"></span></a>
+</li>
+</ul>
+</div> <!-- /navcollapse -->
+<div class="quarto-navbar-tools">
+</div>
+</div> <!-- /container-fluid -->
+</nav>
 </header>
 <!-- content -->
-<header id="title-block-header" class="quarto-title-block default page-columns page-full">
-  <div class="quarto-title-banner page-columns page-full">
-    <div class="quarto-title column-body">
-      <h1 class="title">Autodifferentiation and Asset Liability Management (AAD &amp; ALM)</h1>
-                  <div>
-        <div class="description">
+<header class="quarto-title-block default page-columns page-full" id="title-block-header">
+<div class="quarto-title-banner page-columns page-full">
+<div class="quarto-title column-body">
+<h1 class="title">Autodifferentiation and Asset Liability Management (AAD &amp; ALM)</h1>
+<div>
+<div class="description">
           JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.
         </div>
-      </div>
-                          <div class="quarto-categories">
-                <div class="quarto-category">modeling</div>
-                <div class="quarto-category">autodiff</div>
-                <div class="quarto-category">alm</div>
-              </div>
-                  </div>
-  </div>
-    
-  
-  <div class="quarto-title-meta">
-
-      
-    
-      
-    </div>
-    
-  
-  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+</div>
+<div class="quarto-categories">
+<div class="quarto-category">modeling</div>
+<div class="quarto-category">autodiff</div>
+<div class="quarto-category">alm</div>
+</div>
+</div>
+</div>
+<div class="quarto-title-meta">
+</div>
+</header><div class="quarto-container page-columns page-rows-contents page-layout-article page-navbar" id="quarto-content">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    
 <!-- main -->
 <main class="content quarto-banner-title-block" id="quarto-document-content">
-
-
-
-
-
 <p>Asset liability modeling requires computing derivatives of portfolio values with respect to yield curve changes. Traditional approaches use finite difference methods or analytical approximations, but automatic differentiation (“autodiff” or “AD”) provides exact derivatives with minimal additional computation. This post demonstrates how to implement ALM workflows using autodiff in Julia.</p>
-<div id="4" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>using FinanceCore              # provides Cashflow object
-using DifferentiationInterface # autodiff 
-import ForwardDiff             # specific autodiff technique
-using CairoMakie               # plotting
-using DataInterpolations       # yield curve interpolation
-using Transducers              # data aggregation
-using JuMP, HiGHS              # portfolio optimization
-using LinearAlgebra            # math
-using BenchmarkTools           # benchmarking
-using OhMyThreads              # multi-threading
-
-# Apply the site's custom Makie plot theme (cassette futurism).
-include(joinpath(@__DIR__, "..", "..", "assets", "themes", "cassette_futurism.jl"))
-set_theme!(cassette_futurism_theme())</code></pre>
+<div class="cell" data-execution_count="1" id="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a aria-hidden="true" href="#cb1-1" tabindex="-1"></a><span class="im">using</span> <span class="bu">FinanceCore</span>              <span class="co"># provides Cashflow object</span></span>
+<span id="cb1-2"><a aria-hidden="true" href="#cb1-2" tabindex="-1"></a><span class="im">using</span> <span class="bu">DifferentiationInterface</span> <span class="co"># autodiff </span></span>
+<span id="cb1-3"><a aria-hidden="true" href="#cb1-3" tabindex="-1"></a><span class="im">import</span> <span class="bu">ForwardDiff</span>             <span class="co"># specific autodiff technique</span></span>
+<span id="cb1-4"><a aria-hidden="true" href="#cb1-4" tabindex="-1"></a><span class="im">using</span> <span class="bu">CairoMakie</span>               <span class="co"># plotting</span></span>
+<span id="cb1-5"><a aria-hidden="true" href="#cb1-5" tabindex="-1"></a><span class="im">using</span> <span class="bu">DataInterpolations</span>       <span class="co"># yield curve interpolation</span></span>
+<span id="cb1-6"><a aria-hidden="true" href="#cb1-6" tabindex="-1"></a><span class="im">using</span> <span class="bu">Transducers</span>              <span class="co"># data aggregation</span></span>
+<span id="cb1-7"><a aria-hidden="true" href="#cb1-7" tabindex="-1"></a><span class="im">using</span> <span class="bu">JuMP</span>, <span class="bu">HiGHS</span>              <span class="co"># portfolio optimization</span></span>
+<span id="cb1-8"><a aria-hidden="true" href="#cb1-8" tabindex="-1"></a><span class="im">using</span> <span class="bu">LinearAlgebra</span>            <span class="co"># math</span></span>
+<span id="cb1-9"><a aria-hidden="true" href="#cb1-9" tabindex="-1"></a><span class="im">using</span> <span class="bu">BenchmarkTools</span>           <span class="co"># benchmarking</span></span>
+<span id="cb1-10"><a aria-hidden="true" href="#cb1-10" tabindex="-1"></a><span class="im">using</span> <span class="bu">OhMyThreads</span>              <span class="co"># multi-threading</span></span>
+<span id="cb1-11"><a aria-hidden="true" href="#cb1-11" tabindex="-1"></a></span>
+<span id="cb1-12"><a aria-hidden="true" href="#cb1-12" tabindex="-1"></a><span class="co"># Apply the site's custom Makie plot theme (cassette futurism).</span></span>
+<span id="cb1-13"><a aria-hidden="true" href="#cb1-13" tabindex="-1"></a><span class="fu">include</span>(<span class="fu">joinpath</span>(<span class="pp">@__DIR__</span>, <span class="st">".."</span>, <span class="st">".."</span>, <span class="st">"assets"</span>, <span class="st">"themes"</span>, <span class="st">"cassette_futurism.jl"</span>))</span>
+<span id="cb1-14"><a aria-hidden="true" href="#cb1-14" tabindex="-1"></a><span class="fu">set_theme!</span>(<span class="fu">cassette_futurism_theme</span>())</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 </div>
-<section id="interest-rate-curve-setup" class="level2">
+<section class="level2" id="interest-rate-curve-setup">
 <h2 class="anchored" data-anchor-id="interest-rate-curve-setup">Interest Rate Curve Setup</h2>
 <p>We start by constructing a yield curve using cubic spline interpolation:</p>
 <p>The <code>curve</code> function creates a discount factor curve from zero rates and time points. This curve will serve as input to our <code>value</code> function, which makes it straightforward to compute sensitivities by differentiating with respect to the rate parameters.</p>
-<div id="6" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>
-zeros = [0.01, 0.02, 0.02, 0.03, 0.05, 0.055] #continuous
-
-times = [1., 2., 3., 5., 10., 20.]
-
-function curve(zeros, times)
-    DataInterpolations.CubicSpline([1.0; exp.(-zeros .* times)], [0.; times])
-end
-
-c = curve(zeros, times)</code></pre>
+<div class="cell" data-execution_count="1" id="6">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a aria-hidden="true" href="#cb2-1" tabindex="-1"></a></span>
+<span id="cb2-2"><a aria-hidden="true" href="#cb2-2" tabindex="-1"></a>zeros <span class="op">=</span> [<span class="fl">0.01</span>, <span class="fl">0.02</span>, <span class="fl">0.02</span>, <span class="fl">0.03</span>, <span class="fl">0.05</span>, <span class="fl">0.055</span>] <span class="co">#continuous</span></span>
+<span id="cb2-3"><a aria-hidden="true" href="#cb2-3" tabindex="-1"></a></span>
+<span id="cb2-4"><a aria-hidden="true" href="#cb2-4" tabindex="-1"></a>times <span class="op">=</span> [<span class="fl">1</span>., <span class="fl">2</span>., <span class="fl">3</span>., <span class="fl">5</span>., <span class="fl">10</span>., <span class="fl">20</span>.]</span>
+<span id="cb2-5"><a aria-hidden="true" href="#cb2-5" tabindex="-1"></a></span>
+<span id="cb2-6"><a aria-hidden="true" href="#cb2-6" tabindex="-1"></a><span class="kw">function</span> <span class="fu">curve</span>(zeros, times)</span>
+<span id="cb2-7"><a aria-hidden="true" href="#cb2-7" tabindex="-1"></a>    DataInterpolations.<span class="fu">CubicSpline</span>([<span class="fl">1.0</span>; <span class="fu">exp</span>.(<span class="op">-</span>zeros <span class="op">.*</span> times)], [<span class="fl">0</span>.; times])</span>
+<span id="cb2-8"><a aria-hidden="true" href="#cb2-8" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb2-9"><a aria-hidden="true" href="#cb2-9" tabindex="-1"></a></span>
+<span id="cb2-10"><a aria-hidden="true" href="#cb2-10" tabindex="-1"></a>c <span class="op">=</span> <span class="fu">curve</span>(zeros, times)</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div class="ansi-escaped-output">
 <pre>CubicSpline with 7 points
@@ -245,37 +257,37 @@ c = curve(zeros, times)</code></pre>
 </div>
 </div>
 </section>
-<section id="asset-valuation-framework" class="level2">
+<section class="level2" id="asset-valuation-framework">
 <h2 class="anchored" data-anchor-id="asset-valuation-framework">Asset Valuation Framework</h2>
 <p>The core valuation function operates on any instrument that produces cashflows:</p>
-<div id="8" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>function value(curve, asset)
-    cfs = asset(curve)
-    mapreduce(cf -&gt; cf.amount * curve(cf.time), +, cfs)
-end</code></pre>
+<div class="cell" data-execution_count="1" id="8">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a aria-hidden="true" href="#cb3-1" tabindex="-1"></a><span class="kw">function</span> <span class="fu">value</span>(curve, asset)</span>
+<span id="cb3-2"><a aria-hidden="true" href="#cb3-2" tabindex="-1"></a>    cfs <span class="op">=</span> <span class="fu">asset</span>(curve)</span>
+<span id="cb3-3"><a aria-hidden="true" href="#cb3-3" tabindex="-1"></a>    <span class="fu">mapreduce</span>(cf <span class="op">-&gt;</span> cf.amount <span class="op">*</span> <span class="fu">curve</span>(cf.time), <span class="op">+</span>, cfs)</span>
+<span id="cb3-4"><a aria-hidden="true" href="#cb3-4" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>value (generic function with 1 method)</code></pre>
 </div>
 </div>
 <p>This design separates the valuation logic from the instrument definition. Each asset type implements a callable interface that generates cashflows given a yield curve. Note how the asset itself gets passed the curve (the <code>asset(curve)</code> statement) to determine the cashflows.</p>
 <p>For fixed bonds, we create a structure that generates periodic coupon payments:</p>
-<div id="10" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>struct FixedBond{A,B,C}
-    coupon::A
-    tenor::B
-    periodicity::C
-end
-function (b::FixedBond)(curve)
-    map(1//b.periodicity:1//b.periodicity:b.tenor) do t
-        Cashflow(b.coupon / b.periodicity + (t == b.tenor ? 1. : 0.), t)
-    end
-end
-
-function par_yield(curve, tenor, periodicity)
-    dfs = curve.(1//periodicity:1//periodicity:tenor)
-
-    (1 - last(dfs)) / sum(dfs) * periodicity
-end</code></pre>
+<div class="cell" data-execution_count="1" id="10">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a aria-hidden="true" href="#cb5-1" tabindex="-1"></a><span class="kw">struct</span> FixedBond{A,B,C}</span>
+<span id="cb5-2"><a aria-hidden="true" href="#cb5-2" tabindex="-1"></a>    coupon<span class="op">::</span><span class="dt">A</span></span>
+<span id="cb5-3"><a aria-hidden="true" href="#cb5-3" tabindex="-1"></a>    tenor<span class="op">::</span><span class="dt">B</span></span>
+<span id="cb5-4"><a aria-hidden="true" href="#cb5-4" tabindex="-1"></a>    periodicity<span class="op">::</span><span class="dt">C</span></span>
+<span id="cb5-5"><a aria-hidden="true" href="#cb5-5" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb5-6"><a aria-hidden="true" href="#cb5-6" tabindex="-1"></a><span class="kw">function</span> (b<span class="op">::</span><span class="dt">FixedBond</span>)(curve)</span>
+<span id="cb5-7"><a aria-hidden="true" href="#cb5-7" tabindex="-1"></a>    <span class="fu">map</span>(<span class="fl">1</span><span class="op">//</span>b.periodicity<span class="op">:</span><span class="fl">1</span><span class="op">//</span>b.periodicity<span class="op">:</span>b.tenor) <span class="cf">do</span> t</span>
+<span id="cb5-8"><a aria-hidden="true" href="#cb5-8" tabindex="-1"></a>        <span class="fu">Cashflow</span>(b.coupon <span class="op">/</span> b.periodicity <span class="op">+</span> (t <span class="op">==</span> b.tenor ? <span class="fl">1</span>. <span class="op">:</span> <span class="fl">0</span>.), t)</span>
+<span id="cb5-9"><a aria-hidden="true" href="#cb5-9" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb5-10"><a aria-hidden="true" href="#cb5-10" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb5-11"><a aria-hidden="true" href="#cb5-11" tabindex="-1"></a></span>
+<span id="cb5-12"><a aria-hidden="true" href="#cb5-12" tabindex="-1"></a><span class="kw">function</span> <span class="fu">par_yield</span>(curve, tenor, periodicity)</span>
+<span id="cb5-13"><a aria-hidden="true" href="#cb5-13" tabindex="-1"></a>    dfs <span class="op">=</span> <span class="fu">curve</span>.(<span class="fl">1</span><span class="op">//</span>periodicity<span class="op">:</span><span class="fl">1</span><span class="op">//</span>periodicity<span class="op">:</span>tenor)</span>
+<span id="cb5-14"><a aria-hidden="true" href="#cb5-14" tabindex="-1"></a></span>
+<span id="cb5-15"><a aria-hidden="true" href="#cb5-15" tabindex="-1"></a>    (<span class="fl">1</span> <span class="op">-</span> <span class="fu">last</span>(dfs)) <span class="op">/</span> <span class="fu">sum</span>(dfs) <span class="op">*</span> periodicity</span>
+<span id="cb5-16"><a aria-hidden="true" href="#cb5-16" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 </div>
 <p>The <code>(b::FixedBond)(curve)</code> function (sometimes called a ‘functor’, since we are using the <code>b</code> object itself as the function invocation) takes the curve and returns an array of <code>Cashflow</code>s.</p>
 <div class="callout callout-style-default callout-note callout-titled">
@@ -293,8 +305,8 @@ Note
 </div>
 <p>The <code>par_yield</code> function computes the coupon rate that prices the bond at par, which we’ll use to construct our asset universe.</p>
 <p>Here’s an example of bond cashflows and valuing that bond using the curve <code>c</code> that we constructed earlier.</p>
-<div id="12" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>FixedBond(0.08, 10, 2)(c)</code></pre>
+<div class="cell" data-execution_count="1" id="12">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a aria-hidden="true" href="#cb6-1" tabindex="-1"></a><span class="fu">FixedBond</span>(<span class="fl">0.08</span>, <span class="fl">10</span>, <span class="fl">2</span>)(c)</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>20-element Vector{Cashflow{Float64, Rational{Int64}}}:
  Cashflow{Float64, Rational{Int64}}(0.04, 1//2)
@@ -319,86 +331,85 @@ Note
  Cashflow{Float64, Rational{Int64}}(1.04, 10//1)</code></pre>
 </div>
 </div>
-<div id="14" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>value(c, FixedBond(0.09, 10, 2))</code></pre>
+<div class="cell" data-execution_count="1" id="14">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a aria-hidden="true" href="#cb8-1" tabindex="-1"></a><span class="fu">value</span>(c, <span class="fu">FixedBond</span>(<span class="fl">0.09</span>, <span class="fl">10</span>, <span class="fl">2</span>))</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>1.3526976075662451</code></pre>
 </div>
 </div>
 </section>
-<section id="liability-modeling" class="level2">
+<section class="level2" id="liability-modeling">
 <h2 class="anchored" data-anchor-id="liability-modeling">Liability Modeling</h2>
 <p>Deferred annuities require more complex modeling than fixed bonds due to policyholder behavior (optionality). The surrender rate depends on the difference between market rates and the guaranteed rate. The surrender function chosen below is arbitrary, but follows a typical pattern with much higher surrenders if the market rate on competing instruments is higher than what’s currently available. The account value accumulates at the guaranteed rate, and surrenders create negative cashflows representing benefit payments. Lastly, the <code>annuities</code> function is a wrapper function we will use to compute the portfolio value and ALM metrics later.</p>
-<div id="16" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>begin
-    struct DeferredAnnuity{A,B}
-        tenor::A
-        rate::B
-    end
-
-    function (d::DeferredAnnuity)(curve)
-        av = 1.
-        map(1//12:1//12:d.tenor) do t
-            mkt_rate = -log(curve(d.tenor) / curve(t)) / (d.tenor - t)
-            av *= exp(d.rate / 12)
-            rate_diff = mkt_rate - d.rate
-            sr = t == d.tenor ? 1.0 : surrender_rate(rate_diff) / 12
-            av_surr = av * sr
-            av -= av_surr
-            Cashflow(-av_surr, t)
-
-        end
-    end
-
-    function surrender_rate(rate_diff)
-        1 / (1 + exp(3 - rate_diff * 60))
-    end
-    function annuities(rates, portfolio)
-        times = [1., 2., 3., 5., 10., 20.]
-
-        c = curve(rates, times)
-
-        # threaded map-reduce for more speed
-        OhMyThreads.tmapreduce(+, 1:length(portfolio); ntasks=Threads.nthreads()) do i
-                value(c,portfolio[i])
-        end
-        # mapreduce(l -&gt; value(c,l),+,portfolio)
-    end
-
-end</code></pre>
+<div class="cell" data-execution_count="1" id="16">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb10-1"><a aria-hidden="true" href="#cb10-1" tabindex="-1"></a><span class="cf">begin</span></span>
+<span id="cb10-2"><a aria-hidden="true" href="#cb10-2" tabindex="-1"></a>    <span class="kw">struct</span> DeferredAnnuity{A,B}</span>
+<span id="cb10-3"><a aria-hidden="true" href="#cb10-3" tabindex="-1"></a>        tenor<span class="op">::</span><span class="dt">A</span></span>
+<span id="cb10-4"><a aria-hidden="true" href="#cb10-4" tabindex="-1"></a>        rate<span class="op">::</span><span class="dt">B</span></span>
+<span id="cb10-5"><a aria-hidden="true" href="#cb10-5" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb10-6"><a aria-hidden="true" href="#cb10-6" tabindex="-1"></a></span>
+<span id="cb10-7"><a aria-hidden="true" href="#cb10-7" tabindex="-1"></a>    <span class="kw">function</span> (d<span class="op">::</span><span class="dt">DeferredAnnuity</span>)(curve)</span>
+<span id="cb10-8"><a aria-hidden="true" href="#cb10-8" tabindex="-1"></a>        av <span class="op">=</span> <span class="fl">1</span>.</span>
+<span id="cb10-9"><a aria-hidden="true" href="#cb10-9" tabindex="-1"></a>        <span class="fu">map</span>(<span class="fl">1</span><span class="op">//</span><span class="fl">12</span><span class="op">:</span><span class="fl">1</span><span class="op">//</span><span class="fl">12</span><span class="op">:</span>d.tenor) <span class="cf">do</span> t</span>
+<span id="cb10-10"><a aria-hidden="true" href="#cb10-10" tabindex="-1"></a>            mkt_rate <span class="op">=</span> <span class="fu">-log</span>(<span class="fu">curve</span>(d.tenor) <span class="op">/</span> <span class="fu">curve</span>(t)) <span class="op">/</span> (d.tenor <span class="op">-</span> t)</span>
+<span id="cb10-11"><a aria-hidden="true" href="#cb10-11" tabindex="-1"></a>            av <span class="op">*=</span> <span class="fu">exp</span>(d.rate <span class="op">/</span> <span class="fl">12</span>)</span>
+<span id="cb10-12"><a aria-hidden="true" href="#cb10-12" tabindex="-1"></a>            rate_diff <span class="op">=</span> mkt_rate <span class="op">-</span> d.rate</span>
+<span id="cb10-13"><a aria-hidden="true" href="#cb10-13" tabindex="-1"></a>            sr <span class="op">=</span> t <span class="op">==</span> d.tenor ? <span class="fl">1.0</span> <span class="op">:</span> <span class="fu">surrender_rate</span>(rate_diff) <span class="op">/</span> <span class="fl">12</span></span>
+<span id="cb10-14"><a aria-hidden="true" href="#cb10-14" tabindex="-1"></a>            av_surr <span class="op">=</span> av <span class="op">*</span> sr</span>
+<span id="cb10-15"><a aria-hidden="true" href="#cb10-15" tabindex="-1"></a>            av <span class="op">-=</span> av_surr</span>
+<span id="cb10-16"><a aria-hidden="true" href="#cb10-16" tabindex="-1"></a>            <span class="fu">Cashflow</span>(<span class="op">-</span>av_surr, t)</span>
+<span id="cb10-17"><a aria-hidden="true" href="#cb10-17" tabindex="-1"></a></span>
+<span id="cb10-18"><a aria-hidden="true" href="#cb10-18" tabindex="-1"></a>        <span class="cf">end</span></span>
+<span id="cb10-19"><a aria-hidden="true" href="#cb10-19" tabindex="-1"></a>    <span class="kw">end</span></span>
+<span id="cb10-20"><a aria-hidden="true" href="#cb10-20" tabindex="-1"></a></span>
+<span id="cb10-21"><a aria-hidden="true" href="#cb10-21" tabindex="-1"></a>    <span class="kw">function</span> <span class="fu">surrender_rate</span>(rate_diff)</span>
+<span id="cb10-22"><a aria-hidden="true" href="#cb10-22" tabindex="-1"></a>        <span class="fl">1</span> <span class="op">/</span> (<span class="fl">1</span> <span class="op">+</span> <span class="fu">exp</span>(<span class="fl">3</span> <span class="op">-</span> rate_diff <span class="op">*</span> <span class="fl">60</span>))</span>
+<span id="cb10-23"><a aria-hidden="true" href="#cb10-23" tabindex="-1"></a>    <span class="kw">end</span></span>
+<span id="cb10-24"><a aria-hidden="true" href="#cb10-24" tabindex="-1"></a>    <span class="kw">function</span> <span class="fu">annuities</span>(rates, portfolio)</span>
+<span id="cb10-25"><a aria-hidden="true" href="#cb10-25" tabindex="-1"></a>        times <span class="op">=</span> [<span class="fl">1</span>., <span class="fl">2</span>., <span class="fl">3</span>., <span class="fl">5</span>., <span class="fl">10</span>., <span class="fl">20</span>.]</span>
+<span id="cb10-26"><a aria-hidden="true" href="#cb10-26" tabindex="-1"></a></span>
+<span id="cb10-27"><a aria-hidden="true" href="#cb10-27" tabindex="-1"></a>        c <span class="op">=</span> <span class="fu">curve</span>(rates, times)</span>
+<span id="cb10-28"><a aria-hidden="true" href="#cb10-28" tabindex="-1"></a></span>
+<span id="cb10-29"><a aria-hidden="true" href="#cb10-29" tabindex="-1"></a>        <span class="co"># threaded map-reduce for more speed</span></span>
+<span id="cb10-30"><a aria-hidden="true" href="#cb10-30" tabindex="-1"></a>        OhMyThreads.<span class="fu">tmapreduce</span>(<span class="op">+</span>, <span class="fl">1</span><span class="op">:</span><span class="fu">length</span>(portfolio); ntasks<span class="op">=</span><span class="bu">Threads</span>.<span class="fu">nthreads</span>()) <span class="cf">do</span> i</span>
+<span id="cb10-31"><a aria-hidden="true" href="#cb10-31" tabindex="-1"></a>                <span class="fu">value</span>(c,portfolio[i])</span>
+<span id="cb10-32"><a aria-hidden="true" href="#cb10-32" tabindex="-1"></a>        <span class="cf">end</span></span>
+<span id="cb10-33"><a aria-hidden="true" href="#cb10-33" tabindex="-1"></a>        <span class="co"># mapreduce(l -&gt; value(c,l),+,portfolio)</span></span>
+<span id="cb10-34"><a aria-hidden="true" href="#cb10-34" tabindex="-1"></a>    <span class="kw">end</span></span>
+<span id="cb10-35"><a aria-hidden="true" href="#cb10-35" tabindex="-1"></a></span>
+<span id="cb10-36"><a aria-hidden="true" href="#cb10-36" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>annuities (generic function with 1 method)</code></pre>
 </div>
 </div>
 <p>Here’s what the surrender rate behavior looks like for different levels of market rates compared to the a 3% crediting rate.</p>
-<div id="18" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>let
-    cred_rate = 0.03
-    mkt_rates = 0.005:0.001:0.08
-    rate_diff = mkt_rates .- cred_rate
-
-    lines(rate_diff,surrender_rate.(rate_diff),
-    axis=(
-        title="Surrender rate by difference to market rate",
-        xlabel="Rate Difference",
-        ylabel="Annual Surrender Rate"
-    ))
-end
-</code></pre>
+<div class="cell" data-execution_count="1" id="18">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb12-1"><a aria-hidden="true" href="#cb12-1" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb12-2"><a aria-hidden="true" href="#cb12-2" tabindex="-1"></a>    cred_rate <span class="op">=</span> <span class="fl">0.03</span></span>
+<span id="cb12-3"><a aria-hidden="true" href="#cb12-3" tabindex="-1"></a>    mkt_rates <span class="op">=</span> <span class="fl">0.005</span><span class="op">:</span><span class="fl">0.001</span><span class="op">:</span><span class="fl">0.08</span></span>
+<span id="cb12-4"><a aria-hidden="true" href="#cb12-4" tabindex="-1"></a>    rate_diff <span class="op">=</span> mkt_rates <span class="op">.-</span> cred_rate</span>
+<span id="cb12-5"><a aria-hidden="true" href="#cb12-5" tabindex="-1"></a></span>
+<span id="cb12-6"><a aria-hidden="true" href="#cb12-6" tabindex="-1"></a>    <span class="fu">lines</span>(rate_diff,<span class="fu">surrender_rate</span>.(rate_diff),</span>
+<span id="cb12-7"><a aria-hidden="true" href="#cb12-7" tabindex="-1"></a>    axis<span class="op">=</span>(</span>
+<span id="cb12-8"><a aria-hidden="true" href="#cb12-8" tabindex="-1"></a>        title<span class="op">=</span><span class="st">"Surrender rate by difference to market rate"</span>,</span>
+<span id="cb12-9"><a aria-hidden="true" href="#cb12-9" tabindex="-1"></a>        xlabel<span class="op">=</span><span class="st">"Rate Difference"</span>,</span>
+<span id="cb12-10"><a aria-hidden="true" href="#cb12-10" tabindex="-1"></a>        ylabel<span class="op">=</span><span class="st">"Annual Surrender Rate"</span></span>
+<span id="cb12-11"><a aria-hidden="true" href="#cb12-11" tabindex="-1"></a>    ))</span>
+<span id="cb12-12"><a aria-hidden="true" href="#cb12-12" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-10-output-1.svg" class="img-fluid figure-img"></p>
+<p><img alt="Annual surrender rate as a function of the difference between credited and market interest rates." class="img-fluid figure-img" decoding="async" height="450" loading="eager" src="index_files/figure-html/cell-10-output-1.svg" width="600"/></p>
 </figure>
 </div>
 </div>
 </div>
 <p>We model a large portfolio of these annuities with random tenors:</p>
-<div id="20" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>liabilities = map(1:100_000) do i
-    tenor = rand(1:20)
-    DeferredAnnuity(tenor, par_yield(c,tenor,12)) 
-end</code></pre>
+<div class="cell" data-execution_count="1" id="20">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb13-1"><a aria-hidden="true" href="#cb13-1" tabindex="-1"></a>liabilities <span class="op">=</span> <span class="fu">map</span>(<span class="fl">1</span><span class="op">:</span><span class="fl">100_000</span>) <span class="cf">do</span> i</span>
+<span id="cb13-2"><a aria-hidden="true" href="#cb13-2" tabindex="-1"></a>    tenor <span class="op">=</span> <span class="fu">rand</span>(<span class="fl">1</span><span class="op">:</span><span class="fl">20</span>)</span>
+<span id="cb13-3"><a aria-hidden="true" href="#cb13-3" tabindex="-1"></a>    <span class="fu">DeferredAnnuity</span>(tenor, <span class="fu">par_yield</span>(c,tenor,<span class="fl">12</span>)) </span>
+<span id="cb13-4"><a aria-hidden="true" href="#cb13-4" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>100000-element Vector{DeferredAnnuity{Int64, Float64}}:
  DeferredAnnuity{Int64, Float64}(1, 0.009988829495716861)
@@ -424,7 +435,7 @@ end</code></pre>
 </div>
 </div>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout" class="callout-header d-flex align-content-center collapsed" data-bs-target=".callout-2-contents" data-bs-toggle="collapse">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -433,26 +444,26 @@ end</code></pre>
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-2-contents callout-collapse collapse" id="callout-2">
 <div class="callout-body-container callout-body">
 <p>Later on we will generate vectors of vectors of cashflows without any guarantee that the timepoints will line up, making aggregating cashflows by timepoints a non-obvious task. There are many ways to accomplish this, but <a href="https://docs.juliaactuary.org/FinanceModels/stable/faq/#Why-does-the-package-rely-on-using-Transducers?">I like Transducers</a>.</p>
 <p>Transducers are unfamiliar to many people, and don’t let the presence deter you from the main points of this post. The details aren’t central to the point of this blog post so just skip over if confusing.</p>
-<div id="22" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>function consolidate(cashflows)
-
-    cashflows |&gt; # take the collection
-    MapCat(identity) |&gt; # flatten it out without changing elements
-    # group by the time, and just keep and sum the amounts 
-    GroupBy(x -&gt; x.time, Map(last) ⨟ Map(x -&gt; x.amount), +) |&gt;
-    foldxl(Transducers.right) # perform the aggregation and keep the final grouped result
-end</code></pre>
+<div class="cell" data-execution_count="1" id="22">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb15-1"><a aria-hidden="true" href="#cb15-1" tabindex="-1"></a><span class="kw">function</span> <span class="fu">consolidate</span>(cashflows)</span>
+<span id="cb15-2"><a aria-hidden="true" href="#cb15-2" tabindex="-1"></a></span>
+<span id="cb15-3"><a aria-hidden="true" href="#cb15-3" tabindex="-1"></a>    cashflows <span class="op">|&gt;</span> <span class="co"># take the collection</span></span>
+<span id="cb15-4"><a aria-hidden="true" href="#cb15-4" tabindex="-1"></a>    <span class="fu">MapCat</span>(identity) <span class="op">|&gt;</span> <span class="co"># flatten it out without changing elements</span></span>
+<span id="cb15-5"><a aria-hidden="true" href="#cb15-5" tabindex="-1"></a>    <span class="co"># group by the time, and just keep and sum the amounts </span></span>
+<span id="cb15-6"><a aria-hidden="true" href="#cb15-6" tabindex="-1"></a>    <span class="fu">GroupBy</span>(x <span class="op">-&gt;</span> x.time, <span class="fu">Map</span>(last) <span class="op">⨟</span> <span class="fu">Map</span>(x <span class="op">-&gt;</span> x.amount), <span class="op">+</span>) <span class="op">|&gt;</span></span>
+<span id="cb15-7"><a aria-hidden="true" href="#cb15-7" tabindex="-1"></a>    <span class="fu">foldxl</span>(Transducers.right) <span class="co"># perform the aggregation and keep the final grouped result</span></span>
+<span id="cb15-8"><a aria-hidden="true" href="#cb15-8" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>consolidate (generic function with 1 method)</code></pre>
 </div>
 </div>
 <p>Example:</p>
-<div id="24" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>cashflow_vectors = [l(c) for l in liabilities]</code></pre>
+<div class="cell" data-execution_count="1" id="24">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb17-1"><a aria-hidden="true" href="#cb17-1" tabindex="-1"></a>cashflow_vectors <span class="op">=</span> [<span class="fu">l</span>(c) for l <span class="kw">in</span> liabilities]</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>100000-element Vector{Vector{Cashflow{Float64, Rational{Int64}}}}:
  [Cashflow{Float64, Rational{Int64}}(-0.004085858465737679, 1//12), Cashflow{Float64, Rational{Int64}}(-0.004224514759559243, 1//6), Cashflow{Float64, Rational{Int64}}(-0.004388271423025512, 1//4), Cashflow{Float64, Rational{Int64}}(-0.004579427370077135, 1//3), Cashflow{Float64, Rational{Int64}}(-0.004800700750370862, 5//12), Cashflow{Float64, Rational{Int64}}(-0.0050552759234296805, 1//2), Cashflow{Float64, Rational{Int64}}(-0.005346855772250516, 7//12), Cashflow{Float64, Rational{Int64}}(-0.005679718326711681, 2//3), Cashflow{Float64, Rational{Int64}}(-0.006058775775797353, 3//4), Cashflow{Float64, Rational{Int64}}(-0.006489632610658917, 5//6), Cashflow{Float64, Rational{Int64}}(-0.0069786376879914045, 11//12), Cashflow{Float64, Rational{Int64}}(-0.9520883422854205, 1//1)]
@@ -478,8 +489,8 @@ end</code></pre>
 </div>
 </div>
 <p>And running <code>consolidate</code> groups the cashflows into <code>timepoint =&gt; amount</code> pairs.</p>
-<div id="26" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>consolidate(cashflow_vectors)</code></pre>
+<div class="cell" data-execution_count="1" id="26">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb19-1"><a aria-hidden="true" href="#cb19-1" tabindex="-1"></a><span class="fu">consolidate</span>(cashflow_vectors)</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>Transducers.GroupByViewDict{Rational{Int64}, Float64, Transducers.DefaultInitOf{typeof(+)}, Dict{Rational{Int64}, Float64}}(167//12 =&gt; -115.38828289652774, 6 =&gt; -3476.5426192700997, 77//12 =&gt; -588.1804546360012, 19//3 =&gt; -591.4184331554764, 53//4 =&gt; -122.23788146540367, 121//12 =&gt; -255.05654804592595, 233//12 =&gt; -17.24182455114121, 43//4 =&gt; -232.76355469942777, 23//4 =&gt; -668.5867059421439, 101//12 =&gt; -398.5126457294305…)</code></pre>
 </div>
@@ -488,69 +499,68 @@ end</code></pre>
 </div>
 </div>
 <p>Here’s a visualization of the liability cashflows, showing that when the interest rates are bumped up slightly, that there is more surrenders that occur earlier on (so there’s fewer policies around at the time of each maturity). Negative cashflows are outflows:</p>
-<div id="28" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>let
-    d = consolidate([p(c) for p in liabilities])
-    ks = collect(keys(d)) |&gt; sort!
-    vs = [d[k] for k in ks]
-
-    c2 = curve(zeros .+ 0.005, times)
-    d2 = consolidate([p(c2) for p in liabilities])
-    ks2 = collect(keys(d2)) |&gt; sort!
-    vs2 = [d2[k] for k in ks2]
-
-    f = Figure(size = (900, 600))
-    ax = Axis(f[1, 1], 
-        xlabel = "Time (Years)",
-        ylabel = "Cashflow Amount (cumulative)",
-        title = "Cumulative Liability Cashflows: Base vs +50bp Rate Shock",
-    )
-
-    lines!(ax, ks, cumsum(vs), label = "Base Scenario")
-
-    lines!(ax, ks2, cumsum(vs2), label = "+50bp Rate Shock")
-
-    axislegend(ax, position = :rb)
-
-    f
-end
-</code></pre>
+<div class="cell" data-execution_count="1" id="28">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb21-1"><a aria-hidden="true" href="#cb21-1" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb21-2"><a aria-hidden="true" href="#cb21-2" tabindex="-1"></a>    d <span class="op">=</span> <span class="fu">consolidate</span>([<span class="fu">p</span>(c) for p <span class="kw">in</span> liabilities])</span>
+<span id="cb21-3"><a aria-hidden="true" href="#cb21-3" tabindex="-1"></a>    ks <span class="op">=</span> <span class="fu">collect</span>(<span class="fu">keys</span>(d)) <span class="op">|&gt;</span> sort!</span>
+<span id="cb21-4"><a aria-hidden="true" href="#cb21-4" tabindex="-1"></a>    vs <span class="op">=</span> [d[k] for k <span class="kw">in</span> ks]</span>
+<span id="cb21-5"><a aria-hidden="true" href="#cb21-5" tabindex="-1"></a></span>
+<span id="cb21-6"><a aria-hidden="true" href="#cb21-6" tabindex="-1"></a>    c2 <span class="op">=</span> <span class="fu">curve</span>(zeros <span class="op">.+</span> <span class="fl">0.005</span>, times)</span>
+<span id="cb21-7"><a aria-hidden="true" href="#cb21-7" tabindex="-1"></a>    d2 <span class="op">=</span> <span class="fu">consolidate</span>([<span class="fu">p</span>(c2) for p <span class="kw">in</span> liabilities])</span>
+<span id="cb21-8"><a aria-hidden="true" href="#cb21-8" tabindex="-1"></a>    ks2 <span class="op">=</span> <span class="fu">collect</span>(<span class="fu">keys</span>(d2)) <span class="op">|&gt;</span> sort!</span>
+<span id="cb21-9"><a aria-hidden="true" href="#cb21-9" tabindex="-1"></a>    vs2 <span class="op">=</span> [d2[k] for k <span class="kw">in</span> ks2]</span>
+<span id="cb21-10"><a aria-hidden="true" href="#cb21-10" tabindex="-1"></a></span>
+<span id="cb21-11"><a aria-hidden="true" href="#cb21-11" tabindex="-1"></a>    f <span class="op">=</span> <span class="fu">Figure</span>(size <span class="op">=</span> (<span class="fl">900</span>, <span class="fl">600</span>))</span>
+<span id="cb21-12"><a aria-hidden="true" href="#cb21-12" tabindex="-1"></a>    ax <span class="op">=</span> <span class="fu">Axis</span>(f[<span class="fl">1</span>, <span class="fl">1</span>], </span>
+<span id="cb21-13"><a aria-hidden="true" href="#cb21-13" tabindex="-1"></a>        xlabel <span class="op">=</span> <span class="st">"Time (Years)"</span>,</span>
+<span id="cb21-14"><a aria-hidden="true" href="#cb21-14" tabindex="-1"></a>        ylabel <span class="op">=</span> <span class="st">"Cashflow Amount (cumulative)"</span>,</span>
+<span id="cb21-15"><a aria-hidden="true" href="#cb21-15" tabindex="-1"></a>        title <span class="op">=</span> <span class="st">"Cumulative Liability Cashflows: Base vs +50bp Rate Shock"</span>,</span>
+<span id="cb21-16"><a aria-hidden="true" href="#cb21-16" tabindex="-1"></a>    )</span>
+<span id="cb21-17"><a aria-hidden="true" href="#cb21-17" tabindex="-1"></a></span>
+<span id="cb21-18"><a aria-hidden="true" href="#cb21-18" tabindex="-1"></a>    <span class="fu">lines!</span>(ax, ks, <span class="fu">cumsum</span>(vs), label <span class="op">=</span> <span class="st">"Base Scenario"</span>)</span>
+<span id="cb21-19"><a aria-hidden="true" href="#cb21-19" tabindex="-1"></a></span>
+<span id="cb21-20"><a aria-hidden="true" href="#cb21-20" tabindex="-1"></a>    <span class="fu">lines!</span>(ax, ks2, <span class="fu">cumsum</span>(vs2), label <span class="op">=</span> <span class="st">"+50bp Rate Shock"</span>)</span>
+<span id="cb21-21"><a aria-hidden="true" href="#cb21-21" tabindex="-1"></a></span>
+<span id="cb21-22"><a aria-hidden="true" href="#cb21-22" tabindex="-1"></a>    <span class="fu">axislegend</span>(ax, position <span class="op">=</span> <span class="op">:</span>rb)</span>
+<span id="cb21-23"><a aria-hidden="true" href="#cb21-23" tabindex="-1"></a></span>
+<span id="cb21-24"><a aria-hidden="true" href="#cb21-24" tabindex="-1"></a>    f</span>
+<span id="cb21-25"><a aria-hidden="true" href="#cb21-25" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-15-output-1.svg" class="img-fluid figure-img"></p>
+<p><img alt="Cumulative liability cashflows under the base scenario and a fifty basis point rate increase." class="img-fluid figure-img" decoding="async" height="600" loading="lazy" src="index_files/figure-html/cell-15-output-1.svg" width="900"/></p>
 </figure>
 </div>
 </div>
 </div>
 <p>In the upwards shaped yield curve, without a surrender charge or market value adjustment, many mid-to-late-duration policyholders elect to surrender instead of hold to maturity.</p>
 </section>
-<section id="computing-derivatives-with-autodiff" class="level2">
+<section class="level2" id="computing-derivatives-with-autodiff">
 <h2 class="anchored" data-anchor-id="computing-derivatives-with-autodiff">Computing Derivatives with Autodiff</h2>
 <p>Rather than approximating derivatives through finite differences, autodiff computes exact values, gradients, and Hessians:</p>
 <p>The <code>value_gradient_and_hessian</code> function returns the present value, key rate durations (gradient), and convexities (Hessian diagonal) for the entire liability portfolio. We compute similar derivatives for each potential asset.</p>
-<div id="30" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>vgh_liab = let
-    value_gradient_and_hessian(z -&gt; annuities(z, liabilities), AutoForwardDiff(), zeros)
-end</code></pre>
+<div class="cell" data-execution_count="1" id="30">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb22-1"><a aria-hidden="true" href="#cb22-1" tabindex="-1"></a>vgh_liab <span class="op">=</span> <span class="kw">let</span></span>
+<span id="cb22-2"><a aria-hidden="true" href="#cb22-2" tabindex="-1"></a>    <span class="fu">value_gradient_and_hessian</span>(z <span class="op">-&gt;</span> <span class="fu">annuities</span>(z, liabilities), <span class="fu">AutoForwardDiff</span>(), zeros)</span>
+<span id="cb22-3"><a aria-hidden="true" href="#cb22-3" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>(-102342.70578791756, [11361.401670472067, 30022.260938377476, 29342.067950043573, 256814.9352377915, 123982.85851618621, 6569.901583081439], [-166563.37510676673 197408.151177275 … 8650.57215904071 -42216.368452116374; 197408.1511772747 -1.6782897101469159e6 … 2.497091583151462e6 1.2707944285740166e6; … ; 8650.572159040628 2.4970915831514634e6 … -3.730447366845256e7 -2.7456109908992173e6; -42216.3684521164 1.2707944285740163e6 … -2.745610990899224e6 -2.155782542620245e7])</code></pre>
 </div>
 </div>
-<section id="gradients-and-hessians-in-alm" class="level3">
+<section class="level3" id="gradients-and-hessians-in-alm">
 <h3 class="anchored" data-anchor-id="gradients-and-hessians-in-alm">Gradients and Hessians in ALM</h3>
 <p>Let’s dive into the results here a little bit.</p>
 <p>The first element of <code>vgh_liab</code> is the value of the liability portfolio using the yield curve constructed earlier:</p>
-<div id="32" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>vgh_liab[1]</code></pre>
+<div class="cell" data-execution_count="1" id="32">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb24-1"><a aria-hidden="true" href="#cb24-1" tabindex="-1"></a>vgh_liab[<span class="fl">1</span>]</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>-102342.70578791756</code></pre>
 </div>
 </div>
 <p>The second element of <code>vgh_liab</code> is the partial derivative with respect to each of the inputs (here, just the <code>zeros</code> rates that dictate the curve). The sum of the partials is the (dollar) sensitivity of the liabilities to a parallel shift in rates — a dollar duration, which becomes the effective duration once divided by the value (shown below).</p>
-<div id="34" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>@show sum(vgh_liab[2])
-vgh_liab[2]</code></pre>
+<div class="cell" data-execution_count="1" id="34">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb26-1"><a aria-hidden="true" href="#cb26-1" tabindex="-1"></a><span class="pp">@show</span> <span class="fu">sum</span>(vgh_liab[<span class="fl">2</span>])</span>
+<span id="cb26-2"><a aria-hidden="true" href="#cb26-2" tabindex="-1"></a>vgh_liab[<span class="fl">2</span>]</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>sum(vgh_liab[2]) = 458093.42589595227</code></pre>
 </div>
@@ -564,28 +574,28 @@ vgh_liab[2]</code></pre>
    6569.901583081439</code></pre>
 </div>
 </div>
-<p>This is the sensitivity relative to a full unit change in rates (e.g.&nbsp;<code>1.0</code>). So if we wanted to estimate the dollar impact of a 50bps change, we would take <code>0.005</code> times the gradient (and for the second-order refinement, add <code>½ × 0.005²</code> times the hessian). Also note these are ‘dollar durations’ but we could divide by the price to get <code>effective</code> or percentage durations:</p>
-<div id="36" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>-sum(vgh_liab[2]) / vgh_liab[1]</code></pre>
+<p>This is the sensitivity relative to a full unit change in rates (e.g. <code>1.0</code>). So if we wanted to estimate the dollar impact of a 50bps change, we would take <code>0.005</code> times the gradient (and for the second-order refinement, add <code>½ × 0.005²</code> times the hessian). Also note these are ‘dollar durations’ but we could divide by the price to get <code>effective</code> or percentage durations:</p>
+<div class="cell" data-execution_count="1" id="36">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb29-1"><a aria-hidden="true" href="#cb29-1" tabindex="-1"></a><span class="fu">-sum</span>(vgh_liab[<span class="fl">2</span>]) <span class="op">/</span> vgh_liab[<span class="fl">1</span>]</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>4.476073036853733</code></pre>
 </div>
 </div>
 <p>Additionally, note that this is the dynamic duration of the liabilities, not the static duration which ignores the effect of the interest-sensitive behavior of the liabilities.</p>
-<div id="38" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>let 
-    dynamic(zeros) = value(curve(zeros,times),liabilities[1])
-    cfs = liabilities[1](c)
-    static(zeros) = let
-        c = curve(zeros,times)
-        # note that `cfs` are defined outside of the function, so 
-        # will not change as the curve is sensitized
-        mapreduce(cf -&gt; c(cf.time) * cf.amount,+,cfs)
-    end
-
-    @show DifferentiationInterface.gradient(dynamic,AutoForwardDiff(),zeros) |&gt; sum
-    @show DifferentiationInterface.gradient(static,AutoForwardDiff(),zeros) |&gt; sum
-end</code></pre>
+<div class="cell" data-execution_count="1" id="38">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb31-1"><a aria-hidden="true" href="#cb31-1" tabindex="-1"></a><span class="kw">let</span> </span>
+<span id="cb31-2"><a aria-hidden="true" href="#cb31-2" tabindex="-1"></a>    <span class="fu">dynamic</span>(zeros) <span class="op">=</span> <span class="fu">value</span>(<span class="fu">curve</span>(zeros,times),liabilities[<span class="fl">1</span>])</span>
+<span id="cb31-3"><a aria-hidden="true" href="#cb31-3" tabindex="-1"></a>    cfs <span class="op">=</span> liabilities[<span class="fl">1</span>](c)</span>
+<span id="cb31-4"><a aria-hidden="true" href="#cb31-4" tabindex="-1"></a>    <span class="fu">static</span>(zeros) <span class="op">=</span> <span class="kw">let</span></span>
+<span id="cb31-5"><a aria-hidden="true" href="#cb31-5" tabindex="-1"></a>        c <span class="op">=</span> <span class="fu">curve</span>(zeros,times)</span>
+<span id="cb31-6"><a aria-hidden="true" href="#cb31-6" tabindex="-1"></a>        <span class="co"># note that `cfs` are defined outside of the function, so </span></span>
+<span id="cb31-7"><a aria-hidden="true" href="#cb31-7" tabindex="-1"></a>        <span class="co"># will not change as the curve is sensitized</span></span>
+<span id="cb31-8"><a aria-hidden="true" href="#cb31-8" tabindex="-1"></a>        <span class="fu">mapreduce</span>(cf <span class="op">-&gt;</span> <span class="fu">c</span>(cf.time) <span class="op">*</span> cf.amount,<span class="op">+</span>,cfs)</span>
+<span id="cb31-9"><a aria-hidden="true" href="#cb31-9" tabindex="-1"></a>    <span class="kw">end</span></span>
+<span id="cb31-10"><a aria-hidden="true" href="#cb31-10" tabindex="-1"></a></span>
+<span id="cb31-11"><a aria-hidden="true" href="#cb31-11" tabindex="-1"></a>    <span class="pp">@show</span> DifferentiationInterface.<span class="fu">gradient</span>(dynamic,<span class="fu">AutoForwardDiff</span>(),zeros) <span class="op">|&gt;</span> sum</span>
+<span id="cb31-12"><a aria-hidden="true" href="#cb31-12" tabindex="-1"></a>    <span class="pp">@show</span> DifferentiationInterface.<span class="fu">gradient</span>(static,<span class="fu">AutoForwardDiff</span>(),zeros) <span class="op">|&gt;</span> sum</span>
+<span id="cb31-13"><a aria-hidden="true" href="#cb31-13" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>DifferentiationInterface.gradient(dynamic, AutoForwardDiff(), zeros) |&gt; sum = 0.9687122313982464
 DifferentiationInterface.gradient(static, AutoForwardDiff(), zeros) |&gt; sum = 0.9739909475447536</code></pre>
@@ -596,8 +606,8 @@ DifferentiationInterface.gradient(static, AutoForwardDiff(), zeros) |&gt; sum = 
 </div>
 <p>Due to the steepness of the surrender function, a rise in rates causes the policy to exit sooner on average, shortening the liability and partially offsetting the discounting effect. The dynamic sensitivity is therefore smaller in magnitude than the static sensitivity, which ignores the interest-sensitive behavior.</p>
 <p>The third element of <code>vgh_liab</code> is the Hessian matrix, containing all second partial derivatives with respect to the yield curve inputs:</p>
-<div id="40" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>vgh_liab[3]</code></pre>
+<div class="cell" data-execution_count="1" id="40">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb34-1"><a aria-hidden="true" href="#cb34-1" tabindex="-1"></a>vgh_liab[<span class="fl">3</span>]</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>6×6 Matrix{Float64}:
      -1.66563e5   1.97408e5  -2.21248e5  …  8650.57       -42216.4
@@ -609,9 +619,9 @@ DifferentiationInterface.gradient(static, AutoForwardDiff(), zeros) |&gt; sum = 
 </div>
 </div>
 <p>This matrix captures the convexity characteristics of the liability portfolio. The diagonal elements represent “key rate convexities”—how much the duration at each key rate changes as that specific rate moves:</p>
-<div id="42" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>@show diag(vgh_liab[3])
-@show sum(diag(vgh_liab[3]))  # Total dollar convexity</code></pre>
+<div class="cell" data-execution_count="1" id="42">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb36-1"><a aria-hidden="true" href="#cb36-1" tabindex="-1"></a><span class="pp">@show</span> <span class="fu">diag</span>(vgh_liab[<span class="fl">3</span>])</span>
+<span id="cb36-2"><a aria-hidden="true" href="#cb36-2" tabindex="-1"></a><span class="pp">@show</span> <span class="fu">sum</span>(<span class="fu">diag</span>(vgh_liab[<span class="fl">3</span>]))  <span class="co"># Total dollar convexity</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>diag(vgh_liab[3]) = [-166563.37510676673, -1.6782897101469159e6, -9.922238670227138e6, -2.8780943566115417e7, -3.730447366845256e7, -2.155782542620245e7]
 sum(diag(vgh_liab[3])) = -9.941033441625124e7</code></pre>
@@ -621,26 +631,26 @@ sum(diag(vgh_liab[3])) = -9.941033441625124e7</code></pre>
 </div>
 </div>
 <p>Like duration, we can convert dollar convexity to percentage convexity by dividing by the portfolio value:</p>
-<div id="44" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>sum(diag(vgh_liab[3])) / vgh_liab[1]</code></pre>
+<div class="cell" data-execution_count="1" id="44">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb39-1"><a aria-hidden="true" href="#cb39-1" tabindex="-1"></a><span class="fu">sum</span>(<span class="fu">diag</span>(vgh_liab[<span class="fl">3</span>])) <span class="op">/</span> vgh_liab[<span class="fl">1</span>]</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>971.3475293711406</code></pre>
 </div>
 </div>
 <p>The off-diagonal elements show cross-convexities—how the sensitivity to one key rate changes when a different key rate moves. For most portfolios, these cross-terms are smaller than the diagonal terms but can be significant for complex instruments.</p>
 <p>This convexity measurement is also dynamic, capturing how the surrender behavior changes the second-order interest rate sensitivity:</p>
-<div id="46" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>let 
-    dynamic(zeros) = value(curve(zeros,times),liabilities[1])
-    cfs = liabilities[1](c)
-    static(zeros) = let
-        c = curve(zeros,times)
-        mapreduce(cf -&gt; c(cf.time) * cf.amount,+,cfs)
-    end
-
-    @show hessian(dynamic,AutoForwardDiff(),zeros) |&gt; diag |&gt; sum
-    @show hessian(static,AutoForwardDiff(),zeros) |&gt; diag |&gt; sum
-end</code></pre>
+<div class="cell" data-execution_count="1" id="46">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb41-1"><a aria-hidden="true" href="#cb41-1" tabindex="-1"></a><span class="kw">let</span> </span>
+<span id="cb41-2"><a aria-hidden="true" href="#cb41-2" tabindex="-1"></a>    <span class="fu">dynamic</span>(zeros) <span class="op">=</span> <span class="fu">value</span>(<span class="fu">curve</span>(zeros,times),liabilities[<span class="fl">1</span>])</span>
+<span id="cb41-3"><a aria-hidden="true" href="#cb41-3" tabindex="-1"></a>    cfs <span class="op">=</span> liabilities[<span class="fl">1</span>](c)</span>
+<span id="cb41-4"><a aria-hidden="true" href="#cb41-4" tabindex="-1"></a>    <span class="fu">static</span>(zeros) <span class="op">=</span> <span class="kw">let</span></span>
+<span id="cb41-5"><a aria-hidden="true" href="#cb41-5" tabindex="-1"></a>        c <span class="op">=</span> <span class="fu">curve</span>(zeros,times)</span>
+<span id="cb41-6"><a aria-hidden="true" href="#cb41-6" tabindex="-1"></a>        <span class="fu">mapreduce</span>(cf <span class="op">-&gt;</span> <span class="fu">c</span>(cf.time) <span class="op">*</span> cf.amount,<span class="op">+</span>,cfs)</span>
+<span id="cb41-7"><a aria-hidden="true" href="#cb41-7" tabindex="-1"></a>    <span class="kw">end</span></span>
+<span id="cb41-8"><a aria-hidden="true" href="#cb41-8" tabindex="-1"></a></span>
+<span id="cb41-9"><a aria-hidden="true" href="#cb41-9" tabindex="-1"></a>    <span class="pp">@show</span> <span class="fu">hessian</span>(dynamic,<span class="fu">AutoForwardDiff</span>(),zeros) <span class="op">|&gt;</span> diag <span class="op">|&gt;</span> sum</span>
+<span id="cb41-10"><a aria-hidden="true" href="#cb41-10" tabindex="-1"></a>    <span class="pp">@show</span> <span class="fu">hessian</span>(static,<span class="fu">AutoForwardDiff</span>(),zeros) <span class="op">|&gt;</span> diag <span class="op">|&gt;</span> sum</span>
+<span id="cb41-11"><a aria-hidden="true" href="#cb41-11" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>(hessian(dynamic, AutoForwardDiff(), zeros) |&gt; diag) |&gt; sum = -3.810430821139908
 (hessian(static, AutoForwardDiff(), zeros) |&gt; diag) |&gt; sum = -0.9675282917862529</code></pre>
@@ -653,16 +663,16 @@ end</code></pre>
 <p>For ALM purposes, this convexity information helps quantify how well a duration-matched hedge will perform under large rate movements.</p>
 </section>
 </section>
-<section id="optimizing-an-asset-portfolio" class="level2">
+<section class="level2" id="optimizing-an-asset-portfolio">
 <h2 class="anchored" data-anchor-id="optimizing-an-asset-portfolio">Optimizing an Asset Portfolio</h2>
-<section id="define-asset-universe" class="level3">
+<section class="level3" id="define-asset-universe">
 <h3 class="anchored" data-anchor-id="define-asset-universe">Define Asset Universe</h3>
 <p>We will create a set of par bonds and select a portfolio of assets that matches the liabilities, subject to duration and KRD constraints:</p>
-<div id="48" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>asset_universe = [
-    FixedBond(par_yield(c,t,4),t,4)
-    for t in 1:20
-]</code></pre>
+<div class="cell" data-execution_count="1" id="48">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb44-1"><a aria-hidden="true" href="#cb44-1" tabindex="-1"></a>asset_universe <span class="op">=</span> [</span>
+<span id="cb44-2"><a aria-hidden="true" href="#cb44-2" tabindex="-1"></a>    <span class="fu">FixedBond</span>(<span class="fu">par_yield</span>(c,t,<span class="fl">4</span>),t,<span class="fl">4</span>)</span>
+<span id="cb44-3"><a aria-hidden="true" href="#cb44-3" tabindex="-1"></a>    for t <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">20</span></span>
+<span id="cb44-4"><a aria-hidden="true" href="#cb44-4" tabindex="-1"></a>]</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>20-element Vector{FixedBond{Float64, Int64, Int64}}:
  FixedBond{Float64, Int64, Int64}(0.009998004795647176, 1, 4)
@@ -688,9 +698,8 @@ end</code></pre>
 </div>
 </div>
 <p>And we capture the measures for each of the available assets for the portfolio selection:</p>
-<div id="50" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>vgh_assets= [value_gradient_and_hessian(x-&gt;value(curve(x,times),a),AutoForwardDiff(), zeros) for a in asset_universe]
-</code></pre>
+<div class="cell" data-execution_count="1" id="50">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb46"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb46-1"><a aria-hidden="true" href="#cb46-1" tabindex="-1"></a>vgh_assets<span class="op">=</span> [<span class="fu">value_gradient_and_hessian</span>(<span class="fu">x-&gt;value</span>(<span class="fu">curve</span>(x,times),a),<span class="fu">AutoForwardDiff</span>(), zeros) for a <span class="kw">in</span> asset_universe]</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>20-element Vector{Tuple{Float64, Vector{Float64}, Matrix{Float64}}}:
  (0.9999999999999999, [-0.9976397847116376, 0.001889581158300676, -0.0005911493114439049, 7.570359994056739e-5, -6.627009344962502e-6, 4.849306454692366e-7], [0.9976397847116376 0.0 … 0.0 0.0; 0.0 -0.003779162316601352 … 0.0 0.0; … ; 0.0 0.0 … 6.627009344962502e-5 0.0; 0.0 0.0 … 0.0 -9.698612909384728e-6])
@@ -716,144 +725,141 @@ end</code></pre>
 </div>
 </div>
 </section>
-<section id="optimization-routine" class="level3">
+<section class="level3" id="optimization-routine">
 <h3 class="anchored" data-anchor-id="optimization-routine">Optimization Routine</h3>
 <p>This optimization function uses functionality from <a href="https://jump.dev">JuMP</a>, a robust optimization library in Julia.</p>
 <p>With derivatives available, we can optimize the asset portfolio to match liability characteristics.The optimization maximizes asset yield while constraining the difference between asset and liability key rate durations. This ensures that small yield curve movements don’t create large changes in surplus.</p>
-<div id="52" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>function optimize_portfolio(assets, vgh_assets, liabs, vgh_liabs, constraints)
-    n = length(assets)
-
-    # Create model
-    model = Model(HiGHS.Optimizer)
-    set_silent(model)  # Suppress solver output
-
-    # Decision variables: weight vector w
-    @variable(model, w[1:n])
-
-    @constraint(model, w .&gt;= 0)  # Long-only constraint
-    # Budget/asset value constraint
-    budget_sum = sum(w .* [a[1] for a in vgh_assets]) + vgh_liabs[1]
-    @constraint(model, budget_sum &lt;= 1e2)
-    @constraint(model, budget_sum &gt;= -1e2)
-
-    # Objective: Maximize total yield
-    @objective(model, Max, sum(w[i] * assets[i].coupon for i in 1:n))
-
-    # Gradient component (krd) constraints
-    for j in 1:length(vgh_liabs[2])
-        gradient_sum = sum(w[i] * vgh_assets[i][2][j] for i in 1:n) + vgh_liabs[2][j]
-
-        @constraint(model, gradient_sum &gt;= constraints[:krd][:lower])
-        @constraint(model, gradient_sum &lt;= constraints[:krd][:upper])
-    end
-
-    # total duration constraint 
-    duration_gap = sum(w[i] * sum(vgh_assets[i][2]) for i in 1:n) + sum(vgh_liabs[2])
-    @constraint(model, duration_gap &lt;= constraints[:duration][:upper])
-    @constraint(model, duration_gap &gt;= constraints[:duration][:lower])
-
-    # Solve
-    optimize!(model)
-
-    # Return results
-    if termination_status(model) == MOI.OPTIMAL
-        return (
-            status=:optimal,
-            weights=JuMP.value.(w),
-            objective_value=objective_value(model),
-        )
-    else
-        return (status=termination_status(model), weights=nothing)
-    end
-end
-
-
-# Define gradient constraints
-constraints = Dict(
-    :krd =&gt; Dict(:lower =&gt; -0.35e6, :upper =&gt; 0.35e6),
-    :duration =&gt; Dict(:lower =&gt; -0.05e6, :upper =&gt; 0.05e6)
-)
-
-# Optimize
-result = optimize_portfolio(asset_universe, vgh_assets, liabilities, vgh_liab, constraints)
-</code></pre>
+<div class="cell" data-execution_count="1" id="52">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb48"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb48-1"><a aria-hidden="true" href="#cb48-1" tabindex="-1"></a><span class="kw">function</span> <span class="fu">optimize_portfolio</span>(assets, vgh_assets, liabs, vgh_liabs, constraints)</span>
+<span id="cb48-2"><a aria-hidden="true" href="#cb48-2" tabindex="-1"></a>    n <span class="op">=</span> <span class="fu">length</span>(assets)</span>
+<span id="cb48-3"><a aria-hidden="true" href="#cb48-3" tabindex="-1"></a></span>
+<span id="cb48-4"><a aria-hidden="true" href="#cb48-4" tabindex="-1"></a>    <span class="co"># Create model</span></span>
+<span id="cb48-5"><a aria-hidden="true" href="#cb48-5" tabindex="-1"></a>    model <span class="op">=</span> <span class="fu">Model</span>(HiGHS.Optimizer)</span>
+<span id="cb48-6"><a aria-hidden="true" href="#cb48-6" tabindex="-1"></a>    <span class="fu">set_silent</span>(model)  <span class="co"># Suppress solver output</span></span>
+<span id="cb48-7"><a aria-hidden="true" href="#cb48-7" tabindex="-1"></a></span>
+<span id="cb48-8"><a aria-hidden="true" href="#cb48-8" tabindex="-1"></a>    <span class="co"># Decision variables: weight vector w</span></span>
+<span id="cb48-9"><a aria-hidden="true" href="#cb48-9" tabindex="-1"></a>    <span class="pp">@variable</span>(model, w[<span class="fl">1</span><span class="op">:</span>n])</span>
+<span id="cb48-10"><a aria-hidden="true" href="#cb48-10" tabindex="-1"></a></span>
+<span id="cb48-11"><a aria-hidden="true" href="#cb48-11" tabindex="-1"></a>    <span class="pp">@constraint</span>(model, w <span class="op">.&gt;=</span> <span class="fl">0</span>)  <span class="co"># Long-only constraint</span></span>
+<span id="cb48-12"><a aria-hidden="true" href="#cb48-12" tabindex="-1"></a>    <span class="co"># Budget/asset value constraint</span></span>
+<span id="cb48-13"><a aria-hidden="true" href="#cb48-13" tabindex="-1"></a>    budget_sum <span class="op">=</span> <span class="fu">sum</span>(w <span class="op">.*</span> [a[<span class="fl">1</span>] for a <span class="kw">in</span> vgh_assets]) <span class="op">+</span> vgh_liabs[<span class="fl">1</span>]</span>
+<span id="cb48-14"><a aria-hidden="true" href="#cb48-14" tabindex="-1"></a>    <span class="pp">@constraint</span>(model, budget_sum <span class="op">&lt;=</span> <span class="fl">1e2</span>)</span>
+<span id="cb48-15"><a aria-hidden="true" href="#cb48-15" tabindex="-1"></a>    <span class="pp">@constraint</span>(model, budget_sum <span class="op">&gt;=</span> <span class="op">-</span><span class="fl">1e2</span>)</span>
+<span id="cb48-16"><a aria-hidden="true" href="#cb48-16" tabindex="-1"></a></span>
+<span id="cb48-17"><a aria-hidden="true" href="#cb48-17" tabindex="-1"></a>    <span class="co"># Objective: Maximize total yield</span></span>
+<span id="cb48-18"><a aria-hidden="true" href="#cb48-18" tabindex="-1"></a>    <span class="pp">@objective</span>(model, Max, <span class="fu">sum</span>(w[i] <span class="op">*</span> assets[i].coupon <span class="cf">for</span> i <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>n))</span>
+<span id="cb48-19"><a aria-hidden="true" href="#cb48-19" tabindex="-1"></a></span>
+<span id="cb48-20"><a aria-hidden="true" href="#cb48-20" tabindex="-1"></a>    <span class="co"># Gradient component (krd) constraints</span></span>
+<span id="cb48-21"><a aria-hidden="true" href="#cb48-21" tabindex="-1"></a>    <span class="cf">for</span> j <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu">length</span>(vgh_liabs[<span class="fl">2</span>])</span>
+<span id="cb48-22"><a aria-hidden="true" href="#cb48-22" tabindex="-1"></a>        gradient_sum <span class="op">=</span> <span class="fu">sum</span>(w[i] <span class="op">*</span> vgh_assets[i][<span class="fl">2</span>][j] <span class="cf">for</span> i <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>n) <span class="op">+</span> vgh_liabs[<span class="fl">2</span>][j]</span>
+<span id="cb48-23"><a aria-hidden="true" href="#cb48-23" tabindex="-1"></a></span>
+<span id="cb48-24"><a aria-hidden="true" href="#cb48-24" tabindex="-1"></a>        <span class="pp">@constraint</span>(model, gradient_sum <span class="op">&gt;=</span> constraints[<span class="op">:</span>krd][<span class="op">:</span>lower])</span>
+<span id="cb48-25"><a aria-hidden="true" href="#cb48-25" tabindex="-1"></a>        <span class="pp">@constraint</span>(model, gradient_sum <span class="op">&lt;=</span> constraints[<span class="op">:</span>krd][<span class="op">:</span>upper])</span>
+<span id="cb48-26"><a aria-hidden="true" href="#cb48-26" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb48-27"><a aria-hidden="true" href="#cb48-27" tabindex="-1"></a></span>
+<span id="cb48-28"><a aria-hidden="true" href="#cb48-28" tabindex="-1"></a>    <span class="co"># total duration constraint </span></span>
+<span id="cb48-29"><a aria-hidden="true" href="#cb48-29" tabindex="-1"></a>    duration_gap <span class="op">=</span> <span class="fu">sum</span>(w[i] <span class="op">*</span> <span class="fu">sum</span>(vgh_assets[i][<span class="fl">2</span>]) <span class="cf">for</span> i <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>n) <span class="op">+</span> <span class="fu">sum</span>(vgh_liabs[<span class="fl">2</span>])</span>
+<span id="cb48-30"><a aria-hidden="true" href="#cb48-30" tabindex="-1"></a>    <span class="pp">@constraint</span>(model, duration_gap <span class="op">&lt;=</span> constraints[<span class="op">:</span>duration][<span class="op">:</span>upper])</span>
+<span id="cb48-31"><a aria-hidden="true" href="#cb48-31" tabindex="-1"></a>    <span class="pp">@constraint</span>(model, duration_gap <span class="op">&gt;=</span> constraints[<span class="op">:</span>duration][<span class="op">:</span>lower])</span>
+<span id="cb48-32"><a aria-hidden="true" href="#cb48-32" tabindex="-1"></a></span>
+<span id="cb48-33"><a aria-hidden="true" href="#cb48-33" tabindex="-1"></a>    <span class="co"># Solve</span></span>
+<span id="cb48-34"><a aria-hidden="true" href="#cb48-34" tabindex="-1"></a>    <span class="fu">optimize!</span>(model)</span>
+<span id="cb48-35"><a aria-hidden="true" href="#cb48-35" tabindex="-1"></a></span>
+<span id="cb48-36"><a aria-hidden="true" href="#cb48-36" tabindex="-1"></a>    <span class="co"># Return results</span></span>
+<span id="cb48-37"><a aria-hidden="true" href="#cb48-37" tabindex="-1"></a>    <span class="cf">if</span> <span class="fu">termination_status</span>(model) <span class="op">==</span> MOI.OPTIMAL</span>
+<span id="cb48-38"><a aria-hidden="true" href="#cb48-38" tabindex="-1"></a>        <span class="cf">return</span> (</span>
+<span id="cb48-39"><a aria-hidden="true" href="#cb48-39" tabindex="-1"></a>            status<span class="op">=:</span>optimal,</span>
+<span id="cb48-40"><a aria-hidden="true" href="#cb48-40" tabindex="-1"></a>            weights<span class="op">=</span>JuMP.<span class="fu">value</span>.(w),</span>
+<span id="cb48-41"><a aria-hidden="true" href="#cb48-41" tabindex="-1"></a>            objective_value<span class="op">=</span><span class="fu">objective_value</span>(model),</span>
+<span id="cb48-42"><a aria-hidden="true" href="#cb48-42" tabindex="-1"></a>        )</span>
+<span id="cb48-43"><a aria-hidden="true" href="#cb48-43" tabindex="-1"></a>    <span class="cf">else</span></span>
+<span id="cb48-44"><a aria-hidden="true" href="#cb48-44" tabindex="-1"></a>        <span class="cf">return</span> (status<span class="op">=</span><span class="fu">termination_status</span>(model), weights<span class="op">=</span><span class="cn">nothing</span>)</span>
+<span id="cb48-45"><a aria-hidden="true" href="#cb48-45" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb48-46"><a aria-hidden="true" href="#cb48-46" tabindex="-1"></a><span class="cf">end</span></span>
+<span id="cb48-47"><a aria-hidden="true" href="#cb48-47" tabindex="-1"></a></span>
+<span id="cb48-48"><a aria-hidden="true" href="#cb48-48" tabindex="-1"></a></span>
+<span id="cb48-49"><a aria-hidden="true" href="#cb48-49" tabindex="-1"></a><span class="co"># Define gradient constraints</span></span>
+<span id="cb48-50"><a aria-hidden="true" href="#cb48-50" tabindex="-1"></a>constraints <span class="op">=</span> <span class="fu">Dict</span>(</span>
+<span id="cb48-51"><a aria-hidden="true" href="#cb48-51" tabindex="-1"></a>    <span class="op">:</span>krd <span class="op">=&gt;</span> <span class="fu">Dict</span>(<span class="op">:</span>lower <span class="op">=&gt;</span> <span class="op">-</span><span class="fl">0.35e6</span>, <span class="op">:</span>upper <span class="op">=&gt;</span> <span class="fl">0.35e6</span>),</span>
+<span id="cb48-52"><a aria-hidden="true" href="#cb48-52" tabindex="-1"></a>    <span class="op">:</span>duration <span class="op">=&gt;</span> <span class="fu">Dict</span>(<span class="op">:</span>lower <span class="op">=&gt;</span> <span class="op">-</span><span class="fl">0.05e6</span>, <span class="op">:</span>upper <span class="op">=&gt;</span> <span class="fl">0.05e6</span>)</span>
+<span id="cb48-53"><a aria-hidden="true" href="#cb48-53" tabindex="-1"></a>)</span>
+<span id="cb48-54"><a aria-hidden="true" href="#cb48-54" tabindex="-1"></a></span>
+<span id="cb48-55"><a aria-hidden="true" href="#cb48-55" tabindex="-1"></a><span class="co"># Optimize</span></span>
+<span id="cb48-56"><a aria-hidden="true" href="#cb48-56" tabindex="-1"></a>result <span class="op">=</span> <span class="fu">optimize_portfolio</span>(asset_universe, vgh_assets, liabilities, vgh_liab, constraints)</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>(status = :optimal, weights = [-0.0, 45506.60314564737, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, 56936.10264227019, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0], objective_value = 3465.2857362022587)</code></pre>
 </div>
 </div>
 </section>
-<section id="results" class="level3">
+<section class="level3" id="results">
 <h3 class="anchored" data-anchor-id="results">Results</h3>
 <p>The optimization produces asset weights that hedge the liability portfolio. We can visualize both the resulting cashflow patterns and the key rate duration matching:</p>
-<div id="54" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>
-let
-    d = consolidate([p(c) for p in liabilities])
-    ks = collect(keys(d)) |&gt; sort!
-    vs = -cumsum([d[k] for k in ks])
-
-    f = Figure(size = (900, 600))
-    ax = Axis(f[1, 1], 
-        xlabel = "Time (Years)",
-        ylabel = "Cashflow Amount (cumulative)",
-        title = "Cumulative Asset vs Liability Cashflows",
-    )
-
-    lines!(ax, ks, vs, label = "Liabilities")
-
-
-    asset_cfs = map(1:length(asset_universe)) do i
-        cfs =
-            result.weights[i] * asset_universe[i](c)
-    end
-
-    d = consolidate(asset_cfs)
-    ks2 = collect(keys(d)) |&gt; sort!
-    vs2 = cumsum([d[k] for k in ks2])
-    lines!(ax, ks2, vs2, label = "Assets")
-
-    axislegend(ax, position = :rb)
-
-    f
-end    
-
-
-</code></pre>
+<div class="cell" data-execution_count="1" id="54">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb50"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb50-1"><a aria-hidden="true" href="#cb50-1" tabindex="-1"></a></span>
+<span id="cb50-2"><a aria-hidden="true" href="#cb50-2" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb50-3"><a aria-hidden="true" href="#cb50-3" tabindex="-1"></a>    d <span class="op">=</span> <span class="fu">consolidate</span>([<span class="fu">p</span>(c) for p <span class="kw">in</span> liabilities])</span>
+<span id="cb50-4"><a aria-hidden="true" href="#cb50-4" tabindex="-1"></a>    ks <span class="op">=</span> <span class="fu">collect</span>(<span class="fu">keys</span>(d)) <span class="op">|&gt;</span> sort!</span>
+<span id="cb50-5"><a aria-hidden="true" href="#cb50-5" tabindex="-1"></a>    vs <span class="op">=</span> <span class="fu">-cumsum</span>([d[k] for k <span class="kw">in</span> ks])</span>
+<span id="cb50-6"><a aria-hidden="true" href="#cb50-6" tabindex="-1"></a></span>
+<span id="cb50-7"><a aria-hidden="true" href="#cb50-7" tabindex="-1"></a>    f <span class="op">=</span> <span class="fu">Figure</span>(size <span class="op">=</span> (<span class="fl">900</span>, <span class="fl">600</span>))</span>
+<span id="cb50-8"><a aria-hidden="true" href="#cb50-8" tabindex="-1"></a>    ax <span class="op">=</span> <span class="fu">Axis</span>(f[<span class="fl">1</span>, <span class="fl">1</span>], </span>
+<span id="cb50-9"><a aria-hidden="true" href="#cb50-9" tabindex="-1"></a>        xlabel <span class="op">=</span> <span class="st">"Time (Years)"</span>,</span>
+<span id="cb50-10"><a aria-hidden="true" href="#cb50-10" tabindex="-1"></a>        ylabel <span class="op">=</span> <span class="st">"Cashflow Amount (cumulative)"</span>,</span>
+<span id="cb50-11"><a aria-hidden="true" href="#cb50-11" tabindex="-1"></a>        title <span class="op">=</span> <span class="st">"Cumulative Asset vs Liability Cashflows"</span>,</span>
+<span id="cb50-12"><a aria-hidden="true" href="#cb50-12" tabindex="-1"></a>    )</span>
+<span id="cb50-13"><a aria-hidden="true" href="#cb50-13" tabindex="-1"></a></span>
+<span id="cb50-14"><a aria-hidden="true" href="#cb50-14" tabindex="-1"></a>    <span class="fu">lines!</span>(ax, ks, vs, label <span class="op">=</span> <span class="st">"Liabilities"</span>)</span>
+<span id="cb50-15"><a aria-hidden="true" href="#cb50-15" tabindex="-1"></a></span>
+<span id="cb50-16"><a aria-hidden="true" href="#cb50-16" tabindex="-1"></a></span>
+<span id="cb50-17"><a aria-hidden="true" href="#cb50-17" tabindex="-1"></a>    asset_cfs <span class="op">=</span> <span class="fu">map</span>(<span class="fl">1</span><span class="op">:</span><span class="fu">length</span>(asset_universe)) <span class="cf">do</span> i</span>
+<span id="cb50-18"><a aria-hidden="true" href="#cb50-18" tabindex="-1"></a>        cfs <span class="op">=</span></span>
+<span id="cb50-19"><a aria-hidden="true" href="#cb50-19" tabindex="-1"></a>            result.weights[i] <span class="op">*</span> asset_universe[i](c)</span>
+<span id="cb50-20"><a aria-hidden="true" href="#cb50-20" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb50-21"><a aria-hidden="true" href="#cb50-21" tabindex="-1"></a></span>
+<span id="cb50-22"><a aria-hidden="true" href="#cb50-22" tabindex="-1"></a>    d <span class="op">=</span> <span class="fu">consolidate</span>(asset_cfs)</span>
+<span id="cb50-23"><a aria-hidden="true" href="#cb50-23" tabindex="-1"></a>    ks2 <span class="op">=</span> <span class="fu">collect</span>(<span class="fu">keys</span>(d)) <span class="op">|&gt;</span> sort!</span>
+<span id="cb50-24"><a aria-hidden="true" href="#cb50-24" tabindex="-1"></a>    vs2 <span class="op">=</span> <span class="fu">cumsum</span>([d[k] for k <span class="kw">in</span> ks2])</span>
+<span id="cb50-25"><a aria-hidden="true" href="#cb50-25" tabindex="-1"></a>    <span class="fu">lines!</span>(ax, ks2, vs2, label <span class="op">=</span> <span class="st">"Assets"</span>)</span>
+<span id="cb50-26"><a aria-hidden="true" href="#cb50-26" tabindex="-1"></a></span>
+<span id="cb50-27"><a aria-hidden="true" href="#cb50-27" tabindex="-1"></a>    <span class="fu">axislegend</span>(ax, position <span class="op">=</span> <span class="op">:</span>rb)</span>
+<span id="cb50-28"><a aria-hidden="true" href="#cb50-28" tabindex="-1"></a></span>
+<span id="cb50-29"><a aria-hidden="true" href="#cb50-29" tabindex="-1"></a>    f</span>
+<span id="cb50-30"><a aria-hidden="true" href="#cb50-30" tabindex="-1"></a><span class="kw">end</span>    </span>
+<span id="cb50-31"><a aria-hidden="true" href="#cb50-31" tabindex="-1"></a></span>
+<span id="cb50-32"><a aria-hidden="true" href="#cb50-32" tabindex="-1"></a></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-28-output-1.svg" class="img-fluid figure-img"></p>
+<p><img alt="Comparison of cumulative asset and liability cashflows over time." class="img-fluid figure-img" decoding="async" height="600" loading="lazy" src="index_files/figure-html/cell-28-output-1.svg" width="900"/></p>
 </figure>
 </div>
 </div>
 </div>
-<div id="56" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>let
-    asset_krds = sum(getindex.(vgh_assets,2) .* result.weights)
-    liab_krds = -vgh_liab[2]
-
-    f = Figure(size = (800, 500))
-    ax = Axis(f[1, 1], 
-        xlabel = "Tenor (Years)",
-        ylabel = "Key Rate Dollar Duration",
-        title = "Asset vs Liability Key Rate Dollar Duration Profile",
-    )
-    
-    scatter!(ax, times, asset_krds, label = "Optimized Assets")
-    
-    scatter!(ax, times, liab_krds, label = "Liabilities")
-    
-    axislegend(ax, position = :rt)
-    
-    
-    f
-end
-</code></pre>
+<div class="cell" data-execution_count="1" id="56">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb51"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb51-1"><a aria-hidden="true" href="#cb51-1" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb51-2"><a aria-hidden="true" href="#cb51-2" tabindex="-1"></a>    asset_krds <span class="op">=</span> <span class="fu">sum</span>(<span class="fu">getindex</span>.(vgh_assets,<span class="fl">2</span>) <span class="op">.*</span> result.weights)</span>
+<span id="cb51-3"><a aria-hidden="true" href="#cb51-3" tabindex="-1"></a>    liab_krds <span class="op">=</span> <span class="op">-</span>vgh_liab[<span class="fl">2</span>]</span>
+<span id="cb51-4"><a aria-hidden="true" href="#cb51-4" tabindex="-1"></a></span>
+<span id="cb51-5"><a aria-hidden="true" href="#cb51-5" tabindex="-1"></a>    f <span class="op">=</span> <span class="fu">Figure</span>(size <span class="op">=</span> (<span class="fl">800</span>, <span class="fl">500</span>))</span>
+<span id="cb51-6"><a aria-hidden="true" href="#cb51-6" tabindex="-1"></a>    ax <span class="op">=</span> <span class="fu">Axis</span>(f[<span class="fl">1</span>, <span class="fl">1</span>], </span>
+<span id="cb51-7"><a aria-hidden="true" href="#cb51-7" tabindex="-1"></a>        xlabel <span class="op">=</span> <span class="st">"Tenor (Years)"</span>,</span>
+<span id="cb51-8"><a aria-hidden="true" href="#cb51-8" tabindex="-1"></a>        ylabel <span class="op">=</span> <span class="st">"Key Rate Dollar Duration"</span>,</span>
+<span id="cb51-9"><a aria-hidden="true" href="#cb51-9" tabindex="-1"></a>        title <span class="op">=</span> <span class="st">"Asset vs Liability Key Rate Dollar Duration Profile"</span>,</span>
+<span id="cb51-10"><a aria-hidden="true" href="#cb51-10" tabindex="-1"></a>    )</span>
+<span id="cb51-11"><a aria-hidden="true" href="#cb51-11" tabindex="-1"></a>    </span>
+<span id="cb51-12"><a aria-hidden="true" href="#cb51-12" tabindex="-1"></a>    <span class="fu">scatter!</span>(ax, times, asset_krds, label <span class="op">=</span> <span class="st">"Optimized Assets"</span>)</span>
+<span id="cb51-13"><a aria-hidden="true" href="#cb51-13" tabindex="-1"></a>    </span>
+<span id="cb51-14"><a aria-hidden="true" href="#cb51-14" tabindex="-1"></a>    <span class="fu">scatter!</span>(ax, times, liab_krds, label <span class="op">=</span> <span class="st">"Liabilities"</span>)</span>
+<span id="cb51-15"><a aria-hidden="true" href="#cb51-15" tabindex="-1"></a>    </span>
+<span id="cb51-16"><a aria-hidden="true" href="#cb51-16" tabindex="-1"></a>    <span class="fu">axislegend</span>(ax, position <span class="op">=</span> <span class="op">:</span>rt)</span>
+<span id="cb51-17"><a aria-hidden="true" href="#cb51-17" tabindex="-1"></a>    </span>
+<span id="cb51-18"><a aria-hidden="true" href="#cb51-18" tabindex="-1"></a>    </span>
+<span id="cb51-19"><a aria-hidden="true" href="#cb51-19" tabindex="-1"></a>    f</span>
+<span id="cb51-20"><a aria-hidden="true" href="#cb51-20" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-29-output-1.svg" class="img-fluid figure-img"></p>
+<p><img alt="Key-rate dollar duration by tenor for optimized assets and liabilities." class="img-fluid figure-img" decoding="async" height="500" loading="lazy" src="index_files/figure-html/cell-29-output-1.svg" width="800"/></p>
 </figure>
 </div>
 </div>
@@ -861,7 +867,7 @@ end
 <p>The first plot shows the distribution of asset cashflows over time. The second compares the key rate duration profiles of the optimized asset portfolio and the liability portfolio, demonstrating how well the hedge performs across different points on the yield curve.</p>
 </section>
 </section>
-<section id="computational-benefits" class="level2">
+<section class="level2" id="computational-benefits">
 <h2 class="anchored" data-anchor-id="computational-benefits">Computational Benefits</h2>
 <p>Autodiff provides several advantages over traditional finite difference approaches:</p>
 <ul>
@@ -872,8 +878,8 @@ end
 </ul>
 <p>For ALM applications, this means more accurate risk measurement and the ability to optimize portfolios with complex constraints that would be computationally expensive using traditional methods.</p>
 <p>Here, we value 100,000 interest-sensitive policies with a monthly timestep for up to 20 years <em>and</em> compute 1st and 2nd order partial sensitives extremely quickly:</p>
-<div id="58" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>@btime value_gradient_and_hessian(z -&gt; annuities(z, liabilities), AutoForwardDiff(), zeros)</code></pre>
+<div class="cell" data-execution_count="1" id="58">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb52"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb52-1"><a aria-hidden="true" href="#cb52-1" tabindex="-1"></a><span class="pp">@btime</span> <span class="fu">value_gradient_and_hessian</span>(z <span class="op">-&gt;</span> <span class="fu">annuities</span>(z, liabilities), <span class="fu">AutoForwardDiff</span>(), zeros)</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  5.341 s (165702693 allocations: 42.52 GiB)</code></pre>
 </div>
@@ -882,7 +888,7 @@ end
 </div>
 </div>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout" class="callout-header d-flex align-content-center collapsed" data-bs-target=".callout-3-contents" data-bs-toggle="collapse">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -891,10 +897,10 @@ end
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-3-contents callout-collapse collapse" id="callout-3">
 <div class="callout-body-container callout-body">
-<div id="60" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>versioninfo()</code></pre>
+<div class="cell" data-execution_count="1" id="60">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb55"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb55-1"><a aria-hidden="true" href="#cb55-1" tabindex="-1"></a><span class="fu">versioninfo</span>()</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Julia Version 1.13.1
 Commit 96ca370cf0e (2026-09-25 19:34 UTC)
@@ -919,48 +925,47 @@ Environment:
 </div>
 <p>However, there’s still some performance left on the table! the <code>(d::DeferredAnnuity)(curve)</code> function defined above is not type stable. In the appendix to this post, we’ll cover a way to improve the performance even more.</p>
 </section>
-<section id="conclusion" class="level2">
+<section class="level2" id="conclusion">
 <h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
 <p>The Julia ecosystem supports this workflow through packages like <code>DifferentiationInterface</code> for autodiff, <code>JuMP</code> for optimization, and <code>FinanceCore</code> for financial mathematics. This combination enables sophisticated ALM implementations that are both mathematically precise and computationally efficient.</p>
 </section>
-<section id="appendix-even-more-performance-advanced" class="level2">
+<section class="level2" id="appendix-even-more-performance-advanced">
 <h2 class="anchored" data-anchor-id="appendix-even-more-performance-advanced">Appendix: Even more performance (Advanced)</h2>
-<p>Julia is fastest when all functions are type stable (i.e.&nbsp;the return type can be inferred at compile time). Looking back at the function defined above, the issue is that the <code>av</code> function is defined outside of the scope used within the <code>map</code> block. This means that the compiler can’t be sure that <code>av</code> won’t be modified while being used within the <code>map</code>. Therefore, <code>av</code> get’s ‘boxed’ and held as an <code>Any</code> type. This type uncertainty propagates to the value returned from the <code>(d::DeferredAnnuity)(curve)</code> function:</p>
-<pre class="julia"><code>function (d::DeferredAnnuity)(curve)
-    av = 1. 
-    map(1//12:1//12:d.tenor) do t
-        mkt_rate = -log(curve(d.tenor) / curve(t)) / (d.tenor - t)
-        av *= exp(d.rate / 12)
-        rate_diff = mkt_rate - d.rate
-        sr = t == d.tenor ? 1.0 : surrender_rate(rate_diff) / 12
-        av_surr = av * sr
-        av -= av_surr
-        Cashflow(-av_surr, t)
-    end
-end
-</code></pre>
+<p>Julia is fastest when all functions are type stable (i.e. the return type can be inferred at compile time). Looking back at the function defined above, the issue is that the <code>av</code> function is defined outside of the scope used within the <code>map</code> block. This means that the compiler can’t be sure that <code>av</code> won’t be modified while being used within the <code>map</code>. Therefore, <code>av</code> get’s ‘boxed’ and held as an <code>Any</code> type. This type uncertainty propagates to the value returned from the <code>(d::DeferredAnnuity)(curve)</code> function:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb57"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb57-1"><a aria-hidden="true" href="#cb57-1" tabindex="-1"></a><span class="kw">function</span> (d<span class="op">::</span><span class="dt">DeferredAnnuity</span>)(curve)</span>
+<span id="cb57-2"><a aria-hidden="true" href="#cb57-2" tabindex="-1"></a>    av <span class="op">=</span> <span class="fl">1</span>. </span>
+<span id="cb57-3"><a aria-hidden="true" href="#cb57-3" tabindex="-1"></a>    <span class="fu">map</span>(<span class="fl">1</span><span class="op">//</span><span class="fl">12</span><span class="op">:</span><span class="fl">1</span><span class="op">//</span><span class="fl">12</span><span class="op">:</span>d.tenor) <span class="cf">do</span> t</span>
+<span id="cb57-4"><a aria-hidden="true" href="#cb57-4" tabindex="-1"></a>        mkt_rate <span class="op">=</span> <span class="fu">-log</span>(<span class="fu">curve</span>(d.tenor) <span class="op">/</span> <span class="fu">curve</span>(t)) <span class="op">/</span> (d.tenor <span class="op">-</span> t)</span>
+<span id="cb57-5"><a aria-hidden="true" href="#cb57-5" tabindex="-1"></a>        av <span class="op">*=</span> <span class="fu">exp</span>(d.rate <span class="op">/</span> <span class="fl">12</span>)</span>
+<span id="cb57-6"><a aria-hidden="true" href="#cb57-6" tabindex="-1"></a>        rate_diff <span class="op">=</span> mkt_rate <span class="op">-</span> d.rate</span>
+<span id="cb57-7"><a aria-hidden="true" href="#cb57-7" tabindex="-1"></a>        sr <span class="op">=</span> t <span class="op">==</span> d.tenor ? <span class="fl">1.0</span> <span class="op">:</span> <span class="fu">surrender_rate</span>(rate_diff) <span class="op">/</span> <span class="fl">12</span></span>
+<span id="cb57-8"><a aria-hidden="true" href="#cb57-8" tabindex="-1"></a>        av_surr <span class="op">=</span> av <span class="op">*</span> sr</span>
+<span id="cb57-9"><a aria-hidden="true" href="#cb57-9" tabindex="-1"></a>        av <span class="op">-=</span> av_surr</span>
+<span id="cb57-10"><a aria-hidden="true" href="#cb57-10" tabindex="-1"></a>        <span class="fu">Cashflow</span>(<span class="op">-</span>av_surr, t)</span>
+<span id="cb57-11"><a aria-hidden="true" href="#cb57-11" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb57-12"><a aria-hidden="true" href="#cb57-12" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <p>An alterative would be to write a <code>for</code> loop and initialize an array to hold the cashflows. The challenge with that is to concretely define the output type of the resulting array. Particularly when combine with AD, the types within the program are no longer basic floats and integers, as we have dual numbers and more complex types running through our functions.</p>
-<p>To maintain most of the simplicity, an alternative approach<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> is to use small, immutable containers from <a href="https://juliahub.com/ui/Packages/General/MicroCollections">MicroCollections.jl</a> and combine them with <a href="https://juliahub.com/ui/Packages/General/BangBang">BangBang.jl</a>. Then, instead of using <code>map</code> we will write a regular loop. The macro <code>@unroll</code> is defined to unroll the first <code>N</code> iterations of the loop. This means that the macro transforms the source code to explicitly write out the first two loops. An example of this might be as follows where two iterations of the loop are unrolled.</p>
-<pre class="julia"><code>function basic_loop()
-    out = []
-    for i ∈ 1:10
-        push!(out,i)
-    end
-    out
-end
-
-function partially_unrolled_loop()
-    out = []
-    push!(out,1)
-    push!(out,2) # two steps unrolled
-    for i ∈ 3:10
-        push!(out,i)
-    end
-    out
-end</code></pre>
+<p>To maintain most of the simplicity, an alternative approach<a class="footnote-ref" href="#fn1" id="fnref1" role="doc-noteref"><sup>1</sup></a> is to use small, immutable containers from <a href="https://juliahub.com/ui/Packages/General/MicroCollections">MicroCollections.jl</a> and combine them with <a href="https://juliahub.com/ui/Packages/General/BangBang">BangBang.jl</a>. Then, instead of using <code>map</code> we will write a regular loop. The macro <code>@unroll</code> is defined to unroll the first <code>N</code> iterations of the loop. This means that the macro transforms the source code to explicitly write out the first two loops. An example of this might be as follows where two iterations of the loop are unrolled.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb58"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb58-1"><a aria-hidden="true" href="#cb58-1" tabindex="-1"></a><span class="kw">function</span> <span class="fu">basic_loop</span>()</span>
+<span id="cb58-2"><a aria-hidden="true" href="#cb58-2" tabindex="-1"></a>    out <span class="op">=</span> []</span>
+<span id="cb58-3"><a aria-hidden="true" href="#cb58-3" tabindex="-1"></a>    <span class="cf">for</span> i <span class="op">∈</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span></span>
+<span id="cb58-4"><a aria-hidden="true" href="#cb58-4" tabindex="-1"></a>        <span class="fu">push!</span>(out,i)</span>
+<span id="cb58-5"><a aria-hidden="true" href="#cb58-5" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb58-6"><a aria-hidden="true" href="#cb58-6" tabindex="-1"></a>    out</span>
+<span id="cb58-7"><a aria-hidden="true" href="#cb58-7" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb58-8"><a aria-hidden="true" href="#cb58-8" tabindex="-1"></a></span>
+<span id="cb58-9"><a aria-hidden="true" href="#cb58-9" tabindex="-1"></a><span class="kw">function</span> <span class="fu">partially_unrolled_loop</span>()</span>
+<span id="cb58-10"><a aria-hidden="true" href="#cb58-10" tabindex="-1"></a>    out <span class="op">=</span> []</span>
+<span id="cb58-11"><a aria-hidden="true" href="#cb58-11" tabindex="-1"></a>    <span class="fu">push!</span>(out,<span class="fl">1</span>)</span>
+<span id="cb58-12"><a aria-hidden="true" href="#cb58-12" tabindex="-1"></a>    <span class="fu">push!</span>(out,<span class="fl">2</span>) <span class="co"># two steps unrolled</span></span>
+<span id="cb58-13"><a aria-hidden="true" href="#cb58-13" tabindex="-1"></a>    <span class="cf">for</span> i <span class="op">∈</span> <span class="fl">3</span><span class="op">:</span><span class="fl">10</span></span>
+<span id="cb58-14"><a aria-hidden="true" href="#cb58-14" tabindex="-1"></a>        <span class="fu">push!</span>(out,i)</span>
+<span id="cb58-15"><a aria-hidden="true" href="#cb58-15" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb58-16"><a aria-hidden="true" href="#cb58-16" tabindex="-1"></a>    out</span>
+<span id="cb58-17"><a aria-hidden="true" href="#cb58-17" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <p>Here’s the macro that does this (expand to see the full definition):</p>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout" class="callout-header d-flex align-content-center collapsed" data-bs-target=".callout-4-contents" data-bs-toggle="collapse">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -969,58 +974,58 @@ end</code></pre>
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-4-contents callout-collapse collapse" id="callout-4">
 <div class="callout-body-container callout-body">
-<div id="62" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>"""
-    @unroll N for_loop
-
-Unroll the first `N` iterations of a for loop, with remaining iterations handled by a regular loop.
-
-This macro takes a for loop and explicitly expands the first `N` iterations, which can improve 
-performance and type stability, particularly when building collections where the first few 
-iterations determine the container's type.
-
-# Arguments
-- `N::Int`: Number of loop iterations to unroll (must be a compile-time constant)
-- `for_loop`: A standard for loop expression
-
-# How it works
-The macro transforms:
-```julia
-@unroll 2 for i in 1:n
-    # body
-end
-"""
-macro unroll(N::Int, loop)
-    Base.isexpr(loop, :for) || error("only works on for loops")
-    Base.isexpr(loop.args[1], :(=)) || error("This loop pattern isn't supported")
-    val, itr = esc.(loop.args[1].args)
-    body = esc(loop.args[2])
-    @gensym loopend
-    label = :(@label $loopend)
-    goto = :(@goto $loopend)
-    out = Expr(:block, :(itr = $itr), :(next = iterate(itr)))
-    unrolled = map(1:N) do _
-        quote
-            isnothing(next) &amp;&amp; @goto loopend
-            $val, state = next
-            $body
-            next = iterate(itr, state)
-        end
-    end
-    append!(out.args, unrolled)
-    remainder = quote
-        while !isnothing(next)
-            $val, state = next
-            $body
-            next = iterate(itr, state)
-        end
-        @label loopend
-    end
-    push!(out.args, remainder)
-    out
-end</code></pre>
+<div class="cell" data-execution_count="1" id="62">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb59"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb59-1"><a aria-hidden="true" href="#cb59-1" tabindex="-1"></a><span class="st">"""</span></span>
+<span id="cb59-2"><a aria-hidden="true" href="#cb59-2" tabindex="-1"></a><span class="st">    @unroll N for_loop</span></span>
+<span id="cb59-3"><a aria-hidden="true" href="#cb59-3" tabindex="-1"></a></span>
+<span id="cb59-4"><a aria-hidden="true" href="#cb59-4" tabindex="-1"></a><span class="st">Unroll the first `N` iterations of a for loop, with remaining iterations handled by a regular loop.</span></span>
+<span id="cb59-5"><a aria-hidden="true" href="#cb59-5" tabindex="-1"></a></span>
+<span id="cb59-6"><a aria-hidden="true" href="#cb59-6" tabindex="-1"></a><span class="st">This macro takes a for loop and explicitly expands the first `N` iterations, which can improve </span></span>
+<span id="cb59-7"><a aria-hidden="true" href="#cb59-7" tabindex="-1"></a><span class="st">performance and type stability, particularly when building collections where the first few </span></span>
+<span id="cb59-8"><a aria-hidden="true" href="#cb59-8" tabindex="-1"></a><span class="st">iterations determine the container's type.</span></span>
+<span id="cb59-9"><a aria-hidden="true" href="#cb59-9" tabindex="-1"></a></span>
+<span id="cb59-10"><a aria-hidden="true" href="#cb59-10" tabindex="-1"></a><span class="st"># Arguments</span></span>
+<span id="cb59-11"><a aria-hidden="true" href="#cb59-11" tabindex="-1"></a><span class="st">- `N::Int`: Number of loop iterations to unroll (must be a compile-time constant)</span></span>
+<span id="cb59-12"><a aria-hidden="true" href="#cb59-12" tabindex="-1"></a><span class="st">- `for_loop`: A standard for loop expression</span></span>
+<span id="cb59-13"><a aria-hidden="true" href="#cb59-13" tabindex="-1"></a></span>
+<span id="cb59-14"><a aria-hidden="true" href="#cb59-14" tabindex="-1"></a><span class="st"># How it works</span></span>
+<span id="cb59-15"><a aria-hidden="true" href="#cb59-15" tabindex="-1"></a><span class="st">The macro transforms:</span></span>
+<span id="cb59-16"><a aria-hidden="true" href="#cb59-16" tabindex="-1"></a><span class="st">```julia</span></span>
+<span id="cb59-17"><a aria-hidden="true" href="#cb59-17" tabindex="-1"></a><span class="st">@unroll 2 for i in 1:n</span></span>
+<span id="cb59-18"><a aria-hidden="true" href="#cb59-18" tabindex="-1"></a><span class="st">    # body</span></span>
+<span id="cb59-19"><a aria-hidden="true" href="#cb59-19" tabindex="-1"></a><span class="st">end</span></span>
+<span id="cb59-20"><a aria-hidden="true" href="#cb59-20" tabindex="-1"></a><span class="st">"""</span></span>
+<span id="cb59-21"><a aria-hidden="true" href="#cb59-21" tabindex="-1"></a><span class="kw">macro</span> <span class="fu">unroll</span>(N<span class="op">::</span><span class="dt">Int</span>, loop)</span>
+<span id="cb59-22"><a aria-hidden="true" href="#cb59-22" tabindex="-1"></a>    <span class="bu">Base</span>.<span class="fu">isexpr</span>(loop, <span class="op">:</span><span class="cf">for</span>) <span class="op">||</span> <span class="fu">error</span>(<span class="st">"only works on for loops"</span>)</span>
+<span id="cb59-23"><a aria-hidden="true" href="#cb59-23" tabindex="-1"></a>    <span class="bu">Base</span>.<span class="fu">isexpr</span>(loop.args[<span class="fl">1</span>], <span class="op">:</span>(<span class="op">=</span>)) <span class="op">||</span> <span class="fu">error</span>(<span class="st">"This loop pattern isn't supported"</span>)</span>
+<span id="cb59-24"><a aria-hidden="true" href="#cb59-24" tabindex="-1"></a>    val, itr <span class="op">=</span> <span class="fu">esc</span>.(loop.args[<span class="fl">1</span>].args)</span>
+<span id="cb59-25"><a aria-hidden="true" href="#cb59-25" tabindex="-1"></a>    body <span class="op">=</span> <span class="fu">esc</span>(loop.args[<span class="fl">2</span>])</span>
+<span id="cb59-26"><a aria-hidden="true" href="#cb59-26" tabindex="-1"></a>    <span class="pp">@gensym</span> loopend</span>
+<span id="cb59-27"><a aria-hidden="true" href="#cb59-27" tabindex="-1"></a>    label <span class="op">=</span> <span class="op">:</span>(<span class="pp">@label</span> <span class="op">$</span>loopend)</span>
+<span id="cb59-28"><a aria-hidden="true" href="#cb59-28" tabindex="-1"></a>    goto <span class="op">=</span> <span class="op">:</span>(<span class="pp">@goto</span> <span class="op">$</span>loopend)</span>
+<span id="cb59-29"><a aria-hidden="true" href="#cb59-29" tabindex="-1"></a>    out <span class="op">=</span> <span class="fu">Expr</span>(<span class="op">:</span>block, <span class="op">:</span>(itr <span class="op">=</span> <span class="op">$</span>itr), <span class="op">:</span>(next <span class="op">=</span> <span class="fu">iterate</span>(itr)))</span>
+<span id="cb59-30"><a aria-hidden="true" href="#cb59-30" tabindex="-1"></a>    unrolled <span class="op">=</span> <span class="fu">map</span>(<span class="fl">1</span><span class="op">:</span>N) <span class="cf">do</span> _</span>
+<span id="cb59-31"><a aria-hidden="true" href="#cb59-31" tabindex="-1"></a>        <span class="kw">quote</span></span>
+<span id="cb59-32"><a aria-hidden="true" href="#cb59-32" tabindex="-1"></a>            <span class="fu">isnothing</span>(next) <span class="op">&amp;&amp;</span> <span class="pp">@goto</span> loopend</span>
+<span id="cb59-33"><a aria-hidden="true" href="#cb59-33" tabindex="-1"></a>            <span class="op">$</span>val, state <span class="op">=</span> next</span>
+<span id="cb59-34"><a aria-hidden="true" href="#cb59-34" tabindex="-1"></a>            <span class="op">$</span>body</span>
+<span id="cb59-35"><a aria-hidden="true" href="#cb59-35" tabindex="-1"></a>            next <span class="op">=</span> <span class="fu">iterate</span>(itr, state)</span>
+<span id="cb59-36"><a aria-hidden="true" href="#cb59-36" tabindex="-1"></a>        <span class="cf">end</span></span>
+<span id="cb59-37"><a aria-hidden="true" href="#cb59-37" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb59-38"><a aria-hidden="true" href="#cb59-38" tabindex="-1"></a>    <span class="fu">append!</span>(out.args, unrolled)</span>
+<span id="cb59-39"><a aria-hidden="true" href="#cb59-39" tabindex="-1"></a>    remainder <span class="op">=</span> <span class="kw">quote</span></span>
+<span id="cb59-40"><a aria-hidden="true" href="#cb59-40" tabindex="-1"></a>        <span class="cf">while</span> !<span class="fu">isnothing</span>(next)</span>
+<span id="cb59-41"><a aria-hidden="true" href="#cb59-41" tabindex="-1"></a>            <span class="op">$</span>val, state <span class="op">=</span> next</span>
+<span id="cb59-42"><a aria-hidden="true" href="#cb59-42" tabindex="-1"></a>            <span class="op">$</span>body</span>
+<span id="cb59-43"><a aria-hidden="true" href="#cb59-43" tabindex="-1"></a>            next <span class="op">=</span> <span class="fu">iterate</span>(itr, state)</span>
+<span id="cb59-44"><a aria-hidden="true" href="#cb59-44" tabindex="-1"></a>        <span class="cf">end</span></span>
+<span id="cb59-45"><a aria-hidden="true" href="#cb59-45" tabindex="-1"></a>        <span class="pp">@label</span> loopend</span>
+<span id="cb59-46"><a aria-hidden="true" href="#cb59-46" tabindex="-1"></a>    <span class="kw">end</span></span>
+<span id="cb59-47"><a aria-hidden="true" href="#cb59-47" tabindex="-1"></a>    <span class="fu">push!</span>(out.args, remainder)</span>
+<span id="cb59-48"><a aria-hidden="true" href="#cb59-48" tabindex="-1"></a>    out</span>
+<span id="cb59-49"><a aria-hidden="true" href="#cb59-49" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>@unroll (macro with 1 method)</code></pre>
 </div>
@@ -1029,25 +1034,25 @@ end</code></pre>
 </div>
 </div>
 <p>Then, we re-write and redefine <code>(d::DeferredAnnuity)(curve)</code> to utilize this technique.</p>
-<div id="64" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>using BangBang, MicroCollections
-
-function (d::DeferredAnnuity)(curve)
-        times = 1//12:1//12:d.tenor
-        out = UndefVector{Union{}}(length(times)) # 1
-        av = 1.0
-        @unroll 2 for (i,t) ∈ enumerate(times) # 2
-            mkt_rate = -log(curve(d.tenor) / curve(t)) / (d.tenor - t)
-            av *= exp(d.rate / 12)
-            rate_diff = mkt_rate - d.rate
-            sr = t == d.tenor ? 1.0 : surrender_rate(rate_diff) / 12
-            av_surr = av * sr
-            av -= av_surr
-            cf = Cashflow(-av_surr, t)
-            out = setindex!!(out, cf, i) # 3
-        end
-        out
-    end;</code></pre>
+<div class="cell" data-execution_count="1" id="64">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb61"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb61-1"><a aria-hidden="true" href="#cb61-1" tabindex="-1"></a><span class="im">using</span> <span class="bu">BangBang</span>, <span class="bu">MicroCollections</span></span>
+<span id="cb61-2"><a aria-hidden="true" href="#cb61-2" tabindex="-1"></a></span>
+<span id="cb61-3"><a aria-hidden="true" href="#cb61-3" tabindex="-1"></a><span class="kw">function</span> (d<span class="op">::</span><span class="dt">DeferredAnnuity</span>)(curve)</span>
+<span id="cb61-4"><a aria-hidden="true" href="#cb61-4" tabindex="-1"></a>        times <span class="op">=</span> <span class="fl">1</span><span class="op">//</span><span class="fl">12</span><span class="op">:</span><span class="fl">1</span><span class="op">//</span><span class="fl">12</span><span class="op">:</span>d.tenor</span>
+<span id="cb61-5"><a aria-hidden="true" href="#cb61-5" tabindex="-1"></a>        out <span class="op">=</span> <span class="fu">UndefVector</span><span class="dt">{Union{}}</span>(<span class="fu">length</span>(times)) <span class="co"># 1</span></span>
+<span id="cb61-6"><a aria-hidden="true" href="#cb61-6" tabindex="-1"></a>        av <span class="op">=</span> <span class="fl">1.0</span></span>
+<span id="cb61-7"><a aria-hidden="true" href="#cb61-7" tabindex="-1"></a>        <span class="pp">@unroll</span> <span class="fl">2</span> <span class="cf">for</span> (i,t) <span class="op">∈</span> <span class="fu">enumerate</span>(times) <span class="co"># 2</span></span>
+<span id="cb61-8"><a aria-hidden="true" href="#cb61-8" tabindex="-1"></a>            mkt_rate <span class="op">=</span> <span class="fu">-log</span>(<span class="fu">curve</span>(d.tenor) <span class="op">/</span> <span class="fu">curve</span>(t)) <span class="op">/</span> (d.tenor <span class="op">-</span> t)</span>
+<span id="cb61-9"><a aria-hidden="true" href="#cb61-9" tabindex="-1"></a>            av <span class="op">*=</span> <span class="fu">exp</span>(d.rate <span class="op">/</span> <span class="fl">12</span>)</span>
+<span id="cb61-10"><a aria-hidden="true" href="#cb61-10" tabindex="-1"></a>            rate_diff <span class="op">=</span> mkt_rate <span class="op">-</span> d.rate</span>
+<span id="cb61-11"><a aria-hidden="true" href="#cb61-11" tabindex="-1"></a>            sr <span class="op">=</span> t <span class="op">==</span> d.tenor ? <span class="fl">1.0</span> <span class="op">:</span> <span class="fu">surrender_rate</span>(rate_diff) <span class="op">/</span> <span class="fl">12</span></span>
+<span id="cb61-12"><a aria-hidden="true" href="#cb61-12" tabindex="-1"></a>            av_surr <span class="op">=</span> av <span class="op">*</span> sr</span>
+<span id="cb61-13"><a aria-hidden="true" href="#cb61-13" tabindex="-1"></a>            av <span class="op">-=</span> av_surr</span>
+<span id="cb61-14"><a aria-hidden="true" href="#cb61-14" tabindex="-1"></a>            cf <span class="op">=</span> <span class="fu">Cashflow</span>(<span class="op">-</span>av_surr, t)</span>
+<span id="cb61-15"><a aria-hidden="true" href="#cb61-15" tabindex="-1"></a>            out <span class="op">=</span> <span class="fu">setindex!!</span>(out, cf, i) <span class="co"># 3</span></span>
+<span id="cb61-16"><a aria-hidden="true" href="#cb61-16" tabindex="-1"></a>        <span class="cf">end</span></span>
+<span id="cb61-17"><a aria-hidden="true" href="#cb61-17" tabindex="-1"></a>        out</span>
+<span id="cb61-18"><a aria-hidden="true" href="#cb61-18" tabindex="-1"></a>    <span class="kw">end</span>;</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 </div>
 <ol type="1">
 <li>We tell the <code>out</code> vector how many elements to expect</li>
@@ -1055,8 +1060,8 @@ function (d::DeferredAnnuity)(curve)
 <li>We use <code>setindex!!</code> from BangBang to efficiently update the output vector and it’s type.</li>
 </ol>
 <p>Using this technique, we can see that we achieve a significant speedup (less than half the runtime) from the earlier version due to improving the type stability of the code:</p>
-<div id="66" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>@btime value_gradient_and_hessian(z -&gt; annuities(z, liabilities), AutoForwardDiff(), zeros)</code></pre>
+<div class="cell" data-execution_count="1" id="66">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb62"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb62-1"><a aria-hidden="true" href="#cb62-1" tabindex="-1"></a><span class="pp">@btime</span> <span class="fu">value_gradient_and_hessian</span>(z <span class="op">-&gt;</span> <span class="fu">annuities</span>(z, liabilities), <span class="fu">AutoForwardDiff</span>(), zeros)</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  1.994 s (600217 allocations: 5.42 GiB)</code></pre>
 </div>
@@ -1064,15 +1069,10 @@ function (d::DeferredAnnuity)(curve)
 <pre><code>(-102342.70578791756, [11361.401670472067, 30022.260938377476, 29342.067950043573, 256814.9352377915, 123982.85851618621, 6569.901583081439], [-166563.37510676673 197408.151177275 … 8650.57215904071 -42216.368452116374; 197408.1511772747 -1.6782897101469159e6 … 2.497091583151462e6 1.2707944285740166e6; … ; 8650.572159040628 2.4970915831514634e6 … -3.730447366845256e7 -2.7456109908992173e6; -42216.3684521164 1.2707944285740163e6 … -2.745610990899224e6 -2.155782542620245e7])</code></pre>
 </div>
 </div>
-
-
 </section>
-
-
-<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
-
+<div class="default" id="quarto-appendix"><section class="footnotes footnotes-end-of-document" id="footnotes" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
 <ol>
-<li id="fn1"><p>With thanks to the helpful persons on the <a href="https://julialang.zulipchat.com/#narrow/channel/274208-helpdesk-.28published.29/topic/map.20pattern.20and.20avoiding.20closures/with/525441431">Julia Zulip</a>, in particular Mason Protter for this approach.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn1"><p>With thanks to the helpful persons on the <a href="https://julialang.zulipchat.com/#narrow/channel/274208-helpdesk-.28published.29/topic/map.20pattern.20and.20avoiding.20closures/with/525441431">Julia Zulip</a>, in particular Mason Protter for this approach.<a class="footnote-back" href="#fnref1" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -1476,8 +1476,4 @@ function (d::DeferredAnnuity)(curve)
   });
   </script>
 </div> <!-- /content -->
-
-
-
-
 </body></html>

@@ -1,5 +1,7 @@
 project:
   type: website
+  post-render:
+    - python3 scripts/post-render.py
 engines: ['julia']
 julia:
     env: ["JULIA_NUM_THREADS=auto"]
@@ -16,43 +18,40 @@ website:
       - packages.qmd
       - text: Docs
         href: https://docs.juliaactuary.org
-      - text: Book
-        href: https://modernfinancialmodeling.com
       - learn.qmd
       - examples.qmd
-      - benchmarks.qmd
       - community.qmd
-      - blog.qmd
+      - text: More
+        menu:
+          - benchmarks.qmd
+          - blog.qmd
+          - text: Book
+            href: https://modernfinancialmodeling.com
       - icon: github
+        aria-label: JuliaActuary on GitHub
         href: https://github.com/JuliaActuary
       - icon: rss
+        aria-label: RSS feed
         href: all-posts.xml
 
 
 format:
   html:
     engine: julia
-    theme: cosmo
+    theme: assets/themes/cassette.scss
     css: styles.css
     monofont: JuliaMono
     mainfont: "Atkinson Hyperlegible"
-    highlight: false
-    highlight-style: "none"
+    highlight-style: assets/themes/cassette.theme
+    filters:
+      - scripts/julia-repl.lua
     description: "JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows."
     header-includes:
       - |
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
       - |
-        <link rel="stylesheet" href="/assets/highlight/styles/github.min.css">
-      - |
-        <script src="/assets/highlight/highlight.min.js"></script>
-        <script src="/assets/highlight/languages/julia.min.js"></script>
-        <script src="/assets/highlight/languages/julia-repl.min.js"></script>
-        <script src="/assets/highlight/languages/python.min.js"></script>
-        <script src="/assets/highlight/languages/r.min.js"></script>
-        <script>hljs.highlightAll();</script>
         <script data-goatcounter="https://juliaactuary.goatcounter.com/count"
         async src="//gc.zgo.at/count.js"></script>
 

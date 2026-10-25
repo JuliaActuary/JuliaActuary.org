@@ -5,47 +5,45 @@ toc: true
 
 These packages are available for use in your project. Scroll down for more information and links to the associated repository for each one.
 
-```{=html}
-<table class="package-table">
-<tr></tr>
-<tr>
-<td style="width:50%" style="vertical-align: top;">
-   <p><strong><a href="/packages.html#mortalitytables.jl">MortalityTables.jl</a></strong></p>
+::: {.package-grid}
 
-<p>Easily work with standard tables and parametric models with common survival calculations.</p>
-</td>
-<td style="vertical-align: top;">
-   <p><strong><a href="/packages.html#lifecontingencies.jl">LifeContingencies.jl</a></strong></p>
-<p>Insurance, annuity, premium, and reserve maths.</p>
-</td>
+::: {.package-card}
+## [MortalityTables.jl](#mortalitytables.jl) {#summary-mortalitytables .unlisted .unnumbered}
 
-</tr>
-<tr>
-<td style="vertical-align: top;">
-   <p><strong><a href="/packages.html#actuaryutilities.jl">ActuaryUtilities.jl</a></strong></p>
+Work with standard mortality tables, parametric models, and survival calculations.
+:::
 
-<p>Robust and fast calculations for <code>internal_rate_of_return</code>, <code>duration</code>, <code>convexity</code>, <code>present_value</code>, <code>breakeven</code>, and more.</p>
-</td>
-<td style="vertical-align: top;">
-   <p><strong><a href="/packages.html#experienceanalysis.jl">ExperienceAnalysis.jl</a></strong></p>
-<p>Meeting your exposure calculation needs.</p>
-</td>
+::: {.package-card}
+## [LifeContingencies.jl](#lifecontingencies.jl) {#summary-lifecontingencies .unlisted .unnumbered}
 
-</tr>
-<tr>
-<td style="vertical-align: top;">
-   <p><strong><a href="/packages.html#financemodels.jl">FinanceModels.jl</a></strong></p>
+Calculate insurance and annuity values, premiums, and reserves.
+:::
 
-<p>Composable contracts, models, and functions that allow for modeling of both simple and complex financial instruments.</p>
-</td>
-<td style="vertical-align: top;">
-   <p><strong><a href="/packages.html#economicscenariogenerators.jl">EconomicScenarioGenerators.jl</a></strong></p>
-<p>Scenario iterators for existing ESG workflows; see version compatibility below.</p>
-</td>
+::: {.package-card}
+## [ActuaryUtilities.jl](#actuaryutilities.jl) {#summary-actuaryutilities .unlisted .unnumbered}
 
-</tr>
-</table>
-```
+Calculate present values, durations, convexities, internal rates of return, and sensitivities.
+:::
+
+::: {.package-card}
+## [ExperienceAnalysis.jl](#experienceanalysis.jl) {#summary-experienceanalysis .unlisted .unnumbered}
+
+Calculate exposures and prepare insurance experience studies.
+:::
+
+::: {.package-card}
+## [FinanceModels.jl](#financemodels.jl) {#summary-financemodels .unlisted .unnumbered}
+
+Build curves, contracts, stochastic models, and financial valuations.
+:::
+
+::: {.package-card}
+## [EconomicScenarioGenerators.jl](#economicscenariogenerators.jl) {#summary-economicscenariogenerators .unlisted .unnumbered}
+
+Generate economic scenarios for existing ESG workflows; see compatibility notes below.
+:::
+
+:::
 
 ::: callout-tip
 For consistency, you can lock any package in its current state and not worry about breaking changes to any code that you write. Julia's package manager lets you [exactly recreate a set of code and its dependencies](https://julialang.github.io/Pkg.jl/v1/toml-files/#Manifest.toml-1). [More information](https://stackoverflow.com/questions/63485891/how-do-i-ensure-repeatability-of-julia-code-and-assoicated-dependencies).

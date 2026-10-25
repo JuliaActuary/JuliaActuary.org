@@ -3,7 +3,7 @@ title: "US Treasury Comparison Tool"
 categories: [modeling,financemodels, tutorial]
 ---
 
-![](PlutoScreenshot.png)
+![](PlutoScreenshot.png){fig-alt="Pluto notebook comparing US Treasury zero-rate curves for two selected dates."}
 
 The screenshot above shows a [Pluto.jl](https://github.com/fonsp/Pluto.jl) notebook where you can select a pair of dates and find the change in the treasury curve's zero rates.
 

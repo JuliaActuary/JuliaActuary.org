@@ -45,6 +45,7 @@ end
 Visualizing the data:
 
 ```{julia}
+#| fig-alt: "Observed survival proportions decreasing over time."
 plt = Figure(); ax = Axis(plt[1,1]; xlabel="time", ylabel="survival",
     title="Observed survival proportion")
 lines!(ax, data.times, data.survival;
@@ -68,6 +69,7 @@ This means that we need to write our model function so it applies the model to t
 And fit the model with [LsqFit.jl](https://github.com/JuliaNLSolvers/LsqFit.jl):
 
 ```{julia}
+#| fig-alt: "Observed survival proportions and the fitted Weibull survival curve."
 fit1 = curve_fit(model1, data.times, data.survival, [1.0, 1.0])
 
 lines!(ax, data.times, model1(data.times, fit1.param);
@@ -138,6 +140,7 @@ KaplanMeier comes from [Survival.jl](https://github.com/JuliaStats/Survival.jl).
 
 
 ```{julia}
+#| fig-alt: "Empirical Kaplan-Meier survival estimates over time."
 #t- time vector;c - censored events vector
 km = fit(Survival.KaplanMeier, t, c)
 
@@ -148,6 +151,7 @@ plt2
 ```
 
 ```{julia}
+#| fig-alt: "Kaplan-Meier survival estimates compared with the fitted Weibull curve."
 @. model(x, p) = survival(MortalityTables.Weibull(; m=p[1], σ=p[2]), x)
 
 mfit = LsqFit.curve_fit(model, km.events.time, km.survival, [2.0, 2.0])

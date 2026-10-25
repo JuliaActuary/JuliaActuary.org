@@ -1,13 +1,10 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
-<meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.16">
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-
-<meta name="description" content="JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.">
-
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml"><head>
+<meta charset="utf-8"/>
+<meta content="quarto-1.9.16" name="generator"/>
+<meta content="width=device-width, initial-scale=1.0, user-scalable=yes" name="viewport"/>
+<meta content="JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows." name="description"/>
 <title>Fitting Rate Data to Yield Curves – JuliaActuary</title>
 <style>
 code{white-space: pre-wrap;}
@@ -21,28 +18,61 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
-
-
 <script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="../../site_libs/quarto-nav/headroom.min.js"></script>
 <script src="../../site_libs/clipboard/clipboard.min.js"></script>
 <script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="../../">
-<link href="../..//assets/logos/favicon.ico" rel="icon">
+<meta content="../../" name="quarto:offset"/>
+<link href="../..//assets/logos/favicon.ico" rel="icon"/>
 <script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
-<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-a0731b9a3a5d496010872d775e5d9bc3.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet"/>
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-be14ce6d32a635bebd8f9e4e558f9eeb.css" id="quarto-text-highlighting-styles" rel="stylesheet"/>
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-98ac2d5361ef6f18cc0525d38bedc462.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet"/>
+<link append-hash="true" data-mode="light" href="../../site_libs/bootstrap/bootstrap-4a135b976b00f53a3a768ff94eb1df18.min.css" id="quarto-bootstrap" rel="stylesheet"/>
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -70,144 +100,126 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&amp;family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&amp;display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../../assets/highlight/styles/github.min.css">
-<script src="../../assets/highlight/highlight.min.js"></script>
-<script src="../../assets/highlight/languages/julia.min.js"></script>
-<script src="../../assets/highlight/languages/julia-repl.min.js"></script>
-<script src="../../assets/highlight/languages/python.min.js"></script>
-<script src="../../assets/highlight/languages/r.min.js"></script>
-<script>hljs.highlightAll();</script>
-<script data-goatcounter="https://juliaactuary.goatcounter.com/count" async="" src="//gc.zgo.at/count.js"></script>
-
-
-<link rel="stylesheet" href="../../styles.css">
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" rel="stylesheet"/>
+<script async="" data-goatcounter="https://juliaactuary.goatcounter.com/count" src="//gc.zgo.at/count.js"></script>
+<link href="../../styles-c416c153cdf24884.css" rel="stylesheet"/>
 </head>
-
 <body class="nav-fixed fullcontent quarto-light">
-
 <div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top quarto-banner">
-    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
-      <div class="navbar-container container-fluid">
-      <div class="navbar-brand-container mx-auto">
-    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
-    <img src="../../assets/logos/android-chrome-512x512.png" alt="JuliaActuary Logo" class="navbar-logo light-content">
-    <img src="../../assets/logos/android-chrome-512x512.png" alt="JuliaActuary Logo" class="navbar-logo dark-content">
-    </a>
-    <a class="navbar-brand" href="../../index.html">
-    <span class="navbar-title">JuliaActuary</span>
-    </a>
-  </div>
-            <div id="quarto-search" class="" title="Search"></div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-  <span class="navbar-toggler-icon"></span>
-</button>
-          <div class="collapse navbar-collapse" id="navbarCollapse">
-            <ul class="navbar-nav navbar-nav-scroll ms-auto">
-  <li class="nav-item">
-    <a class="nav-link" href="../../packages.html"> 
-<span class="menu-text">Packages</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="https://docs.juliaactuary.org"> 
-<span class="menu-text">Docs</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="https://modernfinancialmodeling.com"> 
-<span class="menu-text">Book</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../learn.html"> 
-<span class="menu-text">Learn</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../examples.html"> 
-<span class="menu-text">Examples</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../benchmarks.html"> 
-<span class="menu-text">Benchmarks</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../community.html"> 
-<span class="menu-text">Community</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../blog.html"> 
-<span class="menu-text">Blog</span></a>
-  </li>  
-  <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/JuliaActuary"> <i class="bi bi-github" role="img">
-</i> 
-<span class="menu-text"></span></a>
-  </li>  
-  <li class="nav-item compact">
-    <a class="nav-link" href="../../all-posts.xml"> <i class="bi bi-rss" role="img">
-</i> 
-<span class="menu-text"></span></a>
-  </li>  
-</ul>
-          </div> <!-- /navcollapse -->
-            <div class="quarto-navbar-tools">
+<header class="headroom fixed-top quarto-banner" id="quarto-header">
+<nav class="navbar navbar-expand-lg" data-bs-theme="dark">
+<div class="navbar-container container-fluid">
+<div class="navbar-brand-container mx-auto">
+<a class="navbar-brand navbar-brand-logo" href="../../index.html">
+<img alt="JuliaActuary Logo" class="navbar-logo light-content" src="../../assets/logos/android-chrome-512x512.png"/>
+<img alt="JuliaActuary Logo" class="navbar-logo dark-content" src="../../assets/logos/android-chrome-512x512.png"/>
+</a>
+<a class="navbar-brand" href="../../index.html">
+<span class="navbar-title">JuliaActuary</span>
+</a>
 </div>
-      </div> <!-- /container-fluid -->
-    </nav>
+<div class="" id="quarto-search" title="Search"></div>
+<button aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-bs-target="#navbarCollapse" data-bs-toggle="collapse" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }" role="menu" type="button">
+<span class="navbar-toggler-icon"></span>
+</button>
+<div class="collapse navbar-collapse" id="navbarCollapse">
+<ul class="navbar-nav navbar-nav-scroll ms-auto">
+<li class="nav-item">
+<a class="nav-link" href="../../packages.html">
+<span class="menu-text">Packages</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="https://docs.juliaactuary.org">
+<span class="menu-text">Docs</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="../../learn.html">
+<span class="menu-text">Learn</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="../../examples.html">
+<span class="menu-text">Examples</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="../../community.html">
+<span class="menu-text">Community</span></a>
+</li>
+<li class="nav-item dropdown">
+<a aria-expanded="false" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" id="nav-menu-more" role="link">
+<span class="menu-text">More</span>
+</a>
+<ul aria-labelledby="nav-menu-more" class="dropdown-menu dropdown-menu-end">
+<li>
+<a class="dropdown-item" href="../../benchmarks.html">
+<span class="dropdown-text">Benchmarks</span></a>
+</li>
+<li>
+<a class="dropdown-item" href="../../blog.html">
+<span class="dropdown-text">Blog</span></a>
+</li>
+<li>
+<a class="dropdown-item" href="https://modernfinancialmodeling.com">
+<span class="dropdown-text">Book</span></a>
+</li>
+</ul>
+</li>
+<li class="nav-item compact">
+<a class="nav-link" href="https://github.com/JuliaActuary"> <i aria-label="JuliaActuary on GitHub" class="bi bi-github" role="img">
+</i>
+<span class="menu-text"></span></a>
+</li>
+<li class="nav-item compact">
+<a class="nav-link" href="../../all-posts.xml"> <i aria-label="RSS feed" class="bi bi-rss" role="img">
+</i>
+<span class="menu-text"></span></a>
+</li>
+</ul>
+</div> <!-- /navcollapse -->
+<div class="quarto-navbar-tools">
+</div>
+</div> <!-- /container-fluid -->
+</nav>
 </header>
 <!-- content -->
-<header id="title-block-header" class="quarto-title-block default page-columns page-full">
-  <div class="quarto-title-banner page-columns page-full">
-    <div class="quarto-title column-body">
-      <h1 class="title">Fitting Rate Data to Yield Curves</h1>
-                  <div>
-        <div class="description">
+<header class="quarto-title-block default page-columns page-full" id="title-block-header">
+<div class="quarto-title-banner page-columns page-full">
+<div class="quarto-title column-body">
+<h1 class="title">Fitting Rate Data to Yield Curves</h1>
+<div>
+<div class="description">
           JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.
         </div>
-      </div>
-                          <div class="quarto-categories">
-                <div class="quarto-category">market</div>
-                <div class="quarto-category">yieldcurves</div>
-                <div class="quarto-category">financemodels</div>
-                <div class="quarto-category">tutorial</div>
-              </div>
-                  </div>
-  </div>
-    
-  
-  <div class="quarto-title-meta">
-
-      
-    
-      
-    </div>
-    
-  
-  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+</div>
+<div class="quarto-categories">
+<div class="quarto-category">market</div>
+<div class="quarto-category">yieldcurves</div>
+<div class="quarto-category">financemodels</div>
+<div class="quarto-category">tutorial</div>
+</div>
+</div>
+</div>
+<div class="quarto-title-meta">
+</div>
+</header><div class="quarto-container page-columns page-rows-contents page-layout-article page-navbar" id="quarto-content">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    
 <!-- main -->
 <main class="content quarto-banner-title-block" id="quarto-document-content">
-
-
-
-
-
 <p>Given rates and maturities, we can fit the yield curves with different techniques.</p>
 <p>Below, we specify that the rates should be interpreted as <code>Continuous</code>ly compounded zero rates:</p>
-<div id="4" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>using FinanceModels
-using CairoMakie
-
-# Apply the site's custom Makie plot theme (cassette futurism).
-include(joinpath(@__DIR__, "..", "..", "assets", "themes", "cassette_futurism.jl"))
-set_theme!(cassette_futurism_theme())</code></pre>
+<div class="cell" data-execution_count="1" id="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a aria-hidden="true" href="#cb1-1" tabindex="-1"></a><span class="im">using</span> <span class="bu">FinanceModels</span></span>
+<span id="cb1-2"><a aria-hidden="true" href="#cb1-2" tabindex="-1"></a><span class="im">using</span> <span class="bu">CairoMakie</span></span>
+<span id="cb1-3"><a aria-hidden="true" href="#cb1-3" tabindex="-1"></a></span>
+<span id="cb1-4"><a aria-hidden="true" href="#cb1-4" tabindex="-1"></a><span class="co"># Apply the site's custom Makie plot theme (cassette futurism).</span></span>
+<span id="cb1-5"><a aria-hidden="true" href="#cb1-5" tabindex="-1"></a><span class="fu">include</span>(<span class="fu">joinpath</span>(<span class="pp">@__DIR__</span>, <span class="st">".."</span>, <span class="st">".."</span>, <span class="st">"assets"</span>, <span class="st">"themes"</span>, <span class="st">"cassette_futurism.jl"</span>))</span>
+<span id="cb1-6"><a aria-hidden="true" href="#cb1-6" tabindex="-1"></a><span class="fu">set_theme!</span>(<span class="fu">cassette_futurism_theme</span>())</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 </div>
-<div id="6" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>rates = Continuous.([0.01, 0.01, 0.03, 0.05, 0.07, 0.16, 0.35, 0.92, 1.40, 1.74, 2.31, 2.41] ./ 100)
-mats = [1 / 12, 2 / 12, 3 / 12, 6 / 12, 1, 2, 3, 5, 7, 10, 20, 30]</code></pre>
+<div class="cell" data-execution_count="1" id="6">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a aria-hidden="true" href="#cb2-1" tabindex="-1"></a>rates <span class="op">=</span> <span class="fu">Continuous</span>.([<span class="fl">0.01</span>, <span class="fl">0.01</span>, <span class="fl">0.03</span>, <span class="fl">0.05</span>, <span class="fl">0.07</span>, <span class="fl">0.16</span>, <span class="fl">0.35</span>, <span class="fl">0.92</span>, <span class="fl">1.40</span>, <span class="fl">1.74</span>, <span class="fl">2.31</span>, <span class="fl">2.41</span>] <span class="op">./</span> <span class="fl">100</span>)</span>
+<span id="cb2-2"><a aria-hidden="true" href="#cb2-2" tabindex="-1"></a>mats <span class="op">=</span> [<span class="fl">1</span> <span class="op">/</span> <span class="fl">12</span>, <span class="fl">2</span> <span class="op">/</span> <span class="fl">12</span>, <span class="fl">3</span> <span class="op">/</span> <span class="fl">12</span>, <span class="fl">6</span> <span class="op">/</span> <span class="fl">12</span>, <span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">3</span>, <span class="fl">5</span>, <span class="fl">7</span>, <span class="fl">10</span>, <span class="fl">20</span>, <span class="fl">30</span>]</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>12-element Vector{Float64}:
   0.08333333333333333
@@ -225,8 +237,8 @@ mats = [1 / 12, 2 / 12, 3 / 12, 6 / 12, 1, 2, 3, 5, 7, 10, 20, 30]</code></pre>
 </div>
 </div>
 <p>The above rates and associated maturities represent yields of zero coupon bonds (from which the corresponding prices follow), which we use as the financial instrument that we will fit the curve to:</p>
-<div id="8" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>quotes = ZCBYield.(rates, mats)</code></pre>
+<div class="cell" data-execution_count="1" id="8">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a aria-hidden="true" href="#cb4-1" tabindex="-1"></a>quotes <span class="op">=</span> <span class="fu">ZCBYield</span>.(rates, mats)</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>12-element Vector{Quote{Float64, Cashflow{Float64, Float64}}}:
  Quote{Float64, Cashflow{Float64, Float64}}(0.9999916667013888, Cashflow{Float64, Float64}(1.0, 0.08333333333333333))
@@ -244,78 +256,75 @@ mats = [1 / 12, 2 / 12, 3 / 12, 6 / 12, 1, 2, 3, 5, 7, 10, 20, 30]</code></pre>
 </div>
 </div>
 <p>With FinanceModels 7, <code>Fit.Bootstrap()</code> supports linear interpolation. Quadratic and cubic splines use a loss fit over all quotes. Here are six alternatives:</p>
-<div id="10" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>ns = fit(Yield.NelsonSiegel(), quotes);
-nss = fit(Yield.NelsonSiegelSvensson(), quotes);
-sw = fit(Yield.SmithWilson(ufr=0.05, α=0.1), quotes);
-bl = fit(Spline.Linear(), quotes, Fit.Bootstrap());
-bq = fit(Spline.Quadratic(), quotes, Fit.Loss(x -&gt; x^2));
-bc = fit(Spline.Cubic(), quotes, Fit.Loss(x -&gt; x^2));</code></pre>
+<div class="cell" data-execution_count="1" id="10">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a aria-hidden="true" href="#cb6-1" tabindex="-1"></a>ns <span class="op">=</span> <span class="fu">fit</span>(Yield.<span class="fu">NelsonSiegel</span>(), quotes);</span>
+<span id="cb6-2"><a aria-hidden="true" href="#cb6-2" tabindex="-1"></a>nss <span class="op">=</span> <span class="fu">fit</span>(Yield.<span class="fu">NelsonSiegelSvensson</span>(), quotes);</span>
+<span id="cb6-3"><a aria-hidden="true" href="#cb6-3" tabindex="-1"></a>sw <span class="op">=</span> <span class="fu">fit</span>(Yield.<span class="fu">SmithWilson</span>(ufr<span class="op">=</span><span class="fl">0.05</span>, α<span class="op">=</span><span class="fl">0.1</span>), quotes);</span>
+<span id="cb6-4"><a aria-hidden="true" href="#cb6-4" tabindex="-1"></a>bl <span class="op">=</span> <span class="fu">fit</span>(Spline.<span class="fu">Linear</span>(), quotes, Fit.<span class="fu">Bootstrap</span>());</span>
+<span id="cb6-5"><a aria-hidden="true" href="#cb6-5" tabindex="-1"></a>bq <span class="op">=</span> <span class="fu">fit</span>(Spline.<span class="fu">Quadratic</span>(), quotes, Fit.<span class="fu">Loss</span>(x <span class="op">-&gt;</span> x<span class="op">^</span><span class="fl">2</span>));</span>
+<span id="cb6-6"><a aria-hidden="true" href="#cb6-6" tabindex="-1"></a>bc <span class="op">=</span> <span class="fu">fit</span>(Spline.<span class="fu">Cubic</span>(), quotes, Fit.<span class="fu">Loss</span>(x <span class="op">-&gt;</span> x<span class="op">^</span><span class="fl">2</span>));</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 </div>
 <p>These curves can discount cashflows with <code>present_value</code>, or supply <code>duration</code> and <code>convexity</code> calculations in <a href="https://docs.juliaactuary.org/ActuaryUtilities/stable/">ActuaryUtilities</a>. The fitted spline curves use flat-forward extrapolation after the final 30-year knot. Their zero rates approach that forward rate; they do not continue the final interpolation polynomial.</p>
 <p>For direct interpolation of observed zero rates, use <code>ZeroRateCurve(rates, mats, Spline.Cubic())</code>. A loss fit is useful when fitting the prices of coupon-bearing instruments as well.</p>
-<section id="visualizing-the-results" class="level2">
+<section class="level2" id="visualizing-the-results">
 <h2 class="anchored" data-anchor-id="visualizing-the-results">Visualizing the results</h2>
-<div id="12" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>const CURVES = [
-    (bc,  "Loss fit (Cubic)"),
-    (bq,  "Loss fit (Quadratic)"),
-    (bl,  "Bootstrap (Linear)"),
-    (ns,  "NelsonSiegel"),
-    (nss, "NelsonSiegelSvensson"),
-    (sw,  "SmithWilson"),
-]
-
-function curveplot!(ax, curve, color; label="", alpha=1.0)
-    maturities = 0.25:0.25:40
-    f(x) = rate(zero(curve, x))
-    lines!(ax, maturities, f.(maturities);
-        label, linewidth=3, color=(color, alpha))
-end
-
-function build_axis!(ax, alpha=ones(length(CURVES)))
-    scatter!(ax, mats, rate.(Continuous().(rates));
-        label="Given zero rates", color=CF_INK, markersize=9)
-    for (i, (c, name)) in enumerate(CURVES)
-        curveplot!(ax, c, CASSETTE_PALETTE[i]; label=name, alpha=alpha[i])
-    end
-    return ax
-end
-
-let
-    fig = Figure(size=(760, 460))
-    ax = Axis(fig[1,1]; xlabel="Tenor", ylabel="Continuous yield")
-    build_axis!(ax)
-    axislegend(ax, position=:lt)
-    fig
-end</code></pre>
+<div class="cell" data-execution_count="1" id="12">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a aria-hidden="true" href="#cb7-1" tabindex="-1"></a><span class="kw">const</span> CURVES <span class="op">=</span> [</span>
+<span id="cb7-2"><a aria-hidden="true" href="#cb7-2" tabindex="-1"></a>    (bc,  <span class="st">"Loss fit (Cubic)"</span>),</span>
+<span id="cb7-3"><a aria-hidden="true" href="#cb7-3" tabindex="-1"></a>    (bq,  <span class="st">"Loss fit (Quadratic)"</span>),</span>
+<span id="cb7-4"><a aria-hidden="true" href="#cb7-4" tabindex="-1"></a>    (bl,  <span class="st">"Bootstrap (Linear)"</span>),</span>
+<span id="cb7-5"><a aria-hidden="true" href="#cb7-5" tabindex="-1"></a>    (ns,  <span class="st">"NelsonSiegel"</span>),</span>
+<span id="cb7-6"><a aria-hidden="true" href="#cb7-6" tabindex="-1"></a>    (nss, <span class="st">"NelsonSiegelSvensson"</span>),</span>
+<span id="cb7-7"><a aria-hidden="true" href="#cb7-7" tabindex="-1"></a>    (sw,  <span class="st">"SmithWilson"</span>),</span>
+<span id="cb7-8"><a aria-hidden="true" href="#cb7-8" tabindex="-1"></a>]</span>
+<span id="cb7-9"><a aria-hidden="true" href="#cb7-9" tabindex="-1"></a></span>
+<span id="cb7-10"><a aria-hidden="true" href="#cb7-10" tabindex="-1"></a><span class="kw">function</span> <span class="fu">curveplot!</span>(ax, curve, color; label<span class="op">=</span><span class="st">""</span>, alpha<span class="op">=</span><span class="fl">1.0</span>)</span>
+<span id="cb7-11"><a aria-hidden="true" href="#cb7-11" tabindex="-1"></a>    maturities <span class="op">=</span> <span class="fl">0.25</span><span class="op">:</span><span class="fl">0.25</span><span class="op">:</span><span class="fl">40</span></span>
+<span id="cb7-12"><a aria-hidden="true" href="#cb7-12" tabindex="-1"></a>    <span class="fu">f</span>(x) <span class="op">=</span> <span class="fu">rate</span>(<span class="fu">zero</span>(curve, x))</span>
+<span id="cb7-13"><a aria-hidden="true" href="#cb7-13" tabindex="-1"></a>    <span class="fu">lines!</span>(ax, maturities, <span class="fu">f</span>.(maturities);</span>
+<span id="cb7-14"><a aria-hidden="true" href="#cb7-14" tabindex="-1"></a>        label, linewidth<span class="op">=</span><span class="fl">3</span>, color<span class="op">=</span>(color, alpha))</span>
+<span id="cb7-15"><a aria-hidden="true" href="#cb7-15" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb7-16"><a aria-hidden="true" href="#cb7-16" tabindex="-1"></a></span>
+<span id="cb7-17"><a aria-hidden="true" href="#cb7-17" tabindex="-1"></a><span class="kw">function</span> <span class="fu">build_axis!</span>(ax, alpha<span class="op">=</span><span class="fu">ones</span>(<span class="fu">length</span>(CURVES)))</span>
+<span id="cb7-18"><a aria-hidden="true" href="#cb7-18" tabindex="-1"></a>    <span class="fu">scatter!</span>(ax, mats, <span class="fu">rate</span>.(<span class="fu">Continuous</span>().(rates));</span>
+<span id="cb7-19"><a aria-hidden="true" href="#cb7-19" tabindex="-1"></a>        label<span class="op">=</span><span class="st">"Given zero rates"</span>, color<span class="op">=</span>CF_INK, markersize<span class="op">=</span><span class="fl">9</span>)</span>
+<span id="cb7-20"><a aria-hidden="true" href="#cb7-20" tabindex="-1"></a>    <span class="cf">for</span> (i, (c, name)) <span class="kw">in</span> <span class="fu">enumerate</span>(CURVES)</span>
+<span id="cb7-21"><a aria-hidden="true" href="#cb7-21" tabindex="-1"></a>        <span class="fu">curveplot!</span>(ax, c, CASSETTE_PALETTE[i]; label<span class="op">=</span>name, alpha<span class="op">=</span>alpha[i])</span>
+<span id="cb7-22"><a aria-hidden="true" href="#cb7-22" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb7-23"><a aria-hidden="true" href="#cb7-23" tabindex="-1"></a>    <span class="cf">return</span> ax</span>
+<span id="cb7-24"><a aria-hidden="true" href="#cb7-24" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb7-25"><a aria-hidden="true" href="#cb7-25" tabindex="-1"></a></span>
+<span id="cb7-26"><a aria-hidden="true" href="#cb7-26" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb7-27"><a aria-hidden="true" href="#cb7-27" tabindex="-1"></a>    fig <span class="op">=</span> <span class="fu">Figure</span>(size<span class="op">=</span>(<span class="fl">760</span>, <span class="fl">460</span>))</span>
+<span id="cb7-28"><a aria-hidden="true" href="#cb7-28" tabindex="-1"></a>    ax <span class="op">=</span> <span class="fu">Axis</span>(fig[<span class="fl">1</span>,<span class="fl">1</span>]; xlabel<span class="op">=</span><span class="st">"Tenor"</span>, ylabel<span class="op">=</span><span class="st">"Continuous yield"</span>)</span>
+<span id="cb7-29"><a aria-hidden="true" href="#cb7-29" tabindex="-1"></a>    <span class="fu">build_axis!</span>(ax)</span>
+<span id="cb7-30"><a aria-hidden="true" href="#cb7-30" tabindex="-1"></a>    <span class="fu">axislegend</span>(ax, position<span class="op">=:</span>lt)</span>
+<span id="cb7-31"><a aria-hidden="true" href="#cb7-31" tabindex="-1"></a>    fig</span>
+<span id="cb7-32"><a aria-hidden="true" href="#cb7-32" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-7-output-1.svg" class="img-fluid figure-img"></p>
+<p><img alt="Fitted yield curves across tenors, compared with the observed continuously compounded zero rates." class="img-fluid figure-img" decoding="async" height="460" loading="eager" src="index_files/figure-html/cell-7-output-1.svg" width="760"/></p>
 </figure>
 </div>
 </div>
 </div>
 <p>And an animated version that fades each fit in turn:</p>
-<div id="14" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>let
-    fig = Figure(size=(760, 460))
-    ax = Axis(fig[1,1]; xlabel="Tenor", ylabel="Continuous yield")
-    a = [1.0, 0.25, 0.25, 0.25, 0.25, 0.25]
-    record(fig, "anim_fps2.gif", 1:6; framerate=2) do _
-        a .= circshift(a, 1)
-        empty!(ax)
-        build_axis!(ax, a)
-        axislegend(ax, position=:lt)
-    end
-end</code></pre>
+<div class="cell" data-execution_count="1" id="14">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a aria-hidden="true" href="#cb8-1" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb8-2"><a aria-hidden="true" href="#cb8-2" tabindex="-1"></a>    fig <span class="op">=</span> <span class="fu">Figure</span>(size<span class="op">=</span>(<span class="fl">760</span>, <span class="fl">460</span>))</span>
+<span id="cb8-3"><a aria-hidden="true" href="#cb8-3" tabindex="-1"></a>    ax <span class="op">=</span> <span class="fu">Axis</span>(fig[<span class="fl">1</span>,<span class="fl">1</span>]; xlabel<span class="op">=</span><span class="st">"Tenor"</span>, ylabel<span class="op">=</span><span class="st">"Continuous yield"</span>)</span>
+<span id="cb8-4"><a aria-hidden="true" href="#cb8-4" tabindex="-1"></a>    a <span class="op">=</span> [<span class="fl">1.0</span>, <span class="fl">0.25</span>, <span class="fl">0.25</span>, <span class="fl">0.25</span>, <span class="fl">0.25</span>, <span class="fl">0.25</span>]</span>
+<span id="cb8-5"><a aria-hidden="true" href="#cb8-5" tabindex="-1"></a>    <span class="fu">record</span>(fig, <span class="st">"anim_fps2.gif"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">6</span>; framerate<span class="op">=</span><span class="fl">2</span>) <span class="cf">do</span> _</span>
+<span id="cb8-6"><a aria-hidden="true" href="#cb8-6" tabindex="-1"></a>        a <span class="op">.=</span> <span class="fu">circshift</span>(a, <span class="fl">1</span>)</span>
+<span id="cb8-7"><a aria-hidden="true" href="#cb8-7" tabindex="-1"></a>        <span class="fu">empty!</span>(ax)</span>
+<span id="cb8-8"><a aria-hidden="true" href="#cb8-8" tabindex="-1"></a>        <span class="fu">build_axis!</span>(ax, a)</span>
+<span id="cb8-9"><a aria-hidden="true" href="#cb8-9" tabindex="-1"></a>        <span class="fu">axislegend</span>(ax, position<span class="op">=:</span>lt)</span>
+<span id="cb8-10"><a aria-hidden="true" href="#cb8-10" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb8-11"><a aria-hidden="true" href="#cb8-11" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 </div>
-<p><img src="anim_fps2.gif" class="img-fluid"></p>
-
-
+<p><img alt="Animation of fitted yield curves as the observed rates change." class="img-fluid" decoding="async" height="460" loading="lazy" src="anim_fps2.gif" width="760"/></p>
 </section>
-
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
@@ -718,8 +727,4 @@ end</code></pre>
   });
   </script>
 </div> <!-- /content -->
-
-
-
-
 </body></html>

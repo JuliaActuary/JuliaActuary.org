@@ -1,13 +1,10 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
-<meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.16">
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-
-<meta name="description" content="JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.">
-
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml"><head>
+<meta charset="utf-8"/>
+<meta content="quarto-1.9.16" name="generator"/>
+<meta content="width=device-width, initial-scale=1.0, user-scalable=yes" name="viewport"/>
+<meta content="JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows." name="description"/>
 <title>summary – JuliaActuary</title>
 <style>
 code{white-space: pre-wrap;}
@@ -22,27 +19,25 @@ ul.task-list li input[type="checkbox"] {
   vertical-align: middle;
 }
 </style>
-
-
 <script src="../../../../site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="../../../../site_libs/quarto-nav/headroom.min.js"></script>
 <script src="../../../../site_libs/clipboard/clipboard.min.js"></script>
 <script src="../../../../site_libs/quarto-search/autocomplete.umd.js"></script>
 <script src="../../../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../../../site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="../../../../">
-<link href="../../../..//assets/logos/favicon.ico" rel="icon">
+<meta content="../../../../" name="quarto:offset"/>
+<link href="../../../..//assets/logos/favicon.ico" rel="icon"/>
 <script src="../../../../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../../../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../../../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="../../../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../../../site_libs/quarto-html/anchor.min.js"></script>
-<link href="../../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../../../site_libs/quarto-html/quarto-syntax-highlighting-a0731b9a3a5d496010872d775e5d9bc3.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../../../../site_libs/quarto-html/tippy.css" rel="stylesheet"/>
+<link href="../../../../site_libs/quarto-html/quarto-syntax-highlighting-be14ce6d32a635bebd8f9e4e558f9eeb.css" id="quarto-text-highlighting-styles" rel="stylesheet"/>
 <script src="../../../../site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="../../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../../../site_libs/bootstrap/bootstrap-98ac2d5361ef6f18cc0525d38bedc462.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet"/>
+<link append-hash="true" data-mode="light" href="../../../../site_libs/bootstrap/bootstrap-4a135b976b00f53a3a768ff94eb1df18.min.css" id="quarto-bootstrap" rel="stylesheet"/>
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -70,114 +65,105 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&amp;family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&amp;display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../../../../assets/highlight/styles/github.min.css">
-<script src="../../../../assets/highlight/highlight.min.js"></script>
-<script src="../../../../assets/highlight/languages/julia.min.js"></script>
-<script src="../../../../assets/highlight/languages/julia-repl.min.js"></script>
-<script src="../../../../assets/highlight/languages/python.min.js"></script>
-<script src="../../../../assets/highlight/languages/r.min.js"></script>
-<script>hljs.highlightAll();</script>
-<script data-goatcounter="https://juliaactuary.goatcounter.com/count" async="" src="//gc.zgo.at/count.js"></script>
-
-
-<link rel="stylesheet" href="../../../../styles.css">
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" rel="stylesheet"/>
+<script async="" data-goatcounter="https://juliaactuary.goatcounter.com/count" src="//gc.zgo.at/count.js"></script>
+<link href="../../../../styles-c416c153cdf24884.css" rel="stylesheet"/>
 </head>
-
 <body class="nav-fixed fullcontent quarto-light">
-
 <div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top quarto-banner">
-    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
-      <div class="navbar-container container-fluid">
-      <div class="navbar-brand-container mx-auto">
-    <a href="../../../../index.html" class="navbar-brand navbar-brand-logo">
-    <img src="../../../../assets/logos/android-chrome-512x512.png" alt="JuliaActuary Logo" class="navbar-logo light-content">
-    <img src="../../../../assets/logos/android-chrome-512x512.png" alt="JuliaActuary Logo" class="navbar-logo dark-content">
-    </a>
-    <a class="navbar-brand" href="../../../../index.html">
-    <span class="navbar-title">JuliaActuary</span>
-    </a>
-  </div>
-            <div id="quarto-search" class="" title="Search"></div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-  <span class="navbar-toggler-icon"></span>
-</button>
-          <div class="collapse navbar-collapse" id="navbarCollapse">
-            <ul class="navbar-nav navbar-nav-scroll ms-auto">
-  <li class="nav-item">
-    <a class="nav-link" href="../../../../packages.html"> 
-<span class="menu-text">Packages</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="https://docs.juliaactuary.org"> 
-<span class="menu-text">Docs</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="https://modernfinancialmodeling.com"> 
-<span class="menu-text">Book</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../../../learn.html"> 
-<span class="menu-text">Learn</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../../../examples.html"> 
-<span class="menu-text">Examples</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../../../benchmarks.html"> 
-<span class="menu-text">Benchmarks</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../../../community.html"> 
-<span class="menu-text">Community</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../../../blog.html"> 
-<span class="menu-text">Blog</span></a>
-  </li>  
-  <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/JuliaActuary"> <i class="bi bi-github" role="img">
-</i> 
-<span class="menu-text"></span></a>
-  </li>  
-  <li class="nav-item compact">
-    <a class="nav-link" href="../../../../all-posts.xml"> <i class="bi bi-rss" role="img">
-</i> 
-<span class="menu-text"></span></a>
-  </li>  
-</ul>
-          </div> <!-- /navcollapse -->
-            <div class="quarto-navbar-tools">
+<header class="headroom fixed-top quarto-banner" id="quarto-header">
+<nav class="navbar navbar-expand-lg" data-bs-theme="dark">
+<div class="navbar-container container-fluid">
+<div class="navbar-brand-container mx-auto">
+<a class="navbar-brand navbar-brand-logo" href="../../../../index.html">
+<img alt="JuliaActuary Logo" class="navbar-logo light-content" src="../../../../assets/logos/android-chrome-512x512.png"/>
+<img alt="JuliaActuary Logo" class="navbar-logo dark-content" src="../../../../assets/logos/android-chrome-512x512.png"/>
+</a>
+<a class="navbar-brand" href="../../../../index.html">
+<span class="navbar-title">JuliaActuary</span>
+</a>
 </div>
-      </div> <!-- /container-fluid -->
-    </nav>
+<div class="" id="quarto-search" title="Search"></div>
+<button aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-bs-target="#navbarCollapse" data-bs-toggle="collapse" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }" role="menu" type="button">
+<span class="navbar-toggler-icon"></span>
+</button>
+<div class="collapse navbar-collapse" id="navbarCollapse">
+<ul class="navbar-nav navbar-nav-scroll ms-auto">
+<li class="nav-item">
+<a class="nav-link" href="../../../../packages.html">
+<span class="menu-text">Packages</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="https://docs.juliaactuary.org">
+<span class="menu-text">Docs</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="../../../../learn.html">
+<span class="menu-text">Learn</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="../../../../examples.html">
+<span class="menu-text">Examples</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="../../../../community.html">
+<span class="menu-text">Community</span></a>
+</li>
+<li class="nav-item dropdown">
+<a aria-expanded="false" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" id="nav-menu-more" role="link">
+<span class="menu-text">More</span>
+</a>
+<ul aria-labelledby="nav-menu-more" class="dropdown-menu dropdown-menu-end">
+<li>
+<a class="dropdown-item" href="../../../../benchmarks.html">
+<span class="dropdown-text">Benchmarks</span></a>
+</li>
+<li>
+<a class="dropdown-item" href="../../../../blog.html">
+<span class="dropdown-text">Blog</span></a>
+</li>
+<li>
+<a class="dropdown-item" href="https://modernfinancialmodeling.com">
+<span class="dropdown-text">Book</span></a>
+</li>
+</ul>
+</li>
+<li class="nav-item compact">
+<a class="nav-link" href="https://github.com/JuliaActuary"> <i aria-label="JuliaActuary on GitHub" class="bi bi-github" role="img">
+</i>
+<span class="menu-text"></span></a>
+</li>
+<li class="nav-item compact">
+<a class="nav-link" href="../../../../all-posts.xml"> <i aria-label="RSS feed" class="bi bi-rss" role="img">
+</i>
+<span class="menu-text"></span></a>
+</li>
+</ul>
+</div> <!-- /navcollapse -->
+<div class="quarto-navbar-tools">
+</div>
+</div> <!-- /container-fluid -->
+</nav>
 </header>
 <!-- content -->
-<header id="title-block-header" class="quarto-title-block"></header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<header class="quarto-title-block" id="title-block-header"></header><div class="quarto-container page-columns page-rows-contents page-layout-article page-navbar" id="quarto-content">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    
 <!-- main -->
 <main class="content quarto-banner-title-block" id="quarto-document-content">
-
-
-
-
-<section id="release-benchmark-results" class="level1">
+<section class="level1" id="release-benchmark-results">
 <h1>Release benchmark results</h1>
 <p>Speedup = baseline minimum / release minimum. Less than 1 means slower.</p>
-<table class="caption-top table">
+<div aria-label="Scrollable data table" class="table-scroll" role="region" tabindex="0"><table class="caption-top table">
 <colgroup>
-<col style="width: 13%">
-<col style="width: 13%">
-<col style="width: 18%">
-<col style="width: 18%">
-<col style="width: 18%">
-<col style="width: 18%">
+<col style="width: 13%"/>
+<col style="width: 13%"/>
+<col style="width: 18%"/>
+<col style="width: 18%"/>
+<col style="width: 18%"/>
+<col style="width: 18%"/>
 </colgroup>
 <thead>
 <tr class="header">
@@ -887,11 +873,8 @@ ul.task-list li input[type="checkbox"] {
 <td style="text-align: right;">78720 → 65924</td>
 </tr>
 </tbody>
-</table>
-
-
+</table></div>
 </section>
-
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
@@ -1294,8 +1277,4 @@ ul.task-list li input[type="checkbox"] {
   });
   </script>
 </div> <!-- /content -->
-
-
-
-
 </body></html>

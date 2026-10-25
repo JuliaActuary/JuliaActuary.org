@@ -1,9 +1,11 @@
 ---
 title: "Blog"
+description: "Release notes, technical articles, and community updates."
 listing:
   contents: "posts/**/index.qmd"
   sort: "date desc"
   type: default
+  image-lazy-loading: true
   categories: true
   sort-ui: false
   filter-ui: false

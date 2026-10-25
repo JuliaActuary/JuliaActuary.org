@@ -1,15 +1,12 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
-<meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.16">
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-
-<meta name="author" content="Alec Loudenback">
-<meta name="dcterms.date" content="2026-05-21">
-<meta name="description" content="JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.">
-
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml"><head>
+<meta charset="utf-8"/>
+<meta content="quarto-1.9.16" name="generator"/>
+<meta content="width=device-width, initial-scale=1.0, user-scalable=yes" name="viewport"/>
+<meta content="Alec Loudenback" name="author"/>
+<meta content="2026-05-21" name="dcterms.date"/>
+<meta content="JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows." name="description"/>
 <title>JuliaActuary and QuantLib: cashflows, curves and sensitivities – JuliaActuary</title>
 <style>
 code{white-space: pre-wrap;}
@@ -23,28 +20,61 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
-
-
 <script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="../../site_libs/quarto-nav/headroom.min.js"></script>
 <script src="../../site_libs/clipboard/clipboard.min.js"></script>
 <script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="../../">
-<link href="../..//assets/logos/favicon.ico" rel="icon">
+<meta content="../../" name="quarto:offset"/>
+<link href="../..//assets/logos/favicon.ico" rel="icon"/>
 <script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
-<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-a0731b9a3a5d496010872d775e5d9bc3.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet"/>
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-be14ce6d32a635bebd8f9e4e558f9eeb.css" id="quarto-text-highlighting-styles" rel="stylesheet"/>
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-98ac2d5361ef6f18cc0525d38bedc462.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet"/>
+<link append-hash="true" data-mode="light" href="../../site_libs/bootstrap/bootstrap-4a135b976b00f53a3a768ff94eb1df18.min.css" id="quarto-bootstrap" rel="stylesheet"/>
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -72,228 +102,210 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&amp;family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&amp;display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../../assets/highlight/styles/github.min.css">
-<script src="../../assets/highlight/highlight.min.js"></script>
-<script src="../../assets/highlight/languages/julia.min.js"></script>
-<script src="../../assets/highlight/languages/julia-repl.min.js"></script>
-<script src="../../assets/highlight/languages/python.min.js"></script>
-<script src="../../assets/highlight/languages/r.min.js"></script>
-<script>hljs.highlightAll();</script>
-<script data-goatcounter="https://juliaactuary.goatcounter.com/count" async="" src="//gc.zgo.at/count.js"></script>
-
-
-<link rel="stylesheet" href="../../styles.css">
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" rel="stylesheet"/>
+<script async="" data-goatcounter="https://juliaactuary.goatcounter.com/count" src="//gc.zgo.at/count.js"></script>
+<link href="../../styles-c416c153cdf24884.css" rel="stylesheet"/>
 </head>
-
 <body class="nav-fixed fullcontent quarto-light">
-
 <div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top quarto-banner">
-    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
-      <div class="navbar-container container-fluid">
-      <div class="navbar-brand-container mx-auto">
-    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
-    <img src="../../assets/logos/android-chrome-512x512.png" alt="JuliaActuary Logo" class="navbar-logo light-content">
-    <img src="../../assets/logos/android-chrome-512x512.png" alt="JuliaActuary Logo" class="navbar-logo dark-content">
-    </a>
-    <a class="navbar-brand" href="../../index.html">
-    <span class="navbar-title">JuliaActuary</span>
-    </a>
-  </div>
-            <div id="quarto-search" class="" title="Search"></div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-  <span class="navbar-toggler-icon"></span>
-</button>
-          <div class="collapse navbar-collapse" id="navbarCollapse">
-            <ul class="navbar-nav navbar-nav-scroll ms-auto">
-  <li class="nav-item">
-    <a class="nav-link" href="../../packages.html"> 
-<span class="menu-text">Packages</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="https://docs.juliaactuary.org"> 
-<span class="menu-text">Docs</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="https://modernfinancialmodeling.com"> 
-<span class="menu-text">Book</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../learn.html"> 
-<span class="menu-text">Learn</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../examples.html"> 
-<span class="menu-text">Examples</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../benchmarks.html"> 
-<span class="menu-text">Benchmarks</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../community.html"> 
-<span class="menu-text">Community</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../blog.html"> 
-<span class="menu-text">Blog</span></a>
-  </li>  
-  <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/JuliaActuary"> <i class="bi bi-github" role="img">
-</i> 
-<span class="menu-text"></span></a>
-  </li>  
-  <li class="nav-item compact">
-    <a class="nav-link" href="../../all-posts.xml"> <i class="bi bi-rss" role="img">
-</i> 
-<span class="menu-text"></span></a>
-  </li>  
-</ul>
-          </div> <!-- /navcollapse -->
-            <div class="quarto-navbar-tools">
+<header class="headroom fixed-top quarto-banner" id="quarto-header">
+<nav class="navbar navbar-expand-lg" data-bs-theme="dark">
+<div class="navbar-container container-fluid">
+<div class="navbar-brand-container mx-auto">
+<a class="navbar-brand navbar-brand-logo" href="../../index.html">
+<img alt="JuliaActuary Logo" class="navbar-logo light-content" src="../../assets/logos/android-chrome-512x512.png"/>
+<img alt="JuliaActuary Logo" class="navbar-logo dark-content" src="../../assets/logos/android-chrome-512x512.png"/>
+</a>
+<a class="navbar-brand" href="../../index.html">
+<span class="navbar-title">JuliaActuary</span>
+</a>
 </div>
-      </div> <!-- /container-fluid -->
-    </nav>
+<div class="" id="quarto-search" title="Search"></div>
+<button aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-bs-target="#navbarCollapse" data-bs-toggle="collapse" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }" role="menu" type="button">
+<span class="navbar-toggler-icon"></span>
+</button>
+<div class="collapse navbar-collapse" id="navbarCollapse">
+<ul class="navbar-nav navbar-nav-scroll ms-auto">
+<li class="nav-item">
+<a class="nav-link" href="../../packages.html">
+<span class="menu-text">Packages</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="https://docs.juliaactuary.org">
+<span class="menu-text">Docs</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="../../learn.html">
+<span class="menu-text">Learn</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="../../examples.html">
+<span class="menu-text">Examples</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="../../community.html">
+<span class="menu-text">Community</span></a>
+</li>
+<li class="nav-item dropdown">
+<a aria-expanded="false" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" id="nav-menu-more" role="link">
+<span class="menu-text">More</span>
+</a>
+<ul aria-labelledby="nav-menu-more" class="dropdown-menu dropdown-menu-end">
+<li>
+<a class="dropdown-item" href="../../benchmarks.html">
+<span class="dropdown-text">Benchmarks</span></a>
+</li>
+<li>
+<a class="dropdown-item" href="../../blog.html">
+<span class="dropdown-text">Blog</span></a>
+</li>
+<li>
+<a class="dropdown-item" href="https://modernfinancialmodeling.com">
+<span class="dropdown-text">Book</span></a>
+</li>
+</ul>
+</li>
+<li class="nav-item compact">
+<a class="nav-link" href="https://github.com/JuliaActuary"> <i aria-label="JuliaActuary on GitHub" class="bi bi-github" role="img">
+</i>
+<span class="menu-text"></span></a>
+</li>
+<li class="nav-item compact">
+<a class="nav-link" href="../../all-posts.xml"> <i aria-label="RSS feed" class="bi bi-rss" role="img">
+</i>
+<span class="menu-text"></span></a>
+</li>
+</ul>
+</div> <!-- /navcollapse -->
+<div class="quarto-navbar-tools">
+</div>
+</div> <!-- /container-fluid -->
+</nav>
 </header>
 <!-- content -->
-<header id="title-block-header" class="quarto-title-block default page-columns page-full">
-  <div class="quarto-title-banner page-columns page-full">
-    <div class="quarto-title column-body">
-      <h1 class="title">JuliaActuary and QuantLib: cashflows, curves and sensitivities</h1>
-                  <div>
-        <div class="description">
+<header class="quarto-title-block default page-columns page-full" id="title-block-header">
+<div class="quarto-title-banner page-columns page-full">
+<div class="quarto-title column-body">
+<h1 class="title">JuliaActuary and QuantLib: cashflows, curves and sensitivities</h1>
+<div>
+<div class="description">
           JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.
         </div>
-      </div>
-                          <div class="quarto-categories">
-                <div class="quarto-category">blog</div>
-                <div class="quarto-category">code</div>
-                <div class="quarto-category">autodiff</div>
-                <div class="quarto-category">finance</div>
-              </div>
-                  </div>
-  </div>
-    
-  
-  <div class="quarto-title-meta">
-
-      <div>
-      <div class="quarto-title-meta-heading">Author</div>
-      <div class="quarto-title-meta-contents">
-               <p>Alec Loudenback </p>
-            </div>
-    </div>
-      
-      <div>
-      <div class="quarto-title-meta-heading">Published</div>
-      <div class="quarto-title-meta-contents">
-        <p class="date">May 21, 2026</p>
-      </div>
-    </div>
-    
-      <div>
-      <div class="quarto-title-meta-heading">Modified</div>
-      <div class="quarto-title-meta-contents">
-        <p class="date-modified">October 9, 2026</p>
-      </div>
-    </div>
-      
-    </div>
-    
-  
-  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+</div>
+<div class="quarto-categories">
+<div class="quarto-category">blog</div>
+<div class="quarto-category">code</div>
+<div class="quarto-category">autodiff</div>
+<div class="quarto-category">finance</div>
+</div>
+</div>
+</div>
+<div class="quarto-title-meta">
+<div>
+<div class="quarto-title-meta-heading">Author</div>
+<div class="quarto-title-meta-contents">
+<p>Alec Loudenback </p>
+</div>
+</div>
+<div>
+<div class="quarto-title-meta-heading">Published</div>
+<div class="quarto-title-meta-contents">
+<p class="date">May 21, 2026</p>
+</div>
+</div>
+<div>
+<div class="quarto-title-meta-heading">Modified</div>
+<div class="quarto-title-meta-contents">
+<p class="date-modified">October 9, 2026</p>
+</div>
+</div>
+</div>
+</header><div class="quarto-container page-columns page-rows-contents page-layout-article page-navbar" id="quarto-content">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    
 <!-- main -->
 <main class="content quarto-banner-title-block" id="quarto-document-content">
-
-
-
-
-
 <p>Actuarial projections and trading models share cashflows, curves and risk measures, but put different demands on them. A multi-basis forecast of 100,000 annuity contracts and 1,000 supporting assets needs consistent assumptions, robust aggregation and enough speed to explore scenarios. A trading model also needs detailed instrument and settlement conventions. Both require accuracy; their scope and computational trade-offs differ.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="venn-capability-overlap.svg" class="img-fluid figure-img" style="width:85.0%"></p>
+<p><img alt="Actuarial and trading workflows share cashflows, curves and risk measures. This is a conceptual diagram, not a measured capability comparison." class="img-fluid figure-img" decoding="async" height="370" loading="eager" src="venn-capability-overlap.svg" style="width:85.0%" width="720"/></p>
 <figcaption>Actuarial and trading workflows share cashflows, curves and risk measures. This is a conceptual diagram, not a measured capability comparison.</figcaption>
 </figure>
 </div>
 <p>This October 2026 update uses the registered releases FinanceCore 3.0.0, FinanceModels 7.0.1 and ActuaryUtilities 6.0.0, pinned in the <a href="#reproducing-the-comparison">reproduction environment</a>.</p>
-<section id="example-fixed-bond-analytics" class="level2">
+<section class="level2" id="example-fixed-bond-analytics">
 <h2 class="anchored" data-anchor-id="example-fixed-bond-analytics">Example: fixed bond analytics</h2>
 <p>Most bond analytics is a cashflow vector and a yield curve. Price, duration, convexity, key-rate durations, sensitivity to a calibrated curve, arbitrary-precision validation — all of those are things you <em>decide</em> to compute from those two inputs. The interesting design question is how much code each decision costs, and how much new machinery each new computation requires.</p>
 <p>For the workflows it covers, <a href="https://juliaactuary.org">JuliaActuary</a> offers a small vocabulary: <code>pv</code>, <code>duration</code>, <code>convexity</code>, <code>sensitivities</code> and curve constructors. FinanceCore supplies the cashflow and rate primitives, FinanceModels supplies curves, contracts and calibration, and ActuaryUtilities supplies the sensitivity interface and its analytic fixed-cashflow formulas. Custom valuation functions can be differentiated with <code>ForwardDiff</code>. The same cashflow vector carries through the bond examples.</p>
 <p><a href="https://www.quantlib.org/">QuantLib</a> appears throughout as a reference. Its settlement conventions, holiday calendars and market-specific pricing engines support detailed instrument valuation. JuliaActuary emphasizes projections: cashflows and curves as composable values, generic numeric types, and calibration as ordinary optimization. The examples below show where these approaches meet, which quantities agree, and which comparisons require matching conventions first.</p>
 </section>
-<section id="the-cashflow-vector" class="level2">
+<section class="level2" id="the-cashflow-vector">
 <h2 class="anchored" data-anchor-id="the-cashflow-vector">The cashflow vector</h2>
 <p>A 5-year, 4% semi-annual-coupon bond priced against a simple upward-sloping zero curve (a flat 3% continuously-compounded yield appears later for the convention comparisons). Once the vector exists, price and duration are one function call each.</p>
 <p>The Julia examples start with payment times expressed in years. The application is responsible for converting dated schedules, accrual periods and settlement rules into those inputs. QuantLib performs that work explicitly below using a schedule and a day-count convention. Here, unadjusted semiannual dates under 30/360 give the same half-year times as the Julia bond; this simple agreement does not cover irregular schedules or other market conventions.</p>
-<div id="4" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>using FinanceCore
-using FinanceCore: Continuous, Periodic
-using FinanceModels
-using FinanceModels: Spline
-using ActuaryUtilities
-using Printf
-
-coupon_rate = 0.04
-maturity_years = 5
-freq_per_year = 2
-par = 100.0
-
-# A simple upward-sloping zero curve. The t = 0 anchor lines up with QL's
-# ZeroCurve boundary so both libraries are pricing against an identical grid.
-tenors = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 7.0]
-base_zeros = [0.025, 0.025, 0.027, 0.029, 0.030, 0.032, 0.034]
-curve = FinanceModels.ZeroRateCurve(base_zeros, tenors, Spline.Linear())
-
-bond = FinanceModels.Bond.Fixed(coupon_rate, Periodic(freq_per_year), maturity_years)
-cfs = collect(bond)
-
-price = FinanceCore.pv(curve, cfs) * par
-mod_dur = duration(Modified(), curve, cfs)
-
-(price=price, modified=mod_dur)</code></pre>
+<div class="cell" data-execution_count="1" id="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a aria-hidden="true" href="#cb1-1" tabindex="-1"></a><span class="im">using</span> <span class="bu">FinanceCore</span></span>
+<span id="cb1-2"><a aria-hidden="true" href="#cb1-2" tabindex="-1"></a><span class="im">using</span> <span class="bu">FinanceCore</span>: Continuous, Periodic</span>
+<span id="cb1-3"><a aria-hidden="true" href="#cb1-3" tabindex="-1"></a><span class="im">using</span> <span class="bu">FinanceModels</span></span>
+<span id="cb1-4"><a aria-hidden="true" href="#cb1-4" tabindex="-1"></a><span class="im">using</span> <span class="bu">FinanceModels</span>: Spline</span>
+<span id="cb1-5"><a aria-hidden="true" href="#cb1-5" tabindex="-1"></a><span class="im">using</span> <span class="bu">ActuaryUtilities</span></span>
+<span id="cb1-6"><a aria-hidden="true" href="#cb1-6" tabindex="-1"></a><span class="im">using</span> <span class="bu">Printf</span></span>
+<span id="cb1-7"><a aria-hidden="true" href="#cb1-7" tabindex="-1"></a></span>
+<span id="cb1-8"><a aria-hidden="true" href="#cb1-8" tabindex="-1"></a>coupon_rate <span class="op">=</span> <span class="fl">0.04</span></span>
+<span id="cb1-9"><a aria-hidden="true" href="#cb1-9" tabindex="-1"></a>maturity_years <span class="op">=</span> <span class="fl">5</span></span>
+<span id="cb1-10"><a aria-hidden="true" href="#cb1-10" tabindex="-1"></a>freq_per_year <span class="op">=</span> <span class="fl">2</span></span>
+<span id="cb1-11"><a aria-hidden="true" href="#cb1-11" tabindex="-1"></a>par <span class="op">=</span> <span class="fl">100.0</span></span>
+<span id="cb1-12"><a aria-hidden="true" href="#cb1-12" tabindex="-1"></a></span>
+<span id="cb1-13"><a aria-hidden="true" href="#cb1-13" tabindex="-1"></a><span class="co"># A simple upward-sloping zero curve. The t = 0 anchor lines up with QL's</span></span>
+<span id="cb1-14"><a aria-hidden="true" href="#cb1-14" tabindex="-1"></a><span class="co"># ZeroCurve boundary so both libraries are pricing against an identical grid.</span></span>
+<span id="cb1-15"><a aria-hidden="true" href="#cb1-15" tabindex="-1"></a>tenors <span class="op">=</span> [<span class="fl">0.0</span>, <span class="fl">1.0</span>, <span class="fl">2.0</span>, <span class="fl">3.0</span>, <span class="fl">4.0</span>, <span class="fl">5.0</span>, <span class="fl">7.0</span>]</span>
+<span id="cb1-16"><a aria-hidden="true" href="#cb1-16" tabindex="-1"></a>base_zeros <span class="op">=</span> [<span class="fl">0.025</span>, <span class="fl">0.025</span>, <span class="fl">0.027</span>, <span class="fl">0.029</span>, <span class="fl">0.030</span>, <span class="fl">0.032</span>, <span class="fl">0.034</span>]</span>
+<span id="cb1-17"><a aria-hidden="true" href="#cb1-17" tabindex="-1"></a>curve <span class="op">=</span> FinanceModels.<span class="fu">ZeroRateCurve</span>(base_zeros, tenors, Spline.<span class="fu">Linear</span>())</span>
+<span id="cb1-18"><a aria-hidden="true" href="#cb1-18" tabindex="-1"></a></span>
+<span id="cb1-19"><a aria-hidden="true" href="#cb1-19" tabindex="-1"></a>bond <span class="op">=</span> FinanceModels.Bond.<span class="fu">Fixed</span>(coupon_rate, <span class="fu">Periodic</span>(freq_per_year), maturity_years)</span>
+<span id="cb1-20"><a aria-hidden="true" href="#cb1-20" tabindex="-1"></a>cfs <span class="op">=</span> <span class="fu">collect</span>(bond)</span>
+<span id="cb1-21"><a aria-hidden="true" href="#cb1-21" tabindex="-1"></a></span>
+<span id="cb1-22"><a aria-hidden="true" href="#cb1-22" tabindex="-1"></a>price <span class="op">=</span> FinanceCore.<span class="fu">pv</span>(curve, cfs) <span class="op">*</span> par</span>
+<span id="cb1-23"><a aria-hidden="true" href="#cb1-23" tabindex="-1"></a>mod_dur <span class="op">=</span> <span class="fu">duration</span>(<span class="fu">Modified</span>(), curve, cfs)</span>
+<span id="cb1-24"><a aria-hidden="true" href="#cb1-24" tabindex="-1"></a></span>
+<span id="cb1-25"><a aria-hidden="true" href="#cb1-25" tabindex="-1"></a>(price<span class="op">=</span>price, modified<span class="op">=</span>mod_dur)</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>(price = 103.67817922167015, modified = 4.587323550496468)</code></pre>
 </div>
 </div>
 <p>QuantLib’s setup uses a <code>Schedule</code>, a <code>FixedRateBond</code>, a <code>ZeroCurve</code> and a <code>DiscountingBondEngine</code>. It produces the same price:</p>
-<pre class="python"><code># Python — QuantLib via SWIG bindings
-import QuantLib as ql
-
-settle    = ql.Date(1, 1, 2026)
-ql.Settings.instance().evaluationDate = settle
-maturity  = ql.Date(1, 1, 2031)
-day_count = ql.Thirty360(ql.Thirty360.BondBasis)
-
-schedule = ql.Schedule(settle, maturity, ql.Period(ql.Semiannual),
-                       ql.NullCalendar(), ql.Unadjusted, ql.Unadjusted,
-                       ql.DateGeneration.Backward, False)
-bond     = ql.FixedRateBond(0, 100.0, schedule, [0.04], day_count)
-
-pillar_dates = [settle + ql.Period(y, ql.Years) for y in [0, 1, 2, 3, 4, 5, 7]]
-zeros        = [0.025, 0.025, 0.027, 0.029, 0.030, 0.032, 0.034]
-curve = ql.ZeroCurve(pillar_dates, zeros, day_count, ql.NullCalendar(),
-                     ql.Linear(), ql.Continuous)
-bond.setPricingEngine(ql.DiscountingBondEngine(ql.YieldTermStructureHandle(curve)))
-
-print(bond.NPV())  # → 103.6781792217
-
-ytm = bond.bondYield(day_count, ql.Continuous, ql.NoFrequency)   # ≈ 0.0317283
-ir  = ql.InterestRate(ytm, day_count, ql.Continuous, ql.NoFrequency)
-print(ql.BondFunctions.duration(bond, ir, ql.Duration.Modified))  # → 4.5902412191</code></pre>
-<table class="caption-top table">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a aria-hidden="true" href="#cb3-1" tabindex="-1"></a><span class="co"># Python — QuantLib via SWIG bindings</span></span>
+<span id="cb3-2"><a aria-hidden="true" href="#cb3-2" tabindex="-1"></a><span class="im">import</span> QuantLib <span class="im">as</span> ql</span>
+<span id="cb3-3"><a aria-hidden="true" href="#cb3-3" tabindex="-1"></a></span>
+<span id="cb3-4"><a aria-hidden="true" href="#cb3-4" tabindex="-1"></a>settle    <span class="op">=</span> ql.Date(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">2026</span>)</span>
+<span id="cb3-5"><a aria-hidden="true" href="#cb3-5" tabindex="-1"></a>ql.Settings.instance().evaluationDate <span class="op">=</span> settle</span>
+<span id="cb3-6"><a aria-hidden="true" href="#cb3-6" tabindex="-1"></a>maturity  <span class="op">=</span> ql.Date(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">2031</span>)</span>
+<span id="cb3-7"><a aria-hidden="true" href="#cb3-7" tabindex="-1"></a>day_count <span class="op">=</span> ql.Thirty360(ql.Thirty360.BondBasis)</span>
+<span id="cb3-8"><a aria-hidden="true" href="#cb3-8" tabindex="-1"></a></span>
+<span id="cb3-9"><a aria-hidden="true" href="#cb3-9" tabindex="-1"></a>schedule <span class="op">=</span> ql.Schedule(settle, maturity, ql.Period(ql.Semiannual),</span>
+<span id="cb3-10"><a aria-hidden="true" href="#cb3-10" tabindex="-1"></a>                       ql.NullCalendar(), ql.Unadjusted, ql.Unadjusted,</span>
+<span id="cb3-11"><a aria-hidden="true" href="#cb3-11" tabindex="-1"></a>                       ql.DateGeneration.Backward, <span class="va">False</span>)</span>
+<span id="cb3-12"><a aria-hidden="true" href="#cb3-12" tabindex="-1"></a>bond     <span class="op">=</span> ql.FixedRateBond(<span class="dv">0</span>, <span class="fl">100.0</span>, schedule, [<span class="fl">0.04</span>], day_count)</span>
+<span id="cb3-13"><a aria-hidden="true" href="#cb3-13" tabindex="-1"></a></span>
+<span id="cb3-14"><a aria-hidden="true" href="#cb3-14" tabindex="-1"></a>pillar_dates <span class="op">=</span> [settle <span class="op">+</span> ql.Period(y, ql.Years) <span class="cf">for</span> y <span class="kw">in</span> [<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">7</span>]]</span>
+<span id="cb3-15"><a aria-hidden="true" href="#cb3-15" tabindex="-1"></a>zeros        <span class="op">=</span> [<span class="fl">0.025</span>, <span class="fl">0.025</span>, <span class="fl">0.027</span>, <span class="fl">0.029</span>, <span class="fl">0.030</span>, <span class="fl">0.032</span>, <span class="fl">0.034</span>]</span>
+<span id="cb3-16"><a aria-hidden="true" href="#cb3-16" tabindex="-1"></a>curve <span class="op">=</span> ql.ZeroCurve(pillar_dates, zeros, day_count, ql.NullCalendar(),</span>
+<span id="cb3-17"><a aria-hidden="true" href="#cb3-17" tabindex="-1"></a>                     ql.Linear(), ql.Continuous)</span>
+<span id="cb3-18"><a aria-hidden="true" href="#cb3-18" tabindex="-1"></a>bond.setPricingEngine(ql.DiscountingBondEngine(ql.YieldTermStructureHandle(curve)))</span>
+<span id="cb3-19"><a aria-hidden="true" href="#cb3-19" tabindex="-1"></a></span>
+<span id="cb3-20"><a aria-hidden="true" href="#cb3-20" tabindex="-1"></a><span class="bu">print</span>(bond.NPV())  <span class="co"># → 103.6781792217</span></span>
+<span id="cb3-21"><a aria-hidden="true" href="#cb3-21" tabindex="-1"></a></span>
+<span id="cb3-22"><a aria-hidden="true" href="#cb3-22" tabindex="-1"></a>ytm <span class="op">=</span> bond.bondYield(day_count, ql.Continuous, ql.NoFrequency)   <span class="co"># ≈ 0.0317283</span></span>
+<span id="cb3-23"><a aria-hidden="true" href="#cb3-23" tabindex="-1"></a>ir  <span class="op">=</span> ql.InterestRate(ytm, day_count, ql.Continuous, ql.NoFrequency)</span>
+<span id="cb3-24"><a aria-hidden="true" href="#cb3-24" tabindex="-1"></a><span class="bu">print</span>(ql.BondFunctions.duration(bond, ir, ql.Duration.Modified))  <span class="co"># → 4.5902412191</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
+<div aria-label="Scrollable data table" class="table-scroll" role="region" tabindex="0"><table class="caption-top table">
 <colgroup>
-<col style="width: 23%">
-<col style="width: 41%">
-<col style="width: 23%">
-<col style="width: 11%">
+<col style="width: 23%"/>
+<col style="width: 41%"/>
+<col style="width: 23%"/>
+<col style="width: 11%"/>
 </colgroup>
 <thead>
 <tr class="header">
@@ -317,42 +329,42 @@ print(ql.BondFunctions.duration(bond, ir, ql.Duration.Modified))  # → 4.590241
 <td>2.9e-03</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p>The prices agree to the last printed digit. The durations answer different questions: <code>duration(Modified(), curve, cfs)</code> measures a parallel continuous-zero shift of the term-structured curve, while QL’s <code>BondFunctions.duration</code> works from a single yield-to-maturity (about 3.17% continuously compounded here). The curve-based measure can also be calculated from curve-discounted cashflow moments or checked by bumping every pillar. The key-rate section below uses the latter check.</p>
 <p>The interesting part is what the same <code>cfs</code> is about to do without writing any new code.</p>
 </section>
-<section id="modified-duration-is-the-derivative" class="level2">
+<section class="level2" id="modified-duration-is-the-derivative">
 <h2 class="anchored" data-anchor-id="modified-duration-is-the-derivative">Modified duration is the derivative</h2>
 <p>For a positive value, modified duration is <code>−d(log P)/dy</code>. Under a parallel continuous-zero shock, fixed cashflows give an analytic formula: <code>Σ t·cf·D(t) / P</code>. ActuaryUtilities uses that formula for the cashflow-vector call. For a valuation function, it differentiates through the valuation with ForwardDiff:</p>
-<div id="8" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>using ForwardDiff
-mod_analytic = duration(Modified(), curve, cfs)
-mod_ad = duration(c -&gt; FinanceCore.pv(c, cfs), curve)
-@assert isapprox(mod_analytic, mod_ad)
-(analytic=mod_analytic, callback_ad=mod_ad)</code></pre>
+<div class="cell" data-execution_count="1" id="8">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a aria-hidden="true" href="#cb4-1" tabindex="-1"></a><span class="im">using</span> <span class="bu">ForwardDiff</span></span>
+<span id="cb4-2"><a aria-hidden="true" href="#cb4-2" tabindex="-1"></a>mod_analytic <span class="op">=</span> <span class="fu">duration</span>(<span class="fu">Modified</span>(), curve, cfs)</span>
+<span id="cb4-3"><a aria-hidden="true" href="#cb4-3" tabindex="-1"></a>mod_ad <span class="op">=</span> <span class="fu">duration</span>(c <span class="op">-&gt;</span> FinanceCore.<span class="fu">pv</span>(c, cfs), curve)</span>
+<span id="cb4-4"><a aria-hidden="true" href="#cb4-4" tabindex="-1"></a><span class="pp">@assert</span> <span class="fu">isapprox</span>(mod_analytic, mod_ad)</span>
+<span id="cb4-5"><a aria-hidden="true" href="#cb4-5" tabindex="-1"></a>(analytic<span class="op">=</span>mod_analytic, callback_ad<span class="op">=</span>mod_ad)</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>(analytic = 4.587323550496468, callback_ad = 4.587323550496468)</code></pre>
 </div>
 </div>
 <p>The callback receives the shifted curve and can also reproject rate-dependent cashflows. Both routes avoid a finite-difference step size. AD differentiates the implemented computation, subject to floating-point accuracy and differentiability; it is not a guarantee of exact arithmetic.</p>
 <p>The contrast with bump-and-reprice is visible if you ask the same question both ways:</p>
-<div id="10" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code># Parallel-shift the term-structured curve by `shift` at every pillar.
-function mod_finite_diff(shift)
-    yield_up = FinanceModels.ZeroRateCurve(base_zeros .+ shift, tenors, Spline.Linear())
-    yield_dn = FinanceModels.ZeroRateCurve(base_zeros .- shift, tenors, Spline.Linear())
-    p_up = FinanceCore.pv(yield_up, cfs)
-    p_dn = FinanceCore.pv(yield_dn, cfs)
-    p = FinanceCore.pv(curve, cfs)
-    return (p_dn - p_up) / (2 * shift * p)
-end
-
-for h in (1e-2, 1e-4, 1e-6, 1e-8, 1e-10, 1e-12, 1e-14)
-    fd = mod_finite_diff(h)
-    err = abs(fd - mod_ad)
-    @printf("shift = %.0e   mod (FD) = %.12f   |err vs AD| = %.2e\n", h, fd, err)
-end
-@printf("                   mod (AD) = %.12f\n", mod_ad)</code></pre>
+<div class="cell" data-execution_count="1" id="10">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a aria-hidden="true" href="#cb6-1" tabindex="-1"></a><span class="co"># Parallel-shift the term-structured curve by `shift` at every pillar.</span></span>
+<span id="cb6-2"><a aria-hidden="true" href="#cb6-2" tabindex="-1"></a><span class="kw">function</span> <span class="fu">mod_finite_diff</span>(shift)</span>
+<span id="cb6-3"><a aria-hidden="true" href="#cb6-3" tabindex="-1"></a>    yield_up <span class="op">=</span> FinanceModels.<span class="fu">ZeroRateCurve</span>(base_zeros <span class="op">.+</span> shift, tenors, Spline.<span class="fu">Linear</span>())</span>
+<span id="cb6-4"><a aria-hidden="true" href="#cb6-4" tabindex="-1"></a>    yield_dn <span class="op">=</span> FinanceModels.<span class="fu">ZeroRateCurve</span>(base_zeros <span class="op">.-</span> shift, tenors, Spline.<span class="fu">Linear</span>())</span>
+<span id="cb6-5"><a aria-hidden="true" href="#cb6-5" tabindex="-1"></a>    p_up <span class="op">=</span> FinanceCore.<span class="fu">pv</span>(yield_up, cfs)</span>
+<span id="cb6-6"><a aria-hidden="true" href="#cb6-6" tabindex="-1"></a>    p_dn <span class="op">=</span> FinanceCore.<span class="fu">pv</span>(yield_dn, cfs)</span>
+<span id="cb6-7"><a aria-hidden="true" href="#cb6-7" tabindex="-1"></a>    p <span class="op">=</span> FinanceCore.<span class="fu">pv</span>(curve, cfs)</span>
+<span id="cb6-8"><a aria-hidden="true" href="#cb6-8" tabindex="-1"></a>    <span class="cf">return</span> (p_dn <span class="op">-</span> p_up) <span class="op">/</span> (<span class="fl">2</span> <span class="op">*</span> shift <span class="op">*</span> p)</span>
+<span id="cb6-9"><a aria-hidden="true" href="#cb6-9" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb6-10"><a aria-hidden="true" href="#cb6-10" tabindex="-1"></a></span>
+<span id="cb6-11"><a aria-hidden="true" href="#cb6-11" tabindex="-1"></a><span class="cf">for</span> h <span class="kw">in</span> (<span class="fl">1e-2</span>, <span class="fl">1e-4</span>, <span class="fl">1e-6</span>, <span class="fl">1e-8</span>, <span class="fl">1e-10</span>, <span class="fl">1e-12</span>, <span class="fl">1e-14</span>)</span>
+<span id="cb6-12"><a aria-hidden="true" href="#cb6-12" tabindex="-1"></a>    fd <span class="op">=</span> <span class="fu">mod_finite_diff</span>(h)</span>
+<span id="cb6-13"><a aria-hidden="true" href="#cb6-13" tabindex="-1"></a>    err <span class="op">=</span> <span class="fu">abs</span>(fd <span class="op">-</span> mod_ad)</span>
+<span id="cb6-14"><a aria-hidden="true" href="#cb6-14" tabindex="-1"></a>    <span class="pp">@printf</span>(<span class="st">"shift = %.0e   mod (FD) = %.12f   |err vs AD| = %.2e</span><span class="sc">\n</span><span class="st">"</span>, h, fd, err)</span>
+<span id="cb6-15"><a aria-hidden="true" href="#cb6-15" tabindex="-1"></a><span class="cf">end</span></span>
+<span id="cb6-16"><a aria-hidden="true" href="#cb6-16" tabindex="-1"></a><span class="pp">@printf</span>(<span class="st">"                   mod (AD) = %.12f</span><span class="sc">\n</span><span class="st">"</span>, mod_ad)</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>shift = 1e-02   mod (FD) = 4.589142977807   |err vs AD| = 1.82e-03
 shift = 1e-04   mod (FD) = 4.587323732417   |err vs AD| = 1.82e-07
@@ -367,29 +379,29 @@ shift = 1e-14   mod (FD) = 4.583177078405   |err vs AD| = 4.15e-03
 <p>Moderate shifts balance truncation error against cancellation. At very small shifts, subtracting nearly equal prices loses significant digits. The analytic and AD routes avoid that step-size trade-off; the printed errors show its effect for this particular bond.</p>
 <p>For fixed cashflows, the analytic formula is simple and fast. AD becomes particularly useful when the valuation includes a differentiable projection or calibration pipeline, where deriving and maintaining every derivative by hand would take more work.</p>
 </section>
-<section id="convexity-is-the-next-derivative" class="level2">
+<section class="level2" id="convexity-is-the-next-derivative">
 <h2 class="anchored" data-anchor-id="convexity-is-the-next-derivative">Convexity is the next derivative</h2>
 <p>Convexity is <code>(d²P/dy²) / P</code>. QL’s <code>BondFunctions.convexity</code> takes a <em>scalar</em> <code>InterestRate</code>, not a yield curve, so for this convention comparison both sides drop down to a flat 3% reference yield. Same bond, same cashflow vector — only the discounting model is flat instead of term-structured:</p>
-<div id="12" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>yield_flat = FinanceModels.Yield.Constant(Continuous(0.03))
-convex = convexity(yield_flat, cfs)</code></pre>
+<div class="cell" data-execution_count="1" id="12">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a aria-hidden="true" href="#cb8-1" tabindex="-1"></a>yield_flat <span class="op">=</span> FinanceModels.Yield.<span class="fu">Constant</span>(<span class="fu">Continuous</span>(<span class="fl">0.03</span>))</span>
+<span id="cb8-2"><a aria-hidden="true" href="#cb8-2" tabindex="-1"></a>convex <span class="op">=</span> <span class="fu">convexity</span>(yield_flat, cfs)</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>22.228284058748304</code></pre>
 </div>
 </div>
 <p>QuantLib has a native <code>BondFunctions.convexity</code>:</p>
-<pre class="python"><code># Python — QuantLib
-import math
-y_ann = math.exp(0.03) - 1                  # annual-effective equiv. of 3% cont.
-ir    = ql.InterestRate(y_ann, day_count, ql.Compounded, ql.Annual)
-convex_quantlib = ql.BondFunctions.convexity(bond, ir)   # → 25.2585956899</code></pre>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a aria-hidden="true" href="#cb10-1" tabindex="-1"></a><span class="co"># Python — QuantLib</span></span>
+<span id="cb10-2"><a aria-hidden="true" href="#cb10-2" tabindex="-1"></a><span class="im">import</span> math</span>
+<span id="cb10-3"><a aria-hidden="true" href="#cb10-3" tabindex="-1"></a>y_ann <span class="op">=</span> math.exp(<span class="fl">0.03</span>) <span class="op">-</span> <span class="dv">1</span>                  <span class="co"># annual-effective equiv. of 3% cont.</span></span>
+<span id="cb10-4"><a aria-hidden="true" href="#cb10-4" tabindex="-1"></a>ir    <span class="op">=</span> ql.InterestRate(y_ann, day_count, ql.Compounded, ql.Annual)</span>
+<span id="cb10-5"><a aria-hidden="true" href="#cb10-5" tabindex="-1"></a>convex_quantlib <span class="op">=</span> ql.BondFunctions.convexity(bond, ir)   <span class="co"># → 25.2585956899</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <p>The Python snippet above differentiates with respect to an annual-compounded rate. The Julia curve call differentiates with respect to a continuous-zero shift. To compare the same quantity, use continuous compounding in QuantLib:</p>
-<pre class="python"><code>ir_cont = ql.InterestRate(0.03, day_count, ql.Continuous, ql.NoFrequency)
-ql.BondFunctions.convexity(bond, ir_cont)  # → 22.2282840587</code></pre>
-<table class="caption-top table">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a aria-hidden="true" href="#cb11-1" tabindex="-1"></a>ir_cont <span class="op">=</span> ql.InterestRate(<span class="fl">0.03</span>, day_count, ql.Continuous, ql.NoFrequency)</span>
+<span id="cb11-2"><a aria-hidden="true" href="#cb11-2" tabindex="-1"></a>ql.BondFunctions.convexity(bond, ir_cont)  <span class="co"># → 22.2282840587</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
+<div aria-label="Scrollable data table" class="table-scroll" role="region" tabindex="0"><table class="caption-top table">
 <colgroup>
-<col style="width: 82%">
-<col style="width: 17%">
+<col style="width: 82%"/>
+<col style="width: 17%"/>
 </colgroup>
 <thead>
 <tr class="header">
@@ -411,19 +423,19 @@ ql.BondFunctions.convexity(bond, ir_cont)  # → 22.2282840587</code></pre>
 <td style="text-align: right;">25.2585956899</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p>Writing <code>w_t = cf_t D(t)/P</code>, continuous-zero convexity is <code>Σ t² w_t</code>. Differentiating with respect to an annual-compounded rate <code>y</code> instead gives <code>Σ t(t+1) w_t / (1+y)²</code>. ActuaryUtilities returns the latter when passed an explicit <code>Periodic</code> rate rather than a curve. These are different derivatives of the same prices.</p>
-<div id="14" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>convex_periodic = convexity(Periodic(expm1(0.03), 1), cfs)
-@assert isapprox(convex, ql_reference["values"]["flat_convexity"]; atol=1e-10)
-@assert isapprox(convex_periodic, ql_reference["values"]["periodic_convexity"]; atol=1e-10)
-(continuous=convex, annual_periodic=convex_periodic)</code></pre>
+<div class="cell" data-execution_count="1" id="14">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb12-1"><a aria-hidden="true" href="#cb12-1" tabindex="-1"></a>convex_periodic <span class="op">=</span> <span class="fu">convexity</span>(<span class="fu">Periodic</span>(<span class="fu">expm1</span>(<span class="fl">0.03</span>), <span class="fl">1</span>), cfs)</span>
+<span id="cb12-2"><a aria-hidden="true" href="#cb12-2" tabindex="-1"></a><span class="pp">@assert</span> <span class="fu">isapprox</span>(convex, ql_reference[<span class="st">"values"</span>][<span class="st">"flat_convexity"</span>]; atol<span class="op">=</span><span class="fl">1e-10</span>)</span>
+<span id="cb12-3"><a aria-hidden="true" href="#cb12-3" tabindex="-1"></a><span class="pp">@assert</span> <span class="fu">isapprox</span>(convex_periodic, ql_reference[<span class="st">"values"</span>][<span class="st">"periodic_convexity"</span>]; atol<span class="op">=</span><span class="fl">1e-10</span>)</span>
+<span id="cb12-4"><a aria-hidden="true" href="#cb12-4" tabindex="-1"></a>(continuous<span class="op">=</span>convex, annual_periodic<span class="op">=</span>convex_periodic)</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>(continuous = 22.228284058748304, annual_periodic = 25.25859568990508)</code></pre>
 </div>
 </div>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout" class="callout-header d-flex align-content-center collapsed" data-bs-target=".callout-1-contents" data-bs-toggle="collapse">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -432,29 +444,29 @@ ql.BondFunctions.convexity(bond, ir_cont)  # → 22.2282840587</code></pre>
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-1-contents callout-collapse collapse" id="callout-1">
 <div class="callout-body-container callout-body">
 <p>The fixed-cashflow implementation uses analytic moments. A nested derivative of the same price function provides an independent check of the continuous-zero convention:</p>
-<div id="16" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>using ForwardDiff
-
-function price_at_continuous(y)
-    yc = FinanceModels.Yield.Constant(Continuous(y))
-    return FinanceCore.pv(yc, cfs)
-end
-
-ytm_flat = 0.03
-P0 = price_at_continuous(ytm_flat)
-convex_cont = ForwardDiff.derivative(
-    y -&gt; ForwardDiff.derivative(price_at_continuous, y), ytm_flat) / P0</code></pre>
+<div class="cell" data-execution_count="1" id="16">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb14-1"><a aria-hidden="true" href="#cb14-1" tabindex="-1"></a><span class="im">using</span> <span class="bu">ForwardDiff</span></span>
+<span id="cb14-2"><a aria-hidden="true" href="#cb14-2" tabindex="-1"></a></span>
+<span id="cb14-3"><a aria-hidden="true" href="#cb14-3" tabindex="-1"></a><span class="kw">function</span> <span class="fu">price_at_continuous</span>(y)</span>
+<span id="cb14-4"><a aria-hidden="true" href="#cb14-4" tabindex="-1"></a>    yc <span class="op">=</span> FinanceModels.Yield.<span class="fu">Constant</span>(<span class="fu">Continuous</span>(y))</span>
+<span id="cb14-5"><a aria-hidden="true" href="#cb14-5" tabindex="-1"></a>    <span class="cf">return</span> FinanceCore.<span class="fu">pv</span>(yc, cfs)</span>
+<span id="cb14-6"><a aria-hidden="true" href="#cb14-6" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb14-7"><a aria-hidden="true" href="#cb14-7" tabindex="-1"></a></span>
+<span id="cb14-8"><a aria-hidden="true" href="#cb14-8" tabindex="-1"></a>ytm_flat <span class="op">=</span> <span class="fl">0.03</span></span>
+<span id="cb14-9"><a aria-hidden="true" href="#cb14-9" tabindex="-1"></a>P0 <span class="op">=</span> <span class="fu">price_at_continuous</span>(ytm_flat)</span>
+<span id="cb14-10"><a aria-hidden="true" href="#cb14-10" tabindex="-1"></a>convex_cont <span class="op">=</span> ForwardDiff.<span class="fu">derivative</span>(</span>
+<span id="cb14-11"><a aria-hidden="true" href="#cb14-11" tabindex="-1"></a>    y <span class="op">-&gt;</span> ForwardDiff.<span class="fu">derivative</span>(price_at_continuous, y), ytm_flat) <span class="op">/</span> P0</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>22.228284058748308</code></pre>
 </div>
 </div>
 <p>This now agrees with the library’s curve convexity:</p>
-<div id="18" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>@assert isapprox(convex_cont, convex)
-(analytic=convex, nested_ad=convex_cont)</code></pre>
+<div class="cell" data-execution_count="1" id="18">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb16-1"><a aria-hidden="true" href="#cb16-1" tabindex="-1"></a><span class="pp">@assert</span> <span class="fu">isapprox</span>(convex_cont, convex)</span>
+<span id="cb16-2"><a aria-hidden="true" href="#cb16-2" tabindex="-1"></a>(analytic<span class="op">=</span>convex, nested_ad<span class="op">=</span>convex_cont)</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>(analytic = 22.228284058748304, nested_ad = 22.228284058748308)</code></pre>
 </div>
@@ -464,19 +476,19 @@ convex_cont = ForwardDiff.derivative(
 </div>
 </div>
 </section>
-<section id="key-rate-durations-decompose-the-derivative" class="level2">
+<section class="level2" id="key-rate-durations-decompose-the-derivative">
 <h2 class="anchored" data-anchor-id="key-rate-durations-decompose-the-derivative">Key-rate durations decompose the derivative</h2>
 <p>KRDs come from Thomas Ho’s 1992 paper — <em>the</em> standard ALM sensitivity decomposition: shift the zero curve by a tent function centered at each key tenor, measure the price change, sum across pillars to recover the modified duration. ActuaryUtilities ships the tent bumper.</p>
-<div id="20" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>krd_pillars = collect(1.0:1.0:10.0)
-krd = duration(KeyRates(krd_pillars), curve, cfs)
-
-println("Pillar      KRD")
-for (t, k) in zip(krd_pillars, krd)
-    @printf("  %5.1fy   %12.8f\n", t, k)
-end
-@printf("\n  Σ KRD    = %12.8f\n", sum(krd))
-@printf("  Modified = %12.8f\n", mod_dur)</code></pre>
+<div class="cell" data-execution_count="1" id="20">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb18-1"><a aria-hidden="true" href="#cb18-1" tabindex="-1"></a>krd_pillars <span class="op">=</span> <span class="fu">collect</span>(<span class="fl">1.0</span><span class="op">:</span><span class="fl">1.0</span><span class="op">:</span><span class="fl">10.0</span>)</span>
+<span id="cb18-2"><a aria-hidden="true" href="#cb18-2" tabindex="-1"></a>krd <span class="op">=</span> <span class="fu">duration</span>(<span class="fu">KeyRates</span>(krd_pillars), curve, cfs)</span>
+<span id="cb18-3"><a aria-hidden="true" href="#cb18-3" tabindex="-1"></a></span>
+<span id="cb18-4"><a aria-hidden="true" href="#cb18-4" tabindex="-1"></a><span class="fu">println</span>(<span class="st">"Pillar      KRD"</span>)</span>
+<span id="cb18-5"><a aria-hidden="true" href="#cb18-5" tabindex="-1"></a><span class="cf">for</span> (t, k) <span class="kw">in</span> <span class="fu">zip</span>(krd_pillars, krd)</span>
+<span id="cb18-6"><a aria-hidden="true" href="#cb18-6" tabindex="-1"></a>    <span class="pp">@printf</span>(<span class="st">"  %5.1fy   %12.8f</span><span class="sc">\n</span><span class="st">"</span>, t, k)</span>
+<span id="cb18-7"><a aria-hidden="true" href="#cb18-7" tabindex="-1"></a><span class="cf">end</span></span>
+<span id="cb18-8"><a aria-hidden="true" href="#cb18-8" tabindex="-1"></a><span class="pp">@printf</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">  Σ KRD    = %12.8f</span><span class="sc">\n</span><span class="st">"</span>, <span class="fu">sum</span>(krd))</span>
+<span id="cb18-9"><a aria-hidden="true" href="#cb18-9" tabindex="-1"></a><span class="pp">@printf</span>(<span class="st">"  Modified = %12.8f</span><span class="sc">\n</span><span class="st">"</span>, mod_dur)</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Pillar      KRD
     1.0y     0.04225406
@@ -496,7 +508,7 @@ end
 </div>
 <p>A 5-year bond has no cashflows past year 5, so the long-end pillars are zero. The 5y pillar dominates because the principal repayment sits there. Fixed-cashflow key-rate durations are analytic in AU6; there is no internal finite-difference bump. Their sum agrees with parallel duration to floating-point precision.</p>
 <p>QuantLib’s <a href="https://github.com/lballabio/QuantLib/blob/master/ql/termstructures/yield/piecewisezerospreadedtermstructure.hpp">piecewise zero-spread curve</a> uses linear interior spreads and flat endpoint spreads, matching this hat basis. We create the curve and pricing engine once, then bump its observable spread quotes. A central difference with a 0.1 bp step gives:</p>
-<table class="caption-top table">
+<div aria-label="Scrollable data table" class="table-scroll" role="region" tabindex="0"><table class="caption-top table">
 <thead>
 <tr class="header">
 <th style="text-align: right;">Pillar</th>
@@ -541,26 +553,26 @@ end
 <td style="text-align: right;"><strong>4.5873235523</strong></td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p>The hats sum to one at every tenor, so their key-rate durations aggregate to parallel duration. QuantLib’s spread curve supplies the same flat endpoint behavior. The reference script also checks a version that rebuilds <code>ZeroCurve</code> objects; there the time-zero anchor moves with the first pillar to preserve this boundary convention. The small remaining difference from the analytic result is finite-difference error.</p>
 <p>These are zero-rate shocks. For sensitivities to par quotes, pass market inputs to a valuation callback that rebuilds or refits the curve; the removed <code>KeyRatePar</code> marker is not part of AU6.</p>
 </section>
-<section id="the-whole-sensitivity-bundle-in-one-call" class="level2">
+<section class="level2" id="the-whole-sensitivity-bundle-in-one-call">
 <h2 class="anchored" data-anchor-id="the-whole-sensitivity-bundle-in-one-call">The whole sensitivity bundle in one call</h2>
 <p>ActuaryUtilities’ <code>sensitivities</code> returns value, duration and DV01. Add <code>SecondOrder()</code> for convexity and dollar convexity; the default <code>FirstOrder()</code> avoids calculating second derivatives. The <code>KeyRates(tenors)</code> marker carries the reporting grid, independently of the curve’s storage tenors:</p>
-<div id="24" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>zero_rates = [0.02, 0.025, 0.028, 0.030, 0.032, 0.034]
-tenors = [1.0, 2.0, 3.0, 5.0, 7.0, 10.0]
-zrc = FinanceModels.ZeroRateCurve(zero_rates, tenors)
-
-result = sensitivities(SecondOrder(), KeyRates(tenors), zrc, cfs)
-
-@printf("price                  = %.6f\n", result.value * par)
-println("durations by pillar    = ", round.(result.duration; digits=6))
-@printf("Σ durations            = %.6f   (≈ total Modified duration)\n",
-    sum(result.duration))
-@printf("Σ convexities (matrix) = %.6f   (continuous-shock convexity)\n",
-    sum(result.convexity))</code></pre>
+<div class="cell" data-execution_count="1" id="24">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb20-1"><a aria-hidden="true" href="#cb20-1" tabindex="-1"></a>zero_rates <span class="op">=</span> [<span class="fl">0.02</span>, <span class="fl">0.025</span>, <span class="fl">0.028</span>, <span class="fl">0.030</span>, <span class="fl">0.032</span>, <span class="fl">0.034</span>]</span>
+<span id="cb20-2"><a aria-hidden="true" href="#cb20-2" tabindex="-1"></a>tenors <span class="op">=</span> [<span class="fl">1.0</span>, <span class="fl">2.0</span>, <span class="fl">3.0</span>, <span class="fl">5.0</span>, <span class="fl">7.0</span>, <span class="fl">10.0</span>]</span>
+<span id="cb20-3"><a aria-hidden="true" href="#cb20-3" tabindex="-1"></a>zrc <span class="op">=</span> FinanceModels.<span class="fu">ZeroRateCurve</span>(zero_rates, tenors)</span>
+<span id="cb20-4"><a aria-hidden="true" href="#cb20-4" tabindex="-1"></a></span>
+<span id="cb20-5"><a aria-hidden="true" href="#cb20-5" tabindex="-1"></a>result <span class="op">=</span> <span class="fu">sensitivities</span>(<span class="fu">SecondOrder</span>(), <span class="fu">KeyRates</span>(tenors), zrc, cfs)</span>
+<span id="cb20-6"><a aria-hidden="true" href="#cb20-6" tabindex="-1"></a></span>
+<span id="cb20-7"><a aria-hidden="true" href="#cb20-7" tabindex="-1"></a><span class="pp">@printf</span>(<span class="st">"price                  = %.6f</span><span class="sc">\n</span><span class="st">"</span>, result.value <span class="op">*</span> par)</span>
+<span id="cb20-8"><a aria-hidden="true" href="#cb20-8" tabindex="-1"></a><span class="fu">println</span>(<span class="st">"durations by pillar    = "</span>, <span class="fu">round</span>.(result.duration; digits<span class="op">=</span><span class="fl">6</span>))</span>
+<span id="cb20-9"><a aria-hidden="true" href="#cb20-9" tabindex="-1"></a><span class="pp">@printf</span>(<span class="st">"Σ durations            = %.6f   (≈ total Modified duration)</span><span class="sc">\n</span><span class="st">"</span>,</span>
+<span id="cb20-10"><a aria-hidden="true" href="#cb20-10" tabindex="-1"></a>    <span class="fu">sum</span>(result.duration))</span>
+<span id="cb20-11"><a aria-hidden="true" href="#cb20-11" tabindex="-1"></a><span class="pp">@printf</span>(<span class="st">"Σ convexities (matrix) = %.6f   (continuous-shock convexity)</span><span class="sc">\n</span><span class="st">"</span>,</span>
+<span id="cb20-12"><a aria-hidden="true" href="#cb20-12" tabindex="-1"></a>    <span class="fu">sum</span>(result.convexity))</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>price                  = 104.616990
 durations by pillar    = [0.042068, 0.072574, 0.17329, 4.301491, -0.0, -0.0]
@@ -570,19 +582,19 @@ durations by pillar    = [0.042068, 0.072574, 0.17329, 4.301491, -0.0, -0.0]
 </div>
 <p>Each entry of <code>result.duration</code> is a normalized sensitivity to one hat-shaped zero-rate shock. Fixed-cashflow formulas accumulate these contributions directly. The 6×6 <code>result.convexity</code> matrix contains <code>∂²V / ∂z_i ∂z_j / V</code>; <code>result.dollar_convexity</code> contains the unnormalized Hessian. Summing all entries, including cross terms, gives parallel continuous-zero convexity for this same curve. Its value differs from the earlier flat-curve example because the discount curves differ.</p>
 <p>The same result already contains the per-pillar <em>dollar value of a basis point</em>, using the convention that a positive DV01 denotes a loss for an upward 1 bp shock. Scale the unit-par cashflows to the position’s par amount:</p>
-<div id="26" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>dv01s = result.dv01
-(per_pillar = round.(dv01s .* par; digits=6), total = sum(dv01s) * par)</code></pre>
+<div class="cell" data-execution_count="1" id="26">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb22-1"><a aria-hidden="true" href="#cb22-1" tabindex="-1"></a>dv01s <span class="op">=</span> result.dv01</span>
+<span id="cb22-2"><a aria-hidden="true" href="#cb22-2" tabindex="-1"></a>(per_pillar <span class="op">=</span> <span class="fu">round</span>.(dv01s <span class="op">.*</span> par; digits<span class="op">=</span><span class="fl">6</span>), total <span class="op">=</span> <span class="fu">sum</span>(dv01s) <span class="op">*</span> par)</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>(per_pillar = [0.00044, 0.000759, 0.001813, 0.045001, -0.0, -0.0], total = 0.04801316027713399)</code></pre>
 </div>
 </div>
 <p>For a contract, use <code>sensitivities(KeyRates(tenors), zrc, bond)</code>, with <code>SecondOrder()</code> before <code>KeyRates</code> if needed. Contract valuations differentiate through the projection and report discount and index roles in fields such as <code>.duration.discount</code> and <code>.duration.index</code>; sum the roles for effective duration. Two-curve valuation callbacks also support <code>IR01()</code> and <code>CS01()</code>. For fixed payments discounted by a base-plus-credit curve, those parallel exposures coincide; distinct roles become useful when payments themselves depend on a curve.</p>
 <p>Generic numeric code also makes higher-precision validation possible. This example runs in <code>BigFloat</code>; the callback examples use <code>ForwardDiff.Dual</code>:</p>
-<div id="28" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>yield_big = FinanceModels.Yield.Constant(Continuous(big"0.03"))
-cfs_big = collect(FinanceModels.Bond.Fixed(big"0.04", Periodic(2), 5))
-duration(Modified(), yield_big, cfs_big)</code></pre>
+<div class="cell" data-execution_count="1" id="28">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb24-1"><a aria-hidden="true" href="#cb24-1" tabindex="-1"></a>yield_big <span class="op">=</span> FinanceModels.Yield.<span class="fu">Constant</span>(<span class="fu">Continuous</span>(big<span class="st">"0.03"</span>))</span>
+<span id="cb24-2"><a aria-hidden="true" href="#cb24-2" tabindex="-1"></a>cfs_big <span class="op">=</span> <span class="fu">collect</span>(FinanceModels.Bond.<span class="fu">Fixed</span>(big<span class="st">"0.04"</span>, <span class="fu">Periodic</span>(<span class="fl">2</span>), <span class="fl">5</span>))</span>
+<span id="cb24-3"><a aria-hidden="true" href="#cb24-3" tabindex="-1"></a><span class="fu">duration</span>(<span class="fu">Modified</span>(), yield_big, cfs_big)</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>4.592215959206013517692818226598484659134894077030275768293407244010322839862521</code></pre>
 </div>
@@ -590,7 +602,7 @@ duration(Modified(), yield_big, cfs_big)</code></pre>
 <p>With QuantLib the entire library is compiled against a single <code>Real</code> typedef (<code>double</code> in every stock distribution); changing precision means recompiling the C++ library and its bindings, not swapping a type at the call site.</p>
 <p>Generic numeric types still require a differentiable computation and adequate floating-point accuracy. The examples here exercise specific models and parameter ranges; they do not establish that every composed valuation has a reliable gradient.</p>
 <div class="callout callout-style-default callout-warning callout-titled">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout" class="callout-header d-flex align-content-center collapsed" data-bs-target=".callout-2-contents" data-bs-toggle="collapse">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -599,7 +611,7 @@ duration(Modified(), yield_big, cfs_big)</code></pre>
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-2-contents callout-collapse collapse" id="callout-2">
 <div class="callout-body-container callout-body">
 <p>Code and storage must accept dual numbers; a Float64-only buffer or an unsupported foreign-library call can break the chain. Mutation itself is not the problem. Payoff kinks, interpolation branches and solver convergence also need attention. See <a href="https://juliadiff.org/ForwardDiff.jl/stable/user/limitations/">ForwardDiff’s limitations</a>.</p>
 <p>FinanceModels has numerical limits too. In discount-factor blends, extremely small weights or widely separated component log-discounts can produce inaccurate derivatives, including spurious zeros, <code>Inf</code> or <code>NaN</code>, even when the price and mathematical derivative are finite. This can affect weights, time and curve parameters, and can differ between direct discounts, zero rates, intervals and composed curves. Check sensitivities in these regimes against analytic or suitably higher-precision references; a finite price alone does not establish a reliable gradient.</p>
@@ -607,7 +619,7 @@ duration(Modified(), yield_big, cfs_big)</code></pre>
 </div>
 </div>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout" class="callout-header d-flex align-content-center collapsed" data-bs-target=".callout-3-contents" data-bs-toggle="collapse">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -616,16 +628,16 @@ duration(Modified(), yield_big, cfs_big)</code></pre>
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-3-contents callout-collapse collapse" id="callout-3">
 <div class="callout-body-container callout-body">
 <p>If <code>sensitivities</code> doesn’t bundle exactly what you want — different curve type, different valuation function, mixed asset/liability portfolio — write the AD call directly:</p>
-<div id="30" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>function price_from_zeros(rates)
-    curve = FinanceModels.ZeroRateCurve(rates, tenors)
-    return FinanceCore.pv(curve, cfs) * par
-end
-
-ForwardDiff.gradient(price_from_zeros, zero_rates)</code></pre>
+<div class="cell" data-execution_count="1" id="30">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb26-1"><a aria-hidden="true" href="#cb26-1" tabindex="-1"></a><span class="kw">function</span> <span class="fu">price_from_zeros</span>(rates)</span>
+<span id="cb26-2"><a aria-hidden="true" href="#cb26-2" tabindex="-1"></a>    curve <span class="op">=</span> FinanceModels.<span class="fu">ZeroRateCurve</span>(rates, tenors)</span>
+<span id="cb26-3"><a aria-hidden="true" href="#cb26-3" tabindex="-1"></a>    <span class="cf">return</span> FinanceCore.<span class="fu">pv</span>(curve, cfs) <span class="op">*</span> par</span>
+<span id="cb26-4"><a aria-hidden="true" href="#cb26-4" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb26-5"><a aria-hidden="true" href="#cb26-5" tabindex="-1"></a></span>
+<span id="cb26-6"><a aria-hidden="true" href="#cb26-6" tabindex="-1"></a>ForwardDiff.<span class="fu">gradient</span>(price_from_zeros, zero_rates)</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>6-element Vector{Float64}:
    -4.256516955631076
@@ -641,88 +653,88 @@ ForwardDiff.gradient(price_from_zeros, zero_rates)</code></pre>
 </div>
 </div>
 </section>
-<section id="sensitivities-to-the-quotes-used-to-calibrate-a-curve" class="level2">
+<section class="level2" id="sensitivities-to-the-quotes-used-to-calibrate-a-curve">
 <h2 class="anchored" data-anchor-id="sensitivities-to-the-quotes-used-to-calibrate-a-curve">Sensitivities to the quotes used to calibrate a curve</h2>
 <p>A zero-rate shock and a change to a calibration quote define different risks. Here the inputs are annualized semiannual par yields. Each valuation bootstraps a new curve from those quotes and then prices the original fixed-cashflow bond:</p>
-<div id="32" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>par_tenors = [1.0, 2.0, 3.0, 5.0, 10.0]
-par_yields = [0.02, 0.024, 0.028, 0.032, 0.035]
-
-function curve_from_par(yields)
-    quotes = FinanceModels.ParYield.(yields, par_tenors; frequency=Periodic(2))
-    return FinanceModels.fit(Spline.Linear(), quotes, Fit.Bootstrap())
-end
-calibrated_bond_value(yields) = FinanceCore.pv(curve_from_par(yields), cfs) * par
-
-quote_risk = sensitivities((; par_yields)) do market
-    calibrated_bond_value(market.par_yields)
-end
-
-(price=quote_risk.value, par_quote_dv01=quote_risk.dv01.par_yields)</code></pre>
+<div class="cell" data-execution_count="1" id="32">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb28-1"><a aria-hidden="true" href="#cb28-1" tabindex="-1"></a>par_tenors <span class="op">=</span> [<span class="fl">1.0</span>, <span class="fl">2.0</span>, <span class="fl">3.0</span>, <span class="fl">5.0</span>, <span class="fl">10.0</span>]</span>
+<span id="cb28-2"><a aria-hidden="true" href="#cb28-2" tabindex="-1"></a>par_yields <span class="op">=</span> [<span class="fl">0.02</span>, <span class="fl">0.024</span>, <span class="fl">0.028</span>, <span class="fl">0.032</span>, <span class="fl">0.035</span>]</span>
+<span id="cb28-3"><a aria-hidden="true" href="#cb28-3" tabindex="-1"></a></span>
+<span id="cb28-4"><a aria-hidden="true" href="#cb28-4" tabindex="-1"></a><span class="kw">function</span> <span class="fu">curve_from_par</span>(yields)</span>
+<span id="cb28-5"><a aria-hidden="true" href="#cb28-5" tabindex="-1"></a>    quotes <span class="op">=</span> FinanceModels.<span class="fu">ParYield</span>.(yields, par_tenors; frequency<span class="op">=</span><span class="fu">Periodic</span>(<span class="fl">2</span>))</span>
+<span id="cb28-6"><a aria-hidden="true" href="#cb28-6" tabindex="-1"></a>    <span class="cf">return</span> FinanceModels.<span class="fu">fit</span>(Spline.<span class="fu">Linear</span>(), quotes, Fit.<span class="fu">Bootstrap</span>())</span>
+<span id="cb28-7"><a aria-hidden="true" href="#cb28-7" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb28-8"><a aria-hidden="true" href="#cb28-8" tabindex="-1"></a><span class="fu">calibrated_bond_value</span>(yields) <span class="op">=</span> FinanceCore.<span class="fu">pv</span>(<span class="fu">curve_from_par</span>(yields), cfs) <span class="op">*</span> par</span>
+<span id="cb28-9"><a aria-hidden="true" href="#cb28-9" tabindex="-1"></a></span>
+<span id="cb28-10"><a aria-hidden="true" href="#cb28-10" tabindex="-1"></a>quote_risk <span class="op">=</span> <span class="fu">sensitivities</span>((; par_yields)) <span class="cf">do</span> market</span>
+<span id="cb28-11"><a aria-hidden="true" href="#cb28-11" tabindex="-1"></a>    <span class="fu">calibrated_bond_value</span>(market.par_yields)</span>
+<span id="cb28-12"><a aria-hidden="true" href="#cb28-12" tabindex="-1"></a><span class="cf">end</span></span>
+<span id="cb28-13"><a aria-hidden="true" href="#cb28-13" tabindex="-1"></a></span>
+<span id="cb28-14"><a aria-hidden="true" href="#cb28-14" tabindex="-1"></a>(price<span class="op">=</span>quote_risk.value, par_quote_dv01<span class="op">=</span>quote_risk.dv01.par_yields)</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>(price = 103.70397362927383, par_quote_dv01 = [7.84103130308228e-5, 0.00014070415170561136, 0.0003568531949112419, 0.04670898226840432, 0.0])</code></pre>
 </div>
 </div>
 <p>Each bucket is <code>−∂V/∂quote × 10⁻⁴</code>: the first-order value loss for a 1 bp increase in that par quote, holding the other quotes fixed and recalibrating. The buckets sum to sensitivity to a parallel shift of the par quotes. That sum need not equal the parallel continuous-zero sensitivity of the fitted curve.</p>
 <p>We can check the fitted instruments and the five-year quote derivative independently:</p>
-<div id="34" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>calibrated_curve = curve_from_par(par_yields)
-calibration_quotes = FinanceModels.ParYield.(par_yields, par_tenors; frequency=Periodic(2))
-@assert all(isapprox(FinanceCore.pv(calibrated_curve, q.instrument), q.price; atol=1e-10)
-    for q in calibration_quotes)
-
-i = findfirst(==(5.0), par_tenors)
-h = 1e-5                              # 0.1 bp in decimal yield units
-up, down = copy(par_yields), copy(par_yields)
-up[i] += h
-down[i] -= h
-dv01_refit_fd = (calibrated_bond_value(down) - calibrated_bond_value(up)) / (2h) * 1e-4
-@assert isapprox(quote_risk.dv01.par_yields[i], dv01_refit_fd; rtol=1e-6, atol=1e-9)
-(ad_dv01=quote_risk.dv01.par_yields[i], refit_fd_dv01=dv01_refit_fd)</code></pre>
+<div class="cell" data-execution_count="1" id="34">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb30-1"><a aria-hidden="true" href="#cb30-1" tabindex="-1"></a>calibrated_curve <span class="op">=</span> <span class="fu">curve_from_par</span>(par_yields)</span>
+<span id="cb30-2"><a aria-hidden="true" href="#cb30-2" tabindex="-1"></a>calibration_quotes <span class="op">=</span> FinanceModels.<span class="fu">ParYield</span>.(par_yields, par_tenors; frequency<span class="op">=</span><span class="fu">Periodic</span>(<span class="fl">2</span>))</span>
+<span id="cb30-3"><a aria-hidden="true" href="#cb30-3" tabindex="-1"></a><span class="pp">@assert</span> <span class="fu">all</span>(<span class="fu">isapprox</span>(FinanceCore.<span class="fu">pv</span>(calibrated_curve, q.instrument), q.price; atol<span class="op">=</span><span class="fl">1e-10</span>)</span>
+<span id="cb30-4"><a aria-hidden="true" href="#cb30-4" tabindex="-1"></a>    <span class="cf">for</span> q <span class="kw">in</span> calibration_quotes)</span>
+<span id="cb30-5"><a aria-hidden="true" href="#cb30-5" tabindex="-1"></a></span>
+<span id="cb30-6"><a aria-hidden="true" href="#cb30-6" tabindex="-1"></a>i <span class="op">=</span> <span class="fu">findfirst</span>(<span class="op">==</span>(<span class="fl">5.0</span>), par_tenors)</span>
+<span id="cb30-7"><a aria-hidden="true" href="#cb30-7" tabindex="-1"></a>h <span class="op">=</span> <span class="fl">1e-5</span>                              <span class="co"># 0.1 bp in decimal yield units</span></span>
+<span id="cb30-8"><a aria-hidden="true" href="#cb30-8" tabindex="-1"></a>up, down <span class="op">=</span> <span class="fu">copy</span>(par_yields), <span class="fu">copy</span>(par_yields)</span>
+<span id="cb30-9"><a aria-hidden="true" href="#cb30-9" tabindex="-1"></a>up[i] <span class="op">+=</span> h</span>
+<span id="cb30-10"><a aria-hidden="true" href="#cb30-10" tabindex="-1"></a>down[i] <span class="op">-=</span> h</span>
+<span id="cb30-11"><a aria-hidden="true" href="#cb30-11" tabindex="-1"></a>dv01_refit_fd <span class="op">=</span> (<span class="fu">calibrated_bond_value</span>(down) <span class="op">-</span> <span class="fu">calibrated_bond_value</span>(up)) <span class="op">/</span> (<span class="fl">2</span>h) <span class="op">*</span> <span class="fl">1e-4</span></span>
+<span id="cb30-12"><a aria-hidden="true" href="#cb30-12" tabindex="-1"></a><span class="pp">@assert</span> <span class="fu">isapprox</span>(quote_risk.dv01.par_yields[i], dv01_refit_fd; rtol<span class="op">=</span><span class="fl">1e-6</span>, atol<span class="op">=</span><span class="fl">1e-9</span>)</span>
+<span id="cb30-13"><a aria-hidden="true" href="#cb30-13" tabindex="-1"></a>(ad_dv01<span class="op">=</span>quote_risk.dv01.par_yields[i], refit_fd_dv01<span class="op">=</span>dv01_refit_fd)</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>(ad_dv01 = 0.04670898226840432, refit_fd_dv01 = 0.04670898227054465)</code></pre>
 </div>
 </div>
 <p>This demonstrates differentiation through this bootstrap and its linear zero-rate interpolation. Other calibration procedures need their own checks for convergence, differentiability and numerical accuracy.</p>
 </section>
-<section id="when-the-cashflows-respond-to-rates" class="level2">
+<section class="level2" id="when-the-cashflows-respond-to-rates">
 <h2 class="anchored" data-anchor-id="when-the-cashflows-respond-to-rates">When the cashflows respond to rates</h2>
 <p>Everything so far assumed the cashflow vector was <em>fixed</em>. That works for the bond above. Many ALM exposures require payments that respond to rates: callable bonds, prepayable mortgages, life-insurance liabilities with dynamic lapse behavior, and GICs with surrender options. The policyholder or borrower has an option whose exercise correlates with rates, so projecting the cashflows becomes part of the sensitivity calculation.</p>
 <p>The simplest non-trivial case is a level-pay mortgage pool with a constant conditional prepayment rate (CPR). The pass-through cashflow generator is the standard factor model: the underlying mortgage amortizes on its original schedule, and each period a fraction <code>cpr</code> of the surviving balance prepays voluntarily on top of the scheduled cashflow.</p>
-<div id="36" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>using FinanceCore: Cashflow
-
-function passthrough_cfs(wac, balance, term, cpr)
-    payment = balance * wac / (1 - (1 + wac)^(-term))
-    sched_bal = balance
-    factor = one(cpr)
-    map(1:term) do t
-        sched_int = sched_bal * wac
-        sched_prin = payment - sched_int
-        sched_bal_end = sched_bal - sched_prin
-        cf = factor * payment + factor * cpr * sched_bal_end
-        factor *= one(cpr) - cpr
-        sched_bal = sched_bal_end
-        Cashflow(cf, Float64(t))
-    end
-end
-
-wac_m, term_m, bal_m = 0.05, 10, 100.0
-y_market = 0.04
-yj_market = FinanceModels.Yield.Constant(Continuous(y_market))
-
-cfs_static = passthrough_cfs(wac_m, bal_m, term_m, 0.06)
-(price=FinanceCore.pv(yj_market, cfs_static),
-    mod_dur=duration(Modified(), yj_market, cfs_static),
-    convexity=convexity(yj_market, cfs_static))</code></pre>
+<div class="cell" data-execution_count="1" id="36">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb32-1"><a aria-hidden="true" href="#cb32-1" tabindex="-1"></a><span class="im">using</span> <span class="bu">FinanceCore</span>: Cashflow</span>
+<span id="cb32-2"><a aria-hidden="true" href="#cb32-2" tabindex="-1"></a></span>
+<span id="cb32-3"><a aria-hidden="true" href="#cb32-3" tabindex="-1"></a><span class="kw">function</span> <span class="fu">passthrough_cfs</span>(wac, balance, term, cpr)</span>
+<span id="cb32-4"><a aria-hidden="true" href="#cb32-4" tabindex="-1"></a>    payment <span class="op">=</span> balance <span class="op">*</span> wac <span class="op">/</span> (<span class="fl">1</span> <span class="op">-</span> (<span class="fl">1</span> <span class="op">+</span> wac)<span class="op">^</span>(<span class="op">-</span>term))</span>
+<span id="cb32-5"><a aria-hidden="true" href="#cb32-5" tabindex="-1"></a>    sched_bal <span class="op">=</span> balance</span>
+<span id="cb32-6"><a aria-hidden="true" href="#cb32-6" tabindex="-1"></a>    factor <span class="op">=</span> <span class="fu">one</span>(cpr)</span>
+<span id="cb32-7"><a aria-hidden="true" href="#cb32-7" tabindex="-1"></a>    <span class="fu">map</span>(<span class="fl">1</span><span class="op">:</span>term) <span class="cf">do</span> t</span>
+<span id="cb32-8"><a aria-hidden="true" href="#cb32-8" tabindex="-1"></a>        sched_int <span class="op">=</span> sched_bal <span class="op">*</span> wac</span>
+<span id="cb32-9"><a aria-hidden="true" href="#cb32-9" tabindex="-1"></a>        sched_prin <span class="op">=</span> payment <span class="op">-</span> sched_int</span>
+<span id="cb32-10"><a aria-hidden="true" href="#cb32-10" tabindex="-1"></a>        sched_bal_end <span class="op">=</span> sched_bal <span class="op">-</span> sched_prin</span>
+<span id="cb32-11"><a aria-hidden="true" href="#cb32-11" tabindex="-1"></a>        cf <span class="op">=</span> factor <span class="op">*</span> payment <span class="op">+</span> factor <span class="op">*</span> cpr <span class="op">*</span> sched_bal_end</span>
+<span id="cb32-12"><a aria-hidden="true" href="#cb32-12" tabindex="-1"></a>        factor <span class="op">*=</span> <span class="fu">one</span>(cpr) <span class="op">-</span> cpr</span>
+<span id="cb32-13"><a aria-hidden="true" href="#cb32-13" tabindex="-1"></a>        sched_bal <span class="op">=</span> sched_bal_end</span>
+<span id="cb32-14"><a aria-hidden="true" href="#cb32-14" tabindex="-1"></a>        <span class="fu">Cashflow</span>(cf, <span class="fu">Float64</span>(t))</span>
+<span id="cb32-15"><a aria-hidden="true" href="#cb32-15" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb32-16"><a aria-hidden="true" href="#cb32-16" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb32-17"><a aria-hidden="true" href="#cb32-17" tabindex="-1"></a></span>
+<span id="cb32-18"><a aria-hidden="true" href="#cb32-18" tabindex="-1"></a>wac_m, term_m, bal_m <span class="op">=</span> <span class="fl">0.05</span>, <span class="fl">10</span>, <span class="fl">100.0</span></span>
+<span id="cb32-19"><a aria-hidden="true" href="#cb32-19" tabindex="-1"></a>y_market <span class="op">=</span> <span class="fl">0.04</span></span>
+<span id="cb32-20"><a aria-hidden="true" href="#cb32-20" tabindex="-1"></a>yj_market <span class="op">=</span> FinanceModels.Yield.<span class="fu">Constant</span>(<span class="fu">Continuous</span>(y_market))</span>
+<span id="cb32-21"><a aria-hidden="true" href="#cb32-21" tabindex="-1"></a></span>
+<span id="cb32-22"><a aria-hidden="true" href="#cb32-22" tabindex="-1"></a>cfs_static <span class="op">=</span> <span class="fu">passthrough_cfs</span>(wac_m, bal_m, term_m, <span class="fl">0.06</span>)</span>
+<span id="cb32-23"><a aria-hidden="true" href="#cb32-23" tabindex="-1"></a>(price<span class="op">=</span>FinanceCore.<span class="fu">pv</span>(yj_market, cfs_static),</span>
+<span id="cb32-24"><a aria-hidden="true" href="#cb32-24" tabindex="-1"></a>    mod_dur<span class="op">=</span><span class="fu">duration</span>(<span class="fu">Modified</span>(), yj_market, cfs_static),</span>
+<span id="cb32-25"><a aria-hidden="true" href="#cb32-25" tabindex="-1"></a>    convexity<span class="op">=</span><span class="fu">convexity</span>(yj_market, cfs_static))</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>(price = 103.90084299095979, mod_dur = 4.385847270460362, convexity = 26.65435067552569)</code></pre>
 </div>
 </div>
 <p>Fifteen lines of ordinary code; the output is an ordinary <code>Vector{Cashflow}</code>. Every primitive from the previous sections — <code>pv</code>, <code>duration</code>, <code>convexity</code>, <code>sensitivities</code> — works on it without modification. The mortgage is at a premium (gross coupon 5%, market yield 4%), so as the prepayment assumption rises the price drops toward par — the textbook MBS sensitivity, and a useful sanity check:</p>
-<div id="38" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>[(cpr=c, price=FinanceCore.pv(yj_market, passthrough_cfs(wac_m, bal_m, term_m, c)))
- for c in (0.0, 0.06, 0.20, 0.99)]</code></pre>
+<div class="cell" data-execution_count="1" id="38">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb34-1"><a aria-hidden="true" href="#cb34-1" tabindex="-1"></a>[(cpr<span class="op">=</span>c, price<span class="op">=</span>FinanceCore.<span class="fu">pv</span>(yj_market, <span class="fu">passthrough_cfs</span>(wac_m, bal_m, term_m, c)))</span>
+<span id="cb34-2"><a aria-hidden="true" href="#cb34-2" tabindex="-1"></a> for c <span class="kw">in</span> (<span class="fl">0.0</span>, <span class="fl">0.06</span>, <span class="fl">0.20</span>, <span class="fl">0.99</span>)]</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>4-element Vector{@NamedTuple{cpr::Float64, price::Float64}}:
  (cpr = 0.0, price = 104.61713397426567)
@@ -732,29 +744,29 @@ cfs_static = passthrough_cfs(wac_m, bal_m, term_m, 0.06)
 </div>
 </div>
 <p>The <em>interesting</em> thing about a prepayment-sensitive asset is that CPR isn’t a constant. When rates fall, refinancing accelerates and CPR rises. Write a refi-incentive model as ordinary Julia, slot it into the price function, and <code>ForwardDiff</code> walks the analytic derivative through <em>both</em> the discounting <em>and</em> the prepayment response:</p>
-<div id="40" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>refi_cpr(y; base=0.06, sens=2.0, wac_ref=0.05) =
-    base + sens * max(zero(y), wac_ref - y)
-
-function price_with_refi(y)
-    cfs = passthrough_cfs(wac_m, bal_m, term_m, refi_cpr(y))
-    return FinanceCore.pv(FinanceModels.Yield.Constant(Continuous(y)), cfs)
-end
-
-P0_oa = price_with_refi(y_market)
-model_dur = -ForwardDiff.derivative(price_with_refi, y_market) / P0_oa
-model_conv = ForwardDiff.derivative(
-    z -&gt; ForwardDiff.derivative(price_with_refi, z), y_market) / P0_oa
-
-cpr_at_market = refi_cpr(y_market)       # 8%, including the refi incentive
-frozen_cfs = passthrough_cfs(wac_m, bal_m, term_m, cpr_at_market)
-@assert isapprox(P0_oa, FinanceCore.pv(yj_market, frozen_cfs))
-frozen_dur = duration(Modified(), yj_market, frozen_cfs)
-frozen_conv = convexity(yj_market, frozen_cfs)
-
-(price=P0_oa, cpr=cpr_at_market,
-    frozen_duration=frozen_dur, model_duration=model_dur,
-    frozen_convexity=frozen_conv, model_convexity=model_conv)</code></pre>
+<div class="cell" data-execution_count="1" id="40">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb36-1"><a aria-hidden="true" href="#cb36-1" tabindex="-1"></a><span class="fu">refi_cpr</span>(y; base<span class="op">=</span><span class="fl">0.06</span>, sens<span class="op">=</span><span class="fl">2.0</span>, wac_ref<span class="op">=</span><span class="fl">0.05</span>) <span class="op">=</span></span>
+<span id="cb36-2"><a aria-hidden="true" href="#cb36-2" tabindex="-1"></a>    base <span class="op">+</span> sens <span class="op">*</span> <span class="fu">max</span>(<span class="fu">zero</span>(y), wac_ref <span class="op">-</span> y)</span>
+<span id="cb36-3"><a aria-hidden="true" href="#cb36-3" tabindex="-1"></a></span>
+<span id="cb36-4"><a aria-hidden="true" href="#cb36-4" tabindex="-1"></a><span class="kw">function</span> <span class="fu">price_with_refi</span>(y)</span>
+<span id="cb36-5"><a aria-hidden="true" href="#cb36-5" tabindex="-1"></a>    cfs <span class="op">=</span> <span class="fu">passthrough_cfs</span>(wac_m, bal_m, term_m, <span class="fu">refi_cpr</span>(y))</span>
+<span id="cb36-6"><a aria-hidden="true" href="#cb36-6" tabindex="-1"></a>    <span class="cf">return</span> FinanceCore.<span class="fu">pv</span>(FinanceModels.Yield.<span class="fu">Constant</span>(<span class="fu">Continuous</span>(y)), cfs)</span>
+<span id="cb36-7"><a aria-hidden="true" href="#cb36-7" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb36-8"><a aria-hidden="true" href="#cb36-8" tabindex="-1"></a></span>
+<span id="cb36-9"><a aria-hidden="true" href="#cb36-9" tabindex="-1"></a>P0_oa <span class="op">=</span> <span class="fu">price_with_refi</span>(y_market)</span>
+<span id="cb36-10"><a aria-hidden="true" href="#cb36-10" tabindex="-1"></a>model_dur <span class="op">=</span> <span class="op">-</span>ForwardDiff.<span class="fu">derivative</span>(price_with_refi, y_market) <span class="op">/</span> P0_oa</span>
+<span id="cb36-11"><a aria-hidden="true" href="#cb36-11" tabindex="-1"></a>model_conv <span class="op">=</span> ForwardDiff.<span class="fu">derivative</span>(</span>
+<span id="cb36-12"><a aria-hidden="true" href="#cb36-12" tabindex="-1"></a>    z <span class="op">-&gt;</span> ForwardDiff.<span class="fu">derivative</span>(price_with_refi, z), y_market) <span class="op">/</span> P0_oa</span>
+<span id="cb36-13"><a aria-hidden="true" href="#cb36-13" tabindex="-1"></a></span>
+<span id="cb36-14"><a aria-hidden="true" href="#cb36-14" tabindex="-1"></a>cpr_at_market <span class="op">=</span> <span class="fu">refi_cpr</span>(y_market)       <span class="co"># 8%, including the refi incentive</span></span>
+<span id="cb36-15"><a aria-hidden="true" href="#cb36-15" tabindex="-1"></a>frozen_cfs <span class="op">=</span> <span class="fu">passthrough_cfs</span>(wac_m, bal_m, term_m, cpr_at_market)</span>
+<span id="cb36-16"><a aria-hidden="true" href="#cb36-16" tabindex="-1"></a><span class="pp">@assert</span> <span class="fu">isapprox</span>(P0_oa, FinanceCore.<span class="fu">pv</span>(yj_market, frozen_cfs))</span>
+<span id="cb36-17"><a aria-hidden="true" href="#cb36-17" tabindex="-1"></a>frozen_dur <span class="op">=</span> <span class="fu">duration</span>(<span class="fu">Modified</span>(), yj_market, frozen_cfs)</span>
+<span id="cb36-18"><a aria-hidden="true" href="#cb36-18" tabindex="-1"></a>frozen_conv <span class="op">=</span> <span class="fu">convexity</span>(yj_market, frozen_cfs)</span>
+<span id="cb36-19"><a aria-hidden="true" href="#cb36-19" tabindex="-1"></a></span>
+<span id="cb36-20"><a aria-hidden="true" href="#cb36-20" tabindex="-1"></a>(price<span class="op">=</span>P0_oa, cpr<span class="op">=</span>cpr_at_market,</span>
+<span id="cb36-21"><a aria-hidden="true" href="#cb36-21" tabindex="-1"></a>    frozen_duration<span class="op">=</span>frozen_dur, model_duration<span class="op">=</span>model_dur,</span>
+<span id="cb36-22"><a aria-hidden="true" href="#cb36-22" tabindex="-1"></a>    frozen_convexity<span class="op">=</span>frozen_conv, model_convexity<span class="op">=</span>model_conv)</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>(price = 103.69674707565362, cpr = 0.08, frozen_duration = 4.1605803927021245, model_duration = 3.9712193184555766, frozen_convexity = 24.373710636771513, model_convexity = -19.163381796077413)</code></pre>
 </div>
@@ -764,56 +776,56 @@ frozen_conv = convexity(yj_market, frozen_cfs)
 <p>The same pattern applies to a differentiable dynamic-lapse or default model. At a kink, an ordinary derivative may not exist: choose an appropriate directional or finite-change risk measure, or justify a smooth approximation. A smaller finite-difference step cannot create a derivative that the model does not have.</p>
 <p>The QL equivalent for the static case is <code>AmortizingFixedRateBond</code> with a custom cashflow <code>Leg</code>. The cashflow-generator logic looks similar; what differs is that sensitivities to the prepayment model require bump-and-recompute by hand, which AD does implicitly here.</p>
 </section>
-<section id="stochastic-short-rate-models" class="level2">
+<section class="level2" id="stochastic-short-rate-models">
 <h2 class="anchored" data-anchor-id="stochastic-short-rate-models">Stochastic short-rate models</h2>
 <p>FinanceModels implements <code>ShortRate.Vasicek</code>, <code>ShortRate.CoxIngersollRoss</code> and <code>ShortRate.HullWhite</code>, with closed-form zero-coupon prices. <code>simulate</code> uses exact Gaussian rate transitions for Vasicek and Hull–White and full truncation for CIR. Each scenario is a <code>RatePath &lt;: AbstractYieldModel</code>, so the existing valuation functions can price cashflows against it. Pathwise discount integrals use trapezoidal integration:</p>
-<div id="42" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>using FinanceModels: ShortRate, simulate
-using Random, Statistics
-
-hw = ShortRate.HullWhite(0.05, 0.01, yj_market)   # mean-rev a, vol σ, calibrating curve
-rng = Random.MersenneTwister(42)
-paths = simulate(hw; n_scenarios=10_000, timestep=1 / 12, horizon=10.0, rng)
-hw_pvs = [FinanceCore.present_value(p, cfs_static) for p in paths]
-
-(deterministic=FinanceCore.pv(yj_market, cfs_static),
-    hull_white_mc=mean(hw_pvs),
-    mc_standard_error=std(hw_pvs) / sqrt(length(hw_pvs)))</code></pre>
+<div class="cell" data-execution_count="1" id="42">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb38-1"><a aria-hidden="true" href="#cb38-1" tabindex="-1"></a><span class="im">using</span> <span class="bu">FinanceModels</span>: ShortRate, simulate</span>
+<span id="cb38-2"><a aria-hidden="true" href="#cb38-2" tabindex="-1"></a><span class="im">using</span> <span class="bu">Random</span>, <span class="bu">Statistics</span></span>
+<span id="cb38-3"><a aria-hidden="true" href="#cb38-3" tabindex="-1"></a></span>
+<span id="cb38-4"><a aria-hidden="true" href="#cb38-4" tabindex="-1"></a>hw <span class="op">=</span> ShortRate.<span class="fu">HullWhite</span>(<span class="fl">0.05</span>, <span class="fl">0.01</span>, yj_market)   <span class="co"># mean-rev a, vol σ, calibrating curve</span></span>
+<span id="cb38-5"><a aria-hidden="true" href="#cb38-5" tabindex="-1"></a>rng <span class="op">=</span> <span class="bu">Random</span>.<span class="fu">MersenneTwister</span>(<span class="fl">42</span>)</span>
+<span id="cb38-6"><a aria-hidden="true" href="#cb38-6" tabindex="-1"></a>paths <span class="op">=</span> <span class="fu">simulate</span>(hw; n_scenarios<span class="op">=</span><span class="fl">10_000</span>, timestep<span class="op">=</span><span class="fl">1</span> <span class="op">/</span> <span class="fl">12</span>, horizon<span class="op">=</span><span class="fl">10.0</span>, rng)</span>
+<span id="cb38-7"><a aria-hidden="true" href="#cb38-7" tabindex="-1"></a>hw_pvs <span class="op">=</span> [FinanceCore.<span class="fu">present_value</span>(p, cfs_static) for p <span class="kw">in</span> paths]</span>
+<span id="cb38-8"><a aria-hidden="true" href="#cb38-8" tabindex="-1"></a></span>
+<span id="cb38-9"><a aria-hidden="true" href="#cb38-9" tabindex="-1"></a>(deterministic<span class="op">=</span>FinanceCore.<span class="fu">pv</span>(yj_market, cfs_static),</span>
+<span id="cb38-10"><a aria-hidden="true" href="#cb38-10" tabindex="-1"></a>    hull_white_mc<span class="op">=</span><span class="fu">mean</span>(hw_pvs),</span>
+<span id="cb38-11"><a aria-hidden="true" href="#cb38-11" tabindex="-1"></a>    mc_standard_error<span class="op">=</span><span class="fu">std</span>(hw_pvs) <span class="op">/</span> <span class="fu">sqrt</span>(<span class="fu">length</span>(hw_pvs)))</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>(deterministic = 103.90084299095979, hull_white_mc = 103.90784526713374, mc_standard_error = 0.05323374243331889)</code></pre>
 </div>
 </div>
 <p>In the continuous Hull–White model calibrated to the curve, expected discount factors reproduce that curve, so the expected PV of fixed cashflows is the deterministic PV. The simulation approximates the discount integral: exact rate transitions do not make the discounted estimator unbiased. More paths reduce sampling error; finer timesteps address integration error. These examples keep the supplied payment amounts and times fixed across scenarios. They demonstrate stochastic discounting and its sensitivities; a stochastic prepayment or OAS model would also need payments that respond to each simulated path.</p>
 <p>AU6 makes the Monte Carlo choice explicit with <code>Scenarios</code>. Passing the bare short-rate model instead uses its deterministic discount function. Scenario sensitivities differentiate the sampled valuation with common random numbers. As elsewhere, add <code>SecondOrder()</code> only when a Hessian is needed:</p>
-<div id="44" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>mc_tenors = [1.0, 2.0, 3.0, 5.0, 7.0, 10.0]
-scenarios = Scenarios(hw;
-    n_scenarios=5_000, timestep=1 / 12, horizon=10.0, rng=Random.MersenneTwister(42))
-
-mc_sens = sensitivities(KeyRates(mc_tenors), scenarios, cfs_static)
-
-(value=mc_sens.value, total_duration=sum(mc_sens.duration))</code></pre>
+<div class="cell" data-execution_count="1" id="44">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb40-1"><a aria-hidden="true" href="#cb40-1" tabindex="-1"></a>mc_tenors <span class="op">=</span> [<span class="fl">1.0</span>, <span class="fl">2.0</span>, <span class="fl">3.0</span>, <span class="fl">5.0</span>, <span class="fl">7.0</span>, <span class="fl">10.0</span>]</span>
+<span id="cb40-2"><a aria-hidden="true" href="#cb40-2" tabindex="-1"></a>scenarios <span class="op">=</span> <span class="fu">Scenarios</span>(hw;</span>
+<span id="cb40-3"><a aria-hidden="true" href="#cb40-3" tabindex="-1"></a>    n_scenarios<span class="op">=</span><span class="fl">5_000</span>, timestep<span class="op">=</span><span class="fl">1</span> <span class="op">/</span> <span class="fl">12</span>, horizon<span class="op">=</span><span class="fl">10.0</span>, rng<span class="op">=</span><span class="bu">Random</span>.<span class="fu">MersenneTwister</span>(<span class="fl">42</span>))</span>
+<span id="cb40-4"><a aria-hidden="true" href="#cb40-4" tabindex="-1"></a></span>
+<span id="cb40-5"><a aria-hidden="true" href="#cb40-5" tabindex="-1"></a>mc_sens <span class="op">=</span> <span class="fu">sensitivities</span>(<span class="fu">KeyRates</span>(mc_tenors), scenarios, cfs_static)</span>
+<span id="cb40-6"><a aria-hidden="true" href="#cb40-6" tabindex="-1"></a></span>
+<span id="cb40-7"><a aria-hidden="true" href="#cb40-7" tabindex="-1"></a>(value<span class="op">=</span>mc_sens.value, total_duration<span class="op">=</span><span class="fu">sum</span>(mc_sens.duration))</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>(value = 103.84665430682855, total_duration = 4.384916146563002)</code></pre>
 </div>
 </div>
 <p>The key-rate contributions aggregate to the parallel sensitivity of the sampled valuation. Sampling uncertainty and discretization error still matter. The bundle does not itself report standard errors; estimate those with independent runs or retained per-path contributions when reporting stochastic sensitivities.</p>
 <p>Under the hood that’s an ordinary <code>ForwardDiff</code> pass, and you can write it by hand for any parameter the bundled call doesn’t cover. Differentiating the Monte-Carlo PV against Vasicek’s initial short rate, for instance, returns a stochastic-model duration:</p>
-<div id="46" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>function pv_mc_vasicek_r0(r0)
-    rng = Random.MersenneTwister(42)
-    v = ShortRate.Vasicek(0.10, 0.04, 0.01, Continuous(r0))
-    ps = simulate(v; n_scenarios=5_000, timestep=1 / 12, horizon=10.0, rng)
-    return sum(FinanceCore.present_value(p, cfs_static) for p in ps) / 5_000
-end
-
-r0_base = 0.04
-P_vas = pv_mc_vasicek_r0(r0_base)
-dPdr0_vas = ForwardDiff.derivative(pv_mc_vasicek_r0, r0_base)
-
-(pv=P_vas,
-    dpv_dr0=dPdr0_vas,
-    stochastic_model_duration=-dPdr0_vas / P_vas)</code></pre>
+<div class="cell" data-execution_count="1" id="46">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb42-1"><a aria-hidden="true" href="#cb42-1" tabindex="-1"></a><span class="kw">function</span> <span class="fu">pv_mc_vasicek_r0</span>(r0)</span>
+<span id="cb42-2"><a aria-hidden="true" href="#cb42-2" tabindex="-1"></a>    rng <span class="op">=</span> <span class="bu">Random</span>.<span class="fu">MersenneTwister</span>(<span class="fl">42</span>)</span>
+<span id="cb42-3"><a aria-hidden="true" href="#cb42-3" tabindex="-1"></a>    v <span class="op">=</span> ShortRate.<span class="fu">Vasicek</span>(<span class="fl">0.10</span>, <span class="fl">0.04</span>, <span class="fl">0.01</span>, <span class="fu">Continuous</span>(r0))</span>
+<span id="cb42-4"><a aria-hidden="true" href="#cb42-4" tabindex="-1"></a>    ps <span class="op">=</span> <span class="fu">simulate</span>(v; n_scenarios<span class="op">=</span><span class="fl">5_000</span>, timestep<span class="op">=</span><span class="fl">1</span> <span class="op">/</span> <span class="fl">12</span>, horizon<span class="op">=</span><span class="fl">10.0</span>, rng)</span>
+<span id="cb42-5"><a aria-hidden="true" href="#cb42-5" tabindex="-1"></a>    <span class="cf">return</span> <span class="fu">sum</span>(FinanceCore.<span class="fu">present_value</span>(p, cfs_static) <span class="cf">for</span> p <span class="kw">in</span> ps) <span class="op">/</span> <span class="fl">5_000</span></span>
+<span id="cb42-6"><a aria-hidden="true" href="#cb42-6" tabindex="-1"></a><span class="cf">end</span></span>
+<span id="cb42-7"><a aria-hidden="true" href="#cb42-7" tabindex="-1"></a></span>
+<span id="cb42-8"><a aria-hidden="true" href="#cb42-8" tabindex="-1"></a>r0_base <span class="op">=</span> <span class="fl">0.04</span></span>
+<span id="cb42-9"><a aria-hidden="true" href="#cb42-9" tabindex="-1"></a>P_vas <span class="op">=</span> <span class="fu">pv_mc_vasicek_r0</span>(r0_base)</span>
+<span id="cb42-10"><a aria-hidden="true" href="#cb42-10" tabindex="-1"></a>dPdr0_vas <span class="op">=</span> ForwardDiff.<span class="fu">derivative</span>(pv_mc_vasicek_r0, r0_base)</span>
+<span id="cb42-11"><a aria-hidden="true" href="#cb42-11" tabindex="-1"></a></span>
+<span id="cb42-12"><a aria-hidden="true" href="#cb42-12" tabindex="-1"></a>(pv<span class="op">=</span>P_vas,</span>
+<span id="cb42-13"><a aria-hidden="true" href="#cb42-13" tabindex="-1"></a>    dpv_dr0<span class="op">=</span>dPdr0_vas,</span>
+<span id="cb42-14"><a aria-hidden="true" href="#cb42-14" tabindex="-1"></a>    stochastic_model_duration<span class="op">=-</span>dPdr0_vas <span class="op">/</span> P_vas)</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>(pv = 104.07520841214513, dpv_dr0 = -345.75904412134315, stochastic_model_duration = 3.32220371591391)</code></pre>
 </div>
@@ -822,31 +834,31 @@ dPdr0_vas = ForwardDiff.derivative(pv_mc_vasicek_r0, r0_base)
 <p>Stock QuantLib-Python uses ordinary floating-point numbers in its C++ engines rather than carrying an AD type through the valuation. Differentiation inside the engine is another approach: <a href="https://github.com/auto-differentiation/QuantLib-Risks-Py">QuantLib-Risks</a> provides an XAD-based distribution. Here the Julia advantage is the ability to differentiate the same simulation and valuation code used for the ordinary calculation, within its supported numerical domain.</p>
 <p>What FM lacks is the <em>lattice</em> layer: there’s no trinomial-tree engine for early-exercise payoffs, no built-in Longstaff-Schwartz for American Monte Carlo, no multi-factor models like G2++ or LMM, and no calibrator against a swaption-cube vol surface. For a Bermudan callable bond valued under a calibrated short-rate model with market vols, QL’s tree engine is still the right tool. The QL-only territory is more precisely <em>lattice-based early-exercise valuation under stochastic rates</em>, rather than stochastic rates in general, which JA handles directly.</p>
 </section>
-<section id="performance" class="level2">
+<section class="level2" id="performance">
 <h2 class="anchored" data-anchor-id="performance">Performance</h2>
 <p>These benchmarks compare Julia calls with QuantLib’s Python interface. Price, duration and convexity use the same 5-year semiannual bond and a flat 3% continuously compounded yield. The key-rate comparison uses 30 annual continuous-zero shock pillars for two bonds: the original 5-year bond and a 30-year bond with payments across the whole reporting grid.</p>
 <p>For each key-rate case, we measure two QuantLib implementations: rebuilding curves and engines for each bump, and reusing a native <code>PiecewiseZeroSpreadedTermStructure</code> and its engine while changing <code>SimpleQuote</code> spreads. The reused-curve implementation is the primary comparison. Both use the same central-difference step and flat endpoint hats as the earlier correctness check.</p>
-<div id="48" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>using BenchmarkTools
-
-b_price = @benchmark FinanceCore.pv($yield_flat, $cfs) seconds=2
-b_mod = @benchmark duration(Modified(), $yield_flat, $cfs) seconds=2
-b_conv = @benchmark convexity($yield_flat, $cfs) seconds=2
-
-krd_pillars_30 = collect(1.0:1.0:30.0)
-zrc_30 = FinanceModels.ZeroRateCurve(fill(0.03, 30), krd_pillars_30)
-key_rates_30 = KeyRates(krd_pillars_30)
-cfs_30y = collect(FinanceModels.Bond.Fixed(coupon_rate, Periodic(freq_per_year), 30))
-b_krd_5y = @benchmark duration($key_rates_30, $zrc_30, $cfs) seconds=2
-b_krd_30y = @benchmark duration($key_rates_30, $zrc_30, $cfs_30y) seconds=2
-
-julia_ns = Dict(
-    "price" =&gt; minimum(b_price).time,
-    "duration" =&gt; minimum(b_mod).time,
-    "convexity" =&gt; minimum(b_conv).time,
-    "krd_5y" =&gt; minimum(b_krd_5y).time,
-    "krd_30y" =&gt; minimum(b_krd_30y).time,
-)</code></pre>
+<div class="cell" data-execution_count="1" id="48">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb44-1"><a aria-hidden="true" href="#cb44-1" tabindex="-1"></a><span class="im">using</span> <span class="bu">BenchmarkTools</span></span>
+<span id="cb44-2"><a aria-hidden="true" href="#cb44-2" tabindex="-1"></a></span>
+<span id="cb44-3"><a aria-hidden="true" href="#cb44-3" tabindex="-1"></a>b_price <span class="op">=</span> <span class="pp">@benchmark</span> FinanceCore.<span class="fu">pv</span>(<span class="op">$</span>yield_flat, <span class="op">$</span>cfs) seconds<span class="op">=</span><span class="fl">2</span></span>
+<span id="cb44-4"><a aria-hidden="true" href="#cb44-4" tabindex="-1"></a>b_mod <span class="op">=</span> <span class="pp">@benchmark</span> <span class="fu">duration</span>(<span class="fu">Modified</span>(), <span class="op">$</span>yield_flat, <span class="op">$</span>cfs) seconds<span class="op">=</span><span class="fl">2</span></span>
+<span id="cb44-5"><a aria-hidden="true" href="#cb44-5" tabindex="-1"></a>b_conv <span class="op">=</span> <span class="pp">@benchmark</span> <span class="fu">convexity</span>(<span class="op">$</span>yield_flat, <span class="op">$</span>cfs) seconds<span class="op">=</span><span class="fl">2</span></span>
+<span id="cb44-6"><a aria-hidden="true" href="#cb44-6" tabindex="-1"></a></span>
+<span id="cb44-7"><a aria-hidden="true" href="#cb44-7" tabindex="-1"></a>krd_pillars_30 <span class="op">=</span> <span class="fu">collect</span>(<span class="fl">1.0</span><span class="op">:</span><span class="fl">1.0</span><span class="op">:</span><span class="fl">30.0</span>)</span>
+<span id="cb44-8"><a aria-hidden="true" href="#cb44-8" tabindex="-1"></a>zrc_30 <span class="op">=</span> FinanceModels.<span class="fu">ZeroRateCurve</span>(<span class="fu">fill</span>(<span class="fl">0.03</span>, <span class="fl">30</span>), krd_pillars_30)</span>
+<span id="cb44-9"><a aria-hidden="true" href="#cb44-9" tabindex="-1"></a>key_rates_30 <span class="op">=</span> <span class="fu">KeyRates</span>(krd_pillars_30)</span>
+<span id="cb44-10"><a aria-hidden="true" href="#cb44-10" tabindex="-1"></a>cfs_30y <span class="op">=</span> <span class="fu">collect</span>(FinanceModels.Bond.<span class="fu">Fixed</span>(coupon_rate, <span class="fu">Periodic</span>(freq_per_year), <span class="fl">30</span>))</span>
+<span id="cb44-11"><a aria-hidden="true" href="#cb44-11" tabindex="-1"></a>b_krd_5y <span class="op">=</span> <span class="pp">@benchmark</span> <span class="fu">duration</span>(<span class="op">$</span>key_rates_30, <span class="op">$</span>zrc_30, <span class="op">$</span>cfs) seconds<span class="op">=</span><span class="fl">2</span></span>
+<span id="cb44-12"><a aria-hidden="true" href="#cb44-12" tabindex="-1"></a>b_krd_30y <span class="op">=</span> <span class="pp">@benchmark</span> <span class="fu">duration</span>(<span class="op">$</span>key_rates_30, <span class="op">$</span>zrc_30, <span class="op">$</span>cfs_30y) seconds<span class="op">=</span><span class="fl">2</span></span>
+<span id="cb44-13"><a aria-hidden="true" href="#cb44-13" tabindex="-1"></a></span>
+<span id="cb44-14"><a aria-hidden="true" href="#cb44-14" tabindex="-1"></a>julia_ns <span class="op">=</span> <span class="fu">Dict</span>(</span>
+<span id="cb44-15"><a aria-hidden="true" href="#cb44-15" tabindex="-1"></a>    <span class="st">"price"</span> <span class="op">=&gt;</span> <span class="fu">minimum</span>(b_price).time,</span>
+<span id="cb44-16"><a aria-hidden="true" href="#cb44-16" tabindex="-1"></a>    <span class="st">"duration"</span> <span class="op">=&gt;</span> <span class="fu">minimum</span>(b_mod).time,</span>
+<span id="cb44-17"><a aria-hidden="true" href="#cb44-17" tabindex="-1"></a>    <span class="st">"convexity"</span> <span class="op">=&gt;</span> <span class="fu">minimum</span>(b_conv).time,</span>
+<span id="cb44-18"><a aria-hidden="true" href="#cb44-18" tabindex="-1"></a>    <span class="st">"krd_5y"</span> <span class="op">=&gt;</span> <span class="fu">minimum</span>(b_krd_5y).time,</span>
+<span id="cb44-19"><a aria-hidden="true" href="#cb44-19" tabindex="-1"></a>    <span class="st">"krd_30y"</span> <span class="op">=&gt;</span> <span class="fu">minimum</span>(b_krd_30y).time,</span>
+<span id="cb44-20"><a aria-hidden="true" href="#cb44-20" tabindex="-1"></a>)</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>Dict{String, Float64} with 5 entries:
   "krd_5y"    =&gt; 230.394
@@ -856,12 +868,12 @@ julia_ns = Dict(
   "convexity" =&gt; 24.5562</code></pre>
 </div>
 </div>
-<table class="caption-top table">
+<div aria-label="Scrollable data table" class="table-scroll" role="region" tabindex="0"><table class="caption-top table">
 <colgroup>
-<col style="width: 20%">
-<col style="width: 26%">
-<col style="width: 26%">
-<col style="width: 26%">
+<col style="width: 20%"/>
+<col style="width: 26%"/>
+<col style="width: 26%"/>
+<col style="width: 26%"/>
 </colgroup>
 <thead>
 <tr class="header">
@@ -897,15 +909,15 @@ julia_ns = Dict(
 <td style="text-align: right;">40.7×</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p>All 30 key-rate buckets, in <strong>microseconds per vector</strong>:</p>
-<table class="caption-top table">
+<div aria-label="Scrollable data table" class="table-scroll" role="region" tabindex="0"><table class="caption-top table">
 <colgroup>
-<col style="width: 15%">
-<col style="width: 21%">
-<col style="width: 21%">
-<col style="width: 21%">
-<col style="width: 21%">
+<col style="width: 15%"/>
+<col style="width: 21%"/>
+<col style="width: 21%"/>
+<col style="width: 21%"/>
+<col style="width: 21%"/>
 </colgroup>
 <thead>
 <tr class="header">
@@ -932,13 +944,13 @@ julia_ns = Dict(
 <td style="text-align: right;">512.8×</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p>Maximum absolute differences between analytic and reused-curve KRDs: 1.76e-09 (5y) and 1.57e-07 (30y).</p>
 <p>Julia timings are minima from warmed BenchmarkTools trials with interpolated inputs. Python timings are minima of seven <code>timeit</code> repeats, with an automatically selected loop count taking at least 0.2 seconds per repeat. Both include allocation of the returned key-rate vector. Reusable schedules, dates, quote handles, base prices and initial pricing engines are prepared before timing. The versions, hardware and raw results are recorded below.</p>
 <p>The cached QuantLib row returns an already calculated price. The forced-reprice row calls <code>bond.recalculate()</code> before <code>bond.NPV()</code>. Duration and convexity are computed on each call. Julia’s fixed-cashflow sensitivities use analytic cashflow moments, with each key-rate contribution touching only the neighboring hats. The 30-year case exercises all 30 buckets; the 5-year case has zero exposure beyond maturity.</p>
 <p>The reused QuantLib curve avoids repeated engine and curve construction, but it still reprices for each side of each pillar bump. The remaining key-rate gap includes an algorithmic difference between analytic accumulation and bump-and-reprice. These are measurements of these implementations; an analytic calculation over QuantLib cashflows would be another comparison. They do not isolate language or binding overhead or establish portfolio throughput.</p>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout" class="callout-header d-flex align-content-center collapsed" data-bs-target=".callout-4-contents" data-bs-toggle="collapse">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -947,14 +959,14 @@ julia_ns = Dict(
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-4-contents callout-collapse collapse" id="callout-4">
 <div class="callout-body-container callout-body">
 <p>The fixed-cashflow route and the callback route use the same hats. This checks that their definitions agree, independently of their calculation methods:</p>
-<div id="54" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>krds_analytic = duration(key_rates_30, zrc_30, cfs)
-krds_ad = duration(c -&gt; FinanceCore.pv(c, cfs), key_rates_30, zrc_30)
-@assert isapprox(krds_analytic, krds_ad; atol=1e-12)
-maximum(abs.(krds_analytic .- krds_ad))</code></pre>
+<div class="cell" data-execution_count="1" id="54">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb46"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb46-1"><a aria-hidden="true" href="#cb46-1" tabindex="-1"></a>krds_analytic <span class="op">=</span> <span class="fu">duration</span>(key_rates_30, zrc_30, cfs)</span>
+<span id="cb46-2"><a aria-hidden="true" href="#cb46-2" tabindex="-1"></a>krds_ad <span class="op">=</span> <span class="fu">duration</span>(c <span class="op">-&gt;</span> FinanceCore.<span class="fu">pv</span>(c, cfs), key_rates_30, zrc_30)</span>
+<span id="cb46-3"><a aria-hidden="true" href="#cb46-3" tabindex="-1"></a><span class="pp">@assert</span> <span class="fu">isapprox</span>(krds_analytic, krds_ad; atol<span class="op">=</span><span class="fl">1e-12</span>)</span>
+<span id="cb46-4"><a aria-hidden="true" href="#cb46-4" tabindex="-1"></a><span class="fu">maximum</span>(<span class="fu">abs</span>.(krds_analytic <span class="op">.-</span> krds_ad))</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>0.0</code></pre>
 </div>
@@ -964,32 +976,29 @@ maximum(abs.(krds_analytic .- krds_ad))</code></pre>
 </div>
 </div>
 </section>
-<section id="reproducing-the-comparison" class="level2">
+<section class="level2" id="reproducing-the-comparison">
 <h2 class="anchored" data-anchor-id="reproducing-the-comparison">Reproducing the comparison</h2>
 <p>The <a href="Project.toml">Julia environment</a> pins FinanceCore 3.0.0, FinanceModels 7.0.1 and ActuaryUtilities 6.0.0 from the Julia registry. It requires Julia 1.13 or later within the 1.x series. The <a href="quantlib_reference.py">QuantLib reference script</a> is runnable independently with the <a href="requirements.txt">pinned Python dependency</a>. It regenerates the <a href="quantlib-results.toml">reference values and timings</a>, including the date, Python version, QuantLib version and machine model.</p>
 <p>From this post’s directory:</p>
-<pre class="sh"><code>python3 -m venv .venv
-.venv/bin/python -m pip install -r requirements.txt
-.venv/bin/python quantlib_reference.py
-julia --project=. reproduce.jl</code></pre>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb48"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb48-1"><a aria-hidden="true" href="#cb48-1" tabindex="-1"></a><span class="ex">python3</span> <span class="at">-m</span> venv .venv</span>
+<span id="cb48-2"><a aria-hidden="true" href="#cb48-2" tabindex="-1"></a><span class="ex">.venv/bin/python</span> <span class="at">-m</span> pip install <span class="at">-r</span> requirements.txt</span>
+<span id="cb48-3"><a aria-hidden="true" href="#cb48-3" tabindex="-1"></a><span class="ex">.venv/bin/python</span> quantlib_reference.py</span>
+<span id="cb48-4"><a aria-hidden="true" href="#cb48-4" tabindex="-1"></a><span class="ex">julia</span> <span class="at">--project</span><span class="op">=</span>. reproduce.jl</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <p><a href="reproduce.jl">reproduce.jl</a> executes the Julia chunks, including the comparisons with the saved Python results, and writes <a href="julia-results.toml">julia-results.toml</a>, which records all resolved Julia package versions. Use <code>quarto render posts/quantlib-comparison/index.qmd</code> from the website root to rebuild the page. Python snippets in this post are explanatory; Quarto executes the Julia chunks and reads the separately generated Python reference file. Rerun both sides on the same machine before comparing timings; a Julia-only render still reads the saved Python measurements.</p>
 <p>Reference machine: <strong>Apple M4 Max</strong>, macOS-27.0.1-arm64-arm-64bit. Python <strong>3.12.12</strong>, QuantLib <strong>1.43</strong>; Python measurements dated 2026-10-12.</p>
 <p>This render: Julia <strong>1.13.1</strong>, FinanceCore <strong>3.0.0</strong>, FinanceModels <strong>7.0.1</strong>, ActuaryUtilities <strong>6.0.0</strong>, BenchmarkTools <strong>1.8.0</strong>, ForwardDiff <strong>1.4.6</strong>. Julia CPU: Apple M4 Max; 14 Julia threads. The benchmarked analytics are serial.</p>
 </section>
-<section id="when-youd-reach-for-quantlib-instead" class="level2">
+<section class="level2" id="when-youd-reach-for-quantlib-instead">
 <h2 class="anchored" data-anchor-id="when-youd-reach-for-quantlib-instead">When you’d reach for QuantLib instead</h2>
 <p>FinanceModels now covers Gaussian short-rate models, differentiable simulation, FX forwards, deterministic constant-notional basis-swap calibration, and par/OIS curve bootstrapping with explicit year fractions. QuantLib remains broader in market-specific schedules, holiday calendars, day counts, settlement and fixing conventions, and instrument-specific engines. Its trading-model coverage also includes early-exercise lattices, multi-factor models, volatility models and surface calibration, and credit, inflation and commodity term structures. Support for an FX forward or a par-swap quote does not imply full coverage of every market convention or stochastic cross-currency adjustment.</p>
 <p>JuliaActuary emphasizes projecting cashflows, fitting curves, calculating sensitivities and running scenarios with reusable numerical code. For the examples here, analytic formulas handle fixed-payment risk efficiently, while AD extends the same valuation functions to custom projections. QuantLib’s larger instrument and convention library can save substantial implementation work when those details are central to the valuation.</p>
 <p>The choice depends on the calculation: the supplied instrument conventions, the projection logic, the risk definition and the workload all matter.</p>
-<hr>
+<hr/>
 <p>The bond’s <code>cfs</code> vector supported price, duration, convexity, key-rate risk and sensitivities to bootstrapped par quotes. Its mortgage-pool counterpart supported a deterministic prepayment response and fixed-payment valuation under Hull–White discounting scenarios. These examples share cashflow and curve interfaces while using different numerical methods where appropriate: analytic moments for fixed payments, AD for differentiable valuation functions, and simulation for stochastic discounting.</p>
 <p><strong>One vector of cashflows. One curve. The rest is just ordinary Julia.</strong></p>
-<hr>
+<hr/>
 <p><em>Drafted with AI assistance under my direction. Julia chunks execute at render time; QuantLib reference values and timings are generated separately by the linked Python script. The comparison assertions are rerun when the page is rendered.</em></p>
-
-
 </section>
-
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
@@ -1392,8 +1401,4 @@ julia --project=. reproduce.jl</code></pre>
   });
   </script>
 </div> <!-- /content -->
-
-
-
-
 </body></html>

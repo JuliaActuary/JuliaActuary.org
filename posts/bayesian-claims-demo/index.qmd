@@ -136,6 +136,7 @@ num_chains = 4
 We use a No-U-Turn-Sampler (NUTS) technique to sample multiple chains at once:
 
 ```{julia}
+#| fig-alt: "Trace and density diagnostics for posterior samples from the constant mortality-rate model."
 #| column: page-inset
 chain = MCMCChains.Chains(sample(m1, NUTS(), MCMCThreads(), 1000, num_chains))
 
@@ -149,6 +150,7 @@ We can see that the sampling of possible posterior parameters doesn't really fit
 This is saying that for the observed data, if there really is just a single probability `p` that governs the true process that came up with the data, there's a pretty narrow range of values it could possibly be:
 
 ```{julia}
+#| fig-alt: "Posterior samples of a constant mortality rate compared with observed rates by attained age; marker size represents exposure."
 let
     data_weight = data.exposures ./ sum(data.exposures)
     data_weight = .√(data_weight ./ maximum(data_weight) .* 20) .* 4  # Makie markersize ≈ 4× Plots
@@ -225,6 +227,7 @@ summarize(chain2)
 ```
 
 ```{julia}
+#| fig-alt: "Trace and density diagnostics for the fitted parametric mortality model."
 #| column: page-inset
 chainplot(chain2)
 ```
@@ -234,6 +237,7 @@ chainplot(chain2)
 We can see that the sampling of possible posterior parameters fits the data well:
 
 ```{julia}
+#| fig-alt: "Posterior mortality curves compared with observed mortality rates by attained age."
 let
     data_weight = data.exposures ./ sum(data.exposures)
     data_weight = .√(data_weight ./ maximum(data_weight) .* 20) .* 4
@@ -300,6 +304,7 @@ summarize(chain3)
 ```
 
 ```{julia}
+#| fig-alt: "Posterior mortality curves for different risk levels, compared with experience data by attained age."
 let data = data2
     data_weight = data.exposures ./ sum(data.exposures)
     data_weight = .√(data_weight ./ maximum(data_weight) .* 20) .* 4
@@ -373,6 +378,7 @@ risk_factors4 = [mean(chain4[Symbol("a[$f]")]) for f in 1:3]
 ```
 
 ```{julia}
+#| fig-alt: "Mortality curves by risk level fitted with non-unit exposures, compared with observed experience."
 let data = data2
     data_weight = data.exposures ./ sum(data.exposures)
     data_weight = .√(data_weight ./ maximum(data_weight) .* 20) .* 4

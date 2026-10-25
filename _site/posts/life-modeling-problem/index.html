@@ -1,15 +1,12 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
-<meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.16">
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-
-<meta name="author" content="Alec Loudenback">
-<meta name="dcterms.date" content="2021-05-16">
-<meta name="description" content="JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.">
-
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml"><head>
+<meta charset="utf-8"/>
+<meta content="quarto-1.9.16" name="generator"/>
+<meta content="width=device-width, initial-scale=1.0, user-scalable=yes" name="viewport"/>
+<meta content="Alec Loudenback" name="author"/>
+<meta content="2021-05-16" name="dcterms.date"/>
+<meta content="JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows." name="description"/>
 <title>The Life Modeling Problem: A Comparison of Julia, Rust, Python, and R – JuliaActuary</title>
 <style>
 code{white-space: pre-wrap;}
@@ -23,28 +20,61 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
-
-
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script crossorigin="anonymous" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script><script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="../../site_libs/quarto-nav/headroom.min.js"></script>
 <script src="../../site_libs/clipboard/clipboard.min.js"></script>
 <script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="../../">
-<link href="../..//assets/logos/favicon.ico" rel="icon">
+<meta content="../../" name="quarto:offset"/>
+<link href="../..//assets/logos/favicon.ico" rel="icon"/>
 <script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
-<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-a0731b9a3a5d496010872d775e5d9bc3.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet"/>
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-be14ce6d32a635bebd8f9e4e558f9eeb.css" id="quarto-text-highlighting-styles" rel="stylesheet"/>
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-98ac2d5361ef6f18cc0525d38bedc462.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet"/>
+<link append-hash="true" data-mode="light" href="../../site_libs/bootstrap/bootstrap-4a135b976b00f53a3a768ff94eb1df18.min.css" id="quarto-bootstrap" rel="stylesheet"/>
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -72,144 +102,125 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
-
+<script crossorigin="anonymous" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js"></script>
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&amp;family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&amp;display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../../assets/highlight/styles/github.min.css">
-<script src="../../assets/highlight/highlight.min.js"></script>
-<script src="../../assets/highlight/languages/julia.min.js"></script>
-<script src="../../assets/highlight/languages/julia-repl.min.js"></script>
-<script src="../../assets/highlight/languages/python.min.js"></script>
-<script src="../../assets/highlight/languages/r.min.js"></script>
-<script>hljs.highlightAll();</script>
-<script data-goatcounter="https://juliaactuary.goatcounter.com/count" async="" src="//gc.zgo.at/count.js"></script>
-
-
-<link rel="stylesheet" href="../../styles.css">
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" rel="stylesheet"/>
+<script async="" data-goatcounter="https://juliaactuary.goatcounter.com/count" src="//gc.zgo.at/count.js"></script>
+<link href="../../styles-c416c153cdf24884.css" rel="stylesheet"/>
 </head>
-
 <body class="nav-fixed fullcontent quarto-light">
-
 <div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top quarto-banner">
-    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
-      <div class="navbar-container container-fluid">
-      <div class="navbar-brand-container mx-auto">
-    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
-    <img src="../../assets/logos/android-chrome-512x512.png" alt="JuliaActuary Logo" class="navbar-logo light-content">
-    <img src="../../assets/logos/android-chrome-512x512.png" alt="JuliaActuary Logo" class="navbar-logo dark-content">
-    </a>
-    <a class="navbar-brand" href="../../index.html">
-    <span class="navbar-title">JuliaActuary</span>
-    </a>
-  </div>
-            <div id="quarto-search" class="" title="Search"></div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-  <span class="navbar-toggler-icon"></span>
-</button>
-          <div class="collapse navbar-collapse" id="navbarCollapse">
-            <ul class="navbar-nav navbar-nav-scroll ms-auto">
-  <li class="nav-item">
-    <a class="nav-link" href="../../packages.html"> 
-<span class="menu-text">Packages</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="https://docs.juliaactuary.org"> 
-<span class="menu-text">Docs</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="https://modernfinancialmodeling.com"> 
-<span class="menu-text">Book</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../learn.html"> 
-<span class="menu-text">Learn</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../examples.html"> 
-<span class="menu-text">Examples</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../benchmarks.html"> 
-<span class="menu-text">Benchmarks</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../community.html"> 
-<span class="menu-text">Community</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../blog.html"> 
-<span class="menu-text">Blog</span></a>
-  </li>  
-  <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/JuliaActuary"> <i class="bi bi-github" role="img">
-</i> 
-<span class="menu-text"></span></a>
-  </li>  
-  <li class="nav-item compact">
-    <a class="nav-link" href="../../all-posts.xml"> <i class="bi bi-rss" role="img">
-</i> 
-<span class="menu-text"></span></a>
-  </li>  
-</ul>
-          </div> <!-- /navcollapse -->
-            <div class="quarto-navbar-tools">
+<header class="headroom fixed-top quarto-banner" id="quarto-header">
+<nav class="navbar navbar-expand-lg" data-bs-theme="dark">
+<div class="navbar-container container-fluid">
+<div class="navbar-brand-container mx-auto">
+<a class="navbar-brand navbar-brand-logo" href="../../index.html">
+<img alt="JuliaActuary Logo" class="navbar-logo light-content" src="../../assets/logos/android-chrome-512x512.png"/>
+<img alt="JuliaActuary Logo" class="navbar-logo dark-content" src="../../assets/logos/android-chrome-512x512.png"/>
+</a>
+<a class="navbar-brand" href="../../index.html">
+<span class="navbar-title">JuliaActuary</span>
+</a>
 </div>
-      </div> <!-- /container-fluid -->
-    </nav>
+<div class="" id="quarto-search" title="Search"></div>
+<button aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-bs-target="#navbarCollapse" data-bs-toggle="collapse" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }" role="menu" type="button">
+<span class="navbar-toggler-icon"></span>
+</button>
+<div class="collapse navbar-collapse" id="navbarCollapse">
+<ul class="navbar-nav navbar-nav-scroll ms-auto">
+<li class="nav-item">
+<a class="nav-link" href="../../packages.html">
+<span class="menu-text">Packages</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="https://docs.juliaactuary.org">
+<span class="menu-text">Docs</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="../../learn.html">
+<span class="menu-text">Learn</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="../../examples.html">
+<span class="menu-text">Examples</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="../../community.html">
+<span class="menu-text">Community</span></a>
+</li>
+<li class="nav-item dropdown">
+<a aria-expanded="false" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" id="nav-menu-more" role="link">
+<span class="menu-text">More</span>
+</a>
+<ul aria-labelledby="nav-menu-more" class="dropdown-menu dropdown-menu-end">
+<li>
+<a class="dropdown-item" href="../../benchmarks.html">
+<span class="dropdown-text">Benchmarks</span></a>
+</li>
+<li>
+<a class="dropdown-item" href="../../blog.html">
+<span class="dropdown-text">Blog</span></a>
+</li>
+<li>
+<a class="dropdown-item" href="https://modernfinancialmodeling.com">
+<span class="dropdown-text">Book</span></a>
+</li>
+</ul>
+</li>
+<li class="nav-item compact">
+<a class="nav-link" href="https://github.com/JuliaActuary"> <i aria-label="JuliaActuary on GitHub" class="bi bi-github" role="img">
+</i>
+<span class="menu-text"></span></a>
+</li>
+<li class="nav-item compact">
+<a class="nav-link" href="../../all-posts.xml"> <i aria-label="RSS feed" class="bi bi-rss" role="img">
+</i>
+<span class="menu-text"></span></a>
+</li>
+</ul>
+</div> <!-- /navcollapse -->
+<div class="quarto-navbar-tools">
+</div>
+</div> <!-- /container-fluid -->
+</nav>
 </header>
 <!-- content -->
-<header id="title-block-header" class="quarto-title-block default page-columns page-full">
-  <div class="quarto-title-banner page-columns page-full">
-    <div class="quarto-title column-body">
-      <h1 class="title">The Life Modeling Problem: A Comparison of Julia, Rust, Python, and R</h1>
-                  <div>
-        <div class="description">
+<header class="quarto-title-block default page-columns page-full" id="title-block-header">
+<div class="quarto-title-banner page-columns page-full">
+<div class="quarto-title column-body">
+<h1 class="title">The Life Modeling Problem: A Comparison of Julia, Rust, Python, and R</h1>
+<div>
+<div class="description">
           JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.
         </div>
-      </div>
-                          <div class="quarto-categories">
-                <div class="quarto-category">code</div>
-                <div class="quarto-category">blog</div>
-              </div>
-                  </div>
-  </div>
-    
-  
-  <div class="quarto-title-meta">
-
-      <div>
-      <div class="quarto-title-meta-heading">Author</div>
-      <div class="quarto-title-meta-contents">
-               <p>Alec Loudenback </p>
-            </div>
-    </div>
-      
-      <div>
-      <div class="quarto-title-meta-heading">Published</div>
-      <div class="quarto-title-meta-contents">
-        <p class="date">May 16, 2021</p>
-      </div>
-    </div>
-    
-      
-    </div>
-    
-  
-  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+</div>
+<div class="quarto-categories">
+<div class="quarto-category">code</div>
+<div class="quarto-category">blog</div>
+</div>
+</div>
+</div>
+<div class="quarto-title-meta">
+<div>
+<div class="quarto-title-meta-heading">Author</div>
+<div class="quarto-title-meta-contents">
+<p>Alec Loudenback </p>
+</div>
+</div>
+<div>
+<div class="quarto-title-meta-heading">Published</div>
+<div class="quarto-title-meta-contents">
+<p class="date">May 16, 2021</p>
+</div>
+</div>
+</div>
+</header><div class="quarto-container page-columns page-rows-contents page-layout-article page-navbar" id="quarto-content">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    
 <!-- main -->
 <main class="content quarto-banner-title-block page-columns page-full" id="quarto-document-content">
-
-
-
-
-
 <blockquote class="blockquote">
 <p><strong>!! Note that this article is a draft</strong></p>
 </blockquote>
@@ -228,7 +239,7 @@ ul.task-list li input[type="checkbox"] {
 <li>Performance, flexibility, readability: pick one, two, or three depending on the language</li>
 </ol>
 <p>To skip the background and the discussion, <a href="#benchmarks">click here to jump to the benchmarks</a>.</p>
-<section id="the-life-modeling-problem" class="level2">
+<section class="level2" id="the-life-modeling-problem">
 <h2 class="anchored" data-anchor-id="the-life-modeling-problem">The Life Modeling Problem</h2>
 <p>Inspired by the discussion in the <a href="https://github.com/actuarialopensource">ActuarialOpenSource</a> GitHub community discussion, folks started submitted solutions to what someone referred to as the “Life Modeling Problem”. This user <a href="https://github.com/orgs/actuarialopensource/teams/common-room/discussions/5">submitted a short snippet</a> for consideration of a representative problem.</p>
 <p>My take on the characteristics are that modeling life actuarial science problems breaks down to the following items:</p>
@@ -238,104 +249,104 @@ ul.task-list li input[type="checkbox"] {
 <li>Performance matters given large volumes of data to process</li>
 <li>Readability and usability aids in controls and risk</li>
 </ul>
-<section id="recursive-calculations" class="level3">
+<section class="level3" id="recursive-calculations">
 <h3 class="anchored" data-anchor-id="recursive-calculations">Recursive calculations</h3>
 <p>Many actuarial formulas are recursive in nature. Reserves are defined “prospectively” or “retrospectively”. Algorithmically, this means that intra-seriatim calculations (ie account value growth, survivorship) are not amenable to parallelism but iter-seriatim calculations would be (ie calculating multiple policy trajectories simultaneously).</p>
 </section>
-<section id="computationally-intensive" class="level3">
+<section class="level3" id="computationally-intensive">
 <h3 class="anchored" data-anchor-id="computationally-intensive">Computationally intensive</h3>
 <p>Modeling is incredibly computationally complex due to the volume of data needed to process. For example, CUNA Mutual disclosed that they spin up 50 servers with 20 cores a <a href="https://www.cunamutual.com/landing-pages/that-conference/cuna-mutual-applications">couple of days per month</a> to do the calculations.</p>
 </section>
-<section id="processing-volume" class="level3">
+<section class="level3" id="processing-volume">
 <h3 class="anchored" data-anchor-id="processing-volume">Processing volume</h3>
-<p>There’s a cottage industry devoted to inforce compression and model simplifications to get runtime and budgets down to a reasonable level. However, as the capacity for computing has grown, the company and regulatory demands have grown. E.g in the US reserving has transition from net-premium reserve to integrated ALM (CFT) to deterministic scenarios sets (CFT w NY7 + others) to truly stochastic (Stochastic PBR). “What Intel giveth, the NAIC taketh away.”<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>.</p>
+<p>There’s a cottage industry devoted to inforce compression and model simplifications to get runtime and budgets down to a reasonable level. However, as the capacity for computing has grown, the company and regulatory demands have grown. E.g in the US reserving has transition from net-premium reserve to integrated ALM (CFT) to deterministic scenarios sets (CFT w NY7 + others) to truly stochastic (Stochastic PBR). “What Intel giveth, the NAIC taketh away.”<a class="footnote-ref" href="#fn1" id="fnref1" role="doc-noteref"><sup>1</sup></a>.</p>
 <p>So again, performance matters!</p>
 </section>
-<section id="readability-and-expressiveness" class="level3">
+<section class="level3" id="readability-and-expressiveness">
 <h3 class="anchored" data-anchor-id="readability-and-expressiveness">Readability and Expressiveness</h3>
 <p>Actuaries, even the <a href="../../posts/coding-the-future/index.html">10x Actuary</a>, aren’t pure computer scientists and computational efficiency has never been <em>so</em> critical that they sacrifice everything else to get it. So the industry never turned to the 40-year king of performance computation, <a href="https://en.wikipedia.org/wiki/Fortran">Fortran</a>. The syntax is very “close to the machine”. I’s a bit rough to read to anyone not well versed.</p>
 <p>Interestingly, <a href="https://en.wikipedia.org/wiki/APL_(programming_language)">APL</a> took off and was one of the dominant languages used by actuaries before the advent of <a href="../../posts/coding-the-future/index.html#the-10x-actuary">vendor-supplied modeling solutions</a>.</p>
 <p>Counting the occurrences of a string looks like this in APL:</p>
 <pre><code>csubs←{0=x←⊃⍸⍺⍷⍵:0 ⋄ 1+⍺∇(¯1+x+⍴⍺)↓⍵}</code></pre>
 <p>whereas in Fortran it would be:</p>
-<pre class="fortran"><code>function countsubstring(s1, s2) result(c)
-  character(*), intent(in) :: s1, s2
-  integer :: c, p, posn
- 
-  c = 0
-  if(len(s2) == 0) return
-  p = 1
-  do 
-    posn = index(s1(p:), s2)
-    if(posn == 0) return
-    c = c + 1
-    p = p + posn + len(s2) - 1
-  end do
-end function</code></pre>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode fortran code-with-copy"><code class="sourceCode fortranfixed"><span id="cb2-1"><a aria-hidden="true" href="#cb2-1" tabindex="-1"></a><span class="kw">function</span> countsubstring(s1, s2) <span class="kw">result</span>(c)</span>
+<span id="cb2-2"><a aria-hidden="true" href="#cb2-2" tabindex="-1"></a>  <span class="dt">character(*)</span>, <span class="dt">intent(in)</span> <span class="dt">::</span> s1, s2</span>
+<span id="cb2-3"><a aria-hidden="true" href="#cb2-3" tabindex="-1"></a>  <span class="dt">integer</span> <span class="dt">::</span> c, p, posn</span>
+<span id="cb2-4"><a aria-hidden="true" href="#cb2-4" tabindex="-1"></a> </span>
+<span id="cb2-5"><a aria-hidden="true" href="#cb2-5" tabindex="-1"></a>  c <span class="kw">=</span> <span class="dv">0</span></span>
+<span id="cb2-6"><a aria-hidden="true" href="#cb2-6" tabindex="-1"></a>  <span class="kw">if</span>(<span class="fu">len</span>(s2) <span class="op">==</span> <span class="dv">0</span>) <span class="kw">return</span></span>
+<span id="cb2-7"><a aria-hidden="true" href="#cb2-7" tabindex="-1"></a>  p <span class="kw">=</span> <span class="dv">1</span></span>
+<span id="cb2-8"><a aria-hidden="true" href="#cb2-8" tabindex="-1"></a>  <span class="kw">do</span> </span>
+<span id="cb2-9"><a aria-hidden="true" href="#cb2-9" tabindex="-1"></a>    posn <span class="kw">=</span> <span class="bu">index</span>(s1(p:), s2)</span>
+<span id="cb2-10"><a aria-hidden="true" href="#cb2-10" tabindex="-1"></a>    <span class="kw">if</span>(posn <span class="op">==</span> <span class="dv">0</span>) <span class="kw">return</span></span>
+<span id="cb2-11"><a aria-hidden="true" href="#cb2-11" tabindex="-1"></a>    c <span class="kw">=</span> c <span class="kw">+</span> <span class="dv">1</span></span>
+<span id="cb2-12"><a aria-hidden="true" href="#cb2-12" tabindex="-1"></a>    p <span class="kw">=</span> p <span class="kw">+</span> posn <span class="kw">+</span> <span class="fu">len</span>(s2) <span class="kw">-</span> <span class="dv">1</span></span>
+<span id="cb2-13"><a aria-hidden="true" href="#cb2-13" tabindex="-1"></a>  <span class="kw">end do</span></span>
+<span id="cb2-14"><a aria-hidden="true" href="#cb2-14" tabindex="-1"></a><span class="kw">end function</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <p>Maybe more readable to the modern eye than APL, but many actuaries would still recognize what’s going on with the first code example.</p>
 <p>Why did APL take off for Actuaries and not Fortran? I think <a href="https://en.wikipedia.org/wiki/Expressive_power_%28computer_science%29">expressiveness</a> and the ability to have a language inspired by mathematical notation were attractive. It’s not pleasant to write a lot of boiler-plate simply to achieve a simple objective.</p>
 <p>What is boiler-plate? It’s writing a lot of code supporting the main idea, but straying from a simple mathematical formulation. For example, in high performance object-oriented languages (C#/C++/Java), the idiomatic code might involve a special class. See, for example this C# code to count substrings:</p>
-<pre class="csharp"><code>using System;
- 
-class SubStringTestClass
-{
-   public static int CountSubStrings(this string testString, string testSubstring)
-   {
-        int count = 0;
- 
-        if (testString.Contains(testSubstring))
-        {
-            for (int i = 0; i &lt; testString.Length; i++)
-            {
-                if (testString.Substring(i).Length &gt;= testSubstring.Length)
-                {
-                    bool equals = testString.Substring(i, testSubstring.Length).Equals(testSubstring);
-                    if (equals)
-                    {
-                        count++;
-                        i += testSubstring.Length - 1;
-                    }
-                }
-            }
-        }
-        return count;
-   }
-}</code></pre>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode csharp code-with-copy"><code class="sourceCode cs"><span id="cb3-1"><a aria-hidden="true" href="#cb3-1" tabindex="-1"></a><span class="kw">using</span> System<span class="op">;</span></span>
+<span id="cb3-2"><a aria-hidden="true" href="#cb3-2" tabindex="-1"></a> </span>
+<span id="cb3-3"><a aria-hidden="true" href="#cb3-3" tabindex="-1"></a><span class="kw">class</span> SubStringTestClass</span>
+<span id="cb3-4"><a aria-hidden="true" href="#cb3-4" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb3-5"><a aria-hidden="true" href="#cb3-5" tabindex="-1"></a>   <span class="kw">public</span> <span class="kw">static</span> <span class="dt">int</span> <span class="fu">CountSubStrings</span><span class="op">(</span><span class="kw">this</span> <span class="dt">string</span> testString<span class="op">,</span> <span class="dt">string</span> testSubstring<span class="op">)</span></span>
+<span id="cb3-6"><a aria-hidden="true" href="#cb3-6" tabindex="-1"></a>   <span class="op">{</span></span>
+<span id="cb3-7"><a aria-hidden="true" href="#cb3-7" tabindex="-1"></a>        <span class="dt">int</span> count <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb3-8"><a aria-hidden="true" href="#cb3-8" tabindex="-1"></a> </span>
+<span id="cb3-9"><a aria-hidden="true" href="#cb3-9" tabindex="-1"></a>        <span class="kw">if</span> <span class="op">(</span>testString<span class="op">.</span><span class="fu">Contains</span><span class="op">(</span>testSubstring<span class="op">))</span></span>
+<span id="cb3-10"><a aria-hidden="true" href="#cb3-10" tabindex="-1"></a>        <span class="op">{</span></span>
+<span id="cb3-11"><a aria-hidden="true" href="#cb3-11" tabindex="-1"></a>            <span class="kw">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> testString<span class="op">.</span><span class="fu">Length</span><span class="op">;</span> i<span class="op">++)</span></span>
+<span id="cb3-12"><a aria-hidden="true" href="#cb3-12" tabindex="-1"></a>            <span class="op">{</span></span>
+<span id="cb3-13"><a aria-hidden="true" href="#cb3-13" tabindex="-1"></a>                <span class="kw">if</span> <span class="op">(</span>testString<span class="op">.</span><span class="fu">Substring</span><span class="op">(</span>i<span class="op">).</span><span class="fu">Length</span> <span class="op">&gt;=</span> testSubstring<span class="op">.</span><span class="fu">Length</span><span class="op">)</span></span>
+<span id="cb3-14"><a aria-hidden="true" href="#cb3-14" tabindex="-1"></a>                <span class="op">{</span></span>
+<span id="cb3-15"><a aria-hidden="true" href="#cb3-15" tabindex="-1"></a>                    <span class="dt">bool</span> equals <span class="op">=</span> testString<span class="op">.</span><span class="fu">Substring</span><span class="op">(</span>i<span class="op">,</span> testSubstring<span class="op">.</span><span class="fu">Length</span><span class="op">).</span><span class="fu">Equals</span><span class="op">(</span>testSubstring<span class="op">);</span></span>
+<span id="cb3-16"><a aria-hidden="true" href="#cb3-16" tabindex="-1"></a>                    <span class="kw">if</span> <span class="op">(</span>equals<span class="op">)</span></span>
+<span id="cb3-17"><a aria-hidden="true" href="#cb3-17" tabindex="-1"></a>                    <span class="op">{</span></span>
+<span id="cb3-18"><a aria-hidden="true" href="#cb3-18" tabindex="-1"></a>                        count<span class="op">++;</span></span>
+<span id="cb3-19"><a aria-hidden="true" href="#cb3-19" tabindex="-1"></a>                        i <span class="op">+=</span> testSubstring<span class="op">.</span><span class="fu">Length</span> <span class="op">-</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb3-20"><a aria-hidden="true" href="#cb3-20" tabindex="-1"></a>                    <span class="op">}</span></span>
+<span id="cb3-21"><a aria-hidden="true" href="#cb3-21" tabindex="-1"></a>                <span class="op">}</span></span>
+<span id="cb3-22"><a aria-hidden="true" href="#cb3-22" tabindex="-1"></a>            <span class="op">}</span></span>
+<span id="cb3-23"><a aria-hidden="true" href="#cb3-23" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb3-24"><a aria-hidden="true" href="#cb3-24" tabindex="-1"></a>        <span class="kw">return</span> count<span class="op">;</span></span>
+<span id="cb3-25"><a aria-hidden="true" href="#cb3-25" tabindex="-1"></a>   <span class="op">}</span></span>
+<span id="cb3-26"><a aria-hidden="true" href="#cb3-26" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <p>The takeaway from this point, though, is that there is a natural draw towards more expressive, powerful languages than less expressive languages, especially when dealing with mathematically based ideas. So high expressiveness is something we want from a language that solves the LMP.</p>
 </section>
 </section>
-<section id="benchmarks" class="level2 page-columns page-full">
+<section class="level2 page-columns page-full" id="benchmarks">
 <h2 class="anchored" data-anchor-id="benchmarks">Benchmarks</h2>
-<p>After the original user submitted a proposal, others chimed in and submitted versions in their favorite languages. I have collected those versions, and run them on a consistent set of hardware<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>.</p>
-<p>Some “submissions” were excluded because they involved an entirely different approach, such as <a href="https://en.wikipedia.org/wiki/Memoization">memoizing</a> the function calls<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a>.</p>
+<p>After the original user submitted a proposal, others chimed in and submitted versions in their favorite languages. I have collected those versions, and run them on a consistent set of hardware<a class="footnote-ref" href="#fn2" id="fnref2" role="doc-noteref"><sup>2</sup></a>.</p>
+<p>Some “submissions” were excluded because they involved an entirely different approach, such as <a href="https://en.wikipedia.org/wiki/Memoization">memoizing</a> the function calls<a class="footnote-ref" href="#fn3" id="fnref3" role="doc-noteref"><sup>3</sup></a>.</p>
 <div class="cell" data-execution_count="1">
-<div id="tbl-life-modeling-benchmark" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-execution_count="1">
+<div class="cell quarto-float quarto-figure quarto-figure-center anchored" data-execution_count="1" id="tbl-life-modeling-benchmark">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-life-modeling-benchmark-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;1: Benchmarks for the Life Modeling Problem in nanoseconds (lower times are better).
+Table 1: Benchmarks for the Life Modeling Problem in nanoseconds (lower times are better).
 </figcaption>
 <div aria-describedby="tbl-life-modeling-benchmark-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div><div style="float: left;"><span>18×6 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
-<table class="data-frame do-not-create-environment cell caption-top table table-sm table-striped small">
+<div aria-label="Scrollable data table" class="table-scroll" role="region" tabindex="0"><table class="data-frame do-not-create-environment cell caption-top table table-sm table-striped small">
 <thead>
 <tr class="columnLabelRow header">
 <th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">lang</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">algorithm</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">function_name</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">median</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">mean</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">relative_mean</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;">lang</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;">algorithm</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;">function_name</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;">median</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;">mean</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;">relative_mean</th>
 </tr>
 <tr class="columnLabelRow even">
 <th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="DataStrings.DataString">DataStri…</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="DataStrings.DataString">DataStri…</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="DataStrings.DataString">DataStri…</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="Union{Missing, Float64}">Float64?</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;" title="DataStrings.DataString">DataStri…</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;" title="DataStrings.DataString">DataStri…</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;" title="DataStrings.DataString">DataStri…</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;" title="Union{Missing, Float64}">Float64?</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;" title="Float64">Float64</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;" title="Float64">Float64</th>
 </tr>
 </thead>
 <tbody>
@@ -502,7 +513,7 @@ Table&nbsp;1: Benchmarks for the Life Modeling Problem in nanoseconds (lower tim
 <td style="text-align: right;">1.32199e5</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 </div>
 </div>
 </div>
@@ -510,100 +521,100 @@ Table&nbsp;1: Benchmarks for the Life Modeling Problem in nanoseconds (lower tim
 </div>
 </div>
 <p>To aid in visualizing results with such vast different orders of magnitude, this graph includes a physical length comparison to serve as a reference. The computation time is represented by the distance that light travels in the time for the computation to complete (comparing a nanosecond to one foot length <a href="https://www.youtube.com/watch?v=9eyFDBPk4Yw">goes at least back to Admiral Grace Hopper</a>).</p>
-<div id="cell-fig-life-modeling-benchmark-blog" class="cell page-columns page-full" data-execution_count="1">
+<div class="cell page-columns page-full" data-execution_count="1" id="cell-fig-life-modeling-benchmark-blog">
 <div class="cell-output cell-output-display page-columns page-full" data-execution_count="1">
-<div id="fig-life-modeling-benchmark-blog" class="quarto-float quarto-figure quarto-figure-center anchored page-columns page-full">
+<div alt="Life Modeling Problem runtimes by language and implementation on a logarithmic scale, with light-travel distance comparisons." class="quarto-float quarto-figure quarto-figure-center anchored page-columns page-full" id="fig-life-modeling-benchmark-blog">
 <figure class="quarto-float quarto-float-fig figure page-columns page-full">
 <div aria-describedby="fig-life-modeling-benchmark-blog-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca" class="page-columns page-full">
-<img src="index_files/figure-html/fig-life-modeling-benchmark-blog-output-1.svg" id="fig-life-modeling-benchmark-blog" class="img-fluid figure-img column-page-inset">
+<img alt="Life Modeling Problem runtimes by language and implementation on a logarithmic scale, with light-travel distance comparisons." class="img-fluid figure-img column-page-inset" decoding="async" height="460" id="fig-life-modeling-benchmark-blog" loading="eager" src="index_files/figure-html/fig-life-modeling-benchmark-blog-output-1.svg" width="960"/>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-life-modeling-benchmark-blog-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;1
+Figure 1
 </figcaption>
 </figure>
 </div>
 </div>
 </div>
 </section>
-<section id="benchmark-discussion" class="level2">
+<section class="level2" id="benchmark-discussion">
 <h2 class="anchored" data-anchor-id="benchmark-discussion">Benchmark Discussion</h2>
-<section id="takeaway-1" class="level3">
+<section class="level3" id="takeaway-1">
 <h3 class="anchored" data-anchor-id="takeaway-1">Takeaway #1</h3>
 <blockquote class="blockquote">
 <p>There are a lot of ways to accomplish the same task and and that’s good enough in most cases</p>
 </blockquote>
 <p>All of the submissions and algorithms above worked, and fast enough that it gave an answer in very little time. And much of the time, the volume of data to process is small enough that it doesn’t matter.</p>
 <p>But remember the CUNA Mutual example from above: Let’s say that CUNA’s runtime is already as fast as it can be, and index it to the fastest result in the benchmarks below. The difference between the fastest “couple of days” run and the slowest would be over <strong>721 years</strong>. So it’s important to use tools and approaches that are performant for actuarial work.</p>
-<p>So for little one-off tasks it doesn’t make a big difference what tool or algorithm is used. More often than not, your one-off calculations or checks will be done fast enough that it’s not important to be picky. But if wanting to scale your work to a broader application within your company or the industry, I think it’s important to be performance-minded<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a>.</p>
+<p>So for little one-off tasks it doesn’t make a big difference what tool or algorithm is used. More often than not, your one-off calculations or checks will be done fast enough that it’s not important to be picky. But if wanting to scale your work to a broader application within your company or the industry, I think it’s important to be performance-minded<a class="footnote-ref" href="#fn4" id="fnref4" role="doc-noteref"><sup>4</sup></a>.</p>
 </section>
-<section id="takeaway-2" class="level3">
+<section class="level3" id="takeaway-2">
 <h3 class="anchored" data-anchor-id="takeaway-2">Takeaway #2</h3>
 <blockquote class="blockquote">
 <p>“If all you have is a dataframe, everything looks like a join”</p>
 </blockquote>
 <p>I’ve seen this several times in practice. Where a stacked dataframe of mortality rates is joined up with policy data in a complicated series of <code>%&gt;%</code>s (pipes), <code>inner_joins</code> and <code>mutates</code>.</p>
-<p>Don’t get me wrong, I think code is often still a better approach than spreadsheets<a href="#fn5" class="footnote-ref" id="fnref5" role="doc-noteref"><sup>5</sup></a>.</p>
+<p>Don’t get me wrong, I think code is often still a better approach than spreadsheets<a class="footnote-ref" href="#fn5" id="fnref5" role="doc-noteref"><sup>5</sup></a>.</p>
 <p>However, like the old proverb that “if all you have is a hammer, everything looks like a nail” - sometimes the tool you have just isn’t right for the job. That’s the lesson of the R <a href="https://cran.r-project.org/web/packages/data.table/vignettes/datatable-intro.html">data.table</a> result above. Even with the fastest dataframe implementation in R, it vastly trails other submissions.</p>
-<section id="algorithm-choice" class="level4">
+<section class="level4" id="algorithm-choice">
 <h4 class="anchored" data-anchor-id="algorithm-choice">Algorithm choice</h4>
 <p>Getting more refined about the approach, the other thing that is very obvious is that for this recursive type calculation, it’s much more efficient to write a <code>for</code> loop (the <code>Accumulator</code> approach) in every language except for R (where it wants everything to be a vector or dataframe).</p>
 <p>The difference hints at some computational aspects related to arrays that I will touch upon when discussing code examples below. The point for now is that you should consider using tools that give you the flexibility to approach problems in different ways.</p>
 </section>
 </section>
-<section id="takeaway-3" class="level3">
+<section class="level3" id="takeaway-3">
 <h3 class="anchored" data-anchor-id="takeaway-3">Takeaway #3</h3>
 <blockquote class="blockquote">
 <p>Performance, flexibility, readability: pick one, two, or three depending on the language</p>
 </blockquote>
 <p>This section ranges from objective (performance metrics) to subjective (my take on flexibility and readability). My opinions are based on using R heavily for several years ~2011-2015, Python for ~2015-2018, and then primarily switched to Julia in ~2018. I have a lot of experience with VBA, and moderate experience with Javascript, with some educational/introductory background in C, List/Racket, Mathematica, Haskell, and Java.</p>
-<section id="r" class="level4">
+<section class="level4" id="r">
 <h4 class="anchored" data-anchor-id="r">R</h4>
-<section id="performance" class="level5">
+<section class="level5" id="performance">
 <h5 class="anchored" data-anchor-id="performance">Performance</h5>
 <p>R was the slowest all-around.</p>
 </section>
-<section id="flexibility" class="level5">
+<section class="level5" id="flexibility">
 <h5 class="anchored" data-anchor-id="flexibility">Flexibility</h5>
 <p>R scores well here - <a href="http://adv-r.had.co.nz/Computing-on-the-language.html#nse">non-standard evaluation</a> lets you, essentially, inspect the written code without evaluating it. This is a nice feature that enables a lot of creativity and pleasantries (like ggplot knowing what to label the axes without you telling it).</p>
 <p>R works in notebook environments and from a REPL.</p>
-<p>One negative about R’s flexibility is the fact that the language is <a href="https://www.r-project.org/Licenses/AGPL-3">GPL licensed</a>, meaning that there are quite a few restrictions. For example, if you distribute an application that relies on R (e.g.&nbsp;it becomes part of your sales platform distributed to agents) you would need to be able to provide the source code for your application to the said users<a href="#fn6" class="footnote-ref" id="fnref6" role="doc-noteref"><sup>6</sup></a>. The other languages discussed on this page have much more permissive licenses.</p>
+<p>One negative about R’s flexibility is the fact that the language is <a href="https://www.r-project.org/Licenses/AGPL-3">GPL licensed</a>, meaning that there are quite a few restrictions. For example, if you distribute an application that relies on R (e.g. it becomes part of your sales platform distributed to agents) you would need to be able to provide the source code for your application to the said users<a class="footnote-ref" href="#fn6" id="fnref6" role="doc-noteref"><sup>6</sup></a>. The other languages discussed on this page have much more permissive licenses.</p>
 </section>
-<section id="readability" class="level5">
+<section class="level5" id="readability">
 <h5 class="anchored" data-anchor-id="readability">Readability</h5>
 <p>R reads pretty easily, with very little boiler plate and terse syntax:</p>
-<pre class="r"><code>
-# via Houstonwp
-q &lt;- c(0.001,0.002,0.003,0.003,0.004,0.004,0.005,0.007,0.009,0.011)
-w &lt;- c(0.05,0.07,0.08,0.10,0.14,0.20,0.20,0.20,0.10,0.04)
-P &lt;- 100
-S &lt;- 25000
-r &lt;- 0.02
-
-base_r_npv &lt;- function(q,w,P,S,r) {
-  inforce &lt;- c(1,head(cumprod(1-q-w), -1))
-  ncf &lt;- inforce * P - inforce * q * S
-  d &lt;- (1/(1+r)) ^ seq_along(ncf)
-  sum(ncf * d)
-}
-
-base_r_npv(q,w,P,S,r)
-#&gt; [1] 50.32483
-microbenchmark::microbenchmark(base_r_npv(q,w,P,S,r))</code></pre>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a aria-hidden="true" href="#cb4-1" tabindex="-1"></a></span>
+<span id="cb4-2"><a aria-hidden="true" href="#cb4-2" tabindex="-1"></a><span class="co"># via Houstonwp</span></span>
+<span id="cb4-3"><a aria-hidden="true" href="#cb4-3" tabindex="-1"></a>q <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.001</span>,<span class="fl">0.002</span>,<span class="fl">0.003</span>,<span class="fl">0.003</span>,<span class="fl">0.004</span>,<span class="fl">0.004</span>,<span class="fl">0.005</span>,<span class="fl">0.007</span>,<span class="fl">0.009</span>,<span class="fl">0.011</span>)</span>
+<span id="cb4-4"><a aria-hidden="true" href="#cb4-4" tabindex="-1"></a>w <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.05</span>,<span class="fl">0.07</span>,<span class="fl">0.08</span>,<span class="fl">0.10</span>,<span class="fl">0.14</span>,<span class="fl">0.20</span>,<span class="fl">0.20</span>,<span class="fl">0.20</span>,<span class="fl">0.10</span>,<span class="fl">0.04</span>)</span>
+<span id="cb4-5"><a aria-hidden="true" href="#cb4-5" tabindex="-1"></a>P <span class="ot">&lt;-</span> <span class="dv">100</span></span>
+<span id="cb4-6"><a aria-hidden="true" href="#cb4-6" tabindex="-1"></a>S <span class="ot">&lt;-</span> <span class="dv">25000</span></span>
+<span id="cb4-7"><a aria-hidden="true" href="#cb4-7" tabindex="-1"></a>r <span class="ot">&lt;-</span> <span class="fl">0.02</span></span>
+<span id="cb4-8"><a aria-hidden="true" href="#cb4-8" tabindex="-1"></a></span>
+<span id="cb4-9"><a aria-hidden="true" href="#cb4-9" tabindex="-1"></a>base_r_npv <span class="ot">&lt;-</span> <span class="cf">function</span>(q,w,P,S,r) {</span>
+<span id="cb4-10"><a aria-hidden="true" href="#cb4-10" tabindex="-1"></a>  inforce <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="fu">head</span>(<span class="fu">cumprod</span>(<span class="dv">1</span><span class="sc">-</span>q<span class="sc">-</span>w), <span class="sc">-</span><span class="dv">1</span>))</span>
+<span id="cb4-11"><a aria-hidden="true" href="#cb4-11" tabindex="-1"></a>  ncf <span class="ot">&lt;-</span> inforce <span class="sc">*</span> P <span class="sc">-</span> inforce <span class="sc">*</span> q <span class="sc">*</span> S</span>
+<span id="cb4-12"><a aria-hidden="true" href="#cb4-12" tabindex="-1"></a>  d <span class="ot">&lt;-</span> (<span class="dv">1</span><span class="sc">/</span>(<span class="dv">1</span><span class="sc">+</span>r)) <span class="sc">^</span> <span class="fu">seq_along</span>(ncf)</span>
+<span id="cb4-13"><a aria-hidden="true" href="#cb4-13" tabindex="-1"></a>  <span class="fu">sum</span>(ncf <span class="sc">*</span> d)</span>
+<span id="cb4-14"><a aria-hidden="true" href="#cb4-14" tabindex="-1"></a>}</span>
+<span id="cb4-15"><a aria-hidden="true" href="#cb4-15" tabindex="-1"></a></span>
+<span id="cb4-16"><a aria-hidden="true" href="#cb4-16" tabindex="-1"></a><span class="fu">base_r_npv</span>(q,w,P,S,r)</span>
+<span id="cb4-17"><a aria-hidden="true" href="#cb4-17" tabindex="-1"></a><span class="co">#&gt; [1] 50.32483</span></span>
+<span id="cb4-18"><a aria-hidden="true" href="#cb4-18" tabindex="-1"></a>microbenchmark<span class="sc">::</span><span class="fu">microbenchmark</span>(<span class="fu">base_r_npv</span>(q,w,P,S,r))</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <p>R is the oldest of the languages commonly used in actuarial contexts and carries a lot of that weight for better or worse: over several decades, it’s accumulated a sizeable community but is left with a number of rough edges. The data scientist Evan Patterson has written <a href="https://www.epatters.org/post/r-lang/">a nice summary of “the good, the bad, and the ugly” of R</a>.</p>
 </section>
 </section>
-<section id="rust" class="level4">
+<section class="level4" id="rust">
 <h4 class="anchored" data-anchor-id="rust">Rust</h4>
 <p>Rust is a newer, statically compiled language designed for performance and safety (in the don’t let your program do memory management mistakes that crash the computer).</p>
-<section id="performance-1" class="level5">
+<section class="level5" id="performance-1">
 <h5 class="anchored" data-anchor-id="performance-1">Performance</h5>
 <p>Rust scores well here, coming second only to Julia.</p>
 </section>
-<section id="flexibility-1" class="level5">
+<section class="level5" id="flexibility-1">
 <h5 class="anchored" data-anchor-id="flexibility-1">Flexibility</h5>
-<p>Rust is statically compiled (you write a program, compile it, and then run it to see results). It doesn’t have an official REPL and interactive use (e.g.&nbsp;notebook environments) is uncommon, though third-party tools like <a href="https://github.com/evcxr/evcxr">evcxr</a> provide a REPL and Jupyter kernel.</p>
+<p>Rust is statically compiled (you write a program, compile it, and then run it to see results). It doesn’t have an official REPL and interactive use (e.g. notebook environments) is uncommon, though third-party tools like <a href="https://github.com/evcxr/evcxr">evcxr</a> provide a REPL and Jupyter kernel.</p>
 </section>
-<section id="readability-1" class="level5">
+<section class="level5" id="readability-1">
 <h5 class="anchored" data-anchor-id="readability-1">Readability</h5>
 <p>I really like the explicit function contract: you give it various floating point (<code>f64</code>) vectors and numbers, and it returns a float: <code>-&gt; f64</code>.</p>
 <p>Other than that it’s pretty straightforward but definitely more verbose than any of the others.</p>
@@ -647,67 +658,67 @@ let r: f64 = 0.02;
 }</code></pre>
 </section>
 </section>
-<section id="python" class="level4">
+<section class="level4" id="python">
 <h4 class="anchored" data-anchor-id="python">Python</h4>
-<section id="performance-2" class="level5">
+<section class="level5" id="performance-2">
 <h5 class="anchored" data-anchor-id="performance-2">Performance</h5>
 <p>With <a href="https://numpy.org/">NumPy</a>, Python was the second fastest <code>Vectorized</code> approach and 3rd place for the <code>Accumulator</code> loop, both cases were still more than an order of magnitude slower than the next place.</p>
 </section>
-<section id="flexibility-2" class="level5">
+<section class="level5" id="flexibility-2">
 <h5 class="anchored" data-anchor-id="flexibility-2">Flexibility</h5>
 <p>Python wins large points for interactive usage in the REPL, notebooks, and wide variety of environments that support running Python code. However, within the language itself I have to deduct points for the ease of inspecting/evaluating code.</p>
 <p>What I mean by that, is that if you look at the code example below, the idiomatic standalone <code>timeit</code> pattern turns the code into a string which the <code>timeit</code> function then reads and parses (<code>timeit</code> can also accept a callable, and IPython/Jupyter offer <code>%timeit</code>, but the string form is the common standalone-script pattern). In none of the other tested languages was that sort of boiler-plate typical.</p>
 <p>Python scores partial points for meta-programming: decorators (<code>@</code> syntax) is syntactic sugar for macro-like modifications to functions, but Python metaprogramming is <a href="https://softwareengineering.stackexchange.com/a/253377/37060">fundamentally limited</a> by the language design.</p>
-<p>Python has perhaps the most robust ecosystem of all the languages discussed here, but in many ways its limiting: once you get deep into an ecosystem (e.g.&nbsp;NumPy), you are sort of at the mercy of package developers to ensure that the packages are compatible. As a key example, many common types and data structures are not shareable between libraries: there are <a href="https://data-apis.org/">efforts</a> to standardize data types/classes for better compatibility across the Python ecosystem, but may require fundamental changes to the language or ecosystem to accomplish.</p>
+<p>Python has perhaps the most robust ecosystem of all the languages discussed here, but in many ways its limiting: once you get deep into an ecosystem (e.g. NumPy), you are sort of at the mercy of package developers to ensure that the packages are compatible. As a key example, many common types and data structures are not shareable between libraries: there are <a href="https://data-apis.org/">efforts</a> to standardize data types/classes for better compatibility across the Python ecosystem, but may require fundamental changes to the language or ecosystem to accomplish.</p>
 <p>On the subject of Python packages: environment and package management in Python is notoriously painful:</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="https://imgs.xkcd.com/comics/python_environment.png" class="img-fluid figure-img"></p>
+<p><img alt="Python XKCD" class="img-fluid figure-img" decoding="async" loading="lazy" src="https://imgs.xkcd.com/comics/python_environment.png"/></p>
 <figcaption>Python XKCD</figcaption>
 </figure>
 </div>
 </section>
-<section id="readability-2" class="level5">
+<section class="level5" id="readability-2">
 <h5 class="anchored" data-anchor-id="readability-2">Readability</h5>
 <p>One of Python’s seminal features is the pleasant syntax, though opinions differ as to whether the indentation should matter to how your program runs.</p>
-<pre class="python"><code>import timeit
-setup='''
-import numpy as np
-q = np.array([0.001,0.002,0.003,0.003,0.004,0.004,0.005,0.007,0.009,0.011])
-w = np.array([0.05,0.07,0.08,0.10,0.14,0.20,0.20,0.20,0.10,0.04])
-P = 100
-S = 25000
-r = 0.02
-def npv(q,w,P,S,r):
-    decrements = np.cumprod(1-q-w)
-    inforce = np.empty_like(decrements)
-    inforce[:1] = 1
-    inforce[1:] = decrements[:-1]
-    ncf = inforce * P - inforce * q * S
-    t = np.arange(np.size(q))
-    d = np.power(1/(1+r), t)
-    return np.sum(ncf * d)
-'''
-benchmark = '''npv(q,w,P,S,r)'''
-
-print(timeit.timeit(stmt=benchmark,setup=setup,number = 1000000))</code></pre>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a aria-hidden="true" href="#cb6-1" tabindex="-1"></a><span class="im">import</span> timeit</span>
+<span id="cb6-2"><a aria-hidden="true" href="#cb6-2" tabindex="-1"></a>setup<span class="op">=</span><span class="st">'''</span></span>
+<span id="cb6-3"><a aria-hidden="true" href="#cb6-3" tabindex="-1"></a><span class="st">import numpy as np</span></span>
+<span id="cb6-4"><a aria-hidden="true" href="#cb6-4" tabindex="-1"></a><span class="st">q = np.array([0.001,0.002,0.003,0.003,0.004,0.004,0.005,0.007,0.009,0.011])</span></span>
+<span id="cb6-5"><a aria-hidden="true" href="#cb6-5" tabindex="-1"></a><span class="st">w = np.array([0.05,0.07,0.08,0.10,0.14,0.20,0.20,0.20,0.10,0.04])</span></span>
+<span id="cb6-6"><a aria-hidden="true" href="#cb6-6" tabindex="-1"></a><span class="st">P = 100</span></span>
+<span id="cb6-7"><a aria-hidden="true" href="#cb6-7" tabindex="-1"></a><span class="st">S = 25000</span></span>
+<span id="cb6-8"><a aria-hidden="true" href="#cb6-8" tabindex="-1"></a><span class="st">r = 0.02</span></span>
+<span id="cb6-9"><a aria-hidden="true" href="#cb6-9" tabindex="-1"></a><span class="st">def npv(q,w,P,S,r):</span></span>
+<span id="cb6-10"><a aria-hidden="true" href="#cb6-10" tabindex="-1"></a><span class="st">    decrements = np.cumprod(1-q-w)</span></span>
+<span id="cb6-11"><a aria-hidden="true" href="#cb6-11" tabindex="-1"></a><span class="st">    inforce = np.empty_like(decrements)</span></span>
+<span id="cb6-12"><a aria-hidden="true" href="#cb6-12" tabindex="-1"></a><span class="st">    inforce[:1] = 1</span></span>
+<span id="cb6-13"><a aria-hidden="true" href="#cb6-13" tabindex="-1"></a><span class="st">    inforce[1:] = decrements[:-1]</span></span>
+<span id="cb6-14"><a aria-hidden="true" href="#cb6-14" tabindex="-1"></a><span class="st">    ncf = inforce * P - inforce * q * S</span></span>
+<span id="cb6-15"><a aria-hidden="true" href="#cb6-15" tabindex="-1"></a><span class="st">    t = np.arange(np.size(q))</span></span>
+<span id="cb6-16"><a aria-hidden="true" href="#cb6-16" tabindex="-1"></a><span class="st">    d = np.power(1/(1+r), t)</span></span>
+<span id="cb6-17"><a aria-hidden="true" href="#cb6-17" tabindex="-1"></a><span class="st">    return np.sum(ncf * d)</span></span>
+<span id="cb6-18"><a aria-hidden="true" href="#cb6-18" tabindex="-1"></a><span class="st">'''</span></span>
+<span id="cb6-19"><a aria-hidden="true" href="#cb6-19" tabindex="-1"></a>benchmark <span class="op">=</span> <span class="st">'''npv(q,w,P,S,r)'''</span></span>
+<span id="cb6-20"><a aria-hidden="true" href="#cb6-20" tabindex="-1"></a></span>
+<span id="cb6-21"><a aria-hidden="true" href="#cb6-21" tabindex="-1"></a><span class="bu">print</span>(timeit.timeit(stmt<span class="op">=</span>benchmark,setup<span class="op">=</span>setup,number <span class="op">=</span> <span class="dv">1000000</span>))</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <p>The benchmarking setup with Python’s <code>timeit</code> was the most painful of the languages compared here: the common pattern wraps the code in a string, and the result is a single total time that you have to normalize by the number of runs yourself.</p>
 </section>
 </section>
-<section id="julia" class="level4">
+<section class="level4" id="julia">
 <h4 class="anchored" data-anchor-id="julia">Julia</h4>
-<section id="performance-3" class="level5">
+<section class="level5" id="performance-3">
 <h5 class="anchored" data-anchor-id="performance-3">Performance</h5>
 <p>The fastest language with both algorithms.</p>
 </section>
-<section id="flexibility-3" class="level5">
+<section class="level5" id="flexibility-3">
 <h5 class="anchored" data-anchor-id="flexibility-3">Flexibility</h5>
 <p>Available in a variety of environments, include the standard interactive ones like the REPL and notebooks. One key differentiator is the <a href="https://www.nature.com/articles/d41586-021-01174-w">reactive notebook</a> environment, <a href="https://github.com/fonsp/Pluto.jl">Pluto.jl</a> where notebook cells understand and interact with one-another.</p>
-<p>Julia packages are also <a href="https://www.youtube.com/watch?v=kc9HwsxE1OY">notoriously cross-functional</a>, so unlike Python (e.g.&nbsp;NumPy) or R (e.g.&nbsp;Tidyverse), tightly coupled specialty-ecosystems have not evolved in Julia.</p>
+<p>Julia packages are also <a href="https://www.youtube.com/watch?v=kc9HwsxE1OY">notoriously cross-functional</a>, so unlike Python (e.g. NumPy) or R (e.g. Tidyverse), tightly coupled specialty-ecosystems have not evolved in Julia.</p>
 <p>Julia is MIT licensed, as are many of the community packages (including JuliaActuary’s). This license is very permissive and is likely to cause the least issue compared with other licenses discussed on this page.</p>
 <p>The ability to introspect code is one of Julia’s superpowers</p>
 </section>
-<section id="readability-3" class="level5">
+<section class="level5" id="readability-3">
 <h5 class="anchored" data-anchor-id="readability-3">Readability</h5>
 <p>Julia scores well here, but gets dinged in my mind for a couple of things:</p>
 <ul>
@@ -717,58 +728,58 @@ print(timeit.timeit(stmt=benchmark,setup=setup,number = 1000000))</code></pre>
 <p>The former is actually a very powerful concept/tool called <a href="https://docs.julialang.org/en/v1/manual/arrays/#Broadcasting">broadcasting</a>. Kind of like R (where everything is a vector and will combine in vector-like ways). Julia lets you both worlds: really effective scalars and highly efficient vector operations. Once you know what it does, it’s hard to think of a shorter/more concise way to express it than the dot (<code>.</code>).</p>
 <p>The latter, <code>@benchmark</code> is a way to get Julia to work with the code itself, again kind of like R does. <code>@benchmark</code> is a <a href="https://docs.julialang.org/en/v1/manual/metaprogramming/#man-macros">macro</a> that will run a really comprehensive and informative benchmarking set on the code given.</p>
 <p>The <code>Vectorized</code> version:</p>
-<pre class="julia"><code>using BenchmarkTools
-
-q = [0.001,0.002,0.003,0.003,0.004,0.004,0.005,0.007,0.009,0.011]
-w = [0.05,0.07,0.08,0.10,0.14,0.20,0.20,0.20,0.10,0.04]
-P = 100
-S = 25000
-r = 0.02
-
-function npv1(q,w,P,S,r) 
-    inforce = [1.; cumprod(1 .- q .- w)[1:end-1]] 
-    ncf = inforce .* P .- inforce .* q .* S
-    d = (1 ./ (1 + r)) .^ (1:length(ncf))
-    return sum(ncf .* d)
-end
-
-@benchmark npv1($q,$w,$P,$S,$r)</code></pre>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a aria-hidden="true" href="#cb7-1" tabindex="-1"></a><span class="im">using</span> <span class="bu">BenchmarkTools</span></span>
+<span id="cb7-2"><a aria-hidden="true" href="#cb7-2" tabindex="-1"></a></span>
+<span id="cb7-3"><a aria-hidden="true" href="#cb7-3" tabindex="-1"></a>q <span class="op">=</span> [<span class="fl">0.001</span>,<span class="fl">0.002</span>,<span class="fl">0.003</span>,<span class="fl">0.003</span>,<span class="fl">0.004</span>,<span class="fl">0.004</span>,<span class="fl">0.005</span>,<span class="fl">0.007</span>,<span class="fl">0.009</span>,<span class="fl">0.011</span>]</span>
+<span id="cb7-4"><a aria-hidden="true" href="#cb7-4" tabindex="-1"></a>w <span class="op">=</span> [<span class="fl">0.05</span>,<span class="fl">0.07</span>,<span class="fl">0.08</span>,<span class="fl">0.10</span>,<span class="fl">0.14</span>,<span class="fl">0.20</span>,<span class="fl">0.20</span>,<span class="fl">0.20</span>,<span class="fl">0.10</span>,<span class="fl">0.04</span>]</span>
+<span id="cb7-5"><a aria-hidden="true" href="#cb7-5" tabindex="-1"></a>P <span class="op">=</span> <span class="fl">100</span></span>
+<span id="cb7-6"><a aria-hidden="true" href="#cb7-6" tabindex="-1"></a>S <span class="op">=</span> <span class="fl">25000</span></span>
+<span id="cb7-7"><a aria-hidden="true" href="#cb7-7" tabindex="-1"></a>r <span class="op">=</span> <span class="fl">0.02</span></span>
+<span id="cb7-8"><a aria-hidden="true" href="#cb7-8" tabindex="-1"></a></span>
+<span id="cb7-9"><a aria-hidden="true" href="#cb7-9" tabindex="-1"></a><span class="kw">function</span> <span class="fu">npv1</span>(q,w,P,S,r) </span>
+<span id="cb7-10"><a aria-hidden="true" href="#cb7-10" tabindex="-1"></a>    inforce <span class="op">=</span> [<span class="fl">1</span>.; <span class="fu">cumprod</span>(<span class="fl">1</span> <span class="op">.-</span> q <span class="op">.-</span> w)[<span class="fl">1</span><span class="op">:</span><span class="kw">end</span><span class="op">-</span><span class="fl">1</span>]] </span>
+<span id="cb7-11"><a aria-hidden="true" href="#cb7-11" tabindex="-1"></a>    ncf <span class="op">=</span> inforce <span class="op">.*</span> P <span class="op">.-</span> inforce <span class="op">.*</span> q <span class="op">.*</span> S</span>
+<span id="cb7-12"><a aria-hidden="true" href="#cb7-12" tabindex="-1"></a>    d <span class="op">=</span> (<span class="fl">1</span> <span class="op">./</span> (<span class="fl">1</span> <span class="op">+</span> r)) <span class="op">.^</span> (<span class="fl">1</span><span class="op">:</span><span class="fu">length</span>(ncf))</span>
+<span id="cb7-13"><a aria-hidden="true" href="#cb7-13" tabindex="-1"></a>    <span class="cf">return</span> <span class="fu">sum</span>(ncf <span class="op">.*</span> d)</span>
+<span id="cb7-14"><a aria-hidden="true" href="#cb7-14" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb7-15"><a aria-hidden="true" href="#cb7-15" tabindex="-1"></a></span>
+<span id="cb7-16"><a aria-hidden="true" href="#cb7-16" tabindex="-1"></a><span class="pp">@benchmark</span> <span class="fu">npv1</span>(<span class="op">$</span>q,<span class="op">$</span>w,<span class="op">$</span>P,<span class="op">$</span>S,<span class="op">$</span>r)</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <p>And the <code>Accumulator</code> version:</p>
-<pre class="julia"><code>function npv5(q,w,P,S,r,term=nothing)
-    term = term === nothing ? length(q) : term
-    inforce = 1.0
-    result = 0.0
-    v = (1 / ( 1 + r))
-    v_t = v
-    for (q,w,_) in zip(q,w,1:term)
-        result += inforce * (P - S * q) * v_t
-        inforce -= inforce * q + inforce * w
-        v_t *= v
-    end
-    return result
-end</code></pre>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a aria-hidden="true" href="#cb8-1" tabindex="-1"></a><span class="kw">function</span> <span class="fu">npv5</span>(q,w,P,S,r,term<span class="op">=</span><span class="cn">nothing</span>)</span>
+<span id="cb8-2"><a aria-hidden="true" href="#cb8-2" tabindex="-1"></a>    term <span class="op">=</span> term <span class="op">===</span> <span class="cn">nothing</span> ? <span class="fu">length</span>(q) <span class="op">:</span> term</span>
+<span id="cb8-3"><a aria-hidden="true" href="#cb8-3" tabindex="-1"></a>    inforce <span class="op">=</span> <span class="fl">1.0</span></span>
+<span id="cb8-4"><a aria-hidden="true" href="#cb8-4" tabindex="-1"></a>    result <span class="op">=</span> <span class="fl">0.0</span></span>
+<span id="cb8-5"><a aria-hidden="true" href="#cb8-5" tabindex="-1"></a>    v <span class="op">=</span> (<span class="fl">1</span> <span class="op">/</span> ( <span class="fl">1</span> <span class="op">+</span> r))</span>
+<span id="cb8-6"><a aria-hidden="true" href="#cb8-6" tabindex="-1"></a>    v_t <span class="op">=</span> v</span>
+<span id="cb8-7"><a aria-hidden="true" href="#cb8-7" tabindex="-1"></a>    <span class="cf">for</span> (q,w,_) <span class="kw">in</span> <span class="fu">zip</span>(q,w,<span class="fl">1</span><span class="op">:</span>term)</span>
+<span id="cb8-8"><a aria-hidden="true" href="#cb8-8" tabindex="-1"></a>        result <span class="op">+=</span> inforce <span class="op">*</span> (P <span class="op">-</span> S <span class="op">*</span> q) <span class="op">*</span> v_t</span>
+<span id="cb8-9"><a aria-hidden="true" href="#cb8-9" tabindex="-1"></a>        inforce <span class="op">-=</span> inforce <span class="op">*</span> q <span class="op">+</span> inforce <span class="op">*</span> w</span>
+<span id="cb8-10"><a aria-hidden="true" href="#cb8-10" tabindex="-1"></a>        v_t <span class="op">*=</span> v</span>
+<span id="cb8-11"><a aria-hidden="true" href="#cb8-11" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb8-12"><a aria-hidden="true" href="#cb8-12" tabindex="-1"></a>    <span class="cf">return</span> result</span>
+<span id="cb8-13"><a aria-hidden="true" href="#cb8-13" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 </section>
 </section>
 </section>
 </section>
-<section id="more-flexibility-more-performance-from-julia" class="level2">
+<section class="level2" id="more-flexibility-more-performance-from-julia">
 <h2 class="anchored" data-anchor-id="more-flexibility-more-performance-from-julia">More flexibility, more performance from Julia</h2>
 <p>I wanted to go a little bit deeper and show how 1) Julia just runs fast even if your not explicitly focused on performance. But for where it <em>really</em> matters, you can go even deeper. This is a little advanced, but I think it can be useful to introduce some basics as to why some languages and approaches are going to be fundamentally slower than others.</p>
 </section>
-<section id="colophon" class="level2">
+<section class="level2" id="colophon">
 <h2 class="anchored" data-anchor-id="colophon">Colophon</h2>
-<section id="code" class="level3">
+<section class="level3" id="code">
 <h3 class="anchored" data-anchor-id="code">Code</h3>
 <p>All of the benchmarked code can be found in the <a href="https://github.com/JuliaActuary/Learn/tree/master/Benchmarks/LifeModelingProblem">JuliaActuary Learn repository</a>. Please file an issue or submit a PR request there for issues/suggestions.</p>
 </section>
-<section id="hardware" class="level3">
+<section class="level3" id="hardware">
 <h3 class="anchored" data-anchor-id="hardware">Hardware</h3>
 <p>MacBook Air (M1, 2020)</p>
 </section>
-<section id="software" class="level3">
+<section class="level3" id="software">
 <h3 class="anchored" data-anchor-id="software">Software</h3>
 <p>All languages/libraries are Mac M1 native unless otherwise noted</p>
-<section id="julia-1" class="level4">
+<section class="level4" id="julia-1">
 <h4 class="anchored" data-anchor-id="julia-1">Julia</h4>
 <pre><code>Julia Version 1.7.0-DEV.938
 Commit 2b4c088ee7* (2021-04-16 20:37 UTC)
@@ -779,33 +790,28 @@ Platform Info:
   LIBM: libopenlibm
   LLVM: libLLVM-11.0.1 (ORCJIT, cyclone)</code></pre>
 </section>
-<section id="rust-1" class="level4">
+<section class="level4" id="rust-1">
 <h4 class="anchored" data-anchor-id="rust-1">Rust</h4>
 <pre><code>1.53.0-nightly (b0c818c5e 2021-04-16)</code></pre>
 </section>
-<section id="python-1" class="level4">
+<section class="level4" id="python-1">
 <h4 class="anchored" data-anchor-id="python-1">Python</h4>
 <pre><code>Python 3.9.4 (default, Apr  4 2021, 17:42:23) 
 [Clang 12.0.0 (clang-1200.0.32.29)] on darwin</code></pre>
 </section>
 </section>
 </section>
-<section id="footnotes" class="level2">
+<section class="level2" id="footnotes">
 <h2 class="anchored" data-anchor-id="footnotes">Footnotes</h2>
-
-
 </section>
-
-
-<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
-
+<div class="default" id="quarto-appendix"><section class="footnotes footnotes-end-of-document" id="footnotes" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
 <ol>
-<li id="fn1"><p>A take on <a href="https://en.wikipedia.org/wiki/Andy_and_Bill%27s_law">Andy and Bill’s law</a><a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn2"><p>Note that not all languages have both a mean and median result in their benchmarking libraries. Mean is a better representation for a garbage-collected modern language, because sometimes the computation just takes longer than the median result. Where the mean is not available in the graph below, median is substituted.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn3"><p>If benchmarking memoization, it’s essentially benchmarking how long it takes to perform hashing in a language. While interesting, especially in the context of <a href="https://scattered-thoughts.net/writing/an-opinionated-map-of-incremental-and-streaming-systems">incremental computing</a>, it’s not the core issue at hand. Incremental computing libraries exist for all of the modern languages discussed here.<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn4"><p>Don’t <a href="https://en.wikipedia.org/wiki/Program_optimization#When_to_optimizer">prematurely optimize</a>. But in the long run avoid, <a href="https://www.nature.com/articles/d41586-019-02310-3">re-writing your code in a faster language too many times!</a><a href="#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn5"><p>I’ve seen 50+ line, irregular Excel formulas. To Nick: it probably started out as a good idea but it was a beast to understand and modify! At least with code you can look at the code with variable names and syntax highlighting! Comments, if you are lucky!<a href="#fnref5" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn6"><p>This is not legal advice, consult a lawyer for more details.<a href="#fnref6" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn1"><p>A take on <a href="https://en.wikipedia.org/wiki/Andy_and_Bill%27s_law">Andy and Bill’s law</a><a class="footnote-back" href="#fnref1" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>Note that not all languages have both a mean and median result in their benchmarking libraries. Mean is a better representation for a garbage-collected modern language, because sometimes the computation just takes longer than the median result. Where the mean is not available in the graph below, median is substituted.<a class="footnote-back" href="#fnref2" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3"><p>If benchmarking memoization, it’s essentially benchmarking how long it takes to perform hashing in a language. While interesting, especially in the context of <a href="https://scattered-thoughts.net/writing/an-opinionated-map-of-incremental-and-streaming-systems">incremental computing</a>, it’s not the core issue at hand. Incremental computing libraries exist for all of the modern languages discussed here.<a class="footnote-back" href="#fnref3" role="doc-backlink">↩︎</a></p></li>
+<li id="fn4"><p>Don’t <a href="https://en.wikipedia.org/wiki/Program_optimization#When_to_optimizer">prematurely optimize</a>. But in the long run avoid, <a href="https://www.nature.com/articles/d41586-019-02310-3">re-writing your code in a faster language too many times!</a><a class="footnote-back" href="#fnref4" role="doc-backlink">↩︎</a></p></li>
+<li id="fn5"><p>I’ve seen 50+ line, irregular Excel formulas. To Nick: it probably started out as a good idea but it was a beast to understand and modify! At least with code you can look at the code with variable names and syntax highlighting! Comments, if you are lucky!<a class="footnote-back" href="#fnref5" role="doc-backlink">↩︎</a></p></li>
+<li id="fn6"><p>This is not legal advice, consult a lawyer for more details.<a class="footnote-back" href="#fnref6" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -1209,8 +1215,4 @@ Platform Info:
   });
   </script>
 </div> <!-- /content -->
-
-
-
-
 </body></html>

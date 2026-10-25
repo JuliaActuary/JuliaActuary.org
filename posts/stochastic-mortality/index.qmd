@@ -208,6 +208,7 @@ stoch = stochastic_proj(policies, params, 50)
 ```
 
 ```{julia}
+#| fig-alt: "Distribution of projected present values across stochastic mortality scenarios."
 v = [pv(0.03, s.benefits) for s in stoch]
 hist(v,
     bins=15;

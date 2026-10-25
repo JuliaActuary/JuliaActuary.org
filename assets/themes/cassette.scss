@@ -1,0 +1,79 @@
+/*-- scss:defaults --*/
+// Shared palette with cassette_futurism.jl; darker red/rust are text accents.
+$cf-paper: #F0EDE3;
+$cf-paper-deep: #E6E2D5;
+$cf-paper-bright: #F7F4EB;
+$cf-ink: #1B2A3A;
+$cf-ink-soft: #3C4A5C;
+$cf-rule: #B6AD90;
+$cf-red: #B5321E;
+$cf-rust: #974413;
+$cf-amber: #D4A017;
+$cf-blue: #1F4E79;
+
+$body-bg: $cf-paper;
+$body-color: $cf-ink;
+$primary: $cf-blue;
+$secondary: $cf-ink-soft;
+$success: #3F7D4E;
+$info: $cf-blue;
+$warning: $cf-amber;
+$danger: $cf-red;
+$light: $cf-paper-bright;
+$dark: $cf-ink;
+$link-color: $cf-red;
+$link-hover-color: $cf-rust;
+$border-color: $cf-rule;
+$min-contrast-ratio: 4.5;
+
+$font-family-sans-serif: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
+$font-family-monospace: "JuliaMono", ui-monospace, "SFMono-Regular", Consolas, monospace;
+$font-size-base: 1rem;
+$line-height-base: 1.65;
+$headings-font-family: $font-family-sans-serif;
+$headings-font-weight: 700;
+$headings-color: $cf-ink;
+$headings-line-height: 1.25;
+$h1-font-size: 2.25rem;
+$h2-font-size: 1.5rem;
+$h3-font-size: 1.2rem;
+
+$border-radius: .2rem;
+$border-radius-sm: .15rem;
+$border-radius-lg: .25rem;
+$navbar-bg: $cf-ink;
+$navbar-fg: $cf-paper;
+$navbar-hl: $cf-amber;
+$dropdown-bg: $cf-paper-bright;
+$dropdown-link-color: $cf-ink;
+$dropdown-link-hover-bg: $cf-paper-deep;
+$dropdown-link-hover-color: $cf-ink;
+$input-bg: $cf-paper-bright;
+$input-color: $cf-ink;
+$input-border-color: $cf-ink-soft;
+$input-focus-border-color: $cf-blue;
+$input-group-addon-bg: $cf-paper-deep;
+$table-color: $cf-ink;
+$table-bg: transparent;
+$table-border-color: $cf-rule;
+$table-striped-bg: $cf-paper-deep;
+$table-hover-bg: $cf-paper-deep;
+$code-color: $cf-ink;
+$code-bg: $cf-paper-deep;
+$code-block-bg: $cf-paper-bright;
+$code-block-border-left: false;
+$toc-color: $cf-red;
+
+/*-- scss:rules --*/
+:root {
+  --cf-paper: #{$cf-paper};
+  --cf-paper-deep: #{$cf-paper-deep};
+  --cf-paper-bright: #{$cf-paper-bright};
+  --cf-ink: #{$cf-ink};
+  --cf-ink-soft: #{$cf-ink-soft};
+  --cf-rule: #{$cf-rule};
+  --cf-red: #{$cf-red};
+  --cf-rust: #{$cf-rust};
+  --cf-amber: #{$cf-amber};
+  --cf-blue: #{$cf-blue};
+}

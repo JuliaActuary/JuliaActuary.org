@@ -45,6 +45,7 @@ Three questions drive the comparison, and they get concrete answers:
 If you take one thing away, take this figure. Each point is one implementation of the same model producing the same validated numbers on the same data. Across is speed: the cost of one policy × one inner scenario across all 120 switch points, whole-portfolio workload. Up is code: the gzipped size of the source that expresses that rung, measured live at render from this post's own cells and the `pysrc/` and `gpu/` bundles. The gray annotations scale each point's rate to the paper's full 190,000-policy × 1,000 outer × 500 inner problem — down and to the left wins:
 
 ```{julia}
+#| fig-alt: "Runtime per policy and inner scenario versus compressed source size for the implementation ladder; laptop and GPU results use different marker shapes."
 #| label: fig-headline
 #| fig-cap: "The ladder in one view — runtime per policy · inner scenario against gzipped source of each rung (state, setup, stepping, and valuation driver; comments stripped; measured live at render — details in @tbl-codesize). Circles: Apple M4 Max. Triangles: rented Lambda H100. Gray annotations scale each rate to the paper's full 190,000 × 1,000 × 500 problem, extrapolated linearly per @tbl-full — except the H100 kernel, which ran the whole thing, measured, in 24.8 minutes. Timings here are authoring-time measurements, rounded; each laptop number is re-measured live in the sections below."
 #| code-fold: true
@@ -868,6 +869,7 @@ None of this is a criticism of the research — the paper's claims were about st
 ## The assembled ladder
 
 ```{julia}
+#| fig-alt: "Full-model runtime per policy and inner scenario for the implementations, compared on a logarithmic scale."
 #| echo: false
 #| label: fig-ladder
 #| fig-cap: "Full-model cost per policy · inner scenario (one outer scenario, all 120 switch points; log scale). Python points measured with pysrc/bench.py during authoring on the same machine and data; Julia laptop points measured at render time; the two H100 triangles as measured on the rented instance (@tbl-h100)."
@@ -940,6 +942,7 @@ The five laptop rungs live in a 1.0–1.4 KB band while spanning four orders of 
 Lest the benchmark tables obscure that a full valuation engine is running underneath: the guarantee-value profile $R[s]$ — the inner-scenario-average metric at each future quarter — for four outer scenarios (the first uses the full 500 inner scenarios from the headline run; the others 100). Given the reference's unfloored maturity benefit and the synthetic inner scenarios, read these as benchmark outputs with the *shape* of a reserve profile, not bookable reserves:
 
 ```{julia}
+#| fig-alt: "Inner-average guarantee present values by future switch point for four outer market scenarios."
 #| label: fig-reserves
 #| fig-cap: "Future guarantee-value profiles along four outer paths: 38,000 policies, inner valuation at every future quarter under the reference semantics (unfloored maturity benefit; risk-free-drifted synthetic inner scenarios). Profiles decline as policies mature out of the projection."
 #| code-fold: true
@@ -1045,6 +1048,7 @@ The same-silicon gap is the structural argument's cleanest confirmation — and 
 Then the run the paper opens by pricing at 560 days: **190,000 policies × 1,000 outer × 500 inner × 120 switch points, exact brute force, completed in 24.8 minutes** — roughly a dollar of rented compute — with every switch-point value checkpointed. What that buys an actuary is the full distribution, not a point estimate:
 
 ```{julia}
+#| fig-alt: "Median and interquartile and fifth-to-ninety-fifth percentile bands of guarantee present values across one thousand outer scenarios."
 #| label: fig-h100dist
 #| fig-cap: "The measured full run: guarantee-value profiles across all 1,000 outer scenarios (190,000 policies, 500 inner scenarios each, H100, 24.8 minutes). Bands are percentiles across outer scenarios of the inner-average value at each future quarter; every path prices identically at the valuation date and disperses with the real-world market."
 #| code-fold: true

@@ -130,6 +130,7 @@ params(prem, int) = (
 This results in the following plot of the tracked account value (`state[1]`):
 
 ```{julia}
+#| fig-alt: "Projected policy account value over years from issue."
 begin
     pp = params(
         8000.0, # 8,000 annual premium
@@ -202,6 +203,7 @@ Now let's plot the result. Not surprising, interest has a huge effect on the pol
 One thing that's remarkable is how going from 2000 premium to just ~2200 of premium results in about a $5m difference at 8% interest. The power of compound interest!
 
 ```{julia}
+#| fig-alt: "Contour maps of account value at age one hundred and age at lapse across credited interest rates and annual premiums."
 #| column: page-inset
 let
     fig = Figure(size=(960, 430))

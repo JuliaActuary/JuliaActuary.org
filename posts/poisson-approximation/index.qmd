@@ -114,6 +114,7 @@ One caveat: increasing $N$ improves the *location* of the Poisson-based posterio
 This visualization shows the aggregated posterior distribution across all of the trials and model points. The darker shaded band indicates the middle 50% of the posterior:
 
 ```{julia}
+#| fig-alt: "Binomial and Poisson distributions and uncertainty intervals at different sample sizes, with the actual value marked."
 #| column: page
 function plot_band_under!(ax,plot,y,low,high,label="")
     function points(plot)

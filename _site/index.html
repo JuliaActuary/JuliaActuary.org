@@ -1,13 +1,10 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
-<meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.16">
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-
-<meta name="description" content="JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.">
-
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml"><head>
+<meta charset="utf-8"/>
+<meta content="quarto-1.9.16" name="generator"/>
+<meta content="width=device-width, initial-scale=1.0, user-scalable=yes" name="viewport"/>
+<meta content="JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows." name="description"/>
 <title>JuliaActuary</title>
 <style>
 code{white-space: pre-wrap;}
@@ -21,28 +18,61 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
-
-
 <script src="site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="site_libs/quarto-nav/headroom.min.js"></script>
 <script src="site_libs/clipboard/clipboard.min.js"></script>
 <script src="site_libs/quarto-search/autocomplete.umd.js"></script>
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<link href=".//assets/logos/favicon.ico" rel="icon">
+<meta content="./" name="quarto:offset"/>
+<link href=".//assets/logos/favicon.ico" rel="icon"/>
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-a0731b9a3a5d496010872d775e5d9bc3.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet"/>
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-be14ce6d32a635bebd8f9e4e558f9eeb.css" id="quarto-text-highlighting-styles" rel="stylesheet"/>
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-98ac2d5361ef6f18cc0525d38bedc462.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet"/>
+<link append-hash="true" data-mode="light" href="site_libs/bootstrap/bootstrap-4a135b976b00f53a3a768ff94eb1df18.min.css" id="quarto-bootstrap" rel="stylesheet"/>
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -70,246 +100,204 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&amp;family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&amp;display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./assets/highlight/styles/github.min.css">
-<script src="./assets/highlight/highlight.min.js"></script>
-<script src="./assets/highlight/languages/julia.min.js"></script>
-<script src="./assets/highlight/languages/julia-repl.min.js"></script>
-<script src="./assets/highlight/languages/python.min.js"></script>
-<script src="./assets/highlight/languages/r.min.js"></script>
-<script>hljs.highlightAll();</script>
-<script data-goatcounter="https://juliaactuary.goatcounter.com/count" async="" src="//gc.zgo.at/count.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/swiffy-slider@1.6.0/dist/js/swiffy-slider.min.js" crossorigin="anonymous" defer=""></script>
-<link href="https://cdn.jsdelivr.net/npm/swiffy-slider@1.6.0/dist/css/swiffy-slider.min.css" rel="stylesheet" crossorigin="anonymous">
-
-
-<link rel="stylesheet" href="styles.css">
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" rel="stylesheet"/>
+<script async="" data-goatcounter="https://juliaactuary.goatcounter.com/count" src="//gc.zgo.at/count.js"></script>
+<link href="styles-c416c153cdf24884.css" rel="stylesheet"/>
 </head>
-
 <body class="nav-fixed fullcontent quarto-light">
-
 <div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top">
-    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
-      <div class="navbar-container container-fluid">
-      <div class="navbar-brand-container mx-auto">
-    <a href="./index.html" class="navbar-brand navbar-brand-logo">
-    <img src="./assets/logos/android-chrome-512x512.png" alt="JuliaActuary Logo" class="navbar-logo light-content">
-    <img src="./assets/logos/android-chrome-512x512.png" alt="JuliaActuary Logo" class="navbar-logo dark-content">
-    </a>
-    <a class="navbar-brand" href="./index.html">
-    <span class="navbar-title">JuliaActuary</span>
-    </a>
-  </div>
-            <div id="quarto-search" class="" title="Search"></div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-  <span class="navbar-toggler-icon"></span>
-</button>
-          <div class="collapse navbar-collapse" id="navbarCollapse">
-            <ul class="navbar-nav navbar-nav-scroll ms-auto">
-  <li class="nav-item">
-    <a class="nav-link" href="./packages.html"> 
-<span class="menu-text">Packages</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="https://docs.juliaactuary.org"> 
-<span class="menu-text">Docs</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="https://modernfinancialmodeling.com"> 
-<span class="menu-text">Book</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="./learn.html"> 
-<span class="menu-text">Learn</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="./examples.html"> 
-<span class="menu-text">Examples</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="./benchmarks.html"> 
-<span class="menu-text">Benchmarks</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="./community.html"> 
-<span class="menu-text">Community</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="./blog.html"> 
-<span class="menu-text">Blog</span></a>
-  </li>  
-  <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/JuliaActuary"> <i class="bi bi-github" role="img">
-</i> 
-<span class="menu-text"></span></a>
-  </li>  
-  <li class="nav-item compact">
-    <a class="nav-link" href="./all-posts.xml"> <i class="bi bi-rss" role="img">
-</i> 
-<span class="menu-text"></span></a>
-  </li>  
-</ul>
-          </div> <!-- /navcollapse -->
-            <div class="quarto-navbar-tools">
+<header class="headroom fixed-top" id="quarto-header">
+<nav class="navbar navbar-expand-lg" data-bs-theme="dark">
+<div class="navbar-container container-fluid">
+<div class="navbar-brand-container mx-auto">
+<a class="navbar-brand navbar-brand-logo" href="./index.html">
+<img alt="JuliaActuary Logo" class="navbar-logo light-content" src="./assets/logos/android-chrome-512x512.png"/>
+<img alt="JuliaActuary Logo" class="navbar-logo dark-content" src="./assets/logos/android-chrome-512x512.png"/>
+</a>
+<a class="navbar-brand" href="./index.html">
+<span class="navbar-title">JuliaActuary</span>
+</a>
 </div>
-      </div> <!-- /container-fluid -->
-    </nav>
+<div class="" id="quarto-search" title="Search"></div>
+<button aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-bs-target="#navbarCollapse" data-bs-toggle="collapse" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }" role="menu" type="button">
+<span class="navbar-toggler-icon"></span>
+</button>
+<div class="collapse navbar-collapse" id="navbarCollapse">
+<ul class="navbar-nav navbar-nav-scroll ms-auto">
+<li class="nav-item">
+<a class="nav-link" href="./packages.html">
+<span class="menu-text">Packages</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="https://docs.juliaactuary.org">
+<span class="menu-text">Docs</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="./learn.html">
+<span class="menu-text">Learn</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="./examples.html">
+<span class="menu-text">Examples</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="./community.html">
+<span class="menu-text">Community</span></a>
+</li>
+<li class="nav-item dropdown">
+<a aria-expanded="false" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" id="nav-menu-more" role="link">
+<span class="menu-text">More</span>
+</a>
+<ul aria-labelledby="nav-menu-more" class="dropdown-menu dropdown-menu-end">
+<li>
+<a class="dropdown-item" href="./benchmarks.html">
+<span class="dropdown-text">Benchmarks</span></a>
+</li>
+<li>
+<a class="dropdown-item" href="./blog.html">
+<span class="dropdown-text">Blog</span></a>
+</li>
+<li>
+<a class="dropdown-item" href="https://modernfinancialmodeling.com">
+<span class="dropdown-text">Book</span></a>
+</li>
+</ul>
+</li>
+<li class="nav-item compact">
+<a class="nav-link" href="https://github.com/JuliaActuary"> <i aria-label="JuliaActuary on GitHub" class="bi bi-github" role="img">
+</i>
+<span class="menu-text"></span></a>
+</li>
+<li class="nav-item compact">
+<a class="nav-link" href="./all-posts.xml"> <i aria-label="RSS feed" class="bi bi-rss" role="img">
+</i>
+<span class="menu-text"></span></a>
+</li>
+</ul>
+</div> <!-- /navcollapse -->
+<div class="quarto-navbar-tools">
+</div>
+</div> <!-- /container-fluid -->
+</nav>
 </header>
 <!-- content -->
-<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<div class="quarto-container page-columns page-rows-contents page-layout-article page-navbar" id="quarto-content">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    
 <!-- main -->
-<main class="content page-columns page-full" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
-
-
-
-
+<main class="content page-columns page-full" id="quarto-document-content"><header class="quarto-title-block" id="title-block-header"></header>
 <div class="column-page hero">
-<div class="hero-fullwidth">
-<p>Practical, extensible, and open-source actuarial modeling and analysis.</p>
+<p><span class="hero-label">JuliaActuary / Open source</span></p>
+<section class="level1 unlisted unnumbered" id="actuarial-modeling-built-for-julia.">
+<h1 class="unlisted unnumbered">Actuarial modeling, built for Julia.</h1>
+<div class="hero-intro">
+<p>Practical, extensible tools for mortality, financial valuation, and experience analysis.</p>
 </div>
-<div class="grid hero-grid">
-<section id="high-performance-computing" class="level3 hero-child">
-<h3 class="anchored" data-anchor-id="high-performance-computing">High-Performance Computing</h3>
-<p>Designed for speed and efficiency, enabling high-performance numerical computing, quantitative analysis, modeling, and simulation.</p>
+<div class="hero-actions">
+<p><a class="btn btn-primary" href="./learn.html">Get started</a> <a class="btn btn-outline-light" href="./packages.html">Browse packages</a></p>
+</div>
+<div class="hero-grid">
+<section class="level2 unlisted unnumbered hero-child" id="mortality-and-survival">
+<h2 class="unlisted unnumbered anchored" data-anchor-id="mortality-and-survival">Mortality and survival</h2>
+<p>Work with standard tables, mortality models, and life contingencies.</p>
 </section>
-<section id="domain-specific-ecosystem" class="level3 hero-child">
-<h3 class="anchored" data-anchor-id="domain-specific-ecosystem">Domain-Specific Ecosystem</h3>
-<p>Extensive ecosystem of libraries and tools catering to technical computing, data science, machine learning, and domain-specific tasks in finance and actuarial science.</p>
+<section class="level2 unlisted unnumbered hero-child" id="financial-valuation">
+<h2 class="unlisted unnumbered anchored" data-anchor-id="financial-valuation">Financial valuation</h2>
+<p>Build yield curves, value cashflows, and measure interest-rate risk.</p>
 </section>
-<section id="productivity-and-interoperability" class="level3 hero-child">
-<h3 class="anchored" data-anchor-id="productivity-and-interoperability">Productivity and Interoperability</h3>
-<p>Clean, readable syntax, comprehensive documentation, and seamless integration with existing languages and tools enhance productivity and accessibility for a wide range of users.</p>
+<section class="level2 unlisted unnumbered hero-child" id="experience-analysis">
+<h2 class="unlisted unnumbered anchored" data-anchor-id="experience-analysis">Experience analysis</h2>
+<p>Calculate exposures and explore insurance experience with Julia’s data ecosystem.</p>
 </section>
 </div>
+</section>
 </div>
 <p><strong>JuliaActuary</strong> is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.</p>
 <p><strong>Julia</strong> is <a href="./posts/julia-for-actuaries/">an ideal language for Actuaries</a> and other financial professionals.</p>
 <p>It is free, open-source software and you can <a href="https://github.com/JuliaActuary/">join the development on Github</a>.</p>
-<section id="code-examples" class="level2">
+<section class="level2" id="code-examples">
 <h2 class="anchored" data-anchor-id="code-examples">Code Examples</h2>
-<div class="swiffy-slider slider-item-reveal slider-nav-autoplay slider-nav-autopause slider-nav-dark slider-indicators-dark " data-slider-nav-autoplay-interval="7500">
-    <ul class="slider-container">
-        <li>
-        <div class="code-carousel">
-          <div class="top">
-    <span class="code-example-head">Getting Mortality Tables</span>
-  </div>
-<pre class="julia-repl"><code>julia&gt; using MortalityTables
-
-julia&gt; MortalityTables.table("2015 VBT Smoker Distinct Male Non-Smoker ALB")
-MortalityTable (Insured Lives Mortality):
-   Name:
-       2015 VBT Smoker Distinct Male Non-Smoker ALB
-   Fields:
-       (:select, :ultimate, :metadata)
-   Provider:
-       American Academy of Actuaries along with the Society of Actuaries
-   mort.SOA.org ID:
-       3269
-   mort.SOA.org link:
-       https://mort.soa.org/ViewTable.aspx?&amp;TableIdentity=3269
-   Description:
-       2015 Valuation Basic Table (VBT) Smoker Distinct Table...</code></pre>
-       </div>
-        </li>
-        <li>
-        <div class="code-carousel">
-          <div class="top">
-        <span class="code-example-head">Working with Yield Curves</span>
-  </div>
-
-<pre class="julia"><code>using FinanceModels
-
-maturities = [0.5, 1.0, 1.5, 2.0]
-rates = [5.0, 5.8, 6.4, 6.8] ./ 100
-quotes = ZCBYield.(rates, maturities)
-
-curve = fit(Spline.Linear(), quotes, Fit.Bootstrap())
-discount(curve, 2.0)          # discount factor to year 2
-zero(curve, 1.5)              # continuously compounded zero rate
-forward(curve, 1.0, 2.0)      # rate between years 1 and 2</code></pre>
-
-
-        </div></li>
-                <li>
-        <div class="code-carousel">
-                <div class="code-carousel">
-          <div class="top">
-        <span class="code-example-head">Financial Maths</span>
-  </div>
-<pre class="julia-repl"><code>
-julia&gt; using ActuaryUtilities
-
-julia&gt; cashflows = [5, 5, 105]
-julia&gt; discount_rate = 0.03
-
-julia&gt; round(present_value(discount_rate, cashflows); digits=2)
-105.66
-
-julia&gt; round(duration(Macaulay(), discount_rate, cashflows); digits=2)
-2.86
-
-julia&gt; round(duration(discount_rate, cashflows); digits=2)
-2.78
-
-julia&gt; round(convexity(discount_rate, cashflows); digits=2)
-10.63</code></pre>
-
-
-        </div></div></li>
-                <li>
-        <div class="code-carousel">
-                <div class="code-carousel">
-          <div class="top">
-        <span class="code-example-head">Life Contingencies</span>
-  </div>
-<pre class="julia"><code>using LifeContingencies
-using MortalityTables
-using FinanceCore
-
-# load mortality rates from MortalityTables.jl
-vbt2015 = MortalityTables.table("2015 VBT Smoker Distinct Male Non-Smoker ALB")
-
-issue_age = 30
-life = SingleLife(                       # The life underlying the risk
-    mortality = vbt2015.select[issue_age],    # -- Mortality rates
-)
-
-yield = Periodic(0.05, 1)            # Using a flat 5% interest rate
-
-lc = LifeContingency(life, yield)        # combine the life with the yield
-ins = Insurance(lc)                      # alternate way to construct: Insurance(life, yield)
-
-# Summary Scalars
-present_value(ins)                       # The actuarial present value
-premium_net(lc)                          # Net whole life premium
-LifeContingencies.V(lc,5)                # Net premium reserve for whole life insurance at time 5</code></pre>
-
-
-        </div></div></li>
-
-    </ul>
-
-    <button type="button" class="slider-nav"></button>
-    <button type="button" class="slider-nav slider-nav-next"></button>
-
-    <div class="slider-indicators">
-        <button class="active"></button>
-        <button></button>
-        <button></button>
-        <button></button>
-    </div>
+<div class="tabset-margin-container"></div><div class="panel-tabset code-examples">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a aria-controls="tabset-1-1" aria-selected="true" class="nav-link active" data-bs-target="#tabset-1-1" data-bs-toggle="tab" href="" id="tabset-1-1-tab" role="tab">Mortality tables</a></li><li class="nav-item" role="presentation"><a aria-controls="tabset-1-2" aria-selected="false" class="nav-link" data-bs-target="#tabset-1-2" data-bs-toggle="tab" href="" id="tabset-1-2-tab" role="tab">Yield curves</a></li><li class="nav-item" role="presentation"><a aria-controls="tabset-1-3" aria-selected="false" class="nav-link" data-bs-target="#tabset-1-3" data-bs-toggle="tab" href="" id="tabset-1-3-tab" role="tab">Financial maths</a></li><li class="nav-item" role="presentation"><a aria-controls="tabset-1-4" aria-selected="false" class="nav-link" data-bs-target="#tabset-1-4" data-bs-toggle="tab" href="" id="tabset-1-4-tab" role="tab">Life contingencies</a></li></ul>
+<div class="tab-content code-examples">
+<div aria-labelledby="tabset-1-1-tab" class="tab-pane active" id="tabset-1-1" role="tabpanel">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a aria-hidden="true" href="#cb1-1" tabindex="-1"></a>julia<span class="op">&gt;</span> <span class="im">using</span> <span class="bu">MortalityTables</span></span>
+<span id="cb1-2"><a aria-hidden="true" href="#cb1-2" tabindex="-1"></a></span>
+<span id="cb1-3"><a aria-hidden="true" href="#cb1-3" tabindex="-1"></a>julia<span class="op">&gt;</span> MortalityTables.<span class="fu">table</span>(<span class="st">"2015 VBT Smoker Distinct Male Non-Smoker ALB"</span>)</span>
+<span id="cb1-4"><a aria-hidden="true" href="#cb1-4" tabindex="-1"></a>MortalityTable (Insured Lives Mortality)<span class="op">:</span></span>
+<span id="cb1-5"><a aria-hidden="true" href="#cb1-5" tabindex="-1"></a>   Name<span class="op">:</span></span>
+<span id="cb1-6"><a aria-hidden="true" href="#cb1-6" tabindex="-1"></a>       <span class="fl">2015</span> VBT Smoker Distinct Male Non<span class="op">-</span>Smoker ALB</span>
+<span id="cb1-7"><a aria-hidden="true" href="#cb1-7" tabindex="-1"></a>   Fields<span class="op">:</span></span>
+<span id="cb1-8"><a aria-hidden="true" href="#cb1-8" tabindex="-1"></a>       (<span class="op">:</span>select, <span class="op">:</span>ultimate, <span class="op">:</span>metadata)</span>
+<span id="cb1-9"><a aria-hidden="true" href="#cb1-9" tabindex="-1"></a>   Provider<span class="op">:</span></span>
+<span id="cb1-10"><a aria-hidden="true" href="#cb1-10" tabindex="-1"></a>       American Academy of Actuaries along with the Society of Actuaries</span>
+<span id="cb1-11"><a aria-hidden="true" href="#cb1-11" tabindex="-1"></a>   mort.SOA.org ID<span class="op">:</span></span>
+<span id="cb1-12"><a aria-hidden="true" href="#cb1-12" tabindex="-1"></a>       <span class="fl">3269</span></span>
+<span id="cb1-13"><a aria-hidden="true" href="#cb1-13" tabindex="-1"></a>   mort.SOA.org link<span class="op">:</span></span>
+<span id="cb1-14"><a aria-hidden="true" href="#cb1-14" tabindex="-1"></a>       https<span class="op">://</span>mort.soa.org<span class="op">/</span>ViewTable.aspx?<span class="op">&amp;</span>TableIdentity<span class="op">=</span><span class="fl">3269</span></span>
+<span id="cb1-15"><a aria-hidden="true" href="#cb1-15" tabindex="-1"></a>   Description<span class="op">:</span></span>
+<span id="cb1-16"><a aria-hidden="true" href="#cb1-16" tabindex="-1"></a>       <span class="fl">2015</span> Valuation Basic Table (VBT) Smoker Distinct Table<span class="op">...</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 </div>
-    
+<div aria-labelledby="tabset-1-2-tab" class="tab-pane" id="tabset-1-2" role="tabpanel">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a aria-hidden="true" href="#cb2-1" tabindex="-1"></a><span class="im">using</span> <span class="bu">FinanceModels</span></span>
+<span id="cb2-2"><a aria-hidden="true" href="#cb2-2" tabindex="-1"></a></span>
+<span id="cb2-3"><a aria-hidden="true" href="#cb2-3" tabindex="-1"></a>maturities <span class="op">=</span> [<span class="fl">0.5</span>, <span class="fl">1.0</span>, <span class="fl">1.5</span>, <span class="fl">2.0</span>]</span>
+<span id="cb2-4"><a aria-hidden="true" href="#cb2-4" tabindex="-1"></a>rates <span class="op">=</span> [<span class="fl">5.0</span>, <span class="fl">5.8</span>, <span class="fl">6.4</span>, <span class="fl">6.8</span>] <span class="op">./</span> <span class="fl">100</span></span>
+<span id="cb2-5"><a aria-hidden="true" href="#cb2-5" tabindex="-1"></a>quotes <span class="op">=</span> <span class="fu">ZCBYield</span>.(rates, maturities)</span>
+<span id="cb2-6"><a aria-hidden="true" href="#cb2-6" tabindex="-1"></a></span>
+<span id="cb2-7"><a aria-hidden="true" href="#cb2-7" tabindex="-1"></a>curve <span class="op">=</span> <span class="fu">fit</span>(Spline.<span class="fu">Linear</span>(), quotes, Fit.<span class="fu">Bootstrap</span>())</span>
+<span id="cb2-8"><a aria-hidden="true" href="#cb2-8" tabindex="-1"></a><span class="fu">discount</span>(curve, <span class="fl">2.0</span>)          <span class="co"># discount factor to year 2</span></span>
+<span id="cb2-9"><a aria-hidden="true" href="#cb2-9" tabindex="-1"></a><span class="fu">zero</span>(curve, <span class="fl">1.5</span>)              <span class="co"># continuously compounded zero rate</span></span>
+<span id="cb2-10"><a aria-hidden="true" href="#cb2-10" tabindex="-1"></a><span class="fu">forward</span>(curve, <span class="fl">1.0</span>, <span class="fl">2.0</span>)      <span class="co"># rate between years 1 and 2</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
+</div>
+<div aria-labelledby="tabset-1-3-tab" class="tab-pane" id="tabset-1-3" role="tabpanel">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a aria-hidden="true" href="#cb3-1" tabindex="-1"></a>julia<span class="op">&gt;</span> <span class="im">using</span> <span class="bu">ActuaryUtilities</span></span>
+<span id="cb3-2"><a aria-hidden="true" href="#cb3-2" tabindex="-1"></a></span>
+<span id="cb3-3"><a aria-hidden="true" href="#cb3-3" tabindex="-1"></a>julia<span class="op">&gt;</span> cashflows <span class="op">=</span> [<span class="fl">5</span>, <span class="fl">5</span>, <span class="fl">105</span>]</span>
+<span id="cb3-4"><a aria-hidden="true" href="#cb3-4" tabindex="-1"></a>julia<span class="op">&gt;</span> discount_rate <span class="op">=</span> <span class="fl">0.03</span></span>
+<span id="cb3-5"><a aria-hidden="true" href="#cb3-5" tabindex="-1"></a></span>
+<span id="cb3-6"><a aria-hidden="true" href="#cb3-6" tabindex="-1"></a>julia<span class="op">&gt;</span> <span class="fu">round</span>(<span class="fu">present_value</span>(discount_rate, cashflows); digits<span class="op">=</span><span class="fl">2</span>)</span>
+<span id="cb3-7"><a aria-hidden="true" href="#cb3-7" tabindex="-1"></a><span class="fl">105.66</span></span>
+<span id="cb3-8"><a aria-hidden="true" href="#cb3-8" tabindex="-1"></a></span>
+<span id="cb3-9"><a aria-hidden="true" href="#cb3-9" tabindex="-1"></a>julia<span class="op">&gt;</span> <span class="fu">round</span>(<span class="fu">duration</span>(<span class="fu">Macaulay</span>(), discount_rate, cashflows); digits<span class="op">=</span><span class="fl">2</span>)</span>
+<span id="cb3-10"><a aria-hidden="true" href="#cb3-10" tabindex="-1"></a><span class="fl">2.86</span></span>
+<span id="cb3-11"><a aria-hidden="true" href="#cb3-11" tabindex="-1"></a></span>
+<span id="cb3-12"><a aria-hidden="true" href="#cb3-12" tabindex="-1"></a>julia<span class="op">&gt;</span> <span class="fu">round</span>(<span class="fu">duration</span>(discount_rate, cashflows); digits<span class="op">=</span><span class="fl">2</span>)</span>
+<span id="cb3-13"><a aria-hidden="true" href="#cb3-13" tabindex="-1"></a><span class="fl">2.78</span></span>
+<span id="cb3-14"><a aria-hidden="true" href="#cb3-14" tabindex="-1"></a></span>
+<span id="cb3-15"><a aria-hidden="true" href="#cb3-15" tabindex="-1"></a>julia<span class="op">&gt;</span> <span class="fu">round</span>(<span class="fu">convexity</span>(discount_rate, cashflows); digits<span class="op">=</span><span class="fl">2</span>)</span>
+<span id="cb3-16"><a aria-hidden="true" href="#cb3-16" tabindex="-1"></a><span class="fl">10.63</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
+</div>
+<div aria-labelledby="tabset-1-4-tab" class="tab-pane" id="tabset-1-4" role="tabpanel">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a aria-hidden="true" href="#cb4-1" tabindex="-1"></a><span class="im">using</span> <span class="bu">LifeContingencies</span></span>
+<span id="cb4-2"><a aria-hidden="true" href="#cb4-2" tabindex="-1"></a><span class="im">using</span> <span class="bu">MortalityTables</span></span>
+<span id="cb4-3"><a aria-hidden="true" href="#cb4-3" tabindex="-1"></a><span class="im">using</span> <span class="bu">FinanceCore</span></span>
+<span id="cb4-4"><a aria-hidden="true" href="#cb4-4" tabindex="-1"></a></span>
+<span id="cb4-5"><a aria-hidden="true" href="#cb4-5" tabindex="-1"></a><span class="co"># load mortality rates from MortalityTables.jl</span></span>
+<span id="cb4-6"><a aria-hidden="true" href="#cb4-6" tabindex="-1"></a>vbt2015 <span class="op">=</span> MortalityTables.<span class="fu">table</span>(<span class="st">"2015 VBT Smoker Distinct Male Non-Smoker ALB"</span>)</span>
+<span id="cb4-7"><a aria-hidden="true" href="#cb4-7" tabindex="-1"></a></span>
+<span id="cb4-8"><a aria-hidden="true" href="#cb4-8" tabindex="-1"></a>issue_age <span class="op">=</span> <span class="fl">30</span></span>
+<span id="cb4-9"><a aria-hidden="true" href="#cb4-9" tabindex="-1"></a>life <span class="op">=</span> <span class="fu">SingleLife</span>(                       <span class="co"># The life underlying the risk</span></span>
+<span id="cb4-10"><a aria-hidden="true" href="#cb4-10" tabindex="-1"></a>    mortality <span class="op">=</span> vbt2015.select[issue_age],    <span class="co"># -- Mortality rates</span></span>
+<span id="cb4-11"><a aria-hidden="true" href="#cb4-11" tabindex="-1"></a>)</span>
+<span id="cb4-12"><a aria-hidden="true" href="#cb4-12" tabindex="-1"></a></span>
+<span id="cb4-13"><a aria-hidden="true" href="#cb4-13" tabindex="-1"></a>yield <span class="op">=</span> <span class="fu">Periodic</span>(<span class="fl">0.05</span>, <span class="fl">1</span>)            <span class="co"># Using a flat 5% interest rate</span></span>
+<span id="cb4-14"><a aria-hidden="true" href="#cb4-14" tabindex="-1"></a></span>
+<span id="cb4-15"><a aria-hidden="true" href="#cb4-15" tabindex="-1"></a>lc <span class="op">=</span> <span class="fu">LifeContingency</span>(life, yield)        <span class="co"># combine the life with the yield</span></span>
+<span id="cb4-16"><a aria-hidden="true" href="#cb4-16" tabindex="-1"></a>ins <span class="op">=</span> <span class="fu">Insurance</span>(lc)                      <span class="co"># alternate way to construct: Insurance(life, yield)</span></span>
+<span id="cb4-17"><a aria-hidden="true" href="#cb4-17" tabindex="-1"></a></span>
+<span id="cb4-18"><a aria-hidden="true" href="#cb4-18" tabindex="-1"></a><span class="co"># Summary Scalars</span></span>
+<span id="cb4-19"><a aria-hidden="true" href="#cb4-19" tabindex="-1"></a><span class="fu">present_value</span>(ins)                       <span class="co"># The actuarial present value</span></span>
+<span id="cb4-20"><a aria-hidden="true" href="#cb4-20" tabindex="-1"></a><span class="fu">premium_net</span>(lc)                          <span class="co"># Net whole life premium</span></span>
+<span id="cb4-21"><a aria-hidden="true" href="#cb4-21" tabindex="-1"></a>LifeContingencies.<span class="fu">V</span>(lc,<span class="fl">5</span>)                <span class="co"># Net premium reserve for whole life insurance at time 5</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
+</div>
+</div>
+</div>
 <p>The life-contingency example uses the compatible LifeContingencies 2.5 / FinanceCore 2 / MortalityTables 2 environment. See <a href="./packages.html#current-releases">package compatibility</a> before combining it with the newer finance and mortality releases.</p>
 </section>
-<section id="packages" class="level2">
+<section class="level2" id="packages">
 <h2 class="anchored" data-anchor-id="packages">Packages</h2>
 <p>See the <a href="./packages.html#current-releases">current releases and migration guides</a>, including the Julia 1.10 minimum for the latest finance and mortality packages.</p>
 <p><a href="./packages.html#mortalitytables.jl"><code>MortalityTables.jl</code></a> - Easily work with standard <a href="https://mort.soa.org/">mort.SOA.org</a> tables and parametric models with common survival calculations.</p>
@@ -318,10 +306,7 @@ LifeContingencies.V(lc,5)                # Net premium reserve for whole life in
 <p><a href="./packages.html#financemodels.jl"><code>FinanceModels.jl</code></a> - Composable contracts, models, and functions for financial instruments — including stochastic short-rate models and Monte Carlo simulation.</p>
 <p><a href="./packages.html#experienceanalysis.jl"><code>ExperienceAnalysis.jl</code></a> - Meeting your exposure calculation needs.</p>
 <p><a href="./packages.html#economicscenariogenerators.jl"><code>EconomicScenarioGenerators.jl</code></a> - Scenario generation for existing ESG workflows. For current short-rate models, see FinanceModels 7 and the <a href="./packages.html#economicscenariogenerators.jl">compatibility notes</a>.</p>
-
-
 </section>
-
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
@@ -724,8 +709,4 @@ LifeContingencies.V(lc,5)                # Net premium reserve for whole life in
   });
   </script>
 </div> <!-- /content -->
-
-
-
-
 </body></html>

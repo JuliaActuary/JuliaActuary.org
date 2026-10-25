@@ -1,13 +1,10 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
-<meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.16">
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-
-<meta name="description" content="JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.">
-
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml"><head>
+<meta charset="utf-8"/>
+<meta content="quarto-1.9.16" name="generator"/>
+<meta content="width=device-width, initial-scale=1.0, user-scalable=yes" name="viewport"/>
+<meta content="JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows." name="description"/>
 <title>Poisson approximation to Binomial – JuliaActuary</title>
 <style>
 code{white-space: pre-wrap;}
@@ -21,28 +18,61 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
-
-
 <script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="../../site_libs/quarto-nav/headroom.min.js"></script>
 <script src="../../site_libs/clipboard/clipboard.min.js"></script>
 <script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="../../">
-<link href="../..//assets/logos/favicon.ico" rel="icon">
+<meta content="../../" name="quarto:offset"/>
+<link href="../..//assets/logos/favicon.ico" rel="icon"/>
 <script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
-<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-a0731b9a3a5d496010872d775e5d9bc3.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet"/>
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-be14ce6d32a635bebd8f9e4e558f9eeb.css" id="quarto-text-highlighting-styles" rel="stylesheet"/>
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-98ac2d5361ef6f18cc0525d38bedc462.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet"/>
+<link append-hash="true" data-mode="light" href="../../site_libs/bootstrap/bootstrap-4a135b976b00f53a3a768ff94eb1df18.min.css" id="quarto-bootstrap" rel="stylesheet"/>
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -70,130 +100,112 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&amp;family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&amp;display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../../assets/highlight/styles/github.min.css">
-<script src="../../assets/highlight/highlight.min.js"></script>
-<script src="../../assets/highlight/languages/julia.min.js"></script>
-<script src="../../assets/highlight/languages/julia-repl.min.js"></script>
-<script src="../../assets/highlight/languages/python.min.js"></script>
-<script src="../../assets/highlight/languages/r.min.js"></script>
-<script>hljs.highlightAll();</script>
-<script data-goatcounter="https://juliaactuary.goatcounter.com/count" async="" src="//gc.zgo.at/count.js"></script>
-
-
-<link rel="stylesheet" href="../../styles.css">
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" rel="stylesheet"/>
+<script async="" data-goatcounter="https://juliaactuary.goatcounter.com/count" src="//gc.zgo.at/count.js"></script>
+<link href="../../styles-c416c153cdf24884.css" rel="stylesheet"/>
 </head>
-
 <body class="nav-fixed fullcontent quarto-light">
-
 <div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top quarto-banner">
-    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
-      <div class="navbar-container container-fluid">
-      <div class="navbar-brand-container mx-auto">
-    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
-    <img src="../../assets/logos/android-chrome-512x512.png" alt="JuliaActuary Logo" class="navbar-logo light-content">
-    <img src="../../assets/logos/android-chrome-512x512.png" alt="JuliaActuary Logo" class="navbar-logo dark-content">
-    </a>
-    <a class="navbar-brand" href="../../index.html">
-    <span class="navbar-title">JuliaActuary</span>
-    </a>
-  </div>
-            <div id="quarto-search" class="" title="Search"></div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-  <span class="navbar-toggler-icon"></span>
-</button>
-          <div class="collapse navbar-collapse" id="navbarCollapse">
-            <ul class="navbar-nav navbar-nav-scroll ms-auto">
-  <li class="nav-item">
-    <a class="nav-link" href="../../packages.html"> 
-<span class="menu-text">Packages</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="https://docs.juliaactuary.org"> 
-<span class="menu-text">Docs</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="https://modernfinancialmodeling.com"> 
-<span class="menu-text">Book</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../learn.html"> 
-<span class="menu-text">Learn</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../examples.html"> 
-<span class="menu-text">Examples</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../benchmarks.html"> 
-<span class="menu-text">Benchmarks</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../community.html"> 
-<span class="menu-text">Community</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../blog.html"> 
-<span class="menu-text">Blog</span></a>
-  </li>  
-  <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/JuliaActuary"> <i class="bi bi-github" role="img">
-</i> 
-<span class="menu-text"></span></a>
-  </li>  
-  <li class="nav-item compact">
-    <a class="nav-link" href="../../all-posts.xml"> <i class="bi bi-rss" role="img">
-</i> 
-<span class="menu-text"></span></a>
-  </li>  
-</ul>
-          </div> <!-- /navcollapse -->
-            <div class="quarto-navbar-tools">
+<header class="headroom fixed-top quarto-banner" id="quarto-header">
+<nav class="navbar navbar-expand-lg" data-bs-theme="dark">
+<div class="navbar-container container-fluid">
+<div class="navbar-brand-container mx-auto">
+<a class="navbar-brand navbar-brand-logo" href="../../index.html">
+<img alt="JuliaActuary Logo" class="navbar-logo light-content" src="../../assets/logos/android-chrome-512x512.png"/>
+<img alt="JuliaActuary Logo" class="navbar-logo dark-content" src="../../assets/logos/android-chrome-512x512.png"/>
+</a>
+<a class="navbar-brand" href="../../index.html">
+<span class="navbar-title">JuliaActuary</span>
+</a>
 </div>
-      </div> <!-- /container-fluid -->
-    </nav>
+<div class="" id="quarto-search" title="Search"></div>
+<button aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-bs-target="#navbarCollapse" data-bs-toggle="collapse" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }" role="menu" type="button">
+<span class="navbar-toggler-icon"></span>
+</button>
+<div class="collapse navbar-collapse" id="navbarCollapse">
+<ul class="navbar-nav navbar-nav-scroll ms-auto">
+<li class="nav-item">
+<a class="nav-link" href="../../packages.html">
+<span class="menu-text">Packages</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="https://docs.juliaactuary.org">
+<span class="menu-text">Docs</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="../../learn.html">
+<span class="menu-text">Learn</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="../../examples.html">
+<span class="menu-text">Examples</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="../../community.html">
+<span class="menu-text">Community</span></a>
+</li>
+<li class="nav-item dropdown">
+<a aria-expanded="false" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" id="nav-menu-more" role="link">
+<span class="menu-text">More</span>
+</a>
+<ul aria-labelledby="nav-menu-more" class="dropdown-menu dropdown-menu-end">
+<li>
+<a class="dropdown-item" href="../../benchmarks.html">
+<span class="dropdown-text">Benchmarks</span></a>
+</li>
+<li>
+<a class="dropdown-item" href="../../blog.html">
+<span class="dropdown-text">Blog</span></a>
+</li>
+<li>
+<a class="dropdown-item" href="https://modernfinancialmodeling.com">
+<span class="dropdown-text">Book</span></a>
+</li>
+</ul>
+</li>
+<li class="nav-item compact">
+<a class="nav-link" href="https://github.com/JuliaActuary"> <i aria-label="JuliaActuary on GitHub" class="bi bi-github" role="img">
+</i>
+<span class="menu-text"></span></a>
+</li>
+<li class="nav-item compact">
+<a class="nav-link" href="../../all-posts.xml"> <i aria-label="RSS feed" class="bi bi-rss" role="img">
+</i>
+<span class="menu-text"></span></a>
+</li>
+</ul>
+</div> <!-- /navcollapse -->
+<div class="quarto-navbar-tools">
+</div>
+</div> <!-- /container-fluid -->
+</nav>
 </header>
 <!-- content -->
-<header id="title-block-header" class="quarto-title-block default page-columns page-full">
-  <div class="quarto-title-banner page-columns page-full">
-    <div class="quarto-title column-body">
-      <h1 class="title">Poisson approximation to Binomial</h1>
-                  <div>
-        <div class="description">
+<header class="quarto-title-block default page-columns page-full" id="title-block-header">
+<div class="quarto-title-banner page-columns page-full">
+<div class="quarto-title column-body">
+<h1 class="title">Poisson approximation to Binomial</h1>
+<div>
+<div class="description">
           JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.
         </div>
-      </div>
-                          <div class="quarto-categories">
-                <div class="quarto-category">modeling</div>
-                <div class="quarto-category">statistics</div>
-                <div class="quarto-category">experience-analysis</div>
-              </div>
-                  </div>
-  </div>
-    
-  
-  <div class="quarto-title-meta">
-
-      
-    
-      
-    </div>
-    
-  
-  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+</div>
+<div class="quarto-categories">
+<div class="quarto-category">modeling</div>
+<div class="quarto-category">statistics</div>
+<div class="quarto-category">experience-analysis</div>
+</div>
+</div>
+</div>
+<div class="quarto-title-meta">
+</div>
+</header><div class="quarto-container page-columns page-rows-contents page-layout-article page-navbar" id="quarto-content">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    
 <!-- main -->
 <main class="content quarto-banner-title-block page-columns page-full" id="quarto-document-content">
-
-
-
-
-
 <p>This notebook explores using the Poissson approximation to the Binomial. This can be useful for a number of reasons:</p>
 <ol type="1">
 <li>The Binomial probability mass formula becomes more unwieldy for large <code>N</code> faster than it does for the Poisson.</li>
@@ -206,24 +218,24 @@ ul.task-list li input[type="checkbox"] {
 <p>According to two rules of thumb, this approximation is good if n ≥ 20 and p ≤ 0.05, or if n ≥ 100 and np ≤ 10.</p>
 </blockquote>
 <p>It’s not really that simple, and arguably a bit restrictive as this analysis will show.</p>
-<section id="approach" class="level2">
+<section class="level2" id="approach">
 <h2 class="anchored" data-anchor-id="approach">Approach</h2>
 <p>We will use Julia and Turing.jl to simulate the posterior distribution. Our prior for the parameter $q$ will be ${Uniform} = Beta(1,1)$.</p>
 <p>We will sample from the posterior using the No-U-Turn (NUTS) sampler, and aggregate the results of the chains over $(trials) trials of simulated outcomes for the given $q$ and $N$.</p>
 <p>This is overkill for a toy problem where we could just model the parameters themselves, but it demonstrates using Bayesian MCMC techniques in a simple, exploratory fashion.</p>
 <p>We begin by importing the relevant packages:</p>
-<div id="4" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>using Turing
-using CairoMakie
-using StatsBase
-using MCMCChains
-using DataFrames
-using ThreadsX
-using Logging
-using Markdown
-
-include(joinpath(@__DIR__, "..", "..", "assets", "themes", "cassette_futurism.jl"))
-set_theme!(cassette_futurism_theme())</code></pre>
+<div class="cell" data-execution_count="1" id="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a aria-hidden="true" href="#cb1-1" tabindex="-1"></a><span class="im">using</span> <span class="bu">Turing</span></span>
+<span id="cb1-2"><a aria-hidden="true" href="#cb1-2" tabindex="-1"></a><span class="im">using</span> <span class="bu">CairoMakie</span></span>
+<span id="cb1-3"><a aria-hidden="true" href="#cb1-3" tabindex="-1"></a><span class="im">using</span> <span class="bu">StatsBase</span></span>
+<span id="cb1-4"><a aria-hidden="true" href="#cb1-4" tabindex="-1"></a><span class="im">using</span> <span class="bu">MCMCChains</span></span>
+<span id="cb1-5"><a aria-hidden="true" href="#cb1-5" tabindex="-1"></a><span class="im">using</span> <span class="bu">DataFrames</span></span>
+<span id="cb1-6"><a aria-hidden="true" href="#cb1-6" tabindex="-1"></a><span class="im">using</span> <span class="bu">ThreadsX</span></span>
+<span id="cb1-7"><a aria-hidden="true" href="#cb1-7" tabindex="-1"></a><span class="im">using</span> <span class="bu">Logging</span></span>
+<span id="cb1-8"><a aria-hidden="true" href="#cb1-8" tabindex="-1"></a><span class="im">using</span> <span class="bu">Markdown</span></span>
+<span id="cb1-9"><a aria-hidden="true" href="#cb1-9" tabindex="-1"></a></span>
+<span id="cb1-10"><a aria-hidden="true" href="#cb1-10" tabindex="-1"></a><span class="fu">include</span>(<span class="fu">joinpath</span>(<span class="pp">@__DIR__</span>, <span class="st">".."</span>, <span class="st">".."</span>, <span class="st">"assets"</span>, <span class="st">"themes"</span>, <span class="st">"cassette_futurism.jl"</span>))</span>
+<span id="cb1-11"><a aria-hidden="true" href="#cb1-11" tabindex="-1"></a><span class="fu">set_theme!</span>(<span class="fu">cassette_futurism_theme</span>())</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <div class="ansi-escaped-output">
 <pre><span class="ansi-green-fg ansi-bold">Precompiling</span> packages...
@@ -238,38 +250,38 @@ set_theme!(cassette_futurism_theme())</code></pre>
 </div>
 <p>““”</p>
 </section>
-<section id="define-the-models" class="level2">
+<section class="level2" id="define-the-models">
 <h2 class="anchored" data-anchor-id="define-the-models">Define the Models</h2>
-<div id="6" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>@model function poisson(N,n_events) 
-    q ~ Beta(1,1)
-    
-    n_events ~ Poisson(q*N)
-end
-
-@model function binom(N,n_events) 
-    q ~ Beta(1,1)
-    
-    n_events ~ Binomial(N,q)
-end</code></pre>
+<div class="cell" data-execution_count="1" id="6">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a aria-hidden="true" href="#cb2-1" tabindex="-1"></a><span class="pp">@model</span> <span class="kw">function</span> <span class="fu">poisson</span>(N,n_events) </span>
+<span id="cb2-2"><a aria-hidden="true" href="#cb2-2" tabindex="-1"></a>    q <span class="op">~</span> <span class="fu">Beta</span>(<span class="fl">1</span>,<span class="fl">1</span>)</span>
+<span id="cb2-3"><a aria-hidden="true" href="#cb2-3" tabindex="-1"></a>    </span>
+<span id="cb2-4"><a aria-hidden="true" href="#cb2-4" tabindex="-1"></a>    n_events <span class="op">~</span> <span class="fu">Poisson</span>(q<span class="op">*</span>N)</span>
+<span id="cb2-5"><a aria-hidden="true" href="#cb2-5" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb2-6"><a aria-hidden="true" href="#cb2-6" tabindex="-1"></a></span>
+<span id="cb2-7"><a aria-hidden="true" href="#cb2-7" tabindex="-1"></a><span class="pp">@model</span> <span class="kw">function</span> <span class="fu">binom</span>(N,n_events) </span>
+<span id="cb2-8"><a aria-hidden="true" href="#cb2-8" tabindex="-1"></a>    q <span class="op">~</span> <span class="fu">Beta</span>(<span class="fl">1</span>,<span class="fl">1</span>)</span>
+<span id="cb2-9"><a aria-hidden="true" href="#cb2-9" tabindex="-1"></a>    </span>
+<span id="cb2-10"><a aria-hidden="true" href="#cb2-10" tabindex="-1"></a>    n_events <span class="op">~</span> <span class="fu">Binomial</span>(N,q)</span>
+<span id="cb2-11"><a aria-hidden="true" href="#cb2-11" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>binom (generic function with 2 methods)</code></pre>
 </div>
 </div>
 </section>
-<section id="simulation-parameters" class="level2">
+<section class="level2" id="simulation-parameters">
 <h2 class="anchored" data-anchor-id="simulation-parameters">Simulation Parameters</h2>
-<div id="8" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>trials = 30
-
-# true probabilities
-qs = [0.05,0.25,0.5,0.75,0.95]
-
-# number of observations
-Ns = [10,25,50,100,250,500,1000,5000]
-
-# combine q and N into joint model points
-model_points =  [(;q,N) for q in qs, N in Ns]</code></pre>
+<div class="cell" data-execution_count="1" id="8">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a aria-hidden="true" href="#cb4-1" tabindex="-1"></a>trials <span class="op">=</span> <span class="fl">30</span></span>
+<span id="cb4-2"><a aria-hidden="true" href="#cb4-2" tabindex="-1"></a></span>
+<span id="cb4-3"><a aria-hidden="true" href="#cb4-3" tabindex="-1"></a><span class="co"># true probabilities</span></span>
+<span id="cb4-4"><a aria-hidden="true" href="#cb4-4" tabindex="-1"></a>qs <span class="op">=</span> [<span class="fl">0.05</span>,<span class="fl">0.25</span>,<span class="fl">0.5</span>,<span class="fl">0.75</span>,<span class="fl">0.95</span>]</span>
+<span id="cb4-5"><a aria-hidden="true" href="#cb4-5" tabindex="-1"></a></span>
+<span id="cb4-6"><a aria-hidden="true" href="#cb4-6" tabindex="-1"></a><span class="co"># number of observations</span></span>
+<span id="cb4-7"><a aria-hidden="true" href="#cb4-7" tabindex="-1"></a>Ns <span class="op">=</span> [<span class="fl">10</span>,<span class="fl">25</span>,<span class="fl">50</span>,<span class="fl">100</span>,<span class="fl">250</span>,<span class="fl">500</span>,<span class="fl">1000</span>,<span class="fl">5000</span>]</span>
+<span id="cb4-8"><a aria-hidden="true" href="#cb4-8" tabindex="-1"></a></span>
+<span id="cb4-9"><a aria-hidden="true" href="#cb4-9" tabindex="-1"></a><span class="co"># combine q and N into joint model points</span></span>
+<span id="cb4-10"><a aria-hidden="true" href="#cb4-10" tabindex="-1"></a>model_points <span class="op">=</span>  [(;q,N) for q <span class="kw">in</span> qs, N <span class="kw">in</span> Ns]</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>5×8 Matrix{@NamedTuple{q::Float64, N::Int64}}:
  (q = 0.05, N = 10)  (q = 0.05, N = 25)  …  (q = 0.05, N = 5000)
@@ -280,22 +292,22 @@ model_points =  [(;q,N) for q in qs, N in Ns]</code></pre>
 </div>
 </div>
 </section>
-<section id="sample-from-the-posterior" class="level2">
+<section class="level2" id="sample-from-the-posterior">
 <h2 class="anchored" data-anchor-id="sample-from-the-posterior">Sample from the Posterior</h2>
 <p>This is a collection of samples (chains) from Markov chains that are sampled in proportion to the posterior density. If this is new to you, I highly recommend the book <em>Statistical Rethinking</em>:</p>
-<div id="10" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>Logging.disable_logging(Logging.Warn); #Disable warning logs to improve sampling time
-
-bpchains = map(model_points) do mp
-    
-    ThreadsX.map(1:trials) do i
-        claims = sum(rand() &lt; mp.q for _ in 1:mp.N)
-        bc = MCMCChains.Chains(sample(binom(mp.N,claims), NUTS(), 500))
-        pc = MCMCChains.Chains(sample(poisson(mp.N,claims), NUTS(), 500))
-
-        (;bc,pc)
-    end
-end</code></pre>
+<div class="cell" data-execution_count="1" id="10">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a aria-hidden="true" href="#cb6-1" tabindex="-1"></a><span class="bu">Logging</span>.<span class="fu">disable_logging</span>(<span class="bu">Logging</span>.Warn); <span class="co">#Disable warning logs to improve sampling time</span></span>
+<span id="cb6-2"><a aria-hidden="true" href="#cb6-2" tabindex="-1"></a></span>
+<span id="cb6-3"><a aria-hidden="true" href="#cb6-3" tabindex="-1"></a>bpchains <span class="op">=</span> <span class="fu">map</span>(model_points) <span class="cf">do</span> mp</span>
+<span id="cb6-4"><a aria-hidden="true" href="#cb6-4" tabindex="-1"></a>    </span>
+<span id="cb6-5"><a aria-hidden="true" href="#cb6-5" tabindex="-1"></a>    ThreadsX.<span class="fu">map</span>(<span class="fl">1</span><span class="op">:</span>trials) <span class="cf">do</span> i</span>
+<span id="cb6-6"><a aria-hidden="true" href="#cb6-6" tabindex="-1"></a>        claims <span class="op">=</span> <span class="fu">sum</span>(<span class="fu">rand</span>() <span class="op">&lt;</span> mp.q <span class="cf">for</span> _ <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>mp.N)</span>
+<span id="cb6-7"><a aria-hidden="true" href="#cb6-7" tabindex="-1"></a>        bc <span class="op">=</span> MCMCChains.<span class="fu">Chains</span>(<span class="fu">sample</span>(<span class="fu">binom</span>(mp.N,claims), <span class="fu">NUTS</span>(), <span class="fl">500</span>))</span>
+<span id="cb6-8"><a aria-hidden="true" href="#cb6-8" tabindex="-1"></a>        pc <span class="op">=</span> MCMCChains.<span class="fu">Chains</span>(<span class="fu">sample</span>(<span class="fu">poisson</span>(mp.N,claims), <span class="fu">NUTS</span>(), <span class="fl">500</span>))</span>
+<span id="cb6-9"><a aria-hidden="true" href="#cb6-9" tabindex="-1"></a></span>
+<span id="cb6-10"><a aria-hidden="true" href="#cb6-10" tabindex="-1"></a>        (;bc,pc)</span>
+<span id="cb6-11"><a aria-hidden="true" href="#cb6-11" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb6-12"><a aria-hidden="true" href="#cb6-12" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>5×8 Matrix{Vector{@NamedTuple{bc::Chains{Float64, AxisArrays.AxisArray{Float64, 3, Array{Float64, 3}, Tuple{AxisArrays.Axis{:iter, UnitRange{Int64}}, AxisArrays.Axis{:var, Vector{Symbol}}, AxisArrays.Axis{:chain, UnitRange{Int64}}}}, Missing, @NamedTuple{parameters::Vector{Symbol}, internals::Vector{Symbol}}, @NamedTuple{varname_to_symbol::OrderedDict{AbstractPPL.VarName, Symbol}, start_time::Vector{Float64}, stop_time::Vector{Float64}}}, pc::Chains{Float64, AxisArrays.AxisArray{Float64, 3, Array{Float64, 3}, Tuple{AxisArrays.Axis{:iter, UnitRange{Int64}}, AxisArrays.Axis{:var, Vector{Symbol}}, AxisArrays.Axis{:chain, UnitRange{Int64}}}}, Missing, @NamedTuple{parameters::Vector{Symbol}, internals::Vector{Symbol}}, @NamedTuple{varname_to_symbol::OrderedDict{AbstractPPL.VarName, Symbol}, start_time::Vector{Float64}, stop_time::Vector{Float64}}}}}}:
  [(bc = MCMC chain (500×15×1 Array{Float64, 3}), pc = MCMC chain (500×15×1 Array{Float64, 3})), (bc = MCMC chain (500×15×1 Array{Float64, 3}), pc = MCMC chain (500×15×1 Array{Float64, 3})), (bc = MCMC chain (500×15×1 Array{Float64, 3}), pc = MCMC chain (500×15×1 Array{Float64, 3})), (bc = MCMC chain (500×15×1 Array{Float64, 3}), pc = MCMC chain (500×15×1 Array{Float64, 3})), (bc = MCMC chain (500×15×1 Array{Float64, 3}), pc = MCMC chain (500×15×1 Array{Float64, 3})), (bc = MCMC chain (500×15×1 Array{Float64, 3}), pc = MCMC chain (500×15×1 Array{Float64, 3})), (bc = MCMC chain (500×15×1 Array{Float64, 3}), pc = MCMC chain (500×15×1 Array{Float64, 3})), (bc = MCMC chain (500×15×1 Array{Float64, 3}), pc = MCMC chain (500×15×1 Array{Float64, 3})), (bc = MCMC chain (500×15×1 Array{Float64, 3}), pc = MCMC chain (500×15×1 Array{Float64, 3})), (bc = MCMC chain (500×15×1 Array{Float64, 3}), pc = MCMC chain (500×15×1 Array{Float64, 3}))  …  (bc = MCMC chain (500×15×1 Array{Float64, 3}), pc = MCMC chain (500×15×1 Array{Float64, 3})), (bc = MCMC chain (500×15×1 Array{Float64, 3}), pc = MCMC chain (500×15×1 Array{Float64, 3})), (bc = MCMC chain (500×15×1 Array{Float64, 3}), pc = MCMC chain (500×15×1 Array{Float64, 3})), (bc = MCMC chain (500×15×1 Array{Float64, 3}), pc = MCMC chain (500×15×1 Array{Float64, 3})), (bc = MCMC chain (500×15×1 Array{Float64, 3}), pc = MCMC chain (500×15×1 Array{Float64, 3})), (bc = MCMC chain (500×15×1 Array{Float64, 3}), pc = MCMC chain (500×15×1 Array{Float64, 3})), (bc = MCMC chain (500×15×1 Array{Float64, 3}), pc = MCMC chain (500×15×1 Array{Float64, 3})), (bc = MCMC chain (500×15×1 Array{Float64, 3}), pc = MCMC chain (500×15×1 Array{Float64, 3})), (bc = MCMC chain (500×15×1 Array{Float64, 3}), pc = MCMC chain (500×15×1 Array{Float64, 3})), (bc = MCMC chain (500×15×1 Array{Float64, 3}), pc = MCMC chain (500×15×1 Array{Float64, 3}))]  …  [(bc = MCMC chain (500×15×1 Array{Float64, 3}), pc = MCMC chain (500×15×1 Array{Float64, 3})), (bc = MCMC chain (500×15×1 Array{Float64, 3}), pc = MCMC chain (500×15×1 Array{Float64, 3})), (bc = MCMC chain (500×15×1 Array{Float64, 3}), pc = MCMC chain (500×15×1 Array{Float64, 3})), (bc = MCMC chain (500×15×1 Array{Float64, 3}), pc = MCMC chain (500×15×1 Array{Float64, 3})), (bc = MCMC chain (500×15×1 Array{Float64, 3}), pc = MCMC chain (500×15×1 Array{Float64, 3})), (bc = MCMC chain (500×15×1 Array{Float64, 3}), pc = MCMC chain (500×15×1 Array{Float64, 3})), (bc = MCMC chain (500×15×1 Array{Float64, 3}), pc = MCMC chain (500×15×1 Array{Float64, 3})), (bc = MCMC chain (500×15×1 Array{Float64, 3}), pc = MCMC chain (500×15×1 Array{Float64, 3})), (bc = MCMC chain (500×15×1 Array{Float64, 3}), pc = MCMC chain (500×15×1 Array{Float64, 3})), (bc = MCMC chain (500×15×1 Array{Float64, 3}), pc = MCMC chain (500×15×1 Array{Float64, 3}))  …  (bc = MCMC chain (500×15×1 Array{Float64, 3}), pc = MCMC chain (500×15×1 Array{Float64, 3})), (bc = MCMC chain (500×15×1 Array{Float64, 3}), pc = MCMC chain (500×15×1 Array{Float64, 3})), (bc = MCMC chain (500×15×1 Array{Float64, 3}), pc = MCMC chain (500×15×1 Array{Float64, 3})), (bc = MCMC chain (500×15×1 Array{Float64, 3}), pc = MCMC chain (500×15×1 Array{Float64, 3})), (bc = MCMC chain (500×15×1 Array{Float64, 3}), pc = MCMC chain (500×15×1 Array{Float64, 3})), (bc = MCMC chain (500×15×1 Array{Float64, 3}), pc = MCMC chain (500×15×1 Array{Float64, 3})), (bc = MCMC chain (500×15×1 Array{Float64, 3}), pc = MCMC chain (500×15×1 Array{Float64, 3})), (bc = MCMC chain (500×15×1 Array{Float64, 3}), pc = MCMC chain (500×15×1 Array{Float64, 3})), (bc = MCMC chain (500×15×1 Array{Float64, 3}), pc = MCMC chain (500×15×1 Array{Float64, 3})), (bc = MCMC chain (500×15×1 Array{Float64, 3}), pc = MCMC chain (500×15×1 Array{Float64, 3}))]
@@ -306,106 +318,103 @@ end</code></pre>
 </div>
 </div>
 </section>
-<section id="results" class="level2 page-columns page-full">
+<section class="level2 page-columns page-full" id="results">
 <h2 class="anchored" data-anchor-id="results">Results</h2>
-<p>The results indicate that the Poisson is a good fit when $q$ is small, where “small” depends on N, but in general it seems to provide a good fit in less restrictive cases than the “rule of thumb” quoted below. E.g. go ahead and use the Poisson approximation when you’ve got enough expsoures even if $q$ is well above $0.10$. The Poisson approximation also isn’t terrible when $N$ is as low as 10 as long as $q$ is very small (e.g.&nbsp;$&lt;0.05$ ).</p>
+<p>The results indicate that the Poisson is a good fit when $q$ is small, where “small” depends on N, but in general it seems to provide a good fit in less restrictive cases than the “rule of thumb” quoted below. E.g. go ahead and use the Poisson approximation when you’ve got enough expsoures even if $q$ is well above $0.10$. The Poisson approximation also isn’t terrible when $N$ is as low as 10 as long as $q$ is very small (e.g. $&lt;0.05$ ).</p>
 <p>The fit remains poor when $q &gt;&gt; 0.5$ and when $N$ is small.</p>
-<section id="visualization" class="level3 page-columns page-full">
+<section class="level3 page-columns page-full" id="visualization">
 <h3 class="anchored" data-anchor-id="visualization">Visualization</h3>
 <p>This visualization shows the aggregated posterior distribution across all of the trials and model points. The darker shaded band indicates the middle 50% of the posterior:</p>
-<div id="12" class="cell page-columns page-full" data-execution_count="1">
-<pre class="julia cell-code"><code>function plot_band_under!(ax,plot,y,low,high,label="")
-    function points(plot)
-        # Modern Makie: positions on the Lines child are arg-1's Observable.
-        # (Was plot.plots[2].converted[1][] pre-ComputePipeline.)
-        pts = plot.plots[2][1][]
-        [p[1] for p in pts], [p[2] for p in pts]
-    end
-    xs′, ys′ = points(plot)
-
-    filt = findall(x-&gt; (x ≥ low) &amp;&amp; (x ≤ high),xs′)
-    typeof(xs′[filt]), typeof(fill(y,length(filt))), typeof(ys′[filt])
-    b = band!(
-        ax,
-        Float64.(xs′[filt]), 
-        Float64.(fill(y * 1.0, length(filt))), 
-        Float64.(ys′[filt]),
-        color=(plot.color[], 0.9),transparency=true,shading = false) # 0.25 alpha
-    translate!(b,0,0,5)
-end
-
-
-let
-    f = Figure(size=(1100, 720))
-    a = Any # outer variable to set as axis for to grab legend
-    
-    for (i,N) in enumerate(reverse(Ns))
-        ax = Axis(f[i+1,1:10],
-        xticks=qs,
-        ylabel="N=$N"
-        )
-        a = ax
-        xlims!(0,1)
-        model_idx = findall(x-&gt;x.N == N,model_points)
-
-        for n in model_idx
-            c = bpchains[n]
-            q = model_points[n].q
-            y = model_points[n].N
-            bpoints = vcat([x.bc["q"][:] for x in c]...)
-            ppoints = vcat([x.pc["q"][:] for x in c]...)
-            bqtls = quantile(bpoints,[.25,.75])
-            pqtls = quantile(ppoints,[.25,.75])
-            j = density!(
-                bpoints,
-                # linewidth=10,
-                strokewidth = 1, 
-                strokecolor = (:grey30,0.6),
-                label="Binomial",
-                color=(:red,.25),
-            )
-            plot_band_under!(ax,j,0,bqtls[1],bqtls[2],"Binomial")
-        
-
-            j = density!(
-                ppoints, 
-                color=(:blue,.25),
-                # linewidth=10,
-                strokewidth = 1, 
-                strokecolor = (:grey30,0.6),
-                label="Poisson",
-            )
-            plot_band_under!(ax,j,0,pqtls[1],pqtls[2],"Poisson")
-
-            hideydecorations!(ax,label=false)
-        end
-
-        scatter!(
-            qs,
-            zeros(length(qs)),
-            marker = :vline,
-            markersize=20,
-            color=:grey30,
-            label="actual value"
-            )
-    end
-
-    Legend(f[1,5],a,unique=true,orientation=:horizontal)
-    f
-end</code></pre>
+<div class="cell page-columns page-full" data-execution_count="1" id="12">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a aria-hidden="true" href="#cb8-1" tabindex="-1"></a><span class="kw">function</span> <span class="fu">plot_band_under!</span>(ax,plot,y,low,high,label<span class="op">=</span><span class="st">""</span>)</span>
+<span id="cb8-2"><a aria-hidden="true" href="#cb8-2" tabindex="-1"></a>    <span class="kw">function</span> <span class="fu">points</span>(plot)</span>
+<span id="cb8-3"><a aria-hidden="true" href="#cb8-3" tabindex="-1"></a>        <span class="co"># Modern Makie: positions on the Lines child are arg-1's Observable.</span></span>
+<span id="cb8-4"><a aria-hidden="true" href="#cb8-4" tabindex="-1"></a>        <span class="co"># (Was plot.plots[2].converted[1][] pre-ComputePipeline.)</span></span>
+<span id="cb8-5"><a aria-hidden="true" href="#cb8-5" tabindex="-1"></a>        pts <span class="op">=</span> plot.plots[<span class="fl">2</span>][<span class="fl">1</span>][]</span>
+<span id="cb8-6"><a aria-hidden="true" href="#cb8-6" tabindex="-1"></a>        [p[<span class="fl">1</span>] for p <span class="kw">in</span> pts], [p[<span class="fl">2</span>] for p <span class="kw">in</span> pts]</span>
+<span id="cb8-7"><a aria-hidden="true" href="#cb8-7" tabindex="-1"></a>    <span class="kw">end</span></span>
+<span id="cb8-8"><a aria-hidden="true" href="#cb8-8" tabindex="-1"></a>    xs′, ys′ <span class="op">=</span> <span class="fu">points</span>(plot)</span>
+<span id="cb8-9"><a aria-hidden="true" href="#cb8-9" tabindex="-1"></a></span>
+<span id="cb8-10"><a aria-hidden="true" href="#cb8-10" tabindex="-1"></a>    filt <span class="op">=</span> <span class="fu">findall</span>(x<span class="op">-&gt;</span> (x <span class="op">≥</span> low) <span class="op">&amp;&amp;</span> (x <span class="op">≤</span> high),xs′)</span>
+<span id="cb8-11"><a aria-hidden="true" href="#cb8-11" tabindex="-1"></a>    <span class="fu">typeof</span>(xs′[filt]), <span class="fu">typeof</span>(<span class="fu">fill</span>(y,<span class="fu">length</span>(filt))), <span class="fu">typeof</span>(ys′[filt])</span>
+<span id="cb8-12"><a aria-hidden="true" href="#cb8-12" tabindex="-1"></a>    b <span class="op">=</span> <span class="fu">band!</span>(</span>
+<span id="cb8-13"><a aria-hidden="true" href="#cb8-13" tabindex="-1"></a>        ax,</span>
+<span id="cb8-14"><a aria-hidden="true" href="#cb8-14" tabindex="-1"></a>        <span class="fu">Float64</span>.(xs′[filt]), </span>
+<span id="cb8-15"><a aria-hidden="true" href="#cb8-15" tabindex="-1"></a>        <span class="fu">Float64</span>.(<span class="fu">fill</span>(y <span class="op">*</span> <span class="fl">1.0</span>, <span class="fu">length</span>(filt))), </span>
+<span id="cb8-16"><a aria-hidden="true" href="#cb8-16" tabindex="-1"></a>        <span class="fu">Float64</span>.(ys′[filt]),</span>
+<span id="cb8-17"><a aria-hidden="true" href="#cb8-17" tabindex="-1"></a>        color<span class="op">=</span>(plot.color[], <span class="fl">0.9</span>),transparency<span class="op">=</span><span class="cn">true</span>,shading <span class="op">=</span> <span class="cn">false</span>) <span class="co"># 0.25 alpha</span></span>
+<span id="cb8-18"><a aria-hidden="true" href="#cb8-18" tabindex="-1"></a>    <span class="fu">translate!</span>(b,<span class="fl">0</span>,<span class="fl">0</span>,<span class="fl">5</span>)</span>
+<span id="cb8-19"><a aria-hidden="true" href="#cb8-19" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb8-20"><a aria-hidden="true" href="#cb8-20" tabindex="-1"></a></span>
+<span id="cb8-21"><a aria-hidden="true" href="#cb8-21" tabindex="-1"></a></span>
+<span id="cb8-22"><a aria-hidden="true" href="#cb8-22" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb8-23"><a aria-hidden="true" href="#cb8-23" tabindex="-1"></a>    f <span class="op">=</span> <span class="fu">Figure</span>(size<span class="op">=</span>(<span class="fl">1100</span>, <span class="fl">720</span>))</span>
+<span id="cb8-24"><a aria-hidden="true" href="#cb8-24" tabindex="-1"></a>    a <span class="op">=</span> <span class="dt">Any</span> <span class="co"># outer variable to set as axis for to grab legend</span></span>
+<span id="cb8-25"><a aria-hidden="true" href="#cb8-25" tabindex="-1"></a>    </span>
+<span id="cb8-26"><a aria-hidden="true" href="#cb8-26" tabindex="-1"></a>    <span class="cf">for</span> (i,N) <span class="kw">in</span> <span class="fu">enumerate</span>(<span class="fu">reverse</span>(Ns))</span>
+<span id="cb8-27"><a aria-hidden="true" href="#cb8-27" tabindex="-1"></a>        ax <span class="op">=</span> <span class="fu">Axis</span>(f[i<span class="op">+</span><span class="fl">1</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">10</span>],</span>
+<span id="cb8-28"><a aria-hidden="true" href="#cb8-28" tabindex="-1"></a>        xticks<span class="op">=</span>qs,</span>
+<span id="cb8-29"><a aria-hidden="true" href="#cb8-29" tabindex="-1"></a>        ylabel<span class="op">=</span><span class="st">"N=</span><span class="sc">$</span>N<span class="st">"</span></span>
+<span id="cb8-30"><a aria-hidden="true" href="#cb8-30" tabindex="-1"></a>        )</span>
+<span id="cb8-31"><a aria-hidden="true" href="#cb8-31" tabindex="-1"></a>        a <span class="op">=</span> ax</span>
+<span id="cb8-32"><a aria-hidden="true" href="#cb8-32" tabindex="-1"></a>        <span class="fu">xlims!</span>(<span class="fl">0</span>,<span class="fl">1</span>)</span>
+<span id="cb8-33"><a aria-hidden="true" href="#cb8-33" tabindex="-1"></a>        model_idx <span class="op">=</span> <span class="fu">findall</span>(x<span class="op">-&gt;</span>x.N <span class="op">==</span> N,model_points)</span>
+<span id="cb8-34"><a aria-hidden="true" href="#cb8-34" tabindex="-1"></a></span>
+<span id="cb8-35"><a aria-hidden="true" href="#cb8-35" tabindex="-1"></a>        <span class="cf">for</span> n <span class="kw">in</span> model_idx</span>
+<span id="cb8-36"><a aria-hidden="true" href="#cb8-36" tabindex="-1"></a>            c <span class="op">=</span> bpchains[n]</span>
+<span id="cb8-37"><a aria-hidden="true" href="#cb8-37" tabindex="-1"></a>            q <span class="op">=</span> model_points[n].q</span>
+<span id="cb8-38"><a aria-hidden="true" href="#cb8-38" tabindex="-1"></a>            y <span class="op">=</span> model_points[n].N</span>
+<span id="cb8-39"><a aria-hidden="true" href="#cb8-39" tabindex="-1"></a>            bpoints <span class="op">=</span> <span class="fu">vcat</span>([x.bc[<span class="st">"q"</span>][<span class="op">:</span>] for x <span class="kw">in</span> c]<span class="op">...</span>)</span>
+<span id="cb8-40"><a aria-hidden="true" href="#cb8-40" tabindex="-1"></a>            ppoints <span class="op">=</span> <span class="fu">vcat</span>([x.pc[<span class="st">"q"</span>][<span class="op">:</span>] for x <span class="kw">in</span> c]<span class="op">...</span>)</span>
+<span id="cb8-41"><a aria-hidden="true" href="#cb8-41" tabindex="-1"></a>            bqtls <span class="op">=</span> <span class="fu">quantile</span>(bpoints,[<span class="fl">.25</span>,<span class="fl">.75</span>])</span>
+<span id="cb8-42"><a aria-hidden="true" href="#cb8-42" tabindex="-1"></a>            pqtls <span class="op">=</span> <span class="fu">quantile</span>(ppoints,[<span class="fl">.25</span>,<span class="fl">.75</span>])</span>
+<span id="cb8-43"><a aria-hidden="true" href="#cb8-43" tabindex="-1"></a>            j <span class="op">=</span> <span class="fu">density!</span>(</span>
+<span id="cb8-44"><a aria-hidden="true" href="#cb8-44" tabindex="-1"></a>                bpoints,</span>
+<span id="cb8-45"><a aria-hidden="true" href="#cb8-45" tabindex="-1"></a>                <span class="co"># linewidth=10,</span></span>
+<span id="cb8-46"><a aria-hidden="true" href="#cb8-46" tabindex="-1"></a>                strokewidth <span class="op">=</span> <span class="fl">1</span>, </span>
+<span id="cb8-47"><a aria-hidden="true" href="#cb8-47" tabindex="-1"></a>                strokecolor <span class="op">=</span> (<span class="op">:</span>grey30,<span class="fl">0.6</span>),</span>
+<span id="cb8-48"><a aria-hidden="true" href="#cb8-48" tabindex="-1"></a>                label<span class="op">=</span><span class="st">"Binomial"</span>,</span>
+<span id="cb8-49"><a aria-hidden="true" href="#cb8-49" tabindex="-1"></a>                color<span class="op">=</span>(<span class="op">:</span>red,<span class="fl">.25</span>),</span>
+<span id="cb8-50"><a aria-hidden="true" href="#cb8-50" tabindex="-1"></a>            )</span>
+<span id="cb8-51"><a aria-hidden="true" href="#cb8-51" tabindex="-1"></a>            <span class="fu">plot_band_under!</span>(ax,j,<span class="fl">0</span>,bqtls[<span class="fl">1</span>],bqtls[<span class="fl">2</span>],<span class="st">"Binomial"</span>)</span>
+<span id="cb8-52"><a aria-hidden="true" href="#cb8-52" tabindex="-1"></a>        </span>
+<span id="cb8-53"><a aria-hidden="true" href="#cb8-53" tabindex="-1"></a></span>
+<span id="cb8-54"><a aria-hidden="true" href="#cb8-54" tabindex="-1"></a>            j <span class="op">=</span> <span class="fu">density!</span>(</span>
+<span id="cb8-55"><a aria-hidden="true" href="#cb8-55" tabindex="-1"></a>                ppoints, </span>
+<span id="cb8-56"><a aria-hidden="true" href="#cb8-56" tabindex="-1"></a>                color<span class="op">=</span>(<span class="op">:</span>blue,<span class="fl">.25</span>),</span>
+<span id="cb8-57"><a aria-hidden="true" href="#cb8-57" tabindex="-1"></a>                <span class="co"># linewidth=10,</span></span>
+<span id="cb8-58"><a aria-hidden="true" href="#cb8-58" tabindex="-1"></a>                strokewidth <span class="op">=</span> <span class="fl">1</span>, </span>
+<span id="cb8-59"><a aria-hidden="true" href="#cb8-59" tabindex="-1"></a>                strokecolor <span class="op">=</span> (<span class="op">:</span>grey30,<span class="fl">0.6</span>),</span>
+<span id="cb8-60"><a aria-hidden="true" href="#cb8-60" tabindex="-1"></a>                label<span class="op">=</span><span class="st">"Poisson"</span>,</span>
+<span id="cb8-61"><a aria-hidden="true" href="#cb8-61" tabindex="-1"></a>            )</span>
+<span id="cb8-62"><a aria-hidden="true" href="#cb8-62" tabindex="-1"></a>            <span class="fu">plot_band_under!</span>(ax,j,<span class="fl">0</span>,pqtls[<span class="fl">1</span>],pqtls[<span class="fl">2</span>],<span class="st">"Poisson"</span>)</span>
+<span id="cb8-63"><a aria-hidden="true" href="#cb8-63" tabindex="-1"></a></span>
+<span id="cb8-64"><a aria-hidden="true" href="#cb8-64" tabindex="-1"></a>            <span class="fu">hideydecorations!</span>(ax,label<span class="op">=</span><span class="cn">false</span>)</span>
+<span id="cb8-65"><a aria-hidden="true" href="#cb8-65" tabindex="-1"></a>        <span class="cf">end</span></span>
+<span id="cb8-66"><a aria-hidden="true" href="#cb8-66" tabindex="-1"></a></span>
+<span id="cb8-67"><a aria-hidden="true" href="#cb8-67" tabindex="-1"></a>        <span class="fu">scatter!</span>(</span>
+<span id="cb8-68"><a aria-hidden="true" href="#cb8-68" tabindex="-1"></a>            qs,</span>
+<span id="cb8-69"><a aria-hidden="true" href="#cb8-69" tabindex="-1"></a>            <span class="fu">zeros</span>(<span class="fu">length</span>(qs)),</span>
+<span id="cb8-70"><a aria-hidden="true" href="#cb8-70" tabindex="-1"></a>            marker <span class="op">=</span> <span class="op">:</span>vline,</span>
+<span id="cb8-71"><a aria-hidden="true" href="#cb8-71" tabindex="-1"></a>            markersize<span class="op">=</span><span class="fl">20</span>,</span>
+<span id="cb8-72"><a aria-hidden="true" href="#cb8-72" tabindex="-1"></a>            color<span class="op">=:</span>grey30,</span>
+<span id="cb8-73"><a aria-hidden="true" href="#cb8-73" tabindex="-1"></a>            label<span class="op">=</span><span class="st">"actual value"</span></span>
+<span id="cb8-74"><a aria-hidden="true" href="#cb8-74" tabindex="-1"></a>            )</span>
+<span id="cb8-75"><a aria-hidden="true" href="#cb8-75" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb8-76"><a aria-hidden="true" href="#cb8-76" tabindex="-1"></a></span>
+<span id="cb8-77"><a aria-hidden="true" href="#cb8-77" tabindex="-1"></a>    <span class="fu">Legend</span>(f[<span class="fl">1</span>,<span class="fl">5</span>],a,unique<span class="op">=</span><span class="cn">true</span>,orientation<span class="op">=:</span>horizontal)</span>
+<span id="cb8-78"><a aria-hidden="true" href="#cb8-78" tabindex="-1"></a>    f</span>
+<span id="cb8-79"><a aria-hidden="true" href="#cb8-79" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display page-columns page-full" data-execution_count="1">
 <div class="page-columns page-full">
 <figure class="figure page-columns page-full">
-<p class="page-columns page-full"><img src="index_files/figure-html/cell-7-output-1.svg" class="img-fluid figure-img column-page"></p>
+<p class="page-columns page-full"><img alt="Binomial and Poisson distributions and uncertainty intervals at different sample sizes, with the actual value marked." class="img-fluid figure-img column-page" decoding="async" height="720" loading="eager" src="index_files/figure-html/cell-7-output-1.svg" width="1100"/></p>
 </figure>
 </div>
 </div>
 </div>
-
-
 </section>
 </section>
-
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
@@ -808,8 +817,4 @@ end</code></pre>
   });
   </script>
 </div> <!-- /content -->
-
-
-
-
 </body></html>
