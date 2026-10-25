@@ -1,13 +1,10 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
-<meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.16">
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-
-<meta name="description" content="JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.">
-
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml"><head>
+<meta charset="utf-8"/>
+<meta content="quarto-1.9.16" name="generator"/>
+<meta content="width=device-width, initial-scale=1.0, user-scalable=yes" name="viewport"/>
+<meta content="JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows." name="description"/>
 <title>Replicating the AAA equtity generator – JuliaActuary</title>
 <style>
 code{white-space: pre-wrap;}
@@ -21,28 +18,61 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
-
-
 <script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="../../site_libs/quarto-nav/headroom.min.js"></script>
 <script src="../../site_libs/clipboard/clipboard.min.js"></script>
 <script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="../../">
-<link href="../..//assets/logos/favicon.ico" rel="icon">
+<meta content="../../" name="quarto:offset"/>
+<link href="../..//assets/logos/favicon.ico" rel="icon"/>
 <script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
-<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-a0731b9a3a5d496010872d775e5d9bc3.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet"/>
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-be14ce6d32a635bebd8f9e4e558f9eeb.css" id="quarto-text-highlighting-styles" rel="stylesheet"/>
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-98ac2d5361ef6f18cc0525d38bedc462.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet"/>
+<link append-hash="true" data-mode="light" href="../../site_libs/bootstrap/bootstrap-4a135b976b00f53a3a768ff94eb1df18.min.css" id="quarto-bootstrap" rel="stylesheet"/>
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -70,221 +100,203 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&amp;family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&amp;display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../../assets/highlight/styles/github.min.css">
-<script src="../../assets/highlight/highlight.min.js"></script>
-<script src="../../assets/highlight/languages/julia.min.js"></script>
-<script src="../../assets/highlight/languages/julia-repl.min.js"></script>
-<script src="../../assets/highlight/languages/python.min.js"></script>
-<script src="../../assets/highlight/languages/r.min.js"></script>
-<script>hljs.highlightAll();</script>
-<script data-goatcounter="https://juliaactuary.goatcounter.com/count" async="" src="//gc.zgo.at/count.js"></script>
-
-
-<link rel="stylesheet" href="../../styles.css">
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" rel="stylesheet"/>
+<script async="" data-goatcounter="https://juliaactuary.goatcounter.com/count" src="//gc.zgo.at/count.js"></script>
+<link href="../../styles-c416c153cdf24884.css" rel="stylesheet"/>
 </head>
-
 <body class="nav-fixed fullcontent quarto-light">
-
 <div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top quarto-banner">
-    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
-      <div class="navbar-container container-fluid">
-      <div class="navbar-brand-container mx-auto">
-    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
-    <img src="../../assets/logos/android-chrome-512x512.png" alt="JuliaActuary Logo" class="navbar-logo light-content">
-    <img src="../../assets/logos/android-chrome-512x512.png" alt="JuliaActuary Logo" class="navbar-logo dark-content">
-    </a>
-    <a class="navbar-brand" href="../../index.html">
-    <span class="navbar-title">JuliaActuary</span>
-    </a>
-  </div>
-            <div id="quarto-search" class="" title="Search"></div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-  <span class="navbar-toggler-icon"></span>
-</button>
-          <div class="collapse navbar-collapse" id="navbarCollapse">
-            <ul class="navbar-nav navbar-nav-scroll ms-auto">
-  <li class="nav-item">
-    <a class="nav-link" href="../../packages.html"> 
-<span class="menu-text">Packages</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="https://docs.juliaactuary.org"> 
-<span class="menu-text">Docs</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="https://modernfinancialmodeling.com"> 
-<span class="menu-text">Book</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../learn.html"> 
-<span class="menu-text">Learn</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../examples.html"> 
-<span class="menu-text">Examples</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../benchmarks.html"> 
-<span class="menu-text">Benchmarks</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../community.html"> 
-<span class="menu-text">Community</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../blog.html"> 
-<span class="menu-text">Blog</span></a>
-  </li>  
-  <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/JuliaActuary"> <i class="bi bi-github" role="img">
-</i> 
-<span class="menu-text"></span></a>
-  </li>  
-  <li class="nav-item compact">
-    <a class="nav-link" href="../../all-posts.xml"> <i class="bi bi-rss" role="img">
-</i> 
-<span class="menu-text"></span></a>
-  </li>  
-</ul>
-          </div> <!-- /navcollapse -->
-            <div class="quarto-navbar-tools">
+<header class="headroom fixed-top quarto-banner" id="quarto-header">
+<nav class="navbar navbar-expand-lg" data-bs-theme="dark">
+<div class="navbar-container container-fluid">
+<div class="navbar-brand-container mx-auto">
+<a class="navbar-brand navbar-brand-logo" href="../../index.html">
+<img alt="JuliaActuary Logo" class="navbar-logo light-content" src="../../assets/logos/android-chrome-512x512.png"/>
+<img alt="JuliaActuary Logo" class="navbar-logo dark-content" src="../../assets/logos/android-chrome-512x512.png"/>
+</a>
+<a class="navbar-brand" href="../../index.html">
+<span class="navbar-title">JuliaActuary</span>
+</a>
 </div>
-      </div> <!-- /container-fluid -->
-    </nav>
+<div class="" id="quarto-search" title="Search"></div>
+<button aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-bs-target="#navbarCollapse" data-bs-toggle="collapse" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }" role="menu" type="button">
+<span class="navbar-toggler-icon"></span>
+</button>
+<div class="collapse navbar-collapse" id="navbarCollapse">
+<ul class="navbar-nav navbar-nav-scroll ms-auto">
+<li class="nav-item">
+<a class="nav-link" href="../../packages.html">
+<span class="menu-text">Packages</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="https://docs.juliaactuary.org">
+<span class="menu-text">Docs</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="../../learn.html">
+<span class="menu-text">Learn</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="../../examples.html">
+<span class="menu-text">Examples</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="../../community.html">
+<span class="menu-text">Community</span></a>
+</li>
+<li class="nav-item dropdown">
+<a aria-expanded="false" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" id="nav-menu-more" role="link">
+<span class="menu-text">More</span>
+</a>
+<ul aria-labelledby="nav-menu-more" class="dropdown-menu dropdown-menu-end">
+<li>
+<a class="dropdown-item" href="../../benchmarks.html">
+<span class="dropdown-text">Benchmarks</span></a>
+</li>
+<li>
+<a class="dropdown-item" href="../../blog.html">
+<span class="dropdown-text">Blog</span></a>
+</li>
+<li>
+<a class="dropdown-item" href="https://modernfinancialmodeling.com">
+<span class="dropdown-text">Book</span></a>
+</li>
+</ul>
+</li>
+<li class="nav-item compact">
+<a class="nav-link" href="https://github.com/JuliaActuary"> <i aria-label="JuliaActuary on GitHub" class="bi bi-github" role="img">
+</i>
+<span class="menu-text"></span></a>
+</li>
+<li class="nav-item compact">
+<a class="nav-link" href="../../all-posts.xml"> <i aria-label="RSS feed" class="bi bi-rss" role="img">
+</i>
+<span class="menu-text"></span></a>
+</li>
+</ul>
+</div> <!-- /navcollapse -->
+<div class="quarto-navbar-tools">
+</div>
+</div> <!-- /container-fluid -->
+</nav>
 </header>
 <!-- content -->
-<header id="title-block-header" class="quarto-title-block default page-columns page-full">
-  <div class="quarto-title-banner page-columns page-full">
-    <div class="quarto-title column-body">
-      <h1 class="title">Replicating the AAA equtity generator</h1>
-                  <div>
-        <div class="description">
+<header class="quarto-title-block default page-columns page-full" id="title-block-header">
+<div class="quarto-title-banner page-columns page-full">
+<div class="quarto-title column-body">
+<h1 class="title">Replicating the AAA equtity generator</h1>
+<div>
+<div class="description">
           JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.
         </div>
-      </div>
-                          <div class="quarto-categories">
-                <div class="quarto-category">modeling</div>
-                <div class="quarto-category">scenario-generator</div>
-              </div>
-                  </div>
-  </div>
-    
-  
-  <div class="quarto-title-meta">
-
-      
-    
-      
-    </div>
-    
-  
-  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+</div>
+<div class="quarto-categories">
+<div class="quarto-category">modeling</div>
+<div class="quarto-category">scenario-generator</div>
+</div>
+</div>
+</div>
+<div class="quarto-title-meta">
+</div>
+</header><div class="quarto-container page-columns page-rows-contents page-layout-article page-navbar" id="quarto-content">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    
 <!-- main -->
 <main class="content quarto-banner-title-block" id="quarto-document-content">
-
-
-
-
-
-<div id="4" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>using CairoMakie
-using ColorSchemes
-using Distributions
-using LabelledArrays
-using Random
-
-# Apply the site's custom Makie plot theme (cassette futurism).
-include(joinpath(@__DIR__, "..", "..", "assets", "themes", "cassette_futurism.jl"))
-set_theme!(cassette_futurism_theme())</code></pre>
+<div class="cell" data-execution_count="1" id="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a aria-hidden="true" href="#cb1-1" tabindex="-1"></a><span class="im">using</span> <span class="bu">CairoMakie</span></span>
+<span id="cb1-2"><a aria-hidden="true" href="#cb1-2" tabindex="-1"></a><span class="im">using</span> <span class="bu">ColorSchemes</span></span>
+<span id="cb1-3"><a aria-hidden="true" href="#cb1-3" tabindex="-1"></a><span class="im">using</span> <span class="bu">Distributions</span></span>
+<span id="cb1-4"><a aria-hidden="true" href="#cb1-4" tabindex="-1"></a><span class="im">using</span> <span class="bu">LabelledArrays</span></span>
+<span id="cb1-5"><a aria-hidden="true" href="#cb1-5" tabindex="-1"></a><span class="im">using</span> <span class="bu">Random</span></span>
+<span id="cb1-6"><a aria-hidden="true" href="#cb1-6" tabindex="-1"></a></span>
+<span id="cb1-7"><a aria-hidden="true" href="#cb1-7" tabindex="-1"></a><span class="co"># Apply the site's custom Makie plot theme (cassette futurism).</span></span>
+<span id="cb1-8"><a aria-hidden="true" href="#cb1-8" tabindex="-1"></a><span class="fu">include</span>(<span class="fu">joinpath</span>(<span class="pp">@__DIR__</span>, <span class="st">".."</span>, <span class="st">".."</span>, <span class="st">"assets"</span>, <span class="st">"themes"</span>, <span class="st">"cassette_futurism.jl"</span>))</span>
+<span id="cb1-9"><a aria-hidden="true" href="#cb1-9" tabindex="-1"></a><span class="fu">set_theme!</span>(<span class="fu">cassette_futurism_theme</span>())</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 </div>
 <p>This notebook replicates the model and parameters for the real world equity generator described in this <a href="https://www.actuary.org/sites/default/files/pdf/life/c3supp_march05.pdf">AAA 2005 reference paper</a>.</p>
-<section id="stochastic-log-volatility-model" class="level2">
+<section class="level2" id="stochastic-log-volatility-model">
 <h2 class="anchored" data-anchor-id="stochastic-log-volatility-model">Stochastic Log Volatility Model</h2>
 <p>Note that the <code>@.</code> and other broadcasting (<code>.</code> symbol) allows us to operate on multiple funds at once.</p>
-<div id="6" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>function v(v_prior,params,Zₜ) 
-    (;σ_v, σ_m,σ_p,σ⃰,ϕ,τ) = params
-    
-    v_m = log.(σ_m)
-    v_p = log.(σ_p)
-    v⃰ = log.(σ⃰)
-
-    # vol are the odd values in the random array
-    ṽ =  @. min(v_p, (1 - ϕ) * v_prior + ϕ * log(τ) ) + σ_v * Zₜ[[1,3,5,7]]
-    
-    v = @. max(v_m, min(v⃰,ṽ))
-
-    return v
-end
-
-function scenario(params,Z;months=1200)
-    (;σ_v,σ_0, ρ,A,B,C) = params
-
-    n_funds = size(params,2)
-    
-    #initilize/pre-allocate
-    Zₜ = rand(Z)
-    v_t = log.(σ_0)
-    σ_t = zeros(n_funds)
-    μ_t = zeros(n_funds)
-    
-    log_returns = map(1:months) do t
-        Zₜ = rand!(Z,Zₜ)
-        v_t .= v(v_t,params,Zₜ)
-
-        σ_t .= exp.(v_t)
-
-        @. μ_t =  A + B * σ_t + C * (σ_t)^2
-
-        # return are the even values in the random array
-        log_return = @. μ_t / 12 + σ_t / sqrt(12) * Zₜ[[2,4,6,8]]
-    end
-
-    # convert vector of vector to matrix
-    reduce(hcat,log_returns)
-end</code></pre>
+<div class="cell" data-execution_count="1" id="6">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a aria-hidden="true" href="#cb2-1" tabindex="-1"></a><span class="kw">function</span> <span class="fu">v</span>(v_prior,params,Zₜ) </span>
+<span id="cb2-2"><a aria-hidden="true" href="#cb2-2" tabindex="-1"></a>    (;σ_v, σ_m,σ_p,σ⃰,ϕ,τ) <span class="op">=</span> params</span>
+<span id="cb2-3"><a aria-hidden="true" href="#cb2-3" tabindex="-1"></a>    </span>
+<span id="cb2-4"><a aria-hidden="true" href="#cb2-4" tabindex="-1"></a>    v_m <span class="op">=</span> <span class="fu">log</span>.(σ_m)</span>
+<span id="cb2-5"><a aria-hidden="true" href="#cb2-5" tabindex="-1"></a>    v_p <span class="op">=</span> <span class="fu">log</span>.(σ_p)</span>
+<span id="cb2-6"><a aria-hidden="true" href="#cb2-6" tabindex="-1"></a>    v⃰ <span class="op">=</span> <span class="fu">log</span>.(σ⃰)</span>
+<span id="cb2-7"><a aria-hidden="true" href="#cb2-7" tabindex="-1"></a></span>
+<span id="cb2-8"><a aria-hidden="true" href="#cb2-8" tabindex="-1"></a>    <span class="co"># vol are the odd values in the random array</span></span>
+<span id="cb2-9"><a aria-hidden="true" href="#cb2-9" tabindex="-1"></a>    ṽ <span class="op">=</span>  @. <span class="fu">min</span>(v_p, (<span class="fl">1</span> <span class="op">-</span> ϕ) <span class="op">*</span> v_prior <span class="op">+</span> ϕ <span class="op">*</span> <span class="fu">log</span>(τ) ) <span class="op">+</span> σ_v <span class="op">*</span> Zₜ[[<span class="fl">1</span>,<span class="fl">3</span>,<span class="fl">5</span>,<span class="fl">7</span>]]</span>
+<span id="cb2-10"><a aria-hidden="true" href="#cb2-10" tabindex="-1"></a>    </span>
+<span id="cb2-11"><a aria-hidden="true" href="#cb2-11" tabindex="-1"></a>    v <span class="op">=</span> @. <span class="fu">max</span>(v_m, <span class="fu">min</span>(v⃰,ṽ))</span>
+<span id="cb2-12"><a aria-hidden="true" href="#cb2-12" tabindex="-1"></a></span>
+<span id="cb2-13"><a aria-hidden="true" href="#cb2-13" tabindex="-1"></a>    <span class="cf">return</span> v</span>
+<span id="cb2-14"><a aria-hidden="true" href="#cb2-14" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb2-15"><a aria-hidden="true" href="#cb2-15" tabindex="-1"></a></span>
+<span id="cb2-16"><a aria-hidden="true" href="#cb2-16" tabindex="-1"></a><span class="kw">function</span> <span class="fu">scenario</span>(params,Z;months<span class="op">=</span><span class="fl">1200</span>)</span>
+<span id="cb2-17"><a aria-hidden="true" href="#cb2-17" tabindex="-1"></a>    (;σ_v,σ_0, ρ,A,B,C) <span class="op">=</span> params</span>
+<span id="cb2-18"><a aria-hidden="true" href="#cb2-18" tabindex="-1"></a></span>
+<span id="cb2-19"><a aria-hidden="true" href="#cb2-19" tabindex="-1"></a>    n_funds <span class="op">=</span> <span class="fu">size</span>(params,<span class="fl">2</span>)</span>
+<span id="cb2-20"><a aria-hidden="true" href="#cb2-20" tabindex="-1"></a>    </span>
+<span id="cb2-21"><a aria-hidden="true" href="#cb2-21" tabindex="-1"></a>    <span class="co">#initilize/pre-allocate</span></span>
+<span id="cb2-22"><a aria-hidden="true" href="#cb2-22" tabindex="-1"></a>    Zₜ <span class="op">=</span> <span class="fu">rand</span>(Z)</span>
+<span id="cb2-23"><a aria-hidden="true" href="#cb2-23" tabindex="-1"></a>    v_t <span class="op">=</span> <span class="fu">log</span>.(σ_0)</span>
+<span id="cb2-24"><a aria-hidden="true" href="#cb2-24" tabindex="-1"></a>    σ_t <span class="op">=</span> <span class="fu">zeros</span>(n_funds)</span>
+<span id="cb2-25"><a aria-hidden="true" href="#cb2-25" tabindex="-1"></a>    μ_t <span class="op">=</span> <span class="fu">zeros</span>(n_funds)</span>
+<span id="cb2-26"><a aria-hidden="true" href="#cb2-26" tabindex="-1"></a>    </span>
+<span id="cb2-27"><a aria-hidden="true" href="#cb2-27" tabindex="-1"></a>    log_returns <span class="op">=</span> <span class="fu">map</span>(<span class="fl">1</span><span class="op">:</span>months) <span class="cf">do</span> t</span>
+<span id="cb2-28"><a aria-hidden="true" href="#cb2-28" tabindex="-1"></a>        Zₜ <span class="op">=</span> <span class="fu">rand!</span>(Z,Zₜ)</span>
+<span id="cb2-29"><a aria-hidden="true" href="#cb2-29" tabindex="-1"></a>        v_t <span class="op">.=</span> <span class="fu">v</span>(v_t,params,Zₜ)</span>
+<span id="cb2-30"><a aria-hidden="true" href="#cb2-30" tabindex="-1"></a></span>
+<span id="cb2-31"><a aria-hidden="true" href="#cb2-31" tabindex="-1"></a>        σ_t <span class="op">.=</span> <span class="fu">exp</span>.(v_t)</span>
+<span id="cb2-32"><a aria-hidden="true" href="#cb2-32" tabindex="-1"></a></span>
+<span id="cb2-33"><a aria-hidden="true" href="#cb2-33" tabindex="-1"></a>        @. μ_t <span class="op">=</span>  A <span class="op">+</span> B <span class="op">*</span> σ_t <span class="op">+</span> C <span class="op">*</span> (σ_t)<span class="op">^</span><span class="fl">2</span></span>
+<span id="cb2-34"><a aria-hidden="true" href="#cb2-34" tabindex="-1"></a></span>
+<span id="cb2-35"><a aria-hidden="true" href="#cb2-35" tabindex="-1"></a>        <span class="co"># return are the even values in the random array</span></span>
+<span id="cb2-36"><a aria-hidden="true" href="#cb2-36" tabindex="-1"></a>        log_return <span class="op">=</span> @. μ_t <span class="op">/</span> <span class="fl">12</span> <span class="op">+</span> σ_t <span class="op">/</span> <span class="fu">sqrt</span>(<span class="fl">12</span>) <span class="op">*</span> Zₜ[[<span class="fl">2</span>,<span class="fl">4</span>,<span class="fl">6</span>,<span class="fl">8</span>]]</span>
+<span id="cb2-37"><a aria-hidden="true" href="#cb2-37" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb2-38"><a aria-hidden="true" href="#cb2-38" tabindex="-1"></a></span>
+<span id="cb2-39"><a aria-hidden="true" href="#cb2-39" tabindex="-1"></a>    <span class="co"># convert vector of vector to matrix</span></span>
+<span id="cb2-40"><a aria-hidden="true" href="#cb2-40" tabindex="-1"></a>    <span class="fu">reduce</span>(hcat,log_returns)</span>
+<span id="cb2-41"><a aria-hidden="true" href="#cb2-41" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>scenario (generic function with 1 method)</code></pre>
 </div>
 </div>
 </section>
-<section id="model-parameters" class="level2">
+<section class="level2" id="model-parameters">
 <h2 class="anchored" data-anchor-id="model-parameters">Model Parameters</h2>
-<div id="8" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code># use a labelled array for easy reference of the parameters 
-params = @LArray [
-    0.12515 0.14506 0.16341 0.20201     # τ
-    0.35229 0.41676 0.3632 0.35277      # ϕ
-    0.32645 0.32634 0.35789 0.34302     # σ_v
-    -0.2488 -0.1572 -0.2756 -0.2843     # ρ
-    0.055 0.055 0.055 0.055             # A
-    0.56 0.466 0.67 0.715               # B
-    -0.9 -0.9 -0.95 -1.0                # C
-    0.1476 0.1688 0.2049 0.2496         # σ_0
-    0.0305 0.0354 0.0403 0.0492         # σ_m
-    0.3 0.3 0.4 0.55                    # σ_p
-    0.7988 0.4519 0.9463 1.1387         # σ⃰
-] ( 
-    # define the regions each label refers to
-    τ = (1,:),
-    ϕ = (2,:),
-    σ_v = (3,:),
-    ρ = (4,:),
-    A = (5,:),
-    B = (6,:),
-    C = (7,:),
-    σ_0 = (8,:),
-    σ_m = (9,:),
-    σ_p = (10,:),
-    σ⃰ = (11,:)
-)</code></pre>
+<div class="cell" data-execution_count="1" id="8">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a aria-hidden="true" href="#cb4-1" tabindex="-1"></a><span class="co"># use a labelled array for easy reference of the parameters </span></span>
+<span id="cb4-2"><a aria-hidden="true" href="#cb4-2" tabindex="-1"></a>params <span class="op">=</span> <span class="pp">@LArray</span> [</span>
+<span id="cb4-3"><a aria-hidden="true" href="#cb4-3" tabindex="-1"></a>    <span class="fl">0.12515</span> <span class="fl">0.14506</span> <span class="fl">0.16341</span> <span class="fl">0.20201</span>     <span class="co"># τ</span></span>
+<span id="cb4-4"><a aria-hidden="true" href="#cb4-4" tabindex="-1"></a>    <span class="fl">0.35229</span> <span class="fl">0.41676</span> <span class="fl">0.3632</span> <span class="fl">0.35277</span>      <span class="co"># ϕ</span></span>
+<span id="cb4-5"><a aria-hidden="true" href="#cb4-5" tabindex="-1"></a>    <span class="fl">0.32645</span> <span class="fl">0.32634</span> <span class="fl">0.35789</span> <span class="fl">0.34302</span>     <span class="co"># σ_v</span></span>
+<span id="cb4-6"><a aria-hidden="true" href="#cb4-6" tabindex="-1"></a>    <span class="op">-</span><span class="fl">0.2488</span> <span class="op">-</span><span class="fl">0.1572</span> <span class="op">-</span><span class="fl">0.2756</span> <span class="op">-</span><span class="fl">0.2843</span>     <span class="co"># ρ</span></span>
+<span id="cb4-7"><a aria-hidden="true" href="#cb4-7" tabindex="-1"></a>    <span class="fl">0.055</span> <span class="fl">0.055</span> <span class="fl">0.055</span> <span class="fl">0.055</span>             <span class="co"># A</span></span>
+<span id="cb4-8"><a aria-hidden="true" href="#cb4-8" tabindex="-1"></a>    <span class="fl">0.56</span> <span class="fl">0.466</span> <span class="fl">0.67</span> <span class="fl">0.715</span>               <span class="co"># B</span></span>
+<span id="cb4-9"><a aria-hidden="true" href="#cb4-9" tabindex="-1"></a>    <span class="op">-</span><span class="fl">0.9</span> <span class="op">-</span><span class="fl">0.9</span> <span class="op">-</span><span class="fl">0.95</span> <span class="op">-</span><span class="fl">1.0</span>                <span class="co"># C</span></span>
+<span id="cb4-10"><a aria-hidden="true" href="#cb4-10" tabindex="-1"></a>    <span class="fl">0.1476</span> <span class="fl">0.1688</span> <span class="fl">0.2049</span> <span class="fl">0.2496</span>         <span class="co"># σ_0</span></span>
+<span id="cb4-11"><a aria-hidden="true" href="#cb4-11" tabindex="-1"></a>    <span class="fl">0.0305</span> <span class="fl">0.0354</span> <span class="fl">0.0403</span> <span class="fl">0.0492</span>         <span class="co"># σ_m</span></span>
+<span id="cb4-12"><a aria-hidden="true" href="#cb4-12" tabindex="-1"></a>    <span class="fl">0.3</span> <span class="fl">0.3</span> <span class="fl">0.4</span> <span class="fl">0.55</span>                    <span class="co"># σ_p</span></span>
+<span id="cb4-13"><a aria-hidden="true" href="#cb4-13" tabindex="-1"></a>    <span class="fl">0.7988</span> <span class="fl">0.4519</span> <span class="fl">0.9463</span> <span class="fl">1.1387</span>         <span class="co"># σ⃰</span></span>
+<span id="cb4-14"><a aria-hidden="true" href="#cb4-14" tabindex="-1"></a>] ( </span>
+<span id="cb4-15"><a aria-hidden="true" href="#cb4-15" tabindex="-1"></a>    <span class="co"># define the regions each label refers to</span></span>
+<span id="cb4-16"><a aria-hidden="true" href="#cb4-16" tabindex="-1"></a>    τ <span class="op">=</span> (<span class="fl">1</span>,<span class="op">:</span>),</span>
+<span id="cb4-17"><a aria-hidden="true" href="#cb4-17" tabindex="-1"></a>    ϕ <span class="op">=</span> (<span class="fl">2</span>,<span class="op">:</span>),</span>
+<span id="cb4-18"><a aria-hidden="true" href="#cb4-18" tabindex="-1"></a>    σ_v <span class="op">=</span> (<span class="fl">3</span>,<span class="op">:</span>),</span>
+<span id="cb4-19"><a aria-hidden="true" href="#cb4-19" tabindex="-1"></a>    ρ <span class="op">=</span> (<span class="fl">4</span>,<span class="op">:</span>),</span>
+<span id="cb4-20"><a aria-hidden="true" href="#cb4-20" tabindex="-1"></a>    A <span class="op">=</span> (<span class="fl">5</span>,<span class="op">:</span>),</span>
+<span id="cb4-21"><a aria-hidden="true" href="#cb4-21" tabindex="-1"></a>    B <span class="op">=</span> (<span class="fl">6</span>,<span class="op">:</span>),</span>
+<span id="cb4-22"><a aria-hidden="true" href="#cb4-22" tabindex="-1"></a>    C <span class="op">=</span> (<span class="fl">7</span>,<span class="op">:</span>),</span>
+<span id="cb4-23"><a aria-hidden="true" href="#cb4-23" tabindex="-1"></a>    σ_0 <span class="op">=</span> (<span class="fl">8</span>,<span class="op">:</span>),</span>
+<span id="cb4-24"><a aria-hidden="true" href="#cb4-24" tabindex="-1"></a>    σ_m <span class="op">=</span> (<span class="fl">9</span>,<span class="op">:</span>),</span>
+<span id="cb4-25"><a aria-hidden="true" href="#cb4-25" tabindex="-1"></a>    σ_p <span class="op">=</span> (<span class="fl">10</span>,<span class="op">:</span>),</span>
+<span id="cb4-26"><a aria-hidden="true" href="#cb4-26" tabindex="-1"></a>    σ⃰ <span class="op">=</span> (<span class="fl">11</span>,<span class="op">:</span>)</span>
+<span id="cb4-27"><a aria-hidden="true" href="#cb4-27" tabindex="-1"></a>)</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>11×4 LabelledArrays.LArray{Float64, 2, Matrix{Float64}, (τ = (1, Colon()), ϕ = (2, Colon()), σ_v = (3, Colon()), ρ = (4, Colon()), A = (5, Colon()), B = (6, Colon()), C = (7, Colon()), σ_0 = (8, Colon()), σ_m = (9, Colon()), σ_p = (10, Colon()), σ⃰ = (11, Colon()))}:
    :τ =&gt; 0.12515  …    :τ =&gt; 0.20201
@@ -300,29 +312,29 @@ params = @LArray [
    :σ⃰ =&gt; 0.7988   …    :σ⃰ =&gt; 1.1387</code></pre>
 </div>
 </div>
-<section id="the-multivariate-normal-and-covariance-matrix" class="level3">
+<section class="level3" id="the-multivariate-normal-and-covariance-matrix">
 <h3 class="anchored" data-anchor-id="the-multivariate-normal-and-covariance-matrix">The Multivariate normal and covariance matrix</h3>
-<div id="10" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code># 11 columns because it's got the bond returns in it
-cov_matrix = [
-    1.000   -0.249  0.318   -0.082  0.625   -0.169  0.309   -0.183  0.023   0.075   0.080;
-    -0.249  1.000   -0.046  0.630   -0.123  0.829   -0.136  0.665   -0.120  0.192   0.393;
-    0.318   -0.046  1.000   -0.157  0.259   -0.050  0.236   -0.074  -0.066  0.034   0.044;
-    -0.082  0.630   -0.157  1.000   -0.063  0.515   -0.098  0.558   -0.105  0.130   0.234;
-    0.625   -0.123  0.259   -0.063  1.000   -0.276  0.377   -0.180  0.034   0.028   0.054;
-    -0.169  0.829   -0.050  0.515   -0.276  1.000   -0.142  0.649   -0.106  0.067   0.267;
-    0.309   -0.136  0.236   -0.098  0.377   -0.142  1.000   -0.284  0.026   0.006   0.045;
-    -0.183  0.665   -0.074  0.558   -0.180  0.649   -0.284  1.000   0.034   -0.091  -0.002;
-    0.023   -0.120  -0.066  -0.105  0.034   -0.106  0.026   0.034   1.000   0.047   -0.028;
-    0.075   0.192   0.034   0.130   0.028   0.067   0.006   -0.091  0.047   1.000   0.697;
-    0.080   0.393   0.044   0.234   0.054   0.267   0.045   -0.002  -0.028  0.697   1.000;
-]
-
-    Z = MvNormal(
-        zeros(11), #means for return and volatility
-        cov_matrix # covariance matrix
-        # full covariance matrix in AAA Excel workook on Parameters tab
-    )</code></pre>
+<div class="cell" data-execution_count="1" id="10">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a aria-hidden="true" href="#cb6-1" tabindex="-1"></a><span class="co"># 11 columns because it's got the bond returns in it</span></span>
+<span id="cb6-2"><a aria-hidden="true" href="#cb6-2" tabindex="-1"></a>cov_matrix <span class="op">=</span> [</span>
+<span id="cb6-3"><a aria-hidden="true" href="#cb6-3" tabindex="-1"></a>    <span class="fl">1.000</span>   <span class="op">-</span><span class="fl">0.249</span>  <span class="fl">0.318</span>   <span class="op">-</span><span class="fl">0.082</span>  <span class="fl">0.625</span>   <span class="op">-</span><span class="fl">0.169</span>  <span class="fl">0.309</span>   <span class="op">-</span><span class="fl">0.183</span>  <span class="fl">0.023</span>   <span class="fl">0.075</span>   <span class="fl">0.080</span>;</span>
+<span id="cb6-4"><a aria-hidden="true" href="#cb6-4" tabindex="-1"></a>    <span class="op">-</span><span class="fl">0.249</span>  <span class="fl">1.000</span>   <span class="op">-</span><span class="fl">0.046</span>  <span class="fl">0.630</span>   <span class="op">-</span><span class="fl">0.123</span>  <span class="fl">0.829</span>   <span class="op">-</span><span class="fl">0.136</span>  <span class="fl">0.665</span>   <span class="op">-</span><span class="fl">0.120</span>  <span class="fl">0.192</span>   <span class="fl">0.393</span>;</span>
+<span id="cb6-5"><a aria-hidden="true" href="#cb6-5" tabindex="-1"></a>    <span class="fl">0.318</span>   <span class="op">-</span><span class="fl">0.046</span>  <span class="fl">1.000</span>   <span class="op">-</span><span class="fl">0.157</span>  <span class="fl">0.259</span>   <span class="op">-</span><span class="fl">0.050</span>  <span class="fl">0.236</span>   <span class="op">-</span><span class="fl">0.074</span>  <span class="op">-</span><span class="fl">0.066</span>  <span class="fl">0.034</span>   <span class="fl">0.044</span>;</span>
+<span id="cb6-6"><a aria-hidden="true" href="#cb6-6" tabindex="-1"></a>    <span class="op">-</span><span class="fl">0.082</span>  <span class="fl">0.630</span>   <span class="op">-</span><span class="fl">0.157</span>  <span class="fl">1.000</span>   <span class="op">-</span><span class="fl">0.063</span>  <span class="fl">0.515</span>   <span class="op">-</span><span class="fl">0.098</span>  <span class="fl">0.558</span>   <span class="op">-</span><span class="fl">0.105</span>  <span class="fl">0.130</span>   <span class="fl">0.234</span>;</span>
+<span id="cb6-7"><a aria-hidden="true" href="#cb6-7" tabindex="-1"></a>    <span class="fl">0.625</span>   <span class="op">-</span><span class="fl">0.123</span>  <span class="fl">0.259</span>   <span class="op">-</span><span class="fl">0.063</span>  <span class="fl">1.000</span>   <span class="op">-</span><span class="fl">0.276</span>  <span class="fl">0.377</span>   <span class="op">-</span><span class="fl">0.180</span>  <span class="fl">0.034</span>   <span class="fl">0.028</span>   <span class="fl">0.054</span>;</span>
+<span id="cb6-8"><a aria-hidden="true" href="#cb6-8" tabindex="-1"></a>    <span class="op">-</span><span class="fl">0.169</span>  <span class="fl">0.829</span>   <span class="op">-</span><span class="fl">0.050</span>  <span class="fl">0.515</span>   <span class="op">-</span><span class="fl">0.276</span>  <span class="fl">1.000</span>   <span class="op">-</span><span class="fl">0.142</span>  <span class="fl">0.649</span>   <span class="op">-</span><span class="fl">0.106</span>  <span class="fl">0.067</span>   <span class="fl">0.267</span>;</span>
+<span id="cb6-9"><a aria-hidden="true" href="#cb6-9" tabindex="-1"></a>    <span class="fl">0.309</span>   <span class="op">-</span><span class="fl">0.136</span>  <span class="fl">0.236</span>   <span class="op">-</span><span class="fl">0.098</span>  <span class="fl">0.377</span>   <span class="op">-</span><span class="fl">0.142</span>  <span class="fl">1.000</span>   <span class="op">-</span><span class="fl">0.284</span>  <span class="fl">0.026</span>   <span class="fl">0.006</span>   <span class="fl">0.045</span>;</span>
+<span id="cb6-10"><a aria-hidden="true" href="#cb6-10" tabindex="-1"></a>    <span class="op">-</span><span class="fl">0.183</span>  <span class="fl">0.665</span>   <span class="op">-</span><span class="fl">0.074</span>  <span class="fl">0.558</span>   <span class="op">-</span><span class="fl">0.180</span>  <span class="fl">0.649</span>   <span class="op">-</span><span class="fl">0.284</span>  <span class="fl">1.000</span>   <span class="fl">0.034</span>   <span class="op">-</span><span class="fl">0.091</span>  <span class="op">-</span><span class="fl">0.002</span>;</span>
+<span id="cb6-11"><a aria-hidden="true" href="#cb6-11" tabindex="-1"></a>    <span class="fl">0.023</span>   <span class="op">-</span><span class="fl">0.120</span>  <span class="op">-</span><span class="fl">0.066</span>  <span class="op">-</span><span class="fl">0.105</span>  <span class="fl">0.034</span>   <span class="op">-</span><span class="fl">0.106</span>  <span class="fl">0.026</span>   <span class="fl">0.034</span>   <span class="fl">1.000</span>   <span class="fl">0.047</span>   <span class="op">-</span><span class="fl">0.028</span>;</span>
+<span id="cb6-12"><a aria-hidden="true" href="#cb6-12" tabindex="-1"></a>    <span class="fl">0.075</span>   <span class="fl">0.192</span>   <span class="fl">0.034</span>   <span class="fl">0.130</span>   <span class="fl">0.028</span>   <span class="fl">0.067</span>   <span class="fl">0.006</span>   <span class="op">-</span><span class="fl">0.091</span>  <span class="fl">0.047</span>   <span class="fl">1.000</span>   <span class="fl">0.697</span>;</span>
+<span id="cb6-13"><a aria-hidden="true" href="#cb6-13" tabindex="-1"></a>    <span class="fl">0.080</span>   <span class="fl">0.393</span>   <span class="fl">0.044</span>   <span class="fl">0.234</span>   <span class="fl">0.054</span>   <span class="fl">0.267</span>   <span class="fl">0.045</span>   <span class="op">-</span><span class="fl">0.002</span>  <span class="op">-</span><span class="fl">0.028</span>  <span class="fl">0.697</span>   <span class="fl">1.000</span>;</span>
+<span id="cb6-14"><a aria-hidden="true" href="#cb6-14" tabindex="-1"></a>]</span>
+<span id="cb6-15"><a aria-hidden="true" href="#cb6-15" tabindex="-1"></a></span>
+<span id="cb6-16"><a aria-hidden="true" href="#cb6-16" tabindex="-1"></a>    Z <span class="op">=</span> <span class="fu">MvNormal</span>(</span>
+<span id="cb6-17"><a aria-hidden="true" href="#cb6-17" tabindex="-1"></a>        <span class="fu">zeros</span>(<span class="fl">11</span>), <span class="co">#means for return and volatility</span></span>
+<span id="cb6-18"><a aria-hidden="true" href="#cb6-18" tabindex="-1"></a>        cov_matrix <span class="co"># covariance matrix</span></span>
+<span id="cb6-19"><a aria-hidden="true" href="#cb6-19" tabindex="-1"></a>        <span class="co"># full covariance matrix in AAA Excel workook on Parameters tab</span></span>
+<span id="cb6-20"><a aria-hidden="true" href="#cb6-20" tabindex="-1"></a>    )</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>FullNormal(
 dim: 11
@@ -333,12 +345,12 @@ dim: 11
 </div>
 </section>
 </section>
-<section id="scenarios-and-validation" class="level2">
+<section class="level2" id="scenarios-and-validation">
 <h2 class="anchored" data-anchor-id="scenarios-and-validation">Scenarios and validation</h2>
-<section id="a-single-scenario" class="level3">
+<section class="level3" id="a-single-scenario">
 <h3 class="anchored" data-anchor-id="a-single-scenario">A single scenario</h3>
-<div id="12" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>x = scenario(params,Z;months=1200)</code></pre>
+<div class="cell" data-execution_count="1" id="12">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a aria-hidden="true" href="#cb8-1" tabindex="-1"></a>x <span class="op">=</span> <span class="fu">scenario</span>(params,Z;months<span class="op">=</span><span class="fl">1200</span>)</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>4×1200 Matrix{Float64}:
  -0.0526653  -0.00776578   0.0202473   …  -0.00678658  -0.0524097  0.064024
@@ -348,7 +360,7 @@ dim: 11
 </div>
 </div>
 </section>
-<section id="validation-of-summary-statistics" class="level3">
+<section class="level3" id="validation-of-summary-statistics">
 <h3 class="anchored" data-anchor-id="validation-of-summary-statistics">Validation of summary statistics</h3>
 <p>The summary statistics expected (per paper Table 8):</p>
 <ul>
@@ -356,55 +368,52 @@ dim: 11
 <li><code>σ ≈ [0.0436, 0.0492, 0.0590, 0.0724]</code></li>
 </ul>
 <p>These computed values match very closely:</p>
-<div id="14" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code># generate 1000 scenarios 
-scens = [scenario(params,Z) for _ in 1:1000];
-
-let
-    # compute summary statistics
-    μ = vec(mean(mean(x,dims=2) for x in scens))
-    σ = vec(mean(std(x,dims=2) for x in scens))
-    (;μ,σ)
-end</code></pre>
+<div class="cell" data-execution_count="1" id="14">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb10-1"><a aria-hidden="true" href="#cb10-1" tabindex="-1"></a><span class="co"># generate 1000 scenarios </span></span>
+<span id="cb10-2"><a aria-hidden="true" href="#cb10-2" tabindex="-1"></a>scens <span class="op">=</span> [<span class="fu">scenario</span>(params,Z) for _ <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">1000</span>];</span>
+<span id="cb10-3"><a aria-hidden="true" href="#cb10-3" tabindex="-1"></a></span>
+<span id="cb10-4"><a aria-hidden="true" href="#cb10-4" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb10-5"><a aria-hidden="true" href="#cb10-5" tabindex="-1"></a>    <span class="co"># compute summary statistics</span></span>
+<span id="cb10-6"><a aria-hidden="true" href="#cb10-6" tabindex="-1"></a>    μ <span class="op">=</span> <span class="fu">vec</span>(<span class="fu">mean</span>(<span class="fu">mean</span>(x,dims<span class="op">=</span><span class="fl">2</span>) <span class="cf">for</span> x <span class="kw">in</span> scens))</span>
+<span id="cb10-7"><a aria-hidden="true" href="#cb10-7" tabindex="-1"></a>    σ <span class="op">=</span> <span class="fu">vec</span>(<span class="fu">mean</span>(<span class="fu">std</span>(x,dims<span class="op">=</span><span class="fl">2</span>) <span class="cf">for</span> x <span class="kw">in</span> scens))</span>
+<span id="cb10-8"><a aria-hidden="true" href="#cb10-8" tabindex="-1"></a>    (;μ,σ)</span>
+<span id="cb10-9"><a aria-hidden="true" href="#cb10-9" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>(μ = [0.006062255547580509, 0.006162312037285247, 0.006323027189791918, 0.006601955009778852], σ = [0.043547265928461976, 0.04907728100597166, 0.05901536994534718, 0.0723209572172633])</code></pre>
 </div>
 </div>
 </section>
 </section>
-<section id="plotting-some-scenarios" class="level2">
+<section class="level2" id="plotting-some-scenarios">
 <h2 class="anchored" data-anchor-id="plotting-some-scenarios">Plotting some scenarios</h2>
-<div id="16" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>let 
-    f = Figure()
-    n = 25
-    colors = ColorSchemes.Johnson
-    ax = Axis(f[1,1],yscale=log10,ylabel="index value",
-        title="$n realizations of 4 correlated equity funds per AAA ESG")
-    for s in scens[1:n]
-        for i in 1:4
-        lines!(ax,cumprod(exp.(s[i,:])), color=(colors[i],0.3),label="fund $i")
-        end
-    end
-    axislegend(ax,unique=true,position=:lt)
-    f
-end</code></pre>
+<div class="cell" data-execution_count="1" id="16">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb12-1"><a aria-hidden="true" href="#cb12-1" tabindex="-1"></a><span class="kw">let</span> </span>
+<span id="cb12-2"><a aria-hidden="true" href="#cb12-2" tabindex="-1"></a>    f <span class="op">=</span> <span class="fu">Figure</span>()</span>
+<span id="cb12-3"><a aria-hidden="true" href="#cb12-3" tabindex="-1"></a>    n <span class="op">=</span> <span class="fl">25</span></span>
+<span id="cb12-4"><a aria-hidden="true" href="#cb12-4" tabindex="-1"></a>    colors <span class="op">=</span> ColorSchemes.Johnson</span>
+<span id="cb12-5"><a aria-hidden="true" href="#cb12-5" tabindex="-1"></a>    ax <span class="op">=</span> <span class="fu">Axis</span>(f[<span class="fl">1</span>,<span class="fl">1</span>],yscale<span class="op">=</span>log10,ylabel<span class="op">=</span><span class="st">"index value"</span>,</span>
+<span id="cb12-6"><a aria-hidden="true" href="#cb12-6" tabindex="-1"></a>        title<span class="op">=</span><span class="st">"</span><span class="sc">$</span>n<span class="st"> realizations of 4 correlated equity funds per AAA ESG"</span>)</span>
+<span id="cb12-7"><a aria-hidden="true" href="#cb12-7" tabindex="-1"></a>    <span class="cf">for</span> s <span class="kw">in</span> scens[<span class="fl">1</span><span class="op">:</span>n]</span>
+<span id="cb12-8"><a aria-hidden="true" href="#cb12-8" tabindex="-1"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">4</span></span>
+<span id="cb12-9"><a aria-hidden="true" href="#cb12-9" tabindex="-1"></a>        <span class="fu">lines!</span>(ax,<span class="fu">cumprod</span>(<span class="fu">exp</span>.(s[i,<span class="op">:</span>])), color<span class="op">=</span>(colors[i],<span class="fl">0.3</span>),label<span class="op">=</span><span class="st">"fund </span><span class="sc">$</span>i<span class="st">"</span>)</span>
+<span id="cb12-10"><a aria-hidden="true" href="#cb12-10" tabindex="-1"></a>        <span class="cf">end</span></span>
+<span id="cb12-11"><a aria-hidden="true" href="#cb12-11" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb12-12"><a aria-hidden="true" href="#cb12-12" tabindex="-1"></a>    <span class="fu">axislegend</span>(ax,unique<span class="op">=</span><span class="cn">true</span>,position<span class="op">=:</span>lt)</span>
+<span id="cb12-13"><a aria-hidden="true" href="#cb12-13" tabindex="-1"></a>    f</span>
+<span id="cb12-14"><a aria-hidden="true" href="#cb12-14" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-9-output-1.svg" class="img-fluid figure-img"></p>
+<p><img alt="Simulated paths of four correlated equity fund indices under the AAA economic scenario generator, on a logarithmic scale." class="img-fluid figure-img" decoding="async" height="450" loading="eager" src="index_files/figure-html/cell-9-output-1.svg" width="600"/></p>
 </figure>
 </div>
 </div>
 </div>
 </section>
-<section id="see-also" class="level2">
+<section class="level2" id="see-also">
 <h2 class="anchored" data-anchor-id="see-also">See also</h2>
 <p><a href="../../posts/academy-generator-rates/">Interactive AAA Economic Scenario Generator</a></p>
-
-
 </section>
-
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
@@ -807,8 +816,4 @@ end</code></pre>
   });
   </script>
 </div> <!-- /content -->
-
-
-
-
 </body></html>

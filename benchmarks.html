@@ -1,13 +1,10 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
-<meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.16">
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-
-<meta name="description" content="JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.">
-
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml"><head>
+<meta charset="utf-8"/>
+<meta content="quarto-1.9.16" name="generator"/>
+<meta content="width=device-width, initial-scale=1.0, user-scalable=yes" name="viewport"/>
+<meta content="JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows." name="description"/>
 <title>Benchmarks – JuliaActuary</title>
 <style>
 code{white-space: pre-wrap;}
@@ -22,27 +19,25 @@ ul.task-list li input[type="checkbox"] {
   vertical-align: middle;
 }
 </style>
-
-
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script crossorigin="anonymous" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script><script src="site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="site_libs/quarto-nav/headroom.min.js"></script>
 <script src="site_libs/clipboard/clipboard.min.js"></script>
 <script src="site_libs/quarto-search/autocomplete.umd.js"></script>
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<link href=".//assets/logos/favicon.ico" rel="icon">
+<meta content="./" name="quarto:offset"/>
+<link href=".//assets/logos/favicon.ico" rel="icon"/>
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-a0731b9a3a5d496010872d775e5d9bc3.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet"/>
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-be14ce6d32a635bebd8f9e4e558f9eeb.css" id="quarto-text-highlighting-styles" rel="stylesheet"/>
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-98ac2d5361ef6f18cc0525d38bedc462.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet"/>
+<link append-hash="true" data-mode="light" href="site_libs/bootstrap/bootstrap-4a135b976b00f53a3a768ff94eb1df18.min.css" id="quarto-bootstrap" rel="stylesheet"/>
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -70,24 +65,14 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
-
+<script crossorigin="anonymous" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js"></script>
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&amp;family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&amp;display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./assets/highlight/styles/github.min.css">
-<script src="./assets/highlight/highlight.min.js"></script>
-<script src="./assets/highlight/languages/julia.min.js"></script>
-<script src="./assets/highlight/languages/julia-repl.min.js"></script>
-<script src="./assets/highlight/languages/python.min.js"></script>
-<script src="./assets/highlight/languages/r.min.js"></script>
-<script>hljs.highlightAll();</script>
-<script data-goatcounter="https://juliaactuary.goatcounter.com/count" async="" src="//gc.zgo.at/count.js"></script>
-
-  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
-
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" rel="stylesheet"/>
+<script async="" data-goatcounter="https://juliaactuary.goatcounter.com/count" src="//gc.zgo.at/count.js"></script>
+<script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 <script type="text/javascript">
 const typesetMath = (el) => {
   if (window.MathJax) {
@@ -114,186 +99,176 @@ window.Quarto = {
   typesetMath
 };
 </script>
-
-<link rel="stylesheet" href="styles.css">
+<link href="styles-c416c153cdf24884.css" rel="stylesheet"/>
 </head>
-
 <body class="nav-fixed quarto-light">
-
 <div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top">
-    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
-      <div class="navbar-container container-fluid">
-      <div class="navbar-brand-container mx-auto">
-    <a href="./index.html" class="navbar-brand navbar-brand-logo">
-    <img src="./assets/logos/android-chrome-512x512.png" alt="JuliaActuary Logo" class="navbar-logo light-content">
-    <img src="./assets/logos/android-chrome-512x512.png" alt="JuliaActuary Logo" class="navbar-logo dark-content">
-    </a>
-    <a class="navbar-brand" href="./index.html">
-    <span class="navbar-title">JuliaActuary</span>
-    </a>
-  </div>
-            <div id="quarto-search" class="" title="Search"></div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-  <span class="navbar-toggler-icon"></span>
-</button>
-          <div class="collapse navbar-collapse" id="navbarCollapse">
-            <ul class="navbar-nav navbar-nav-scroll ms-auto">
-  <li class="nav-item">
-    <a class="nav-link" href="./packages.html"> 
-<span class="menu-text">Packages</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="https://docs.juliaactuary.org"> 
-<span class="menu-text">Docs</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="https://modernfinancialmodeling.com"> 
-<span class="menu-text">Book</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="./learn.html"> 
-<span class="menu-text">Learn</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="./examples.html"> 
-<span class="menu-text">Examples</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link active" href="./benchmarks.html" aria-current="page"> 
-<span class="menu-text">Benchmarks</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="./community.html"> 
-<span class="menu-text">Community</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="./blog.html"> 
-<span class="menu-text">Blog</span></a>
-  </li>  
-  <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/JuliaActuary"> <i class="bi bi-github" role="img">
-</i> 
-<span class="menu-text"></span></a>
-  </li>  
-  <li class="nav-item compact">
-    <a class="nav-link" href="./all-posts.xml"> <i class="bi bi-rss" role="img">
-</i> 
-<span class="menu-text"></span></a>
-  </li>  
-</ul>
-          </div> <!-- /navcollapse -->
-            <div class="quarto-navbar-tools">
+<header class="headroom fixed-top" id="quarto-header">
+<nav class="navbar navbar-expand-lg" data-bs-theme="dark">
+<div class="navbar-container container-fluid">
+<div class="navbar-brand-container mx-auto">
+<a class="navbar-brand navbar-brand-logo" href="./index.html">
+<img alt="JuliaActuary Logo" class="navbar-logo light-content" src="./assets/logos/android-chrome-512x512.png"/>
+<img alt="JuliaActuary Logo" class="navbar-logo dark-content" src="./assets/logos/android-chrome-512x512.png"/>
+</a>
+<a class="navbar-brand" href="./index.html">
+<span class="navbar-title">JuliaActuary</span>
+</a>
 </div>
-      </div> <!-- /container-fluid -->
-    </nav>
+<div class="" id="quarto-search" title="Search"></div>
+<button aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-bs-target="#navbarCollapse" data-bs-toggle="collapse" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }" role="menu" type="button">
+<span class="navbar-toggler-icon"></span>
+</button>
+<div class="collapse navbar-collapse" id="navbarCollapse">
+<ul class="navbar-nav navbar-nav-scroll ms-auto">
+<li class="nav-item">
+<a class="nav-link" href="./packages.html">
+<span class="menu-text">Packages</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="https://docs.juliaactuary.org">
+<span class="menu-text">Docs</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="./learn.html">
+<span class="menu-text">Learn</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="./examples.html">
+<span class="menu-text">Examples</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="./community.html">
+<span class="menu-text">Community</span></a>
+</li>
+<li class="nav-item dropdown">
+<a aria-expanded="false" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" id="nav-menu-more" role="link">
+<span class="menu-text">More</span>
+</a>
+<ul aria-labelledby="nav-menu-more" class="dropdown-menu dropdown-menu-end">
+<li>
+<a class="dropdown-item" href="./benchmarks.html">
+<span class="dropdown-text">Benchmarks</span></a>
+</li>
+<li>
+<a class="dropdown-item" href="./blog.html">
+<span class="dropdown-text">Blog</span></a>
+</li>
+<li>
+<a class="dropdown-item" href="https://modernfinancialmodeling.com">
+<span class="dropdown-text">Book</span></a>
+</li>
+</ul>
+</li>
+<li class="nav-item compact">
+<a class="nav-link" href="https://github.com/JuliaActuary"> <i aria-label="JuliaActuary on GitHub" class="bi bi-github" role="img">
+</i>
+<span class="menu-text"></span></a>
+</li>
+<li class="nav-item compact">
+<a class="nav-link" href="./all-posts.xml"> <i aria-label="RSS feed" class="bi bi-rss" role="img">
+</i>
+<span class="menu-text"></span></a>
+</li>
+</ul>
+</div> <!-- /navcollapse -->
+<div class="quarto-navbar-tools">
+</div>
+</div> <!-- /container-fluid -->
+</nav>
 </header>
 <!-- content -->
-<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<div class="quarto-container page-columns page-rows-contents page-layout-article page-navbar" id="quarto-content">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">On this page</h2>
-   
-  <ul>
-  <li><a href="#current-package-benchmarks" id="toc-current-package-benchmarks" class="nav-link active" data-scroll-target="#current-package-benchmarks">Current package benchmarks</a></li>
-  <li><a href="#the-life-modeling-problem" id="toc-the-life-modeling-problem" class="nav-link" data-scroll-target="#the-life-modeling-problem">The Life Modeling Problem</a>
-  <ul class="collapse">
-  <li><a href="#benchmarks" id="toc-benchmarks" class="nav-link" data-scroll-target="#benchmarks">Benchmarks</a></li>
-  <li><a href="#discussion" id="toc-discussion" class="nav-link" data-scroll-target="#discussion">Discussion</a></li>
-  </ul></li>
-  <li><a href="#irrs" id="toc-irrs" class="nav-link" data-scroll-target="#irrs">IRRs</a>
-  <ul class="collapse">
-  <li><a href="#benchmarks-1" id="toc-benchmarks-1" class="nav-link" data-scroll-target="#benchmarks-1">Benchmarks</a></li>
-  <li><a href="#discussion-1" id="toc-discussion-1" class="nav-link" data-scroll-target="#discussion-1">Discussion</a></li>
-  </ul></li>
-  <li><a href="#black-scholes-merton-european-option-pricing" id="toc-black-scholes-merton-european-option-pricing" class="nav-link" data-scroll-target="#black-scholes-merton-european-option-pricing">Black-Scholes-Merton European Option Pricing</a>
-  <ul class="collapse">
-  <li><a href="#benchmarks-2" id="toc-benchmarks-2" class="nav-link" data-scroll-target="#benchmarks-2">Benchmarks</a></li>
-  <li><a href="#discussion-2" id="toc-discussion-2" class="nav-link" data-scroll-target="#discussion-2">Discussion</a></li>
-  </ul></li>
-  <li><a href="#nested-stochastic-projections" id="toc-nested-stochastic-projections" class="nav-link" data-scroll-target="#nested-stochastic-projections">Nested Stochastic Projections</a>
-  <ul class="collapse">
-  <li><a href="#benchmarks-3" id="toc-benchmarks-3" class="nav-link" data-scroll-target="#benchmarks-3">Benchmarks</a></li>
-  <li><a href="#discussion-3" id="toc-discussion-3" class="nav-link" data-scroll-target="#discussion-3">Discussion</a></li>
-  </ul></li>
-  <li><a href="#other-benchmarks" id="toc-other-benchmarks" class="nav-link" data-scroll-target="#other-benchmarks">Other benchmarks</a></li>
-  <li><a href="#colophon" id="toc-colophon" class="nav-link" data-scroll-target="#colophon">Colophon</a>
-  <ul class="collapse">
-  <li><a href="#code" id="toc-code" class="nav-link" data-scroll-target="#code">Code</a></li>
-  </ul></li>
-  <li><a href="#footnotes" id="toc-footnotes" class="nav-link" data-scroll-target="#footnotes">Footnotes</a></li>
-  </ul>
+<div class="sidebar margin-sidebar" id="quarto-margin-sidebar">
+<nav class="toc-active" id="TOC" role="doc-toc">
+<h2 id="toc-title">On this page</h2>
+<ul>
+<li><a class="nav-link active" data-scroll-target="#current-package-benchmarks" href="#current-package-benchmarks" id="toc-current-package-benchmarks">Current package benchmarks</a></li>
+<li><a class="nav-link" data-scroll-target="#the-life-modeling-problem" href="#the-life-modeling-problem" id="toc-the-life-modeling-problem">The Life Modeling Problem</a>
+<ul class="collapse">
+<li><a class="nav-link" data-scroll-target="#benchmarks" href="#benchmarks" id="toc-benchmarks">Benchmarks</a></li>
+<li><a class="nav-link" data-scroll-target="#discussion" href="#discussion" id="toc-discussion">Discussion</a></li>
+</ul></li>
+<li><a class="nav-link" data-scroll-target="#irrs" href="#irrs" id="toc-irrs">IRRs</a>
+<ul class="collapse">
+<li><a class="nav-link" data-scroll-target="#benchmarks-1" href="#benchmarks-1" id="toc-benchmarks-1">Benchmarks</a></li>
+<li><a class="nav-link" data-scroll-target="#discussion-1" href="#discussion-1" id="toc-discussion-1">Discussion</a></li>
+</ul></li>
+<li><a class="nav-link" data-scroll-target="#black-scholes-merton-european-option-pricing" href="#black-scholes-merton-european-option-pricing" id="toc-black-scholes-merton-european-option-pricing">Black-Scholes-Merton European Option Pricing</a>
+<ul class="collapse">
+<li><a class="nav-link" data-scroll-target="#benchmarks-2" href="#benchmarks-2" id="toc-benchmarks-2">Benchmarks</a></li>
+<li><a class="nav-link" data-scroll-target="#discussion-2" href="#discussion-2" id="toc-discussion-2">Discussion</a></li>
+</ul></li>
+<li><a class="nav-link" data-scroll-target="#nested-stochastic-projections" href="#nested-stochastic-projections" id="toc-nested-stochastic-projections">Nested Stochastic Projections</a>
+<ul class="collapse">
+<li><a class="nav-link" data-scroll-target="#benchmarks-3" href="#benchmarks-3" id="toc-benchmarks-3">Benchmarks</a></li>
+<li><a class="nav-link" data-scroll-target="#discussion-3" href="#discussion-3" id="toc-discussion-3">Discussion</a></li>
+</ul></li>
+<li><a class="nav-link" data-scroll-target="#other-benchmarks" href="#other-benchmarks" id="toc-other-benchmarks">Other benchmarks</a></li>
+<li><a class="nav-link" data-scroll-target="#colophon" href="#colophon" id="toc-colophon">Colophon</a>
+<ul class="collapse">
+<li><a class="nav-link" data-scroll-target="#code" href="#code" id="toc-code">Code</a></li>
+</ul></li>
+<li><a class="nav-link" data-scroll-target="#footnotes" href="#footnotes" id="toc-footnotes">Footnotes</a></li>
+</ul>
 </nav>
-    </div>
+</div>
 <!-- main -->
 <main class="content page-columns page-full" id="quarto-document-content">
-
-<header id="title-block-header" class="quarto-title-block default">
+<header class="quarto-title-block default" id="title-block-header">
 <div class="quarto-title">
 <h1 class="title">Benchmarks</h1>
 </div>
-
 <div>
-  <div class="description">
+<div class="description">
     JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.
   </div>
 </div>
-
-
 <div class="quarto-title-meta">
-
-    
-  
-    
-  </div>
-  
-
-
+</div>
 </header>
-
-
-<section id="current-package-benchmarks" class="level2">
+<section class="level2" id="current-package-benchmarks">
 <h2 class="anchored" data-anchor-id="current-package-benchmarks">Current package benchmarks</h2>
 <p>The <a href="./posts/2026-fall-releases/index.html#performance-and-tradeoffs">fall 2026 release benchmarks</a> compare FinanceCore 3, FinanceModels 7, ActuaryUtilities 6 and MortalityTables 3 with the preceding releases. They include scripts, environments and raw results, with Julia timings taken from the minimum of warmed BenchmarkTools trials across repeated runs. The <a href="./posts/quantlib-comparison/index.html">QuantLib comparison</a> covers matched cashflow and sensitivity calculations.</p>
 <p>The cross-language measurements below are historical results from the linked benchmark studies. They have not been rerun for the current package releases; their speed ratios describe those original environments.</p>
 </section>
-<section id="the-life-modeling-problem" class="level2 page-columns page-full">
+<section class="level2 page-columns page-full" id="the-life-modeling-problem">
 <h2 class="anchored" data-anchor-id="the-life-modeling-problem">The Life Modeling Problem</h2>
 <p>Inspired by the discussion in the <a href="https://github.com/actuarialopensource">ActuarialOpenSource</a> GitHub community discussion, folks started submitted solutions to what someone referred to as the “Life Modeling Problem”. This user <a href="https://github.com/orgs/actuarialopensource/teams/common-room/discussions/5">submitted a short snippet</a> for consideration of a representative problem.</p>
-<section id="benchmarks" class="level3 page-columns page-full">
+<section class="level3 page-columns page-full" id="benchmarks">
 <h3 class="anchored" data-anchor-id="benchmarks">Benchmarks</h3>
-<p>After the original user submitted a proposal, others chimed in and submitted versions in their favorite languages. I have collected those versions, and run them on a consistent set of hardware.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
-<p>Some submissions were excluded because from the benchmarks they involved an entirely different approach, such as <a href="https://en.wikipedia.org/wiki/Memoization">memoizing</a> the function calls<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>.</p>
+<p>After the original user submitted a proposal, others chimed in and submitted versions in their favorite languages. I have collected those versions, and run them on a consistent set of hardware.<a class="footnote-ref" href="#fn1" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
+<p>Some submissions were excluded because from the benchmarks they involved an entirely different approach, such as <a href="https://en.wikipedia.org/wiki/Memoization">memoizing</a> the function calls<a class="footnote-ref" href="#fn2" id="fnref2" role="doc-noteref"><sup>2</sup></a>.</p>
 <div class="cell" data-execution_count="1">
-<div id="tbl-life-modeling-benchmark" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-execution_count="1">
+<div class="cell quarto-float quarto-figure quarto-figure-center anchored" data-execution_count="1" id="tbl-life-modeling-benchmark">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-life-modeling-benchmark-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;1: Benchmarks for the Life Modeling Problem in nanoseconds (lower times are better).
+Table 1: Benchmarks for the Life Modeling Problem in nanoseconds (lower times are better).
 </figcaption>
 <div aria-describedby="tbl-life-modeling-benchmark-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div><div style="float: left;"><span>18×6 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
-<table class="data-frame do-not-create-environment cell caption-top table table-sm table-striped small">
+<div aria-label="Scrollable data table" class="table-scroll" role="region" tabindex="0"><table class="data-frame do-not-create-environment cell caption-top table table-sm table-striped small">
 <thead>
 <tr class="columnLabelRow header">
 <th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">lang</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">algorithm</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">function_name</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">median</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">mean</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">relative_mean</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;">lang</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;">algorithm</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;">function_name</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;">median</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;">mean</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;">relative_mean</th>
 </tr>
 <tr class="columnLabelRow even">
 <th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="DataStrings.DataString">DataStri…</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="DataStrings.DataString">DataStri…</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="DataStrings.DataString">DataStri…</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="Union{Missing, Float64}">Float64?</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;" title="DataStrings.DataString">DataStri…</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;" title="DataStrings.DataString">DataStri…</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;" title="DataStrings.DataString">DataStri…</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;" title="Union{Missing, Float64}">Float64?</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;" title="Float64">Float64</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;" title="Float64">Float64</th>
 </tr>
 </thead>
 <tbody>
@@ -460,7 +435,7 @@ Table&nbsp;1: Benchmarks for the Life Modeling Problem in nanoseconds (lower tim
 <td style="text-align: right;">1.32199e5</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 </div>
 </div>
 </div>
@@ -468,31 +443,31 @@ Table&nbsp;1: Benchmarks for the Life Modeling Problem in nanoseconds (lower tim
 </div>
 </div>
 <p>To aid in visualizing results with such vast different orders of magnitude, this graph includes a physical length comparison to serve as a reference. The computation time is represented by the distance that light travels in the time for the computation to complete (comparing a nanosecond to one foot length <a href="https://www.youtube.com/watch?v=9eyFDBPk4Yw">goes at least back to Admiral Grace Hopper</a>).</p>
-<div id="cell-fig-life-modeling-benchmark" class="cell page-columns page-full" data-execution_count="1">
+<div class="cell page-columns page-full" data-execution_count="1" id="cell-fig-life-modeling-benchmark">
 <div class="cell-output cell-output-display page-columns page-full" data-execution_count="1">
-<div id="fig-life-modeling-benchmark" class="quarto-float quarto-figure quarto-figure-center anchored page-columns page-full">
+<div alt="Life Modeling Problem runtimes by language and implementation on a logarithmic scale, with light-travel distance comparisons." class="quarto-float quarto-figure quarto-figure-center anchored page-columns page-full" id="fig-life-modeling-benchmark">
 <figure class="quarto-float quarto-float-fig figure page-columns page-full">
 <div aria-describedby="fig-life-modeling-benchmark-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca" class="page-columns page-full">
-<img src="benchmarks_files/figure-html/fig-life-modeling-benchmark-output-1.svg" id="fig-life-modeling-benchmark" class="img-fluid figure-img column-page-inset">
+<img alt="Life Modeling Problem runtimes by language and implementation on a logarithmic scale, with light-travel distance comparisons." class="img-fluid figure-img column-page-inset" decoding="async" height="460" id="fig-life-modeling-benchmark" loading="eager" src="benchmarks_files/figure-html/fig-life-modeling-benchmark-output-1.svg" width="960"/>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-life-modeling-benchmark-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;1
+Figure 1
 </figcaption>
 </figure>
 </div>
 </div>
 </div>
 </section>
-<section id="discussion" class="level3">
+<section class="level3" id="discussion">
 <h3 class="anchored" data-anchor-id="discussion">Discussion</h3>
 <p>For more a more in-depth discussion of these results, see <a href="./posts/life-modeling-problem/">this post</a>.</p>
 <p>All of the benchmarked code can be found in the <a href="https://github.com/JuliaActuary/Learn/tree/master/Benchmarks/LifeModelingProblem">JuliaActuary Learn repository</a>. Please file an issue or submit a PR request there for issues/suggestions.</p>
 </section>
 </section>
-<section id="irrs" class="level2 page-columns page-full">
+<section class="level2 page-columns page-full" id="irrs">
 <h2 class="anchored" data-anchor-id="irrs">IRRs</h2>
 <p><strong>Task:</strong> determine the IRR for a series of cashflows 701 elements long (roughly 58 years of monthly cashflows).</p>
-<section id="benchmarks-1" class="level3 page-columns page-full">
+<section class="level3 page-columns page-full" id="benchmarks-1">
 <h3 class="anchored" data-anchor-id="benchmarks-1">Benchmarks</h3>
 <div class="column-body-outset">
 <pre class="plaintext"><code>Times are in nanoseconds:
@@ -506,14 +481,14 @@ Figure&nbsp;1
 └──────────┴──────────────────┴───────────────────┴─────────┴─────────────┴───────────────┘</code></pre>
 </div>
 </section>
-<section id="discussion-1" class="level3">
+<section class="level3" id="discussion-1">
 <h3 class="anchored" data-anchor-id="discussion-1">Discussion</h3>
 <p>The ActuaryUtilities implementation is over 100,000 times faster than <code>numpy_financial</code>, and 91 to 722 times faster than the <code>better</code> Python package. The <a href="./packages.html#actuaryutilities.jl">ActuaryUtilities.jl</a> implementation is also more flexible, as it can be given an argument with timepoints, similar to Excel’s <code>XIRR</code>.</p>
 <p>Excel was used to attempt a benchmark, but the <code>IRR</code> formula returned a <code>#DIV/0!</code> error.</p>
 <p>All of the benchmarked code can be found in the <a href="https://github.com/JuliaActuary/Learn/tree/master/Benchmarks/irr">JuliaActuary Learn repository</a>. Please file an issue or submit a PR request there for issues/suggestions.</p>
 </section>
 </section>
-<section id="black-scholes-merton-european-option-pricing" class="level2">
+<section class="level2" id="black-scholes-merton-european-option-pricing">
 <h2 class="anchored" data-anchor-id="black-scholes-merton-european-option-pricing">Black-Scholes-Merton European Option Pricing</h2>
 <p><strong>Task:</strong> calculate the price of a vanilla european call option using the Black-Scholes-Merton formula.</p>
 <p><span class="math display">\[\begin{align}
@@ -524,7 +499,7 @@ d_1 &amp;= \frac{1}{\sigma\sqrt{T - t}}\left[\ln\left(\frac{S_t}{K}\right) + \le
 d_2 &amp;= d_1 - \sigma\sqrt{T - t}
 
 \end{align}\]</span></p>
-<section id="benchmarks-2" class="level3">
+<section class="level3" id="benchmarks-2">
 <h3 class="anchored" data-anchor-id="benchmarks-2">Benchmarks</h3>
 <pre class="plaintext"><code>Times are in nanoseconds:
 ┌──────────┬─────────┬─────────────┬───────────────┐
@@ -535,28 +510,28 @@ d_2 &amp;= d_1 - \sigma\sqrt{T - t}
 │    Julia │    41.0 │        41.6 │           1.0 │
 └──────────┴─────────┴─────────────┴───────────────┘</code></pre>
 </section>
-<section id="discussion-2" class="level3">
+<section class="level3" id="discussion-2">
 <h3 class="anchored" data-anchor-id="discussion-2">Discussion</h3>
 <p>Julia is nearly 20,000 times faster than Python, and two orders of magnitude faster than R.</p>
 </section>
 </section>
-<section id="nested-stochastic-projections" class="level2">
+<section class="level2" id="nested-stochastic-projections">
 <h2 class="anchored" data-anchor-id="nested-stochastic-projections">Nested Stochastic Projections</h2>
 <p><strong>Task:</strong> value a 190,000-policy variable annuity block (GMWB/GMDB/GMMB riders) by full brute force — 1,000 outer real-world scenarios × 500 inner risk-neutral scenarios at each of 120 quarterly switch points, about <span class="math inline">\(10^{13}\)</span> path valuations — reproducing the reference model of the SOA’s 2021 <a href="https://www.soa.org/resources/research-reports/2021/efficient-computation-nested-stochastic/"><em>Efficient Computational Structure of Nested Stochastic Modeling</em></a> paper exactly.</p>
-<section id="benchmarks-3" class="level3">
+<section class="level3" id="benchmarks-3">
 <h3 class="anchored" data-anchor-id="benchmarks-3">Benchmarks</h3>
-<div id="tbl-nested-stochastic-benchmark" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div class="quarto-float quarto-figure quarto-figure-center anchored" id="tbl-nested-stochastic-benchmark">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-nested-stochastic-benchmark-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;2: The nested stochastic ladder. <em>Full problem</em> is the paper’s complete configuration above, extrapolated linearly from the measured per-unit cost for every row except the H100 kernel, which ran it end-to-end. <em>Code size</em> is gzipped source of each implementation (state, setup, stepping, and valuation driver; comments stripped). CPU rows: Apple M4 Max; H100 rows: a rented Lambda instance.
+Table 2: The nested stochastic ladder. <em>Full problem</em> is the paper’s complete configuration above, extrapolated linearly from the measured per-unit cost for every row except the H100 kernel, which ran it end-to-end. <em>Code size</em> is gzipped source of each implementation (state, setup, stepping, and valuation driver; comments stripped). CPU rows: Apple M4 Max; H100 rows: a rented Lambda instance.
 </figcaption>
 <div aria-describedby="tbl-nested-stochastic-benchmark-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<table class="caption-top table">
+<div aria-label="Scrollable data table" class="table-scroll" role="region" tabindex="0"><table class="caption-top table">
 <colgroup>
-<col style="width: 25%">
-<col style="width: 25%">
-<col style="width: 25%">
-<col style="width: 25%">
+<col style="width: 25%"/>
+<col style="width: 25%"/>
+<col style="width: 25%"/>
+<col style="width: 25%"/>
 </colgroup>
 <thead>
 <tr class="header">
@@ -616,18 +591,18 @@ Table&nbsp;2: The nested stochastic ladder. <em>Full problem</em> is the paper�
 <td style="text-align: right;"><strong>1.9 KB</strong></td>
 </tr>
 </tbody>
-</table>
+</table></div>
 </div>
 </figure>
 </div>
 </section>
-<section id="discussion-3" class="level3">
+<section class="level3" id="discussion-3">
 <h3 class="anchored" data-anchor-id="discussion-3">Discussion</h3>
 <p>Translating the Python line-for-line into Julia is worth ~90X on the naive loops and ~2.7X on the completed NumPy/RISP version. Restructuring into a fused seriatim kernel — about 40 lines that read like the model specification and reproduce every other implementation’s numbers to ~1e-11 or better — is worth ~110X over the completed NumPy version on the same laptop, largely by <em>skipping work</em> (each policy stops at its own maturity) and threading freely. The same kernel, moved to a rented H100 via KernelAbstractions.jl, ran the paper’s full “560-day” configuration in <strong>24.8 measured minutes</strong> (~$1 of compute) — roughly 1,000X more throughput per unit of work than CuPy on the same GPU, whose array formulation is launch-overhead-bound.</p>
 <p>For the full ladder, cross-implementation validation, pathwise AD sensitivities, and the GPU details — plus the archived code and results — see <a href="./posts/nested-stochastic-va/">the post</a>.</p>
 </section>
 </section>
-<section id="other-benchmarks" class="level2">
+<section class="level2" id="other-benchmarks">
 <h2 class="anchored" data-anchor-id="other-benchmarks">Other benchmarks</h2>
 <p>These benchmarks have been performed by others, but provide relevant information for actuarial-related work:</p>
 <ul>
@@ -635,25 +610,20 @@ Table&nbsp;2: The nested stochastic ladder. <em>Full problem</em> is the paper�
 <li><a href="https://juliacomputing.com/blog/2020/06/fast-csv/">Reading CSVs</a></li>
 </ul>
 </section>
-<section id="colophon" class="level2">
+<section class="level2" id="colophon">
 <h2 class="anchored" data-anchor-id="colophon">Colophon</h2>
-<section id="code" class="level3">
+<section class="level3" id="code">
 <h3 class="anchored" data-anchor-id="code">Code</h3>
 <p>All of the benchmarked code can be found in the <a href="https://github.com/JuliaActuary/Learn/tree/master/Benchmarks/">JuliaActuary Learn repository</a>. Please file an issue or submit a PR request there for issues/suggestions.</p>
 </section>
 </section>
-<section id="footnotes" class="level2">
+<section class="level2" id="footnotes">
 <h2 class="anchored" data-anchor-id="footnotes">Footnotes</h2>
-
-
 </section>
-
-
-<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
-
+<div class="default" id="quarto-appendix"><section class="footnotes footnotes-end-of-document" id="footnotes" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
 <ol>
-<li id="fn1"><p>Note that not all languages have both a mean and median result in their benchmarking libraries. Mean is a better representation for a garbage-collected modern language, because sometimes the computation just takes longer than the median result. Where one of the two statistics is not reported, the other is shown.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn2"><p>If benchmarking memoization, it’s essentially benchmarking how long it takes to perform hashing in a language. While interesting, especially in the context of <a href="https://scattered-thoughts.net/writing/an-opinionated-map-of-incremental-and-streaming-systems">incremental computing</a>, it’s not the core issue at hand. Incremental computing libraries exist for all of the modern languages discussed here.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn1"><p>Note that not all languages have both a mean and median result in their benchmarking libraries. Mean is a better representation for a garbage-collected modern language, because sometimes the computation just takes longer than the median result. Where one of the two statistics is not reported, the other is shown.<a class="footnote-back" href="#fnref1" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>If benchmarking memoization, it’s essentially benchmarking how long it takes to perform hashing in a language. While interesting, especially in the context of <a href="https://scattered-thoughts.net/writing/an-opinionated-map-of-incremental-and-streaming-systems">incremental computing</a>, it’s not the core issue at hand. Incremental computing libraries exist for all of the modern languages discussed here.<a class="footnote-back" href="#fnref2" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -1057,8 +1027,4 @@ Table&nbsp;2: The nested stochastic ladder. <em>Full problem</em> is the paper�
   });
   </script>
 </div> <!-- /content -->
-
-
-
-
 </body></html>

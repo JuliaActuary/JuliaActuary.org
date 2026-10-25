@@ -1,15 +1,12 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
-<meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.16">
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-
-<meta name="author" content="Alec Loudenback">
-<meta name="dcterms.date" content="2026-05-24">
-<meta name="description" content="JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.">
-
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml"><head>
+<meta charset="utf-8"/>
+<meta content="quarto-1.9.16" name="generator"/>
+<meta content="width=device-width, initial-scale=1.0, user-scalable=yes" name="viewport"/>
+<meta content="Alec Loudenback" name="author"/>
+<meta content="2026-05-24" name="dcterms.date"/>
+<meta content="JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows." name="description"/>
 <title>Cassette Futurism: a Makie theme preview – JuliaActuary</title>
 <style>
 code{white-space: pre-wrap;}
@@ -23,28 +20,61 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
-
-
 <script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="../../site_libs/quarto-nav/headroom.min.js"></script>
 <script src="../../site_libs/clipboard/clipboard.min.js"></script>
 <script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="../../">
-<link href="../..//assets/logos/favicon.ico" rel="icon">
+<meta content="../../" name="quarto:offset"/>
+<link href="../..//assets/logos/favicon.ico" rel="icon"/>
 <script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
-<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-a0731b9a3a5d496010872d775e5d9bc3.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet"/>
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-be14ce6d32a635bebd8f9e4e558f9eeb.css" id="quarto-text-highlighting-styles" rel="stylesheet"/>
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-98ac2d5361ef6f18cc0525d38bedc462.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet"/>
+<link append-hash="true" data-mode="light" href="../../site_libs/bootstrap/bootstrap-4a135b976b00f53a3a768ff94eb1df18.min.css" id="quarto-bootstrap" rel="stylesheet"/>
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -72,355 +102,334 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&amp;family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&amp;display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../../assets/highlight/styles/github.min.css">
-<script src="../../assets/highlight/highlight.min.js"></script>
-<script src="../../assets/highlight/languages/julia.min.js"></script>
-<script src="../../assets/highlight/languages/julia-repl.min.js"></script>
-<script src="../../assets/highlight/languages/python.min.js"></script>
-<script src="../../assets/highlight/languages/r.min.js"></script>
-<script>hljs.highlightAll();</script>
-<script data-goatcounter="https://juliaactuary.goatcounter.com/count" async="" src="//gc.zgo.at/count.js"></script>
-
-
-<link rel="stylesheet" href="../../styles.css">
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" rel="stylesheet"/>
+<script async="" data-goatcounter="https://juliaactuary.goatcounter.com/count" src="//gc.zgo.at/count.js"></script>
+<link href="../../styles-c416c153cdf24884.css" rel="stylesheet"/>
 </head>
-
 <body class="nav-fixed fullcontent quarto-light">
-
 <div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top quarto-banner">
-    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
-      <div class="navbar-container container-fluid">
-      <div class="navbar-brand-container mx-auto">
-    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
-    <img src="../../assets/logos/android-chrome-512x512.png" alt="JuliaActuary Logo" class="navbar-logo light-content">
-    <img src="../../assets/logos/android-chrome-512x512.png" alt="JuliaActuary Logo" class="navbar-logo dark-content">
-    </a>
-    <a class="navbar-brand" href="../../index.html">
-    <span class="navbar-title">JuliaActuary</span>
-    </a>
-  </div>
-            <div id="quarto-search" class="" title="Search"></div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-  <span class="navbar-toggler-icon"></span>
-</button>
-          <div class="collapse navbar-collapse" id="navbarCollapse">
-            <ul class="navbar-nav navbar-nav-scroll ms-auto">
-  <li class="nav-item">
-    <a class="nav-link" href="../../packages.html"> 
-<span class="menu-text">Packages</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="https://docs.juliaactuary.org"> 
-<span class="menu-text">Docs</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="https://modernfinancialmodeling.com"> 
-<span class="menu-text">Book</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../learn.html"> 
-<span class="menu-text">Learn</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../examples.html"> 
-<span class="menu-text">Examples</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../benchmarks.html"> 
-<span class="menu-text">Benchmarks</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../community.html"> 
-<span class="menu-text">Community</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../blog.html"> 
-<span class="menu-text">Blog</span></a>
-  </li>  
-  <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/JuliaActuary"> <i class="bi bi-github" role="img">
-</i> 
-<span class="menu-text"></span></a>
-  </li>  
-  <li class="nav-item compact">
-    <a class="nav-link" href="../../all-posts.xml"> <i class="bi bi-rss" role="img">
-</i> 
-<span class="menu-text"></span></a>
-  </li>  
-</ul>
-          </div> <!-- /navcollapse -->
-            <div class="quarto-navbar-tools">
+<header class="headroom fixed-top quarto-banner" id="quarto-header">
+<nav class="navbar navbar-expand-lg" data-bs-theme="dark">
+<div class="navbar-container container-fluid">
+<div class="navbar-brand-container mx-auto">
+<a class="navbar-brand navbar-brand-logo" href="../../index.html">
+<img alt="JuliaActuary Logo" class="navbar-logo light-content" src="../../assets/logos/android-chrome-512x512.png"/>
+<img alt="JuliaActuary Logo" class="navbar-logo dark-content" src="../../assets/logos/android-chrome-512x512.png"/>
+</a>
+<a class="navbar-brand" href="../../index.html">
+<span class="navbar-title">JuliaActuary</span>
+</a>
 </div>
-      </div> <!-- /container-fluid -->
-    </nav>
+<div class="" id="quarto-search" title="Search"></div>
+<button aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-bs-target="#navbarCollapse" data-bs-toggle="collapse" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }" role="menu" type="button">
+<span class="navbar-toggler-icon"></span>
+</button>
+<div class="collapse navbar-collapse" id="navbarCollapse">
+<ul class="navbar-nav navbar-nav-scroll ms-auto">
+<li class="nav-item">
+<a class="nav-link" href="../../packages.html">
+<span class="menu-text">Packages</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="https://docs.juliaactuary.org">
+<span class="menu-text">Docs</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="../../learn.html">
+<span class="menu-text">Learn</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="../../examples.html">
+<span class="menu-text">Examples</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="../../community.html">
+<span class="menu-text">Community</span></a>
+</li>
+<li class="nav-item dropdown">
+<a aria-expanded="false" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" id="nav-menu-more" role="link">
+<span class="menu-text">More</span>
+</a>
+<ul aria-labelledby="nav-menu-more" class="dropdown-menu dropdown-menu-end">
+<li>
+<a class="dropdown-item" href="../../benchmarks.html">
+<span class="dropdown-text">Benchmarks</span></a>
+</li>
+<li>
+<a class="dropdown-item" href="../../blog.html">
+<span class="dropdown-text">Blog</span></a>
+</li>
+<li>
+<a class="dropdown-item" href="https://modernfinancialmodeling.com">
+<span class="dropdown-text">Book</span></a>
+</li>
+</ul>
+</li>
+<li class="nav-item compact">
+<a class="nav-link" href="https://github.com/JuliaActuary"> <i aria-label="JuliaActuary on GitHub" class="bi bi-github" role="img">
+</i>
+<span class="menu-text"></span></a>
+</li>
+<li class="nav-item compact">
+<a class="nav-link" href="../../all-posts.xml"> <i aria-label="RSS feed" class="bi bi-rss" role="img">
+</i>
+<span class="menu-text"></span></a>
+</li>
+</ul>
+</div> <!-- /navcollapse -->
+<div class="quarto-navbar-tools">
+</div>
+</div> <!-- /container-fluid -->
+</nav>
 </header>
 <!-- content -->
-<header id="title-block-header" class="quarto-title-block default page-columns page-full">
-  <div class="quarto-title-banner page-columns page-full">
-    <div class="quarto-title column-body">
-      <h1 class="title">Cassette Futurism: a Makie theme preview</h1>
-                  <div>
-        <div class="description">
+<header class="quarto-title-block default page-columns page-full" id="title-block-header">
+<div class="quarto-title-banner page-columns page-full">
+<div class="quarto-title column-body">
+<h1 class="title">Cassette Futurism: a Makie theme preview</h1>
+<div>
+<div class="description">
           JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.
         </div>
-      </div>
-                          <div class="quarto-categories">
-                <div class="quarto-category">design</div>
-                <div class="quarto-category">code</div>
-              </div>
-                  </div>
-  </div>
-    
-  
-  <div class="quarto-title-meta">
-
-      <div>
-      <div class="quarto-title-meta-heading">Author</div>
-      <div class="quarto-title-meta-contents">
-               <p>Alec Loudenback </p>
-            </div>
-    </div>
-      
-      <div>
-      <div class="quarto-title-meta-heading">Published</div>
-      <div class="quarto-title-meta-contents">
-        <p class="date">May 24, 2026</p>
-      </div>
-    </div>
-    
-      
-    </div>
-    
-  
-  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+</div>
+<div class="quarto-categories">
+<div class="quarto-category">design</div>
+<div class="quarto-category">code</div>
+</div>
+</div>
+</div>
+<div class="quarto-title-meta">
+<div>
+<div class="quarto-title-meta-heading">Author</div>
+<div class="quarto-title-meta-contents">
+<p>Alec Loudenback </p>
+</div>
+</div>
+<div>
+<div class="quarto-title-meta-heading">Published</div>
+<div class="quarto-title-meta-contents">
+<p class="date">May 24, 2026</p>
+</div>
+</div>
+</div>
+</header><div class="quarto-container page-columns page-rows-contents page-layout-article page-navbar" id="quarto-content">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    
 <!-- main -->
 <main class="content quarto-banner-title-block" id="quarto-document-content">
-
-
-
-
-
 <p>A draft Makie theme exploring a <em>cassette futurism</em> / <em>NASA-punk</em> look for JuliaActuary plots: Apollo-era flight-plan manila, navy plotter-pen ink, instrument-panel accent pigments, draftsman tick marks, and a single monospace family throughout. JuliaMono stands in for a more bespoke draftsman face we’ll swap in later.</p>
-<div id="4" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>using CairoMakie
-using Distributions
-using Random
-
-# Apply the site's custom Makie plot theme (cassette futurism).
-include(joinpath(@__DIR__, "..", "..", "assets", "themes", "cassette_futurism.jl"))
-set_theme!(cassette_futurism_theme())
-Random.seed!(1969)</code></pre>
+<div class="cell" data-execution_count="1" id="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a aria-hidden="true" href="#cb1-1" tabindex="-1"></a><span class="im">using</span> <span class="bu">CairoMakie</span></span>
+<span id="cb1-2"><a aria-hidden="true" href="#cb1-2" tabindex="-1"></a><span class="im">using</span> <span class="bu">Distributions</span></span>
+<span id="cb1-3"><a aria-hidden="true" href="#cb1-3" tabindex="-1"></a><span class="im">using</span> <span class="bu">Random</span></span>
+<span id="cb1-4"><a aria-hidden="true" href="#cb1-4" tabindex="-1"></a></span>
+<span id="cb1-5"><a aria-hidden="true" href="#cb1-5" tabindex="-1"></a><span class="co"># Apply the site's custom Makie plot theme (cassette futurism).</span></span>
+<span id="cb1-6"><a aria-hidden="true" href="#cb1-6" tabindex="-1"></a><span class="fu">include</span>(<span class="fu">joinpath</span>(<span class="pp">@__DIR__</span>, <span class="st">".."</span>, <span class="st">".."</span>, <span class="st">"assets"</span>, <span class="st">"themes"</span>, <span class="st">"cassette_futurism.jl"</span>))</span>
+<span id="cb1-7"><a aria-hidden="true" href="#cb1-7" tabindex="-1"></a><span class="fu">set_theme!</span>(<span class="fu">cassette_futurism_theme</span>())</span>
+<span id="cb1-8"><a aria-hidden="true" href="#cb1-8" tabindex="-1"></a><span class="bu">Random</span>.<span class="fu">seed!</span>(<span class="fl">1969</span>)</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>TaskLocalRNG()</code></pre>
 </div>
 </div>
-<section id="palette-swatch" class="level2">
+<section class="level2" id="palette-swatch">
 <h2 class="anchored" data-anchor-id="palette-swatch">Palette swatch</h2>
-<div id="6" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>let
-    names = ["red", "blue", "amber", "green", "plum", "orange", "teal"]
-    fig = Figure(size = (720, 160))
-    ax = Axis(fig[1, 1];
-        title = "PLOTTER PEN PALETTE / 0001",
-        xticks = (1:length(CASSETTE_PALETTE), names),
-        yticksvisible = false, yticklabelsvisible = false,
-        ygridvisible = false, yminorgridvisible = false,
-    )
-    barplot!(ax, 1:length(CASSETTE_PALETTE), fill(1.0, length(CASSETTE_PALETTE));
-        color = CASSETTE_PALETTE)
-    hidespines!(ax, :l, :r, :t)
-    fig
-end</code></pre>
+<div class="cell" data-execution_count="1" id="6">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a aria-hidden="true" href="#cb3-1" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb3-2"><a aria-hidden="true" href="#cb3-2" tabindex="-1"></a>    names <span class="op">=</span> [<span class="st">"red"</span>, <span class="st">"blue"</span>, <span class="st">"amber"</span>, <span class="st">"green"</span>, <span class="st">"plum"</span>, <span class="st">"orange"</span>, <span class="st">"teal"</span>]</span>
+<span id="cb3-3"><a aria-hidden="true" href="#cb3-3" tabindex="-1"></a>    fig <span class="op">=</span> <span class="fu">Figure</span>(size <span class="op">=</span> (<span class="fl">720</span>, <span class="fl">160</span>))</span>
+<span id="cb3-4"><a aria-hidden="true" href="#cb3-4" tabindex="-1"></a>    ax <span class="op">=</span> <span class="fu">Axis</span>(fig[<span class="fl">1</span>, <span class="fl">1</span>];</span>
+<span id="cb3-5"><a aria-hidden="true" href="#cb3-5" tabindex="-1"></a>        title <span class="op">=</span> <span class="st">"PLOTTER PEN PALETTE / 0001"</span>,</span>
+<span id="cb3-6"><a aria-hidden="true" href="#cb3-6" tabindex="-1"></a>        xticks <span class="op">=</span> (<span class="fl">1</span><span class="op">:</span><span class="fu">length</span>(CASSETTE_PALETTE), names),</span>
+<span id="cb3-7"><a aria-hidden="true" href="#cb3-7" tabindex="-1"></a>        yticksvisible <span class="op">=</span> <span class="cn">false</span>, yticklabelsvisible <span class="op">=</span> <span class="cn">false</span>,</span>
+<span id="cb3-8"><a aria-hidden="true" href="#cb3-8" tabindex="-1"></a>        ygridvisible <span class="op">=</span> <span class="cn">false</span>, yminorgridvisible <span class="op">=</span> <span class="cn">false</span>,</span>
+<span id="cb3-9"><a aria-hidden="true" href="#cb3-9" tabindex="-1"></a>    )</span>
+<span id="cb3-10"><a aria-hidden="true" href="#cb3-10" tabindex="-1"></a>    <span class="fu">barplot!</span>(ax, <span class="fl">1</span><span class="op">:</span><span class="fu">length</span>(CASSETTE_PALETTE), <span class="fu">fill</span>(<span class="fl">1.0</span>, <span class="fu">length</span>(CASSETTE_PALETTE));</span>
+<span id="cb3-11"><a aria-hidden="true" href="#cb3-11" tabindex="-1"></a>        color <span class="op">=</span> CASSETTE_PALETTE)</span>
+<span id="cb3-12"><a aria-hidden="true" href="#cb3-12" tabindex="-1"></a>    <span class="fu">hidespines!</span>(ax, <span class="op">:</span>l, <span class="op">:</span>r, <span class="op">:</span>t)</span>
+<span id="cb3-13"><a aria-hidden="true" href="#cb3-13" tabindex="-1"></a>    fig</span>
+<span id="cb3-14"><a aria-hidden="true" href="#cb3-14" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-4-output-1.svg" class="img-fluid figure-img"></p>
+<p><img alt="Seven plotter-pen palette swatches: red, blue, amber, green, plum, orange, and teal." class="img-fluid figure-img" decoding="async" height="160" loading="eager" src="index_files/figure-html/cell-4-output-1.svg" width="720"/></p>
 </figure>
 </div>
 </div>
 </div>
 </section>
-<section id="line-plot-trajectories" class="level2">
+<section class="level2" id="line-plot-trajectories">
 <h2 class="anchored" data-anchor-id="line-plot-trajectories">Line plot: trajectories</h2>
-<div id="8" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>let
-    t = range(0, 4π; length = 240)
-    fig = Figure(size = (720, 420))
-    ax = Axis(fig[1, 1];
-        title = "FIG. 01 — DAMPED OSCILLATORS",
-        xlabel = "t / s", ylabel = "amplitude",
-    )
-    for (i, ζ) in enumerate((0.05, 0.12, 0.22, 0.40))
-        lines!(ax, t, exp.(-ζ .* t) .* cos.(t); label = "ζ = $ζ")
-    end
-    axislegend(ax, position = :rt, framevisible = true)
-    fig
-end</code></pre>
+<div class="cell" data-execution_count="1" id="8">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a aria-hidden="true" href="#cb4-1" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb4-2"><a aria-hidden="true" href="#cb4-2" tabindex="-1"></a>    t <span class="op">=</span> <span class="fu">range</span>(<span class="fl">0</span>, <span class="fl">4</span>π; length <span class="op">=</span> <span class="fl">240</span>)</span>
+<span id="cb4-3"><a aria-hidden="true" href="#cb4-3" tabindex="-1"></a>    fig <span class="op">=</span> <span class="fu">Figure</span>(size <span class="op">=</span> (<span class="fl">720</span>, <span class="fl">420</span>))</span>
+<span id="cb4-4"><a aria-hidden="true" href="#cb4-4" tabindex="-1"></a>    ax <span class="op">=</span> <span class="fu">Axis</span>(fig[<span class="fl">1</span>, <span class="fl">1</span>];</span>
+<span id="cb4-5"><a aria-hidden="true" href="#cb4-5" tabindex="-1"></a>        title <span class="op">=</span> <span class="st">"FIG. 01 — DAMPED OSCILLATORS"</span>,</span>
+<span id="cb4-6"><a aria-hidden="true" href="#cb4-6" tabindex="-1"></a>        xlabel <span class="op">=</span> <span class="st">"t / s"</span>, ylabel <span class="op">=</span> <span class="st">"amplitude"</span>,</span>
+<span id="cb4-7"><a aria-hidden="true" href="#cb4-7" tabindex="-1"></a>    )</span>
+<span id="cb4-8"><a aria-hidden="true" href="#cb4-8" tabindex="-1"></a>    <span class="cf">for</span> (i, ζ) <span class="kw">in</span> <span class="fu">enumerate</span>((<span class="fl">0.05</span>, <span class="fl">0.12</span>, <span class="fl">0.22</span>, <span class="fl">0.40</span>))</span>
+<span id="cb4-9"><a aria-hidden="true" href="#cb4-9" tabindex="-1"></a>        <span class="fu">lines!</span>(ax, t, <span class="fu">exp</span>.(<span class="op">-</span>ζ <span class="op">.*</span> t) <span class="op">.*</span> <span class="fu">cos</span>.(t); label <span class="op">=</span> <span class="st">"ζ = </span><span class="sc">$</span><span class="st">ζ")</span></span>
+<span id="cb4-10"><a aria-hidden="true" href="#cb4-10" tabindex="-1"></a><span class="st">    </span>end</span>
+<span id="cb4-11"><a aria-hidden="true" href="#cb4-11" tabindex="-1"></a>    <span class="fu">axislegend</span>(ax, position <span class="op">=</span> <span class="op">:</span>rt, framevisible <span class="op">=</span> <span class="cn">true</span>)</span>
+<span id="cb4-12"><a aria-hidden="true" href="#cb4-12" tabindex="-1"></a>    fig</span>
+<span id="cb4-13"><a aria-hidden="true" href="#cb4-13" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-5-output-1.svg" class="img-fluid figure-img"></p>
+<p><img alt="Damped oscillating trajectories with different damping parameters." class="img-fluid figure-img" decoding="async" height="420" loading="lazy" src="index_files/figure-html/cell-5-output-1.svg" width="720"/></p>
 </figure>
 </div>
 </div>
 </div>
 </section>
-<section id="scatter-bivariate-sample" class="level2">
+<section class="level2" id="scatter-bivariate-sample">
 <h2 class="anchored" data-anchor-id="scatter-bivariate-sample">Scatter: bivariate sample</h2>
-<div id="10" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>let
-    n = 220
-    x = randn(n)
-    y = 0.6 .* x .+ 0.7 .* randn(n)
-    groups = rand(1:3, n)
-    fig = Figure(size = (720, 420))
-    ax = Axis(fig[1, 1];
-        title = "FIG. 02 — TELEMETRY SCATTER",
-        xlabel = "x channel", ylabel = "y channel",
-    )
-    markers = (:circle, :rect, :utriangle)
-    for g in 1:3
-        idx = groups .== g
-        scatter!(ax, x[idx], y[idx];
-            color = CASSETTE_PALETTE[g], marker = markers[g],
-            label = "module $g")
-    end
-    axislegend(ax, position = :lt)
-    fig
-end</code></pre>
+<div class="cell" data-execution_count="1" id="10">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a aria-hidden="true" href="#cb5-1" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb5-2"><a aria-hidden="true" href="#cb5-2" tabindex="-1"></a>    n <span class="op">=</span> <span class="fl">220</span></span>
+<span id="cb5-3"><a aria-hidden="true" href="#cb5-3" tabindex="-1"></a>    x <span class="op">=</span> <span class="fu">randn</span>(n)</span>
+<span id="cb5-4"><a aria-hidden="true" href="#cb5-4" tabindex="-1"></a>    y <span class="op">=</span> <span class="fl">0.6</span> <span class="op">.*</span> x <span class="op">.+</span> <span class="fl">0.7</span> <span class="op">.*</span> <span class="fu">randn</span>(n)</span>
+<span id="cb5-5"><a aria-hidden="true" href="#cb5-5" tabindex="-1"></a>    groups <span class="op">=</span> <span class="fu">rand</span>(<span class="fl">1</span><span class="op">:</span><span class="fl">3</span>, n)</span>
+<span id="cb5-6"><a aria-hidden="true" href="#cb5-6" tabindex="-1"></a>    fig <span class="op">=</span> <span class="fu">Figure</span>(size <span class="op">=</span> (<span class="fl">720</span>, <span class="fl">420</span>))</span>
+<span id="cb5-7"><a aria-hidden="true" href="#cb5-7" tabindex="-1"></a>    ax <span class="op">=</span> <span class="fu">Axis</span>(fig[<span class="fl">1</span>, <span class="fl">1</span>];</span>
+<span id="cb5-8"><a aria-hidden="true" href="#cb5-8" tabindex="-1"></a>        title <span class="op">=</span> <span class="st">"FIG. 02 — TELEMETRY SCATTER"</span>,</span>
+<span id="cb5-9"><a aria-hidden="true" href="#cb5-9" tabindex="-1"></a>        xlabel <span class="op">=</span> <span class="st">"x channel"</span>, ylabel <span class="op">=</span> <span class="st">"y channel"</span>,</span>
+<span id="cb5-10"><a aria-hidden="true" href="#cb5-10" tabindex="-1"></a>    )</span>
+<span id="cb5-11"><a aria-hidden="true" href="#cb5-11" tabindex="-1"></a>    markers <span class="op">=</span> (<span class="op">:</span>circle, <span class="op">:</span>rect, <span class="op">:</span>utriangle)</span>
+<span id="cb5-12"><a aria-hidden="true" href="#cb5-12" tabindex="-1"></a>    <span class="cf">for</span> g <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">3</span></span>
+<span id="cb5-13"><a aria-hidden="true" href="#cb5-13" tabindex="-1"></a>        idx <span class="op">=</span> groups <span class="op">.==</span> g</span>
+<span id="cb5-14"><a aria-hidden="true" href="#cb5-14" tabindex="-1"></a>        <span class="fu">scatter!</span>(ax, x[idx], y[idx];</span>
+<span id="cb5-15"><a aria-hidden="true" href="#cb5-15" tabindex="-1"></a>            color <span class="op">=</span> CASSETTE_PALETTE[g], marker <span class="op">=</span> markers[g],</span>
+<span id="cb5-16"><a aria-hidden="true" href="#cb5-16" tabindex="-1"></a>            label <span class="op">=</span> <span class="st">"module </span><span class="sc">$</span>g<span class="st">"</span>)</span>
+<span id="cb5-17"><a aria-hidden="true" href="#cb5-17" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb5-18"><a aria-hidden="true" href="#cb5-18" tabindex="-1"></a>    <span class="fu">axislegend</span>(ax, position <span class="op">=</span> <span class="op">:</span>lt)</span>
+<span id="cb5-19"><a aria-hidden="true" href="#cb5-19" tabindex="-1"></a>    fig</span>
+<span id="cb5-20"><a aria-hidden="true" href="#cb5-20" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-6-output-1.svg" class="img-fluid figure-img"></p>
+<p><img alt="Three groups of positively correlated bivariate samples in the cassette palette." class="img-fluid figure-img" decoding="async" height="420" loading="lazy" src="index_files/figure-html/cell-6-output-1.svg" width="720"/></p>
 </figure>
 </div>
 </div>
 </div>
 </section>
-<section id="bars-comparative-readouts" class="level2">
+<section class="level2" id="bars-comparative-readouts">
 <h2 class="anchored" data-anchor-id="bars-comparative-readouts">Bars: comparative readouts</h2>
-<div id="12" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>let
-    cats   = ["LEM", "CSM", "S-IVB", "S-II", "S-IC"]
-    values = [4.7, 6.3, 10.1, 14.8, 22.4]
-    fig = Figure(size = (720, 380))
-    ax = Axis(fig[1, 1];
-        title = "FIG. 03 — STAGE MASS / 10³ kg",
-        xticks = (1:length(cats), cats),
-        ylabel = "mass",
-    )
-    barplot!(ax, 1:length(cats), values;
-        color = CASSETTE_PALETTE[1:length(cats)])
-    fig
-end</code></pre>
+<div class="cell" data-execution_count="1" id="12">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a aria-hidden="true" href="#cb6-1" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb6-2"><a aria-hidden="true" href="#cb6-2" tabindex="-1"></a>    cats   <span class="op">=</span> [<span class="st">"LEM"</span>, <span class="st">"CSM"</span>, <span class="st">"S-IVB"</span>, <span class="st">"S-II"</span>, <span class="st">"S-IC"</span>]</span>
+<span id="cb6-3"><a aria-hidden="true" href="#cb6-3" tabindex="-1"></a>    values <span class="op">=</span> [<span class="fl">4.7</span>, <span class="fl">6.3</span>, <span class="fl">10.1</span>, <span class="fl">14.8</span>, <span class="fl">22.4</span>]</span>
+<span id="cb6-4"><a aria-hidden="true" href="#cb6-4" tabindex="-1"></a>    fig <span class="op">=</span> <span class="fu">Figure</span>(size <span class="op">=</span> (<span class="fl">720</span>, <span class="fl">380</span>))</span>
+<span id="cb6-5"><a aria-hidden="true" href="#cb6-5" tabindex="-1"></a>    ax <span class="op">=</span> <span class="fu">Axis</span>(fig[<span class="fl">1</span>, <span class="fl">1</span>];</span>
+<span id="cb6-6"><a aria-hidden="true" href="#cb6-6" tabindex="-1"></a>        title <span class="op">=</span> <span class="st">"FIG. 03 — STAGE MASS / 10³ kg"</span>,</span>
+<span id="cb6-7"><a aria-hidden="true" href="#cb6-7" tabindex="-1"></a>        xticks <span class="op">=</span> (<span class="fl">1</span><span class="op">:</span><span class="fu">length</span>(cats), cats),</span>
+<span id="cb6-8"><a aria-hidden="true" href="#cb6-8" tabindex="-1"></a>        ylabel <span class="op">=</span> <span class="st">"mass"</span>,</span>
+<span id="cb6-9"><a aria-hidden="true" href="#cb6-9" tabindex="-1"></a>    )</span>
+<span id="cb6-10"><a aria-hidden="true" href="#cb6-10" tabindex="-1"></a>    <span class="fu">barplot!</span>(ax, <span class="fl">1</span><span class="op">:</span><span class="fu">length</span>(cats), values;</span>
+<span id="cb6-11"><a aria-hidden="true" href="#cb6-11" tabindex="-1"></a>        color <span class="op">=</span> CASSETTE_PALETTE[<span class="fl">1</span><span class="op">:</span><span class="fu">length</span>(cats)])</span>
+<span id="cb6-12"><a aria-hidden="true" href="#cb6-12" tabindex="-1"></a>    fig</span>
+<span id="cb6-13"><a aria-hidden="true" href="#cb6-13" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-7-output-1.svg" class="img-fluid figure-img"></p>
+<p><img alt="Comparative masses of the lunar module, command and service module, and Saturn rocket stages." class="img-fluid figure-img" decoding="async" height="380" loading="lazy" src="index_files/figure-html/cell-7-output-1.svg" width="720"/></p>
 </figure>
 </div>
 </div>
 </div>
 </section>
-<section id="density-distributions" class="level2">
+<section class="level2" id="density-distributions">
 <h2 class="anchored" data-anchor-id="density-distributions">Density: distributions</h2>
-<div id="14" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>let
-    fig = Figure(size = (720, 420))
-    ax = Axis(fig[1, 1];
-        title = "FIG. 04 — RESIDUAL DENSITY",
-        xlabel = "residual", ylabel = "density",
-    )
-    for (i, (μ, σ, name)) in enumerate(((0.0, 1.0, "nominal"),
-                                        (0.4, 1.3, "off-nominal"),
-                                        (-0.3, 0.7, "trim")))
-        s = rand(Normal(μ, σ), 4_000)
-        density!(ax, s; color = (CASSETTE_PALETTE[i], 0.35),
-            strokecolor = CASSETTE_PALETTE[i], strokewidth = 1.6,
-            label = name)
-    end
-    axislegend(ax, position = :rt)
-    fig
-end</code></pre>
+<div class="cell" data-execution_count="1" id="14">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a aria-hidden="true" href="#cb7-1" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb7-2"><a aria-hidden="true" href="#cb7-2" tabindex="-1"></a>    fig <span class="op">=</span> <span class="fu">Figure</span>(size <span class="op">=</span> (<span class="fl">720</span>, <span class="fl">420</span>))</span>
+<span id="cb7-3"><a aria-hidden="true" href="#cb7-3" tabindex="-1"></a>    ax <span class="op">=</span> <span class="fu">Axis</span>(fig[<span class="fl">1</span>, <span class="fl">1</span>];</span>
+<span id="cb7-4"><a aria-hidden="true" href="#cb7-4" tabindex="-1"></a>        title <span class="op">=</span> <span class="st">"FIG. 04 — RESIDUAL DENSITY"</span>,</span>
+<span id="cb7-5"><a aria-hidden="true" href="#cb7-5" tabindex="-1"></a>        xlabel <span class="op">=</span> <span class="st">"residual"</span>, ylabel <span class="op">=</span> <span class="st">"density"</span>,</span>
+<span id="cb7-6"><a aria-hidden="true" href="#cb7-6" tabindex="-1"></a>    )</span>
+<span id="cb7-7"><a aria-hidden="true" href="#cb7-7" tabindex="-1"></a>    <span class="cf">for</span> (i, (μ, σ, name)) <span class="kw">in</span> <span class="fu">enumerate</span>(((<span class="fl">0.0</span>, <span class="fl">1.0</span>, <span class="st">"nominal"</span>),</span>
+<span id="cb7-8"><a aria-hidden="true" href="#cb7-8" tabindex="-1"></a>                                        (<span class="fl">0.4</span>, <span class="fl">1.3</span>, <span class="st">"off-nominal"</span>),</span>
+<span id="cb7-9"><a aria-hidden="true" href="#cb7-9" tabindex="-1"></a>                                        (<span class="op">-</span><span class="fl">0.3</span>, <span class="fl">0.7</span>, <span class="st">"trim"</span>)))</span>
+<span id="cb7-10"><a aria-hidden="true" href="#cb7-10" tabindex="-1"></a>        s <span class="op">=</span> <span class="fu">rand</span>(<span class="fu">Normal</span>(μ, σ), <span class="fl">4_000</span>)</span>
+<span id="cb7-11"><a aria-hidden="true" href="#cb7-11" tabindex="-1"></a>        <span class="fu">density!</span>(ax, s; color <span class="op">=</span> (CASSETTE_PALETTE[i], <span class="fl">0.35</span>),</span>
+<span id="cb7-12"><a aria-hidden="true" href="#cb7-12" tabindex="-1"></a>            strokecolor <span class="op">=</span> CASSETTE_PALETTE[i], strokewidth <span class="op">=</span> <span class="fl">1.6</span>,</span>
+<span id="cb7-13"><a aria-hidden="true" href="#cb7-13" tabindex="-1"></a>            label <span class="op">=</span> name)</span>
+<span id="cb7-14"><a aria-hidden="true" href="#cb7-14" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb7-15"><a aria-hidden="true" href="#cb7-15" tabindex="-1"></a>    <span class="fu">axislegend</span>(ax, position <span class="op">=</span> <span class="op">:</span>rt)</span>
+<span id="cb7-16"><a aria-hidden="true" href="#cb7-16" tabindex="-1"></a>    fig</span>
+<span id="cb7-17"><a aria-hidden="true" href="#cb7-17" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-8-output-1.svg" class="img-fluid figure-img"></p>
+<p><img alt="Residual density curves for nominal, off-nominal, and trimmed samples." class="img-fluid figure-img" decoding="async" height="420" loading="lazy" src="index_files/figure-html/cell-8-output-1.svg" width="720"/></p>
 </figure>
 </div>
 </div>
 </div>
 </section>
-<section id="heatmap-instrument-grid" class="level2">
+<section class="level2" id="heatmap-instrument-grid">
 <h2 class="anchored" data-anchor-id="heatmap-instrument-grid">Heatmap: instrument grid</h2>
-<div id="16" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>let
-    xs = range(-3, 3; length = 80)
-    ys = range(-2, 2; length = 60)
-    z  = [exp(-(x^2 + y^2) / 2) * cos(2x) * sin(1.5y) for x in xs, y in ys]
-    fig = Figure(size = (760, 420))
-    ax = Axis(fig[1, 1];
-        title = "FIG. 05 — FIELD INTENSITY",
-        xlabel = "x", ylabel = "y",
-    )
-    hm = heatmap!(ax, xs, ys, z)
-    contour!(ax, xs, ys, z; levels = 6, color = CF_INK, linewidth = 0.7)
-    Colorbar(fig[1, 2], hm; label = "intensity")
-    fig
-end</code></pre>
+<div class="cell" data-execution_count="1" id="16">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a aria-hidden="true" href="#cb8-1" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb8-2"><a aria-hidden="true" href="#cb8-2" tabindex="-1"></a>    xs <span class="op">=</span> <span class="fu">range</span>(<span class="op">-</span><span class="fl">3</span>, <span class="fl">3</span>; length <span class="op">=</span> <span class="fl">80</span>)</span>
+<span id="cb8-3"><a aria-hidden="true" href="#cb8-3" tabindex="-1"></a>    ys <span class="op">=</span> <span class="fu">range</span>(<span class="op">-</span><span class="fl">2</span>, <span class="fl">2</span>; length <span class="op">=</span> <span class="fl">60</span>)</span>
+<span id="cb8-4"><a aria-hidden="true" href="#cb8-4" tabindex="-1"></a>    z  <span class="op">=</span> [<span class="fu">exp</span>(<span class="fu">-</span>(x<span class="op">^</span><span class="fl">2</span> <span class="op">+</span> y<span class="op">^</span><span class="fl">2</span>) <span class="op">/</span> <span class="fl">2</span>) <span class="op">*</span> <span class="fu">cos</span>(<span class="fl">2</span>x) <span class="op">*</span> <span class="fu">sin</span>(<span class="fl">1.5</span>y) for x <span class="kw">in</span> xs, y <span class="kw">in</span> ys]</span>
+<span id="cb8-5"><a aria-hidden="true" href="#cb8-5" tabindex="-1"></a>    fig <span class="op">=</span> <span class="fu">Figure</span>(size <span class="op">=</span> (<span class="fl">760</span>, <span class="fl">420</span>))</span>
+<span id="cb8-6"><a aria-hidden="true" href="#cb8-6" tabindex="-1"></a>    ax <span class="op">=</span> <span class="fu">Axis</span>(fig[<span class="fl">1</span>, <span class="fl">1</span>];</span>
+<span id="cb8-7"><a aria-hidden="true" href="#cb8-7" tabindex="-1"></a>        title <span class="op">=</span> <span class="st">"FIG. 05 — FIELD INTENSITY"</span>,</span>
+<span id="cb8-8"><a aria-hidden="true" href="#cb8-8" tabindex="-1"></a>        xlabel <span class="op">=</span> <span class="st">"x"</span>, ylabel <span class="op">=</span> <span class="st">"y"</span>,</span>
+<span id="cb8-9"><a aria-hidden="true" href="#cb8-9" tabindex="-1"></a>    )</span>
+<span id="cb8-10"><a aria-hidden="true" href="#cb8-10" tabindex="-1"></a>    hm <span class="op">=</span> <span class="fu">heatmap!</span>(ax, xs, ys, z)</span>
+<span id="cb8-11"><a aria-hidden="true" href="#cb8-11" tabindex="-1"></a>    <span class="fu">contour!</span>(ax, xs, ys, z; levels <span class="op">=</span> <span class="fl">6</span>, color <span class="op">=</span> CF_INK, linewidth <span class="op">=</span> <span class="fl">0.7</span>)</span>
+<span id="cb8-12"><a aria-hidden="true" href="#cb8-12" tabindex="-1"></a>    <span class="fu">Colorbar</span>(fig[<span class="fl">1</span>, <span class="fl">2</span>], hm; label <span class="op">=</span> <span class="st">"intensity"</span>)</span>
+<span id="cb8-13"><a aria-hidden="true" href="#cb8-13" tabindex="-1"></a>    fig</span>
+<span id="cb8-14"><a aria-hidden="true" href="#cb8-14" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-9-output-1.svg" class="img-fluid figure-img"></p>
+<p><img alt="Field intensity across a two-dimensional grid, shown as a heatmap with contour lines." class="img-fluid figure-img" decoding="async" height="420" loading="lazy" src="index_files/figure-html/cell-9-output-1.svg" width="760"/></p>
 </figure>
 </div>
 </div>
 </div>
 </section>
-<section id="small-multiples" class="level2">
+<section class="level2" id="small-multiples">
 <h2 class="anchored" data-anchor-id="small-multiples">Small multiples</h2>
-<div id="18" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>let
-    t = range(0, 6π; length = 300)
-    fig = Figure(size = (760, 460))
-    Label(fig[0, 1:3], "FIG. 06 — WAVEFORM SURVEY";
-        font = "JuliaMono", fontsize = 14, halign = :left, color = CF_INK)
-    forms = (
-        ("sine",       sin),
-        ("triangle",   t -&gt; (2 / π) * asin(sin(t))),
-        ("square",     t -&gt; sign(sin(t))),
-        ("sawtooth",   t -&gt; 2 * (t / (2π) - floor(0.5 + t / (2π)))),
-        ("chirp",      t -&gt; sin(t * (1 + t / 20))),
-        ("decay",      t -&gt; exp(-t / 8) * sin(2t)),
-    )
-    for (i, (name, f)) in enumerate(forms)
-        row, col = fldmod1(i, 3)
-        ax = Axis(fig[row, col]; title = uppercase(name))
-        lines!(ax, t, f.(t); color = CASSETTE_PALETTE[i])
-    end
-    fig
-end</code></pre>
+<div class="cell" data-execution_count="1" id="18">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb9-1"><a aria-hidden="true" href="#cb9-1" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb9-2"><a aria-hidden="true" href="#cb9-2" tabindex="-1"></a>    t <span class="op">=</span> <span class="fu">range</span>(<span class="fl">0</span>, <span class="fl">6</span>π; length <span class="op">=</span> <span class="fl">300</span>)</span>
+<span id="cb9-3"><a aria-hidden="true" href="#cb9-3" tabindex="-1"></a>    fig <span class="op">=</span> <span class="fu">Figure</span>(size <span class="op">=</span> (<span class="fl">760</span>, <span class="fl">460</span>))</span>
+<span id="cb9-4"><a aria-hidden="true" href="#cb9-4" tabindex="-1"></a>    <span class="fu">Label</span>(fig[<span class="fl">0</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">3</span>], <span class="st">"FIG. 06 — WAVEFORM SURVEY"</span>;</span>
+<span id="cb9-5"><a aria-hidden="true" href="#cb9-5" tabindex="-1"></a>        font <span class="op">=</span> <span class="st">"JuliaMono"</span>, fontsize <span class="op">=</span> <span class="fl">14</span>, halign <span class="op">=</span> <span class="op">:</span>left, color <span class="op">=</span> CF_INK)</span>
+<span id="cb9-6"><a aria-hidden="true" href="#cb9-6" tabindex="-1"></a>    forms <span class="op">=</span> (</span>
+<span id="cb9-7"><a aria-hidden="true" href="#cb9-7" tabindex="-1"></a>        (<span class="st">"sine"</span>,       sin),</span>
+<span id="cb9-8"><a aria-hidden="true" href="#cb9-8" tabindex="-1"></a>        (<span class="st">"triangle"</span>,   t <span class="op">-&gt;</span> (<span class="fl">2</span> <span class="op">/</span> <span class="cn">π</span>) <span class="op">*</span> <span class="fu">asin</span>(<span class="fu">sin</span>(t))),</span>
+<span id="cb9-9"><a aria-hidden="true" href="#cb9-9" tabindex="-1"></a>        (<span class="st">"square"</span>,     t <span class="op">-&gt;</span> <span class="fu">sign</span>(<span class="fu">sin</span>(t))),</span>
+<span id="cb9-10"><a aria-hidden="true" href="#cb9-10" tabindex="-1"></a>        (<span class="st">"sawtooth"</span>,   t <span class="op">-&gt;</span> <span class="fl">2</span> <span class="op">*</span> (t <span class="op">/</span> (<span class="fl">2</span>π) <span class="op">-</span> <span class="fu">floor</span>(<span class="fl">0.5</span> <span class="op">+</span> t <span class="op">/</span> (<span class="fl">2</span>π)))),</span>
+<span id="cb9-11"><a aria-hidden="true" href="#cb9-11" tabindex="-1"></a>        (<span class="st">"chirp"</span>,      t <span class="op">-&gt;</span> <span class="fu">sin</span>(t <span class="op">*</span> (<span class="fl">1</span> <span class="op">+</span> t <span class="op">/</span> <span class="fl">20</span>))),</span>
+<span id="cb9-12"><a aria-hidden="true" href="#cb9-12" tabindex="-1"></a>        (<span class="st">"decay"</span>,      t <span class="op">-&gt;</span> <span class="fu">exp</span>(<span class="op">-</span>t <span class="op">/</span> <span class="fl">8</span>) <span class="op">*</span> <span class="fu">sin</span>(<span class="fl">2</span>t)),</span>
+<span id="cb9-13"><a aria-hidden="true" href="#cb9-13" tabindex="-1"></a>    )</span>
+<span id="cb9-14"><a aria-hidden="true" href="#cb9-14" tabindex="-1"></a>    <span class="cf">for</span> (i, (name, f)) <span class="kw">in</span> <span class="fu">enumerate</span>(forms)</span>
+<span id="cb9-15"><a aria-hidden="true" href="#cb9-15" tabindex="-1"></a>        row, col <span class="op">=</span> <span class="fu">fldmod1</span>(i, <span class="fl">3</span>)</span>
+<span id="cb9-16"><a aria-hidden="true" href="#cb9-16" tabindex="-1"></a>        ax <span class="op">=</span> <span class="fu">Axis</span>(fig[row, col]; title <span class="op">=</span> <span class="fu">uppercase</span>(name))</span>
+<span id="cb9-17"><a aria-hidden="true" href="#cb9-17" tabindex="-1"></a>        <span class="fu">lines!</span>(ax, t, <span class="fu">f</span>.(t); color <span class="op">=</span> CASSETTE_PALETTE[i])</span>
+<span id="cb9-18"><a aria-hidden="true" href="#cb9-18" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb9-19"><a aria-hidden="true" href="#cb9-19" tabindex="-1"></a>    fig</span>
+<span id="cb9-20"><a aria-hidden="true" href="#cb9-20" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-10-output-1.svg" class="img-fluid figure-img"></p>
+<p><img alt="Four small-multiple line plots demonstrating a shared instrument-panel theme." class="img-fluid figure-img" decoding="async" height="460" loading="lazy" src="index_files/figure-html/cell-10-output-1.svg" width="760"/></p>
 </figure>
 </div>
 </div>
 </div>
-<hr>
+<hr/>
 <p><em>Theme source: <a href="../../assets/themes/cassette_futurism.jl"><code>assets/themes/cassette_futurism.jl</code></a>. JuliaMono is a placeholder — a more draftsman-style face is planned.</em></p>
-
-
 </section>
-
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
@@ -823,8 +832,4 @@ end</code></pre>
   });
   </script>
 </div> <!-- /content -->
-
-
-
-
 </body></html>

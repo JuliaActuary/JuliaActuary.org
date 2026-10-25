@@ -1,13 +1,10 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
-<meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.16">
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-
-<meta name="description" content="JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.">
-
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml"><head>
+<meta charset="utf-8"/>
+<meta content="quarto-1.9.16" name="generator"/>
+<meta content="width=device-width, initial-scale=1.0, user-scalable=yes" name="viewport"/>
+<meta content="Worked examples for mortality, financial modeling, and insurance analysis." name="description"/>
 <title>Examples – JuliaActuary</title>
 <style>
 code{white-space: pre-wrap;}
@@ -22,16 +19,14 @@ ul.task-list li input[type="checkbox"] {
   vertical-align: middle;
 }
 </style>
-
-
 <script src="site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="site_libs/quarto-nav/headroom.min.js"></script>
 <script src="site_libs/clipboard/clipboard.min.js"></script>
 <script src="site_libs/quarto-search/autocomplete.umd.js"></script>
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<link href=".//assets/logos/favicon.ico" rel="icon">
+<meta content="./" name="quarto:offset"/>
+<link href=".//assets/logos/favicon.ico" rel="icon"/>
 <script src="site_libs/quarto-listing/list.min.js"></script>
 <script src="site_libs/quarto-listing/quarto-listing.js"></script>
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
@@ -40,11 +35,11 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-a0731b9a3a5d496010872d775e5d9bc3.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet"/>
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-be14ce6d32a635bebd8f9e4e558f9eeb.css" id="quarto-text-highlighting-styles" rel="stylesheet"/>
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-98ac2d5361ef6f18cc0525d38bedc462.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet"/>
+<link append-hash="true" data-mode="light" href="site_libs/bootstrap/bootstrap-4a135b976b00f53a3a768ff94eb1df18.min.css" id="quarto-bootstrap" rel="stylesheet"/>
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -101,21 +96,12 @@ ul.task-list li input[type="checkbox"] {
     }
   })
   </script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&amp;family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&amp;display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./assets/highlight/styles/github.min.css">
-<script src="./assets/highlight/highlight.min.js"></script>
-<script src="./assets/highlight/languages/julia.min.js"></script>
-<script src="./assets/highlight/languages/julia-repl.min.js"></script>
-<script src="./assets/highlight/languages/python.min.js"></script>
-<script src="./assets/highlight/languages/r.min.js"></script>
-<script>hljs.highlightAll();</script>
-<script data-goatcounter="https://juliaactuary.goatcounter.com/count" async="" src="//gc.zgo.at/count.js"></script>
-
-  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
-
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" rel="stylesheet"/>
+<script async="" data-goatcounter="https://juliaactuary.goatcounter.com/count" src="//gc.zgo.at/count.js"></script>
+<script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 <script type="text/javascript">
 const typesetMath = (el) => {
   if (window.MathJax) {
@@ -142,783 +128,500 @@ window.Quarto = {
   typesetMath
 };
 </script>
-
-<link rel="stylesheet" href="styles.css">
+<link href="styles-c416c153cdf24884.css" rel="stylesheet"/>
 </head>
-
 <body class="nav-fixed quarto-light">
-
 <div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top quarto-banner">
-    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
-      <div class="navbar-container container-fluid">
-      <div class="navbar-brand-container mx-auto">
-    <a href="./index.html" class="navbar-brand navbar-brand-logo">
-    <img src="./assets/logos/android-chrome-512x512.png" alt="JuliaActuary Logo" class="navbar-logo light-content">
-    <img src="./assets/logos/android-chrome-512x512.png" alt="JuliaActuary Logo" class="navbar-logo dark-content">
-    </a>
-    <a class="navbar-brand" href="./index.html">
-    <span class="navbar-title">JuliaActuary</span>
-    </a>
-  </div>
-            <div id="quarto-search" class="" title="Search"></div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-  <span class="navbar-toggler-icon"></span>
-</button>
-          <div class="collapse navbar-collapse" id="navbarCollapse">
-            <ul class="navbar-nav navbar-nav-scroll ms-auto">
-  <li class="nav-item">
-    <a class="nav-link" href="./packages.html"> 
-<span class="menu-text">Packages</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="https://docs.juliaactuary.org"> 
-<span class="menu-text">Docs</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="https://modernfinancialmodeling.com"> 
-<span class="menu-text">Book</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="./learn.html"> 
-<span class="menu-text">Learn</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link active" href="./examples.html" aria-current="page"> 
-<span class="menu-text">Examples</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="./benchmarks.html"> 
-<span class="menu-text">Benchmarks</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="./community.html"> 
-<span class="menu-text">Community</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="./blog.html"> 
-<span class="menu-text">Blog</span></a>
-  </li>  
-  <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/JuliaActuary"> <i class="bi bi-github" role="img">
-</i> 
-<span class="menu-text"></span></a>
-  </li>  
-  <li class="nav-item compact">
-    <a class="nav-link" href="./all-posts.xml"> <i class="bi bi-rss" role="img">
-</i> 
-<span class="menu-text"></span></a>
-  </li>  
-</ul>
-          </div> <!-- /navcollapse -->
-            <div class="quarto-navbar-tools">
+<header class="headroom fixed-top quarto-banner" id="quarto-header">
+<nav class="navbar navbar-expand-lg" data-bs-theme="dark">
+<div class="navbar-container container-fluid">
+<div class="navbar-brand-container mx-auto">
+<a class="navbar-brand navbar-brand-logo" href="./index.html">
+<img alt="JuliaActuary Logo" class="navbar-logo light-content" src="./assets/logos/android-chrome-512x512.png"/>
+<img alt="JuliaActuary Logo" class="navbar-logo dark-content" src="./assets/logos/android-chrome-512x512.png"/>
+</a>
+<a class="navbar-brand" href="./index.html">
+<span class="navbar-title">JuliaActuary</span>
+</a>
 </div>
-      </div> <!-- /container-fluid -->
-    </nav>
+<div class="" id="quarto-search" title="Search"></div>
+<button aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-bs-target="#navbarCollapse" data-bs-toggle="collapse" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }" role="menu" type="button">
+<span class="navbar-toggler-icon"></span>
+</button>
+<div class="collapse navbar-collapse" id="navbarCollapse">
+<ul class="navbar-nav navbar-nav-scroll ms-auto">
+<li class="nav-item">
+<a class="nav-link" href="./packages.html">
+<span class="menu-text">Packages</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="https://docs.juliaactuary.org">
+<span class="menu-text">Docs</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="./learn.html">
+<span class="menu-text">Learn</span></a>
+</li>
+<li class="nav-item">
+<a aria-current="page" class="nav-link active" href="./examples.html">
+<span class="menu-text">Examples</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="./community.html">
+<span class="menu-text">Community</span></a>
+</li>
+<li class="nav-item dropdown">
+<a aria-expanded="false" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" id="nav-menu-more" role="link">
+<span class="menu-text">More</span>
+</a>
+<ul aria-labelledby="nav-menu-more" class="dropdown-menu dropdown-menu-end">
+<li>
+<a class="dropdown-item" href="./benchmarks.html">
+<span class="dropdown-text">Benchmarks</span></a>
+</li>
+<li>
+<a class="dropdown-item" href="./blog.html">
+<span class="dropdown-text">Blog</span></a>
+</li>
+<li>
+<a class="dropdown-item" href="https://modernfinancialmodeling.com">
+<span class="dropdown-text">Book</span></a>
+</li>
+</ul>
+</li>
+<li class="nav-item compact">
+<a class="nav-link" href="https://github.com/JuliaActuary"> <i aria-label="JuliaActuary on GitHub" class="bi bi-github" role="img">
+</i>
+<span class="menu-text"></span></a>
+</li>
+<li class="nav-item compact">
+<a class="nav-link" href="./all-posts.xml"> <i aria-label="RSS feed" class="bi bi-rss" role="img">
+</i>
+<span class="menu-text"></span></a>
+</li>
+</ul>
+</div> <!-- /navcollapse -->
+<div class="quarto-navbar-tools">
+</div>
+</div> <!-- /container-fluid -->
+</nav>
 </header>
 <!-- content -->
-<header id="title-block-header" class="quarto-title-block default page-columns page-full">
-  <div class="quarto-title-banner page-columns page-full">
-    <div class="quarto-title column-page-left">
-      <h1 class="title">Examples</h1>
-                  <div>
-        <div class="description">
-          JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.
+<header class="quarto-title-block default page-columns page-full" id="title-block-header">
+<div class="quarto-title-banner page-columns page-full">
+<div class="quarto-title column-page-left">
+<h1 class="title">Examples</h1>
+<div>
+<div class="description">
+          Worked examples for mortality, financial modeling, and insurance analysis.
         </div>
-      </div>
-                </div>
-  </div>
-    
-  
-  <div class="quarto-title-meta column-page-left">
-
-      
-    
-      
-    </div>
-    
-  
-  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+</div>
+</div>
+</div>
+<div class="quarto-title-meta column-page-left">
+</div>
+</header><div class="quarto-container page-columns page-rows-contents page-layout-full page-navbar" id="quarto-content">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
-    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(20)</span></div><div class="category" data-category="YWN0dWFyeXV0aWxpdGllcw==">actuaryutilities <span class="quarto-category-count">(5)</span></div><div class="category" data-category="YWxt">alm <span class="quarto-category-count">(1)</span></div><div class="category" data-category="YXNzZXRz">assets <span class="quarto-category-count">(1)</span></div><div class="category" data-category="YXV0b2RpZmY=">autodiff <span class="quarto-category-count">(1)</span></div><div class="category" data-category="YmF5ZXNpYW4=">bayesian <span class="quarto-category-count">(3)</span></div><div class="category" data-category="YmVuY2htYXJr">benchmark <span class="quarto-category-count">(2)</span></div><div class="category" data-category="Y29kZQ==">code <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Y3JlZGliaWxpdHk=">credibility <span class="quarto-category-count">(1)</span></div><div class="category" data-category="ZGF0YWZyYW1lcw==">dataframes <span class="quarto-category-count">(3)</span></div><div class="category" data-category="ZGVzaWdu">design <span class="quarto-category-count">(1)</span></div><div class="category" data-category="ZGlmZmVx">diffeq <span class="quarto-category-count">(1)</span></div><div class="category" data-category="ZXhwZXJpZW5jZS1hbmFseXNpcw==">experience-analysis <span class="quarto-category-count">(6)</span></div><div class="category" data-category="ZXhwb3N1cmVz">exposures <span class="quarto-category-count">(2)</span></div><div class="category" data-category="ZmluYW5jZW1vZGVscw==">financemodels <span class="quarto-category-count">(3)</span></div><div class="category" data-category="bWFya2V0">market <span class="quarto-category-count">(1)</span></div><div class="category" data-category="bW9kZWxpbmc=">modeling <span class="quarto-category-count">(12)</span></div><div class="category" data-category="bW9ydGFsaXR5dGFibGVz">mortalitytables <span class="quarto-category-count">(5)</span></div><div class="category" data-category="c2NlbmFyaW8tZ2VuZXJhdG9y">scenario-generator <span class="quarto-category-count">(2)</span></div><div class="category" data-category="c3RhdGlzdGljcw==">statistics <span class="quarto-category-count">(6)</span></div><div class="category" data-category="c3Vydml2YWw=">survival <span class="quarto-category-count">(1)</span></div><div class="category" data-category="dHV0b3JpYWw=">tutorial <span class="quarto-category-count">(11)</span></div><div class="category" data-category="eWllbGRjdXJ2ZXM=">yieldcurves <span class="quarto-category-count">(1)</span></div></div></div>
+<div class="sidebar margin-sidebar" id="quarto-margin-sidebar">
+<h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><button class="category" data-category="" type="button">All <span class="quarto-category-count">(20)</span></button><button class="category" data-category="YWN0dWFyeXV0aWxpdGllcw==" type="button">actuaryutilities <span class="quarto-category-count">(5)</span></button><button class="category" data-category="YWxt" type="button">alm <span class="quarto-category-count">(1)</span></button><button class="category" data-category="YXNzZXRz" type="button">assets <span class="quarto-category-count">(1)</span></button><button class="category" data-category="YXV0b2RpZmY=" type="button">autodiff <span class="quarto-category-count">(1)</span></button><button class="category" data-category="YmF5ZXNpYW4=" type="button">bayesian <span class="quarto-category-count">(3)</span></button><button class="category" data-category="YmVuY2htYXJr" type="button">benchmark <span class="quarto-category-count">(2)</span></button><button class="category" data-category="Y29kZQ==" type="button">code <span class="quarto-category-count">(1)</span></button><button class="category" data-category="Y3JlZGliaWxpdHk=" type="button">credibility <span class="quarto-category-count">(1)</span></button><button class="category" data-category="ZGF0YWZyYW1lcw==" type="button">dataframes <span class="quarto-category-count">(3)</span></button><button class="category" data-category="ZGVzaWdu" type="button">design <span class="quarto-category-count">(1)</span></button><button class="category" data-category="ZGlmZmVx" type="button">diffeq <span class="quarto-category-count">(1)</span></button><button class="category" data-category="ZXhwZXJpZW5jZS1hbmFseXNpcw==" type="button">experience-analysis <span class="quarto-category-count">(6)</span></button><button class="category" data-category="ZXhwb3N1cmVz" type="button">exposures <span class="quarto-category-count">(2)</span></button><button class="category" data-category="ZmluYW5jZW1vZGVscw==" type="button">financemodels <span class="quarto-category-count">(3)</span></button><button class="category" data-category="bWFya2V0" type="button">market <span class="quarto-category-count">(1)</span></button><button class="category" data-category="bW9kZWxpbmc=" type="button">modeling <span class="quarto-category-count">(12)</span></button><button class="category" data-category="bW9ydGFsaXR5dGFibGVz" type="button">mortalitytables <span class="quarto-category-count">(5)</span></button><button class="category" data-category="c2NlbmFyaW8tZ2VuZXJhdG9y" type="button">scenario-generator <span class="quarto-category-count">(2)</span></button><button class="category" data-category="c3RhdGlzdGljcw==" type="button">statistics <span class="quarto-category-count">(6)</span></button><button class="category" data-category="c3Vydml2YWw=" type="button">survival <span class="quarto-category-count">(1)</span></button><button class="category" data-category="dHV0b3JpYWw=" type="button">tutorial <span class="quarto-category-count">(11)</span></button><button class="category" data-category="eWllbGRjdXJ2ZXM=" type="button">yieldcurves <span class="quarto-category-count">(1)</span></button></div></div>
 <!-- main -->
 <main class="content quarto-banner-title-block column-page-left" id="quarto-document-content">
-
-
-
-
-
-
-
-
-
 <div class="quarto-listing quarto-listing-container-default" id="listing-listing">
 <div class="listing-actions-group">
-   <div class="input-group input-group-sm quarto-listing-sort">
-    <span class="input-group-text"><i class="bi bi-sort-down"></i></span>
-    <select id="listing-listing-sort" class="form-select" aria-label="Order By" onchange="window['quarto-listings']['listing-listing'].sort(this.options[this.selectedIndex].value, { order: this.options[this.selectedIndex].getAttribute('data-direction')})">
-      <option value="" disabled="" selected="" hidden="">Order By</option>
-      <option value="index" data-direction="asc">Default</option>
-      <option value="listing-title" data-direction="asc">
+<div class="input-group input-group-sm quarto-listing-sort">
+<span class="input-group-text"><i class="bi bi-sort-down"></i></span>
+<select aria-label="Order By" class="form-select" id="listing-listing-sort" onchange="window['quarto-listings']['listing-listing'].sort(this.options[this.selectedIndex].value, { order: this.options[this.selectedIndex].getAttribute('data-direction')})">
+<option disabled="" hidden="" selected="" value="">Order By</option>
+<option data-direction="asc" value="index">Default</option>
+<option data-direction="asc" value="listing-title">
         Title
       </option>
-      <option value="listing-date-sort" data-direction="asc">
+<option data-direction="asc" value="listing-date-sort">
         Date - Oldest
       </option>
-      <option value="listing-date-sort" data-direction="desc">
+<option data-direction="desc" value="listing-date-sort">
         Date - Newest
       </option>
-      <option value="listing-author" data-direction="asc">
+<option data-direction="asc" value="listing-author">
         Author
       </option>
-    </select>
-  </div>
-    <div class="input-group input-group-sm quarto-listing-filter">
-      <span class="input-group-text"><i class="bi bi-search"></i></span>
-      <input type="text" class="search form-control" placeholder="Filter">
-    </div>
+</select>
+</div>
+<div class="input-group input-group-sm quarto-listing-filter">
+<span class="input-group-text"><i class="bi bi-search"></i></span>
+<input aria-label="Filter posts" class="search form-control" placeholder="Filter" type="text"/>
+</div>
 </div>
 <div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-categories="bW9kZWxpbmclMkNzY2VuYXJpby1nZW5lcmF0b3I=" data-listing-file-modified-sort="1791828473644" data-listing-reading-time-sort="2" data-listing-word-count-sort="211">
-<div class="thumbnail"><a href="./posts/academy-generator-rates/index.html" class="no-external">
-
-<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
-
-</a></div>
+<div class="quarto-post image-right" data-categories="bW9kZWxpbmclMkNzY2VuYXJpby1nZW5lcmF0b3I=" data-index="0" data-listing-file-modified-sort="1791828473644" data-listing-reading-time-sort="2" data-listing-word-count-sort="211">
 <div class="body">
 <h3 class="no-anchor listing-title">
-<a href="./posts/academy-generator-rates/index.html" class="no-external">Interactive AAA Economic Scenario Generator</a>
+<a class="no-external" href="./posts/academy-generator-rates/index.html">Interactive AAA Economic Scenario Generator</a>
 </h3>
-<div class="listing-subtitle">
-<a href="./posts/academy-generator-rates/index.html" class="no-external"></a>
-</div>
 <div class="listing-categories">
-
-<div class="listing-category" onclick="window.quartoListingCategory('bW9kZWxpbmc='); return false;">modeling</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('c2NlbmFyaW8tZ2VuZXJhdG9y'); return false;">scenario-generator</div>
-
+<button class="listing-category" onclick="window.quartoListingCategory('bW9kZWxpbmc='); return false;" type="button">modeling</button>
+<button class="listing-category" onclick="window.quartoListingCategory('c2NlbmFyaW8tZ2VuZXJhdG9y'); return false;" type="button">scenario-generator</button>
 </div>
-<div class="delink listing-description"><a href="./posts/academy-generator-rates/index.html" class="no-external">
+<div class="delink listing-description"><a class="no-external" href="./posts/academy-generator-rates/index.html">
 Scroll down below the sample video to see how to run it.
 </a></div>
 </div>
-<div class="metadata">
-<a href="./posts/academy-generator-rates/index.html" class="no-external">
-</a>
 </div>
-</div>
-<div class="quarto-post image-right" data-index="1" data-categories="bW9kZWxpbmclMkNzY2VuYXJpby1nZW5lcmF0b3I=" data-listing-file-modified-sort="1784337922981" data-listing-reading-time-sort="3" data-listing-word-count-sort="543">
-<div class="thumbnail"><a href="./posts/academy-generator/index.html" class="no-external">
-
-<p class="card-img-top"><img src="posts/academy-generator/index_files/figure-html/cell-9-output-1.svg"  class="thumbnail-image card-img"/></p>
-
+<div class="quarto-post image-right" data-categories="bW9kZWxpbmclMkNzY2VuYXJpby1nZW5lcmF0b3I=" data-index="1" data-listing-file-modified-sort="1792874596431" data-listing-reading-time-sort="3" data-listing-word-count-sort="562">
+<div class="thumbnail"><a aria-hidden="true" class="no-external" href="./posts/academy-generator/index.html" tabindex="-1">
+<p class="card-img-top"><img alt="" class="thumbnail-image card-img" data-thumbnail-source="posts/academy-generator/index_files/figure-html/cell-9-output-1.svg" decoding="async" height="384" loading="lazy" sizes="176px" src="assets/thumbnails/2feb01785fc83aa2d923-320.webp" srcset="assets/thumbnails/2feb01785fc83aa2d923-320.webp 320w, assets/thumbnails/2feb01785fc83aa2d923-640.webp 640w" width="640"/></p>
 </a></div>
 <div class="body">
 <h3 class="no-anchor listing-title">
-<a href="./posts/academy-generator/index.html" class="no-external">Replicating the AAA equtity generator</a>
+<a class="no-external" href="./posts/academy-generator/index.html">Replicating the AAA equtity generator</a>
 </h3>
-<div class="listing-subtitle">
-<a href="./posts/academy-generator/index.html" class="no-external"></a>
-</div>
 <div class="listing-categories">
-
-<div class="listing-category" onclick="window.quartoListingCategory('bW9kZWxpbmc='); return false;">modeling</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('c2NlbmFyaW8tZ2VuZXJhdG9y'); return false;">scenario-generator</div>
-
+<button class="listing-category" onclick="window.quartoListingCategory('bW9kZWxpbmc='); return false;" type="button">modeling</button>
+<button class="listing-category" onclick="window.quartoListingCategory('c2NlbmFyaW8tZ2VuZXJhdG9y'); return false;" type="button">scenario-generator</button>
 </div>
-<div class="delink listing-description"><a href="./posts/academy-generator/index.html" class="no-external">
+<div class="delink listing-description"><a class="no-external" href="./posts/academy-generator/index.html">
 This notebook replicates the model and parameters for the real world equity generator described in this AAA 2005 reference paper.
 </a></div>
 </div>
-<div class="metadata">
-<a href="./posts/academy-generator/index.html" class="no-external">
-</a>
 </div>
-</div>
-<div class="quarto-post image-right" data-index="2" data-categories="bW9kZWxpbmclMkNhdXRvZGlmZiUyQ2FsbQ==" data-listing-file-modified-sort="1791828388041" data-listing-reading-time-sort="21" data-listing-word-count-sort="4130">
-<div class="thumbnail"><a href="./posts/autodiff_ALM/index.html" class="no-external">
-
-<p class="card-img-top"><img src="posts/autodiff_ALM/index_files/figure-html/cell-10-output-1.svg"  class="thumbnail-image card-img"/></p>
-
+<div class="quarto-post image-right" data-categories="bW9kZWxpbmclMkNhdXRvZGlmZiUyQ2FsbQ==" data-index="2" data-listing-file-modified-sort="1792874596673" data-listing-reading-time-sort="21" data-listing-word-count-sort="4182">
+<div class="thumbnail"><a aria-hidden="true" class="no-external" href="./posts/autodiff_ALM/index.html" tabindex="-1">
+<p class="card-img-top"><img alt="" class="thumbnail-image card-img" data-thumbnail-source="posts/autodiff_ALM/index_files/figure-html/cell-10-output-1.svg" decoding="async" height="384" loading="lazy" sizes="176px" src="assets/thumbnails/48da55041b8c1dfb1acc-320.webp" srcset="assets/thumbnails/48da55041b8c1dfb1acc-320.webp 320w, assets/thumbnails/48da55041b8c1dfb1acc-640.webp 640w" width="640"/></p>
 </a></div>
 <div class="body">
 <h3 class="no-anchor listing-title">
-<a href="./posts/autodiff_ALM/index.html" class="no-external">Autodifferentiation and Asset Liability Management (AAD &amp; ALM)</a>
+<a class="no-external" href="./posts/autodiff_ALM/index.html">Autodifferentiation and Asset Liability Management (AAD &amp; ALM)</a>
 </h3>
-<div class="listing-subtitle">
-<a href="./posts/autodiff_ALM/index.html" class="no-external"></a>
-</div>
 <div class="listing-categories">
-
-<div class="listing-category" onclick="window.quartoListingCategory('bW9kZWxpbmc='); return false;">modeling</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('YXV0b2RpZmY='); return false;">autodiff</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('YWxt'); return false;">alm</div>
-
+<button class="listing-category" onclick="window.quartoListingCategory('bW9kZWxpbmc='); return false;" type="button">modeling</button>
+<button class="listing-category" onclick="window.quartoListingCategory('YXV0b2RpZmY='); return false;" type="button">autodiff</button>
+<button class="listing-category" onclick="window.quartoListingCategory('YWxt'); return false;" type="button">alm</button>
 </div>
-<div class="delink listing-description"><a href="./posts/autodiff_ALM/index.html" class="no-external">
+<div class="delink listing-description"><a class="no-external" href="./posts/autodiff_ALM/index.html">
 Asset liability modeling requires computing derivatives of portfolio values with respect to yield curve changes. Traditional approaches use finite difference methods or…
 </a></div>
 </div>
-<div class="metadata">
-<a href="./posts/autodiff_ALM/index.html" class="no-external">
-</a>
 </div>
-</div>
-<div class="quarto-post image-right" data-index="3" data-categories="bW9kZWxpbmclMkNzdGF0aXN0aWNzJTJDZXhwZXJpZW5jZS1hbmFseXNpcyUyQ2JheWVzaWFu" data-listing-file-modified-sort="1784337922981" data-listing-reading-time-sort="18" data-listing-word-count-sort="3442">
-<div class="thumbnail"><a href="./posts/bayes-vs-limited-fluctuation/index.html" class="no-external">
-
-<p class="card-img-top"><img src="posts/bayes-vs-limited-fluctuation/index_files/figure-html/cell-9-output-1.svg"  class="thumbnail-image card-img"/></p>
-
+<div class="quarto-post image-right" data-categories="bW9kZWxpbmclMkNzdGF0aXN0aWNzJTJDZXhwZXJpZW5jZS1hbmFseXNpcyUyQ2JheWVzaWFu" data-index="3" data-listing-file-modified-sort="1792874596944" data-listing-reading-time-sort="18" data-listing-word-count-sort="3493">
+<div class="thumbnail"><a aria-hidden="true" class="no-external" href="./posts/bayes-vs-limited-fluctuation/index.html" tabindex="-1">
+<p class="card-img-top"><img alt="" class="thumbnail-image card-img" data-thumbnail-source="posts/bayes-vs-limited-fluctuation/index_files/figure-html/cell-9-output-1.svg" decoding="async" height="384" loading="lazy" sizes="176px" src="assets/thumbnails/2774955178258544e878-320.webp" srcset="assets/thumbnails/2774955178258544e878-320.webp 320w, assets/thumbnails/2774955178258544e878-640.webp 640w" width="640"/></p>
 </a></div>
 <div class="body">
 <h3 class="no-anchor listing-title">
-<a href="./posts/bayes-vs-limited-fluctuation/index.html" class="no-external">Bayesian vs Limited Fluctuation Experience Analysis</a>
+<a class="no-external" href="./posts/bayes-vs-limited-fluctuation/index.html">Bayesian vs Limited Fluctuation Experience Analysis</a>
 </h3>
-<div class="listing-subtitle">
-<a href="./posts/bayes-vs-limited-fluctuation/index.html" class="no-external"></a>
-</div>
 <div class="listing-categories">
-
-<div class="listing-category" onclick="window.quartoListingCategory('bW9kZWxpbmc='); return false;">modeling</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('c3RhdGlzdGljcw=='); return false;">statistics</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('ZXhwZXJpZW5jZS1hbmFseXNpcw=='); return false;">experience-analysis</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('YmF5ZXNpYW4='); return false;">bayesian</div>
-
+<button class="listing-category" onclick="window.quartoListingCategory('bW9kZWxpbmc='); return false;" type="button">modeling</button>
+<button class="listing-category" onclick="window.quartoListingCategory('c3RhdGlzdGljcw=='); return false;" type="button">statistics</button>
+<button class="listing-category" onclick="window.quartoListingCategory('ZXhwZXJpZW5jZS1hbmFseXNpcw=='); return false;" type="button">experience-analysis</button>
+<button class="listing-category" onclick="window.quartoListingCategory('YmF5ZXNpYW4='); return false;" type="button">bayesian</button>
 </div>
-<div class="delink listing-description"><a href="./posts/bayes-vs-limited-fluctuation/index.html" class="no-external">
+<div class="delink listing-description"><a class="no-external" href="./posts/bayes-vs-limited-fluctuation/index.html">
 Alternate title: Why actuaries should cease to care about the number 1082.
 </a></div>
 </div>
-<div class="metadata">
-<a href="./posts/bayes-vs-limited-fluctuation/index.html" class="no-external">
-</a>
 </div>
-</div>
-<div class="quarto-post image-right" data-index="4" data-categories="bW9ydGFsaXR5dGFibGVzJTJDZXhwb3N1cmVzJTJDZXhwZXJpZW5jZS1hbmFseXNpcyUyQ2RhdGFmcmFtZXMlMkN0dXRvcmlhbCUyQ3N0YXRpc3RpY3MlMkNiYXllc2lhbg==" data-listing-file-modified-sort="1791827539862" data-listing-reading-time-sort="12" data-listing-word-count-sort="2346">
-<div class="thumbnail"><a href="./posts/bayesian-claims-demo/index.html" class="no-external">
-
-<p class="card-img-top"><img src="posts/bayesian-claims-demo/index_files/figure-html/cell-9-output-2.svg"  class="thumbnail-image card-img"/></p>
-
+<div class="quarto-post image-right" data-categories="bW9ydGFsaXR5dGFibGVzJTJDZXhwb3N1cmVzJTJDZXhwZXJpZW5jZS1hbmFseXNpcyUyQ2RhdGFmcmFtZXMlMkN0dXRvcmlhbCUyQ3N0YXRpc3RpY3MlMkNiYXllc2lhbg==" data-index="4" data-listing-file-modified-sort="1792874597294" data-listing-reading-time-sort="13" data-listing-word-count-sort="2430">
+<div class="thumbnail"><a aria-hidden="true" class="no-external" href="./posts/bayesian-claims-demo/index.html" tabindex="-1">
+<p class="card-img-top"><img alt="" class="thumbnail-image card-img" data-thumbnail-source="posts/bayesian-claims-demo/index_files/figure-html/cell-9-output-2.svg" decoding="async" height="384" loading="lazy" sizes="176px" src="assets/thumbnails/2589413e7742da0a1adf-320.webp" srcset="assets/thumbnails/2589413e7742da0a1adf-320.webp 320w, assets/thumbnails/2589413e7742da0a1adf-640.webp 640w" width="640"/></p>
 </a></div>
 <div class="body">
 <h3 class="no-anchor listing-title">
-<a href="./posts/bayesian-claims-demo/index.html" class="no-external">Bayesian Markov-Chain-Monte-Carlo and Claims Data</a>
+<a class="no-external" href="./posts/bayesian-claims-demo/index.html">Bayesian Markov-Chain-Monte-Carlo and Claims Data</a>
 </h3>
-<div class="listing-subtitle">
-<a href="./posts/bayesian-claims-demo/index.html" class="no-external"></a>
-</div>
 <div class="listing-categories">
-
-<div class="listing-category" onclick="window.quartoListingCategory('bW9ydGFsaXR5dGFibGVz'); return false;">mortalitytables</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('ZXhwb3N1cmVz'); return false;">exposures</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('ZXhwZXJpZW5jZS1hbmFseXNpcw=='); return false;">experience-analysis</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('ZGF0YWZyYW1lcw=='); return false;">dataframes</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('dHV0b3JpYWw='); return false;">tutorial</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('c3RhdGlzdGljcw=='); return false;">statistics</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('YmF5ZXNpYW4='); return false;">bayesian</div>
-
+<button class="listing-category" onclick="window.quartoListingCategory('bW9ydGFsaXR5dGFibGVz'); return false;" type="button">mortalitytables</button>
+<button class="listing-category" onclick="window.quartoListingCategory('ZXhwb3N1cmVz'); return false;" type="button">exposures</button>
+<button class="listing-category" onclick="window.quartoListingCategory('ZXhwZXJpZW5jZS1hbmFseXNpcw=='); return false;" type="button">experience-analysis</button>
+<button class="listing-category" onclick="window.quartoListingCategory('ZGF0YWZyYW1lcw=='); return false;" type="button">dataframes</button>
+<button class="listing-category" onclick="window.quartoListingCategory('dHV0b3JpYWw='); return false;" type="button">tutorial</button>
+<button class="listing-category" onclick="window.quartoListingCategory('c3RhdGlzdGljcw=='); return false;" type="button">statistics</button>
+<button class="listing-category" onclick="window.quartoListingCategory('YmF5ZXNpYW4='); return false;" type="button">bayesian</button>
 </div>
-<div class="delink listing-description"><a href="./posts/bayesian-claims-demo/index.html" class="no-external">
+<div class="delink listing-description"><a class="no-external" href="./posts/bayesian-claims-demo/index.html">
 The problem of interest is to look at mortality rates, which are given in terms of exposures (whether or not a life experienced a death in a given year).
 </a></div>
 </div>
-<div class="metadata">
-<a href="./posts/bayesian-claims-demo/index.html" class="no-external">
-</a>
 </div>
-</div>
-<div class="quarto-post image-right" data-index="5" data-categories="YWN0dWFyeXV0aWxpdGllcyUyQ2ZpbmFuY2Vtb2RlbHMlMkNhc3NldHM=" data-listing-file-modified-sort="1791828473643" data-listing-reading-time-sort="1" data-listing-word-count-sort="125">
-<div class="thumbnail"><a href="./posts/cashflow-interactive/index.html" class="no-external">
-
-<p class="card-img-top"><img src="posts/cashflow-interactive/demo.gif"  class="thumbnail-image card-img"/></p>
-
+<div class="quarto-post image-right" data-categories="YWN0dWFyeXV0aWxpdGllcyUyQ2ZpbmFuY2Vtb2RlbHMlMkNhc3NldHM=" data-index="5" data-listing-file-modified-sort="1792880894106" data-listing-reading-time-sort="1" data-listing-word-count-sort="135">
+<div class="thumbnail"><a aria-hidden="true" class="no-external" href="./posts/cashflow-interactive/index.html" tabindex="-1">
+<p class="card-img-top"><img alt="" class="thumbnail-image card-img" data-thumbnail-source="posts/cashflow-interactive/demo.gif" decoding="async" height="384" loading="lazy" sizes="176px" src="assets/thumbnails/eb37280a19d5059c25c7-320.webp" srcset="assets/thumbnails/eb37280a19d5059c25c7-320.webp 320w, assets/thumbnails/eb37280a19d5059c25c7-640.webp 640w" width="640"/></p>
 </a></div>
 <div class="body">
 <h3 class="no-anchor listing-title">
-<a href="./posts/cashflow-interactive/index.html" class="no-external">Interactive Cashflow Analysis with ActuaryUtilities.jl</a>
+<a class="no-external" href="./posts/cashflow-interactive/index.html">Interactive Cashflow Analysis with ActuaryUtilities.jl</a>
 </h3>
-<div class="listing-subtitle">
-<a href="./posts/cashflow-interactive/index.html" class="no-external"></a>
-</div>
 <div class="listing-categories">
-
-<div class="listing-category" onclick="window.quartoListingCategory('YWN0dWFyeXV0aWxpdGllcw=='); return false;">actuaryutilities</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('ZmluYW5jZW1vZGVscw=='); return false;">financemodels</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('YXNzZXRz'); return false;">assets</div>
-
+<button class="listing-category" onclick="window.quartoListingCategory('YWN0dWFyeXV0aWxpdGllcw=='); return false;" type="button">actuaryutilities</button>
+<button class="listing-category" onclick="window.quartoListingCategory('ZmluYW5jZW1vZGVscw=='); return false;" type="button">financemodels</button>
+<button class="listing-category" onclick="window.quartoListingCategory('YXNzZXRz'); return false;" type="button">assets</button>
 </div>
-<div class="delink listing-description"><a href="./posts/cashflow-interactive/index.html" class="no-external">
+<div class="delink listing-description"><a class="no-external" href="./posts/cashflow-interactive/index.html">
 Scroll down below the sample video to see how to run it.
 </a></div>
 </div>
-<div class="metadata">
-<a href="./posts/cashflow-interactive/index.html" class="no-external">
-</a>
 </div>
-</div>
-<div class="quarto-post image-right" data-index="6" data-categories="c3RhdGlzdGljcyUyQ2V4cGVyaWVuY2UtYW5hbHlzaXMlMkNiYXllc2lhbiUyQ2NyZWRpYmlsaXR5JTJDbW9kZWxpbmc=" data-listing-file-modified-sort="1785075351398" data-listing-reading-time-sort="53" data-listing-word-count-sort="10510">
-<div class="thumbnail"><a href="./posts/credibility-sparse-data/index.html" class="no-external">
-
-<p class="card-img-top"><img src="posts/credibility-sparse-data/index_files/figure-html/cell-5-output-1.svg"  class="thumbnail-image card-img"/></p>
-
+<div class="quarto-post image-right" data-categories="c3RhdGlzdGljcyUyQ2V4cGVyaWVuY2UtYW5hbHlzaXMlMkNiYXllc2lhbiUyQ2NyZWRpYmlsaXR5JTJDbW9kZWxpbmc=" data-index="6" data-listing-file-modified-sort="1792874675371" data-listing-reading-time-sort="54" data-listing-word-count-sort="10657">
+<div class="thumbnail"><a aria-hidden="true" class="no-external" href="./posts/credibility-sparse-data/index.html" tabindex="-1">
+<p class="card-img-top"><img alt="" class="thumbnail-image card-img" data-thumbnail-source="posts/credibility-sparse-data/index_files/figure-html/cell-5-output-1.svg" decoding="async" height="384" loading="lazy" sizes="176px" src="assets/thumbnails/c88a6acb7b8e741147cd-320.webp" srcset="assets/thumbnails/c88a6acb7b8e741147cd-320.webp 320w, assets/thumbnails/c88a6acb7b8e741147cd-640.webp 640w" width="640"/></p>
 </a></div>
 <div class="body">
 <h3 class="no-anchor listing-title">
-<a href="./posts/credibility-sparse-data/index.html" class="no-external">Credibility When Claims Are Scarce</a>
+<a class="no-external" href="./posts/credibility-sparse-data/index.html">Credibility When Claims Are Scarce</a>
 </h3>
 <div class="listing-subtitle">
-<a href="./posts/credibility-sparse-data/index.html" class="no-external">Comparing limited fluctuation, Bühlmann–Straub, and hierarchical Bayes on sparse mortality data</a>
+<a class="no-external" href="./posts/credibility-sparse-data/index.html">Comparing limited fluctuation, Bühlmann–Straub, and hierarchical Bayes on sparse mortality data</a>
 </div>
 <div class="listing-categories">
-
-<div class="listing-category" onclick="window.quartoListingCategory('c3RhdGlzdGljcw=='); return false;">statistics</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('ZXhwZXJpZW5jZS1hbmFseXNpcw=='); return false;">experience-analysis</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('YmF5ZXNpYW4='); return false;">bayesian</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('Y3JlZGliaWxpdHk='); return false;">credibility</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('bW9kZWxpbmc='); return false;">modeling</div>
-
+<button class="listing-category" onclick="window.quartoListingCategory('c3RhdGlzdGljcw=='); return false;" type="button">statistics</button>
+<button class="listing-category" onclick="window.quartoListingCategory('ZXhwZXJpZW5jZS1hbmFseXNpcw=='); return false;" type="button">experience-analysis</button>
+<button class="listing-category" onclick="window.quartoListingCategory('YmF5ZXNpYW4='); return false;" type="button">bayesian</button>
+<button class="listing-category" onclick="window.quartoListingCategory('Y3JlZGliaWxpdHk='); return false;" type="button">credibility</button>
+<button class="listing-category" onclick="window.quartoListingCategory('bW9kZWxpbmc='); return false;" type="button">modeling</button>
 </div>
-<div class="delink listing-description"><a href="./posts/credibility-sparse-data/index.html" class="no-external">
+<div class="delink listing-description"><a class="no-external" href="./posts/credibility-sparse-data/index.html">
 <em>Your best customers are the ones you know least about.</em>
 </a></div>
 </div>
-<div class="metadata">
-<a href="./posts/credibility-sparse-data/index.html" class="no-external">
-</a>
 </div>
-</div>
-<div class="quarto-post image-right" data-index="7" data-categories="bW9ydGFsaXR5dGFibGVzJTJDZXhwb3N1cmVzJTJDZXhwZXJpZW5jZS1hbmFseXNpcyUyQ2RhdGFmcmFtZXMlMkN0dXRvcmlhbA==" data-listing-file-modified-sort="1784337922983" data-listing-reading-time-sort="3" data-listing-word-count-sort="492">
-<div class="thumbnail"><a href="./posts/exposures-example/index.html" class="no-external">
-
-<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
-
-</a></div>
+<div class="quarto-post image-right" data-categories="bW9ydGFsaXR5dGFibGVzJTJDZXhwb3N1cmVzJTJDZXhwZXJpZW5jZS1hbmFseXNpcyUyQ2RhdGFmcmFtZXMlMkN0dXRvcmlhbA==" data-index="7" data-listing-file-modified-sort="1784337922983" data-listing-reading-time-sort="3" data-listing-word-count-sort="492">
 <div class="body">
 <h3 class="no-anchor listing-title">
-<a href="./posts/exposures-example/index.html" class="no-external">Exposure Calculation with ExperienceAnalysis.jl</a>
+<a class="no-external" href="./posts/exposures-example/index.html">Exposure Calculation with ExperienceAnalysis.jl</a>
 </h3>
-<div class="listing-subtitle">
-<a href="./posts/exposures-example/index.html" class="no-external"></a>
-</div>
 <div class="listing-categories">
-
-<div class="listing-category" onclick="window.quartoListingCategory('bW9ydGFsaXR5dGFibGVz'); return false;">mortalitytables</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('ZXhwb3N1cmVz'); return false;">exposures</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('ZXhwZXJpZW5jZS1hbmFseXNpcw=='); return false;">experience-analysis</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('ZGF0YWZyYW1lcw=='); return false;">dataframes</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('dHV0b3JpYWw='); return false;">tutorial</div>
-
+<button class="listing-category" onclick="window.quartoListingCategory('bW9ydGFsaXR5dGFibGVz'); return false;" type="button">mortalitytables</button>
+<button class="listing-category" onclick="window.quartoListingCategory('ZXhwb3N1cmVz'); return false;" type="button">exposures</button>
+<button class="listing-category" onclick="window.quartoListingCategory('ZXhwZXJpZW5jZS1hbmFseXNpcw=='); return false;" type="button">experience-analysis</button>
+<button class="listing-category" onclick="window.quartoListingCategory('ZGF0YWZyYW1lcw=='); return false;" type="button">dataframes</button>
+<button class="listing-category" onclick="window.quartoListingCategory('dHV0b3JpYWw='); return false;" type="button">tutorial</button>
 </div>
-<div class="delink listing-description"><a href="./posts/exposures-example/index.html" class="no-external">
+<div class="delink listing-description"><a class="no-external" href="./posts/exposures-example/index.html">
 In this tutorial, we will walk through how to calculate exposures using the ExperienceAnalysis.jl package.
 </a></div>
 </div>
-<div class="metadata">
-<a href="./posts/exposures-example/index.html" class="no-external">
-</a>
 </div>
-</div>
-<div class="quarto-post image-right" data-index="8" data-categories="c3Vydml2YWwlMkN0dXRvcmlhbA==" data-listing-file-modified-sort="1791827539878" data-listing-reading-time-sort="3" data-listing-word-count-sort="484">
-<div class="thumbnail"><a href="./posts/fitting-survival-data/index.html" class="no-external">
-
-<p class="card-img-top"><img src="posts/fitting-survival-data/index_files/figure-html/cell-5-output-1.svg"  class="thumbnail-image card-img"/></p>
-
+<div class="quarto-post image-right" data-categories="c3Vydml2YWwlMkN0dXRvcmlhbA==" data-index="8" data-listing-file-modified-sort="1792874600757" data-listing-reading-time-sort="3" data-listing-word-count-sort="518">
+<div class="thumbnail"><a aria-hidden="true" class="no-external" href="./posts/fitting-survival-data/index.html" tabindex="-1">
+<p class="card-img-top"><img alt="" class="thumbnail-image card-img" data-thumbnail-source="posts/fitting-survival-data/index_files/figure-html/cell-5-output-1.svg" decoding="async" height="384" loading="lazy" sizes="176px" src="assets/thumbnails/22e24a4f5593aa17e36a-320.webp" srcset="assets/thumbnails/22e24a4f5593aa17e36a-320.webp 320w, assets/thumbnails/22e24a4f5593aa17e36a-640.webp 640w" width="640"/></p>
 </a></div>
 <div class="body">
 <h3 class="no-anchor listing-title">
-<a href="./posts/fitting-survival-data/index.html" class="no-external">Fitting survival data with MortalityTables.jl</a>
+<a class="no-external" href="./posts/fitting-survival-data/index.html">Fitting survival data with MortalityTables.jl</a>
 </h3>
-<div class="listing-subtitle">
-<a href="./posts/fitting-survival-data/index.html" class="no-external"></a>
-</div>
 <div class="listing-categories">
-
-<div class="listing-category" onclick="window.quartoListingCategory('c3Vydml2YWw='); return false;">survival</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('dHV0b3JpYWw='); return false;">tutorial</div>
-
+<button class="listing-category" onclick="window.quartoListingCategory('c3Vydml2YWw='); return false;" type="button">survival</button>
+<button class="listing-category" onclick="window.quartoListingCategory('dHV0b3JpYWw='); return false;" type="button">tutorial</button>
 </div>
-<div class="delink listing-description"><a href="./posts/fitting-survival-data/index.html" class="no-external">
+<div class="delink listing-description"><a class="no-external" href="./posts/fitting-survival-data/index.html">
 <em>This tutorial is via PharmCat on Github (this link has similar code with comments in Russian and English).</em>
 </a></div>
 </div>
-<div class="metadata">
-<a href="./posts/fitting-survival-data/index.html" class="no-external">
-</a>
 </div>
-</div>
-<div class="quarto-post image-right" data-index="9" data-categories="bWFya2V0JTJDeWllbGRjdXJ2ZXMlMkNmaW5hbmNlbW9kZWxzJTJDdHV0b3JpYWw=" data-listing-file-modified-sort="1791824398509" data-listing-reading-time-sort="3" data-listing-word-count-sort="468">
-<div class="thumbnail"><a href="./posts/fitting-yield-curves/index.html" class="no-external">
-
-<p class="card-img-top"><img src="posts/fitting-yield-curves/index_files/figure-html/cell-7-output-1.svg"  class="thumbnail-image card-img"/></p>
-
+<div class="quarto-post image-right" data-categories="bWFya2V0JTJDeWllbGRjdXJ2ZXMlMkNmaW5hbmNlbW9kZWxzJTJDdHV0b3JpYWw=" data-index="9" data-listing-file-modified-sort="1792880894107" data-listing-reading-time-sort="3" data-listing-word-count-sort="491">
+<div class="thumbnail"><a aria-hidden="true" class="no-external" href="./posts/fitting-yield-curves/index.html" tabindex="-1">
+<p class="card-img-top"><img alt="" class="thumbnail-image card-img" data-thumbnail-source="posts/fitting-yield-curves/index_files/figure-html/cell-7-output-1.svg" decoding="async" height="384" loading="lazy" sizes="176px" src="assets/thumbnails/d7dea44d7fe5da2cb479-320.webp" srcset="assets/thumbnails/d7dea44d7fe5da2cb479-320.webp 320w, assets/thumbnails/d7dea44d7fe5da2cb479-640.webp 640w" width="640"/></p>
 </a></div>
 <div class="body">
 <h3 class="no-anchor listing-title">
-<a href="./posts/fitting-yield-curves/index.html" class="no-external">Fitting Rate Data to Yield Curves</a>
+<a class="no-external" href="./posts/fitting-yield-curves/index.html">Fitting Rate Data to Yield Curves</a>
 </h3>
-<div class="listing-subtitle">
-<a href="./posts/fitting-yield-curves/index.html" class="no-external"></a>
-</div>
 <div class="listing-categories">
-
-<div class="listing-category" onclick="window.quartoListingCategory('bWFya2V0'); return false;">market</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('eWllbGRjdXJ2ZXM='); return false;">yieldcurves</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('ZmluYW5jZW1vZGVscw=='); return false;">financemodels</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('dHV0b3JpYWw='); return false;">tutorial</div>
-
+<button class="listing-category" onclick="window.quartoListingCategory('bWFya2V0'); return false;" type="button">market</button>
+<button class="listing-category" onclick="window.quartoListingCategory('eWllbGRjdXJ2ZXM='); return false;" type="button">yieldcurves</button>
+<button class="listing-category" onclick="window.quartoListingCategory('ZmluYW5jZW1vZGVscw=='); return false;" type="button">financemodels</button>
+<button class="listing-category" onclick="window.quartoListingCategory('dHV0b3JpYWw='); return false;" type="button">tutorial</button>
 </div>
-<div class="delink listing-description"><a href="./posts/fitting-yield-curves/index.html" class="no-external">
+<div class="delink listing-description"><a class="no-external" href="./posts/fitting-yield-curves/index.html">
 Given rates and maturities, we can fit the yield curves with different techniques.
 </a></div>
 </div>
-<div class="metadata">
-<a href="./posts/fitting-yield-curves/index.html" class="no-external">
-</a>
 </div>
-</div>
-<div class="quarto-post image-right" data-index="10" data-categories="ZXhwZXJpZW5jZS1hbmFseXNpcyUyQ21vcnRhbGl0eXRhYmxlcw==" data-listing-file-modified-sort="1791828473643" data-listing-reading-time-sort="1" data-listing-word-count-sort="111">
-<div class="thumbnail"><a href="./posts/mortality-comparison/index.html" class="no-external">
-
-<p class="card-img-top"><img src="posts/mortality-comparison/demo.gif"  class="thumbnail-image card-img"/></p>
-
+<div class="quarto-post image-right" data-categories="ZXhwZXJpZW5jZS1hbmFseXNpcyUyQ21vcnRhbGl0eXRhYmxlcw==" data-index="10" data-listing-file-modified-sort="1792880894106" data-listing-reading-time-sort="1" data-listing-word-count-sort="123">
+<div class="thumbnail"><a aria-hidden="true" class="no-external" href="./posts/mortality-comparison/index.html" tabindex="-1">
+<p class="card-img-top"><img alt="" class="thumbnail-image card-img" data-thumbnail-source="posts/mortality-comparison/demo.gif" decoding="async" height="384" loading="lazy" sizes="176px" src="assets/thumbnails/3308c8cdfd1e744cbd84-320.webp" srcset="assets/thumbnails/3308c8cdfd1e744cbd84-320.webp 320w, assets/thumbnails/3308c8cdfd1e744cbd84-640.webp 640w" width="640"/></p>
 </a></div>
 <div class="body">
 <h3 class="no-anchor listing-title">
-<a href="./posts/mortality-comparison/index.html" class="no-external">Interactive Mortality Comparison Tool</a>
+<a class="no-external" href="./posts/mortality-comparison/index.html">Interactive Mortality Comparison Tool</a>
 </h3>
-<div class="listing-subtitle">
-<a href="./posts/mortality-comparison/index.html" class="no-external"></a>
-</div>
 <div class="listing-categories">
-
-<div class="listing-category" onclick="window.quartoListingCategory('ZXhwZXJpZW5jZS1hbmFseXNpcw=='); return false;">experience-analysis</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('bW9ydGFsaXR5dGFibGVz'); return false;">mortalitytables</div>
-
+<button class="listing-category" onclick="window.quartoListingCategory('ZXhwZXJpZW5jZS1hbmFseXNpcw=='); return false;" type="button">experience-analysis</button>
+<button class="listing-category" onclick="window.quartoListingCategory('bW9ydGFsaXR5dGFibGVz'); return false;" type="button">mortalitytables</button>
 </div>
-<div class="delink listing-description"><a href="./posts/mortality-comparison/index.html" class="no-external">
+<div class="delink listing-description"><a class="no-external" href="./posts/mortality-comparison/index.html">
 Scroll down below the sample video to see how to run it.
 </a></div>
 </div>
-<div class="metadata">
-<a href="./posts/mortality-comparison/index.html" class="no-external">
-</a>
 </div>
-</div>
-<div class="quarto-post image-right" data-index="11" data-categories="bW9ydGFsaXR5dGFibGVzJTJDZGF0YWZyYW1lcyUyQ3R1dG9yaWFs" data-listing-file-modified-sort="1750483870069" data-listing-reading-time-sort="2" data-listing-word-count-sort="367">
-<div class="thumbnail"><a href="./posts/mortalitytables-and-dataframes/index.html" class="no-external">
-
-<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
-
-</a></div>
+<div class="quarto-post image-right" data-categories="bW9ydGFsaXR5dGFibGVzJTJDZGF0YWZyYW1lcyUyQ3R1dG9yaWFs" data-index="11" data-listing-file-modified-sort="1750483870069" data-listing-reading-time-sort="2" data-listing-word-count-sort="367">
 <div class="body">
 <h3 class="no-anchor listing-title">
-<a href="./posts/mortalitytables-and-dataframes/index.html" class="no-external">Using MortaltiyTables.jl with DataFrames</a>
+<a class="no-external" href="./posts/mortalitytables-and-dataframes/index.html">Using MortaltiyTables.jl with DataFrames</a>
 </h3>
-<div class="listing-subtitle">
-<a href="./posts/mortalitytables-and-dataframes/index.html" class="no-external"></a>
-</div>
 <div class="listing-categories">
-
-<div class="listing-category" onclick="window.quartoListingCategory('bW9ydGFsaXR5dGFibGVz'); return false;">mortalitytables</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('ZGF0YWZyYW1lcw=='); return false;">dataframes</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('dHV0b3JpYWw='); return false;">tutorial</div>
-
+<button class="listing-category" onclick="window.quartoListingCategory('bW9ydGFsaXR5dGFibGVz'); return false;" type="button">mortalitytables</button>
+<button class="listing-category" onclick="window.quartoListingCategory('ZGF0YWZyYW1lcw=='); return false;" type="button">dataframes</button>
+<button class="listing-category" onclick="window.quartoListingCategory('dHV0b3JpYWw='); return false;" type="button">tutorial</button>
 </div>
-<div class="delink listing-description"><a href="./posts/mortalitytables-and-dataframes/index.html" class="no-external">
+<div class="delink listing-description"><a class="no-external" href="./posts/mortalitytables-and-dataframes/index.html">
 MortalityTables.jl stores the rates in a very efficient manner as a collection of vectors indexed by attained age.
 </a></div>
 </div>
-<div class="metadata">
-<a href="./posts/mortalitytables-and-dataframes/index.html" class="no-external">
-</a>
 </div>
-</div>
-<div class="quarto-post image-right" data-index="12" data-categories="bW9kZWxpbmclMkNiZW5jaG1hcmslMkNhY3R1YXJ5dXRpbGl0aWVzJTJDdHV0b3JpYWw=" data-listing-file-modified-sort="1784337922985" data-listing-reading-time-sort="7" data-listing-word-count-sort="1397">
-<div class="thumbnail"><a href="./posts/nested-policy-projections/index.html" class="no-external">
-
-<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
-
-</a></div>
+<div class="quarto-post image-right" data-categories="bW9kZWxpbmclMkNiZW5jaG1hcmslMkNhY3R1YXJ5dXRpbGl0aWVzJTJDdHV0b3JpYWw=" data-index="12" data-listing-file-modified-sort="1784337922985" data-listing-reading-time-sort="7" data-listing-word-count-sort="1397">
 <div class="body">
 <h3 class="no-anchor listing-title">
-<a href="./posts/nested-policy-projections/index.html" class="no-external">Nested Projection Mechanics</a>
+<a class="no-external" href="./posts/nested-policy-projections/index.html">Nested Projection Mechanics</a>
 </h3>
-<div class="listing-subtitle">
-<a href="./posts/nested-policy-projections/index.html" class="no-external"></a>
-</div>
 <div class="listing-categories">
-
-<div class="listing-category" onclick="window.quartoListingCategory('bW9kZWxpbmc='); return false;">modeling</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('YmVuY2htYXJr'); return false;">benchmark</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('YWN0dWFyeXV0aWxpdGllcw=='); return false;">actuaryutilities</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('dHV0b3JpYWw='); return false;">tutorial</div>
-
+<button class="listing-category" onclick="window.quartoListingCategory('bW9kZWxpbmc='); return false;" type="button">modeling</button>
+<button class="listing-category" onclick="window.quartoListingCategory('YmVuY2htYXJr'); return false;" type="button">benchmark</button>
+<button class="listing-category" onclick="window.quartoListingCategory('YWN0dWFyeXV0aWxpdGllcw=='); return false;" type="button">actuaryutilities</button>
+<button class="listing-category" onclick="window.quartoListingCategory('dHV0b3JpYWw='); return false;" type="button">tutorial</button>
 </div>
-<div class="delink listing-description"><a href="./posts/nested-policy-projections/index.html" class="no-external">
+<div class="delink listing-description"><a class="no-external" href="./posts/nested-policy-projections/index.html">
 A simple example of how one could define a nested projection system. Includes the following examples: - Outer loop policy projections only - Outer + Inner loop policy…
 </a></div>
 </div>
-<div class="metadata">
-<a href="./posts/nested-policy-projections/index.html" class="no-external">
-</a>
 </div>
-</div>
-<div class="quarto-post image-right" data-index="13" data-categories="YWN0dWFyeXV0aWxpdGllcyUyQ3N0YXRpc3RpY3MlMkNtb2RlbGluZyUyQ3R1dG9yaWFs" data-listing-file-modified-sort="1791824398511" data-listing-reading-time-sort="22" data-listing-word-count-sort="4202">
-<div class="thumbnail"><a href="./posts/optimal-transport-capital/index.html" class="no-external">
-
-<p class="card-img-top"><img src="posts/optimal-transport-capital/index_files/figure-html/cell-6-output-1.svg"  class="thumbnail-image card-img"/></p>
-
+<div class="quarto-post image-right" data-categories="YWN0dWFyeXV0aWxpdGllcyUyQ3N0YXRpc3RpY3MlMkNtb2RlbGluZyUyQ3R1dG9yaWFs" data-index="13" data-listing-file-modified-sort="1792874602190" data-listing-reading-time-sort="22" data-listing-word-count-sort="4227">
+<div class="thumbnail"><a aria-hidden="true" class="no-external" href="./posts/optimal-transport-capital/index.html" tabindex="-1">
+<p class="card-img-top"><img alt="" class="thumbnail-image card-img" data-thumbnail-source="posts/optimal-transport-capital/index_files/figure-html/cell-6-output-1.svg" decoding="async" height="384" loading="lazy" sizes="176px" src="assets/thumbnails/8d3b16cba2ca0cf016df-320.webp" srcset="assets/thumbnails/8d3b16cba2ca0cf016df-320.webp 320w, assets/thumbnails/8d3b16cba2ca0cf016df-640.webp 640w" width="640"/></p>
 </a></div>
 <div class="body">
 <h3 class="no-anchor listing-title">
-<a href="./posts/optimal-transport-capital/index.html" class="no-external">How Much Capital Does Model Error Cost?</a>
+<a class="no-external" href="./posts/optimal-transport-capital/index.html">How Much Capital Does Model Error Cost?</a>
 </h3>
 <div class="listing-subtitle">
-<a href="./posts/optimal-transport-capital/index.html" class="no-external">Optimal transport for actuaries, continued: put a dollar budget on how wrong the loss model could be, and price the exact worst case that budget allows</a>
+<a class="no-external" href="./posts/optimal-transport-capital/index.html">Optimal transport for actuaries, continued: put a dollar budget on how wrong the loss model could be, and price the exact worst case that budget allows</a>
 </div>
 <div class="listing-categories">
-
-<div class="listing-category" onclick="window.quartoListingCategory('YWN0dWFyeXV0aWxpdGllcw=='); return false;">actuaryutilities</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('c3RhdGlzdGljcw=='); return false;">statistics</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('bW9kZWxpbmc='); return false;">modeling</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('dHV0b3JpYWw='); return false;">tutorial</div>
-
+<button class="listing-category" onclick="window.quartoListingCategory('YWN0dWFyeXV0aWxpdGllcw=='); return false;" type="button">actuaryutilities</button>
+<button class="listing-category" onclick="window.quartoListingCategory('c3RhdGlzdGljcw=='); return false;" type="button">statistics</button>
+<button class="listing-category" onclick="window.quartoListingCategory('bW9kZWxpbmc='); return false;" type="button">modeling</button>
+<button class="listing-category" onclick="window.quartoListingCategory('dHV0b3JpYWw='); return false;" type="button">tutorial</button>
 </div>
-<div class="delink listing-description"><a href="./posts/optimal-transport-capital/index.html" class="no-external">
+<div class="delink listing-description"><a class="no-external" href="./posts/optimal-transport-capital/index.html">
 Every capital number comes out of a model. Not out of the book of business — out of a model of the book. Everyone in the room knows the model is wrong; the argument is only…
 </a></div>
 </div>
-<div class="metadata">
-<a href="./posts/optimal-transport-capital/index.html" class="no-external">
-</a>
 </div>
-</div>
-<div class="quarto-post image-right" data-index="14" data-categories="YWN0dWFyeXV0aWxpdGllcyUyQ3N0YXRpc3RpY3MlMkNtb2RlbGluZyUyQ3R1dG9yaWFs" data-listing-file-modified-sort="1791828388042" data-listing-reading-time-sort="39" data-listing-word-count-sort="7657">
-<div class="thumbnail"><a href="./posts/optimal-transport/index.html" class="no-external">
-
-<p class="card-img-top"><img src="posts/optimal-transport/index_files/figure-html/cell-6-output-1.svg"  class="thumbnail-image card-img"/></p>
-
+<div class="quarto-post image-right" data-categories="YWN0dWFyeXV0aWxpdGllcyUyQ3N0YXRpc3RpY3MlMkNtb2RlbGluZyUyQ3R1dG9yaWFs" data-index="14" data-listing-file-modified-sort="1792874602129" data-listing-reading-time-sort="39" data-listing-word-count-sort="7771">
+<div class="thumbnail"><a aria-hidden="true" class="no-external" href="./posts/optimal-transport/index.html" tabindex="-1">
+<p class="card-img-top"><img alt="" class="thumbnail-image card-img" data-thumbnail-source="posts/optimal-transport/index_files/figure-html/cell-6-output-1.svg" decoding="async" height="384" loading="lazy" sizes="176px" src="assets/thumbnails/a6a737def3c1e574fb17-320.webp" srcset="assets/thumbnails/a6a737def3c1e574fb17-320.webp 320w, assets/thumbnails/a6a737def3c1e574fb17-640.webp 640w" width="640"/></p>
 </a></div>
 <div class="body">
 <h3 class="no-anchor listing-title">
-<a href="./posts/optimal-transport/index.html" class="no-external">How Far Did the Book Move?</a>
+<a class="no-external" href="./posts/optimal-transport/index.html">How Far Did the Book Move?</a>
 </h3>
 <div class="listing-subtitle">
-<a href="./posts/optimal-transport/index.html" class="no-external">Optimal transport for actuaries: sort the claims, measure the drift in dollars, and be honest about how wrong the model is</a>
+<a class="no-external" href="./posts/optimal-transport/index.html">Optimal transport for actuaries: sort the claims, measure the drift in dollars, and be honest about how wrong the model is</a>
 </div>
 <div class="listing-categories">
-
-<div class="listing-category" onclick="window.quartoListingCategory('YWN0dWFyeXV0aWxpdGllcw=='); return false;">actuaryutilities</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('c3RhdGlzdGljcw=='); return false;">statistics</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('bW9kZWxpbmc='); return false;">modeling</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('dHV0b3JpYWw='); return false;">tutorial</div>
-
+<button class="listing-category" onclick="window.quartoListingCategory('YWN0dWFyeXV0aWxpdGllcw=='); return false;" type="button">actuaryutilities</button>
+<button class="listing-category" onclick="window.quartoListingCategory('c3RhdGlzdGljcw=='); return false;" type="button">statistics</button>
+<button class="listing-category" onclick="window.quartoListingCategory('bW9kZWxpbmc='); return false;" type="button">modeling</button>
+<button class="listing-category" onclick="window.quartoListingCategory('dHV0b3JpYWw='); return false;" type="button">tutorial</button>
 </div>
-<div class="delink listing-description"><a href="./posts/optimal-transport/index.html" class="no-external">
+<div class="delink listing-description"><a class="no-external" href="./posts/optimal-transport/index.html">
 Somewhere right now, an actuary is in a meeting about whether the book of business has changed. There is a slide with two means on it. Someone remembers a bad claim from…
 </a></div>
 </div>
-<div class="metadata">
-<a href="./posts/optimal-transport/index.html" class="no-external">
-</a>
 </div>
-</div>
-<div class="quarto-post image-right" data-index="15" data-categories="bW9kZWxpbmclMkNzdGF0aXN0aWNzJTJDZXhwZXJpZW5jZS1hbmFseXNpcw==" data-listing-file-modified-sort="1784337922985" data-listing-reading-time-sort="7" data-listing-word-count-sort="1208">
-<div class="thumbnail"><a href="./posts/poisson-approximation/index.html" class="no-external">
-
-<p class="card-img-top"><img src="posts/poisson-approximation/index_files/figure-html/cell-7-output-1.svg"  class="thumbnail-image card-img"/></p>
-
+<div class="quarto-post image-right" data-categories="bW9kZWxpbmclMkNzdGF0aXN0aWNzJTJDZXhwZXJpZW5jZS1hbmFseXNpcw==" data-index="15" data-listing-file-modified-sort="1792874602248" data-listing-reading-time-sort="7" data-listing-word-count-sort="1225">
+<div class="thumbnail"><a aria-hidden="true" class="no-external" href="./posts/poisson-approximation/index.html" tabindex="-1">
+<p class="card-img-top"><img alt="" class="thumbnail-image card-img" data-thumbnail-source="posts/poisson-approximation/index_files/figure-html/cell-7-output-1.svg" decoding="async" height="384" loading="lazy" sizes="176px" src="assets/thumbnails/f97267804eb7c85e59d6-320.webp" srcset="assets/thumbnails/f97267804eb7c85e59d6-320.webp 320w, assets/thumbnails/f97267804eb7c85e59d6-640.webp 640w" width="640"/></p>
 </a></div>
 <div class="body">
 <h3 class="no-anchor listing-title">
-<a href="./posts/poisson-approximation/index.html" class="no-external">Poisson approximation to Binomial</a>
+<a class="no-external" href="./posts/poisson-approximation/index.html">Poisson approximation to Binomial</a>
 </h3>
-<div class="listing-subtitle">
-<a href="./posts/poisson-approximation/index.html" class="no-external"></a>
-</div>
 <div class="listing-categories">
-
-<div class="listing-category" onclick="window.quartoListingCategory('bW9kZWxpbmc='); return false;">modeling</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('c3RhdGlzdGljcw=='); return false;">statistics</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('ZXhwZXJpZW5jZS1hbmFseXNpcw=='); return false;">experience-analysis</div>
-
+<button class="listing-category" onclick="window.quartoListingCategory('bW9kZWxpbmc='); return false;" type="button">modeling</button>
+<button class="listing-category" onclick="window.quartoListingCategory('c3RhdGlzdGljcw=='); return false;" type="button">statistics</button>
+<button class="listing-category" onclick="window.quartoListingCategory('ZXhwZXJpZW5jZS1hbmFseXNpcw=='); return false;" type="button">experience-analysis</button>
 </div>
-<div class="delink listing-description"><a href="./posts/poisson-approximation/index.html" class="no-external">
+<div class="delink listing-description"><a class="no-external" href="./posts/poisson-approximation/index.html">
 This notebook explores using the Poissson approximation to the Binomial. This can be useful for a number of reasons:
 </a></div>
 </div>
-<div class="metadata">
-<a href="./posts/poisson-approximation/index.html" class="no-external">
-</a>
 </div>
-</div>
-<div class="quarto-post image-right" data-index="16" data-categories="bW9kZWxpbmclMkNkaWZmZXElMkNtb3J0YWxpdHl0YWJsZXMlMkNhY3R1YXJ5dXRpbGl0aWVzJTJDdHV0b3JpYWw=" data-listing-file-modified-sort="1791828909774" data-listing-reading-time-sort="8" data-listing-word-count-sort="1463">
-<div class="thumbnail"><a href="./posts/policy-diffeq/index.html" class="no-external">
-
-<p class="card-img-top"><img src="posts/policy-diffeq/index_files/figure-html/cell-7-output-1.svg"  class="thumbnail-image card-img"/></p>
-
+<div class="quarto-post image-right" data-categories="bW9kZWxpbmclMkNkaWZmZXElMkNtb3J0YWxpdHl0YWJsZXMlMkNhY3R1YXJ5dXRpbGl0aWVzJTJDdHV0b3JpYWw=" data-index="16" data-listing-file-modified-sort="1792874602345" data-listing-reading-time-sort="8" data-listing-word-count-sort="1493">
+<div class="thumbnail"><a aria-hidden="true" class="no-external" href="./posts/policy-diffeq/index.html" tabindex="-1">
+<p class="card-img-top"><img alt="" class="thumbnail-image card-img" data-thumbnail-source="posts/policy-diffeq/index_files/figure-html/cell-7-output-1.svg" decoding="async" height="384" loading="lazy" sizes="176px" src="assets/thumbnails/0809f450cdbc0807349f-320.webp" srcset="assets/thumbnails/0809f450cdbc0807349f-320.webp 320w, assets/thumbnails/0809f450cdbc0807349f-640.webp 640w" width="640"/></p>
 </a></div>
 <div class="body">
 <h3 class="no-anchor listing-title">
-<a href="./posts/policy-diffeq/index.html" class="no-external">Universal Life Policy Account Mechanics as a Differential Equation</a>
+<a class="no-external" href="./posts/policy-diffeq/index.html">Universal Life Policy Account Mechanics as a Differential Equation</a>
 </h3>
-<div class="listing-subtitle">
-<a href="./posts/policy-diffeq/index.html" class="no-external"></a>
-</div>
 <div class="listing-categories">
-
-<div class="listing-category" onclick="window.quartoListingCategory('bW9kZWxpbmc='); return false;">modeling</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('ZGlmZmVx'); return false;">diffeq</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('bW9ydGFsaXR5dGFibGVz'); return false;">mortalitytables</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('YWN0dWFyeXV0aWxpdGllcw=='); return false;">actuaryutilities</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('dHV0b3JpYWw='); return false;">tutorial</div>
-
+<button class="listing-category" onclick="window.quartoListingCategory('bW9kZWxpbmc='); return false;" type="button">modeling</button>
+<button class="listing-category" onclick="window.quartoListingCategory('ZGlmZmVx'); return false;" type="button">diffeq</button>
+<button class="listing-category" onclick="window.quartoListingCategory('bW9ydGFsaXR5dGFibGVz'); return false;" type="button">mortalitytables</button>
+<button class="listing-category" onclick="window.quartoListingCategory('YWN0dWFyeXV0aWxpdGllcw=='); return false;" type="button">actuaryutilities</button>
+<button class="listing-category" onclick="window.quartoListingCategory('dHV0b3JpYWw='); return false;" type="button">tutorial</button>
 </div>
-<div class="delink listing-description"><a href="./posts/policy-diffeq/index.html" class="no-external">
+<div class="delink listing-description"><a class="no-external" href="./posts/policy-diffeq/index.html">
 This demonstrates an example of defining an universal life policy value roll like a discrete differential equation.
 </a></div>
 </div>
-<div class="metadata">
-<a href="./posts/policy-diffeq/index.html" class="no-external">
-</a>
 </div>
-</div>
-<div class="quarto-post image-right" data-index="17" data-categories="bW9kZWxpbmclMkNiZW5jaG1hcmslMkN0dXRvcmlhbA==" data-listing-file-modified-sort="1791829839597" data-listing-reading-time-sort="6" data-listing-word-count-sort="1189">
-<div class="thumbnail"><a href="./posts/stochastic-mortality/index.html" class="no-external">
-
-<p class="card-img-top"><img src="posts/stochastic-mortality/index_files/figure-html/cell-14-output-1.svg"  class="thumbnail-image card-img"/></p>
-
+<div class="quarto-post image-right" data-categories="bW9kZWxpbmclMkNiZW5jaG1hcmslMkN0dXRvcmlhbA==" data-index="17" data-listing-file-modified-sort="1792874602351" data-listing-reading-time-sort="6" data-listing-word-count-sort="1199">
+<div class="thumbnail"><a aria-hidden="true" class="no-external" href="./posts/stochastic-mortality/index.html" tabindex="-1">
+<p class="card-img-top"><img alt="" class="thumbnail-image card-img" data-thumbnail-source="posts/stochastic-mortality/index_files/figure-html/cell-14-output-1.svg" decoding="async" height="384" loading="lazy" sizes="176px" src="assets/thumbnails/2ac55d343e9e765e3612-320.webp" srcset="assets/thumbnails/2ac55d343e9e765e3612-320.webp 320w, assets/thumbnails/2ac55d343e9e765e3612-640.webp 640w" width="640"/></p>
 </a></div>
 <div class="body">
 <h3 class="no-anchor listing-title">
-<a href="./posts/stochastic-mortality/index.html" class="no-external">Stochastic claims projections demo</a>
+<a class="no-external" href="./posts/stochastic-mortality/index.html">Stochastic claims projections demo</a>
 </h3>
-<div class="listing-subtitle">
-<a href="./posts/stochastic-mortality/index.html" class="no-external"></a>
-</div>
 <div class="listing-categories">
-
-<div class="listing-category" onclick="window.quartoListingCategory('bW9kZWxpbmc='); return false;">modeling</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('YmVuY2htYXJr'); return false;">benchmark</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('dHV0b3JpYWw='); return false;">tutorial</div>
-
+<button class="listing-category" onclick="window.quartoListingCategory('bW9kZWxpbmc='); return false;" type="button">modeling</button>
+<button class="listing-category" onclick="window.quartoListingCategory('YmVuY2htYXJr'); return false;" type="button">benchmark</button>
+<button class="listing-category" onclick="window.quartoListingCategory('dHV0b3JpYWw='); return false;" type="button">tutorial</button>
 </div>
-<div class="delink listing-description"><a href="./posts/stochastic-mortality/index.html" class="no-external">
+<div class="delink listing-description"><a class="no-external" href="./posts/stochastic-mortality/index.html">
 Define a datatype. Not strictly necessary, but will make extending the program with more functions easier.
 </a></div>
 </div>
-<div class="metadata">
-<a href="./posts/stochastic-mortality/index.html" class="no-external">
-</a>
 </div>
-</div>
-<div class="quarto-post image-right" data-index="18" data-categories="bW9kZWxpbmclMkNmaW5hbmNlbW9kZWxzJTJDdHV0b3JpYWw=" data-listing-file-modified-sort="1791828473643" data-listing-reading-time-sort="1" data-listing-word-count-sort="124">
-<div class="thumbnail"><a href="./posts/treasury-interactive/index.html" class="no-external">
-
-<p class="card-img-top"><img src="posts/treasury-interactive/PlutoScreenshot.png"  class="thumbnail-image card-img"/></p>
-
+<div class="quarto-post image-right" data-categories="bW9kZWxpbmclMkNmaW5hbmNlbW9kZWxzJTJDdHV0b3JpYWw=" data-index="18" data-listing-file-modified-sort="1792880894107" data-listing-reading-time-sort="1" data-listing-word-count-sort="134">
+<div class="thumbnail"><a aria-hidden="true" class="no-external" href="./posts/treasury-interactive/index.html" tabindex="-1">
+<p class="card-img-top"><img alt="" class="thumbnail-image card-img" data-thumbnail-source="posts/treasury-interactive/PlutoScreenshot.png" decoding="async" height="384" loading="lazy" sizes="176px" src="assets/thumbnails/c19aa261775bb81d0716-320.webp" srcset="assets/thumbnails/c19aa261775bb81d0716-320.webp 320w, assets/thumbnails/c19aa261775bb81d0716-640.webp 640w" width="640"/></p>
 </a></div>
 <div class="body">
 <h3 class="no-anchor listing-title">
-<a href="./posts/treasury-interactive/index.html" class="no-external">US Treasury Comparison Tool</a>
+<a class="no-external" href="./posts/treasury-interactive/index.html">US Treasury Comparison Tool</a>
 </h3>
-<div class="listing-subtitle">
-<a href="./posts/treasury-interactive/index.html" class="no-external"></a>
-</div>
 <div class="listing-categories">
-
-<div class="listing-category" onclick="window.quartoListingCategory('bW9kZWxpbmc='); return false;">modeling</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('ZmluYW5jZW1vZGVscw=='); return false;">financemodels</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('dHV0b3JpYWw='); return false;">tutorial</div>
-
+<button class="listing-category" onclick="window.quartoListingCategory('bW9kZWxpbmc='); return false;" type="button">modeling</button>
+<button class="listing-category" onclick="window.quartoListingCategory('ZmluYW5jZW1vZGVscw=='); return false;" type="button">financemodels</button>
+<button class="listing-category" onclick="window.quartoListingCategory('dHV0b3JpYWw='); return false;" type="button">tutorial</button>
 </div>
-<div class="delink listing-description"><a href="./posts/treasury-interactive/index.html" class="no-external">
+<div class="delink listing-description"><a class="no-external" href="./posts/treasury-interactive/index.html">
 The screenshot above shows a Pluto.jl notebook where you can select a pair of dates and find the change in the treasury curve’s zero rates.
 </a></div>
 </div>
-<div class="metadata">
-<a href="./posts/treasury-interactive/index.html" class="no-external">
-</a>
 </div>
-</div>
-<div class="quarto-post image-right" data-index="19" data-categories="ZGVzaWduJTJDY29kZQ==" data-listing-date-sort="1779602400000" data-listing-file-modified-sort="1784337922982" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="6" data-listing-word-count-sort="1158">
-<div class="thumbnail"><a href="./posts/cassette-futurism-theme/index.html" class="no-external">
-
-<p class="card-img-top"><img src="posts/cassette-futurism-theme/index_files/figure-html/cell-4-output-1.svg"  class="thumbnail-image card-img"/></p>
-
+<div class="quarto-post image-right" data-categories="ZGVzaWduJTJDY29kZQ==" data-index="19" data-listing-date-modified-sort="NaN" data-listing-date-sort="1779602400000" data-listing-file-modified-sort="1792874597539" data-listing-reading-time-sort="7" data-listing-word-count-sort="1240">
+<div class="thumbnail"><a aria-hidden="true" class="no-external" href="./posts/cassette-futurism-theme/index.html" tabindex="-1">
+<p class="card-img-top"><img alt="" class="thumbnail-image card-img" data-thumbnail-source="posts/cassette-futurism-theme/index_files/figure-html/cell-4-output-1.svg" decoding="async" height="384" loading="lazy" sizes="176px" src="assets/thumbnails/e9091216a091fedd67ad-320.webp" srcset="assets/thumbnails/e9091216a091fedd67ad-320.webp 320w, assets/thumbnails/e9091216a091fedd67ad-640.webp 640w" width="640"/></p>
 </a></div>
 <div class="body">
 <h3 class="no-anchor listing-title">
-<a href="./posts/cassette-futurism-theme/index.html" class="no-external">Cassette Futurism: a Makie theme preview</a>
+<a class="no-external" href="./posts/cassette-futurism-theme/index.html">Cassette Futurism: a Makie theme preview</a>
 </h3>
-<div class="listing-subtitle">
-<a href="./posts/cassette-futurism-theme/index.html" class="no-external"></a>
-</div>
 <div class="listing-categories">
-
-<div class="listing-category" onclick="window.quartoListingCategory('ZGVzaWdu'); return false;">design</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('Y29kZQ=='); return false;">code</div>
-
+<button class="listing-category" onclick="window.quartoListingCategory('ZGVzaWdu'); return false;" type="button">design</button>
+<button class="listing-category" onclick="window.quartoListingCategory('Y29kZQ=='); return false;" type="button">code</button>
 </div>
-<div class="delink listing-description"><a href="./posts/cassette-futurism-theme/index.html" class="no-external">
+<div class="delink listing-description"><a class="no-external" href="./posts/cassette-futurism-theme/index.html">
 A draft Makie theme exploring a <em>cassette futurism</em> / <em>NASA-punk</em> look for JuliaActuary plots: Apollo-era flight-plan manila, navy plotter-pen ink, instrument-panel accent…
 </a></div>
 </div>
 <div class="metadata">
-<a href="./posts/cassette-futurism-theme/index.html" class="no-external">
+<a class="no-external" href="./posts/cassette-futurism-theme/index.html">
 <div class="listing-date">
 May 24, 2026
 </div>
@@ -1332,8 +1035,4 @@ Alec Loudenback
   });
   </script>
 </div> <!-- /content -->
-
-
-
-
 </body></html>

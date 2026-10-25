@@ -1,13 +1,10 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
-<meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.16">
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-
-<meta name="description" content="JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.">
-
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml"><head>
+<meta charset="utf-8"/>
+<meta content="quarto-1.9.16" name="generator"/>
+<meta content="width=device-width, initial-scale=1.0, user-scalable=yes" name="viewport"/>
+<meta content="JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows." name="description"/>
 <title>How Much Capital Does Model Error Cost? – JuliaActuary</title>
 <style>
 code{white-space: pre-wrap;}
@@ -21,28 +18,61 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
-
-
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script crossorigin="anonymous" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script><script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="../../site_libs/quarto-nav/headroom.min.js"></script>
 <script src="../../site_libs/clipboard/clipboard.min.js"></script>
 <script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="../../">
-<link href="../..//assets/logos/favicon.ico" rel="icon">
+<meta content="../../" name="quarto:offset"/>
+<link href="../..//assets/logos/favicon.ico" rel="icon"/>
 <script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
-<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-a0731b9a3a5d496010872d775e5d9bc3.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet"/>
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-be14ce6d32a635bebd8f9e4e558f9eeb.css" id="quarto-text-highlighting-styles" rel="stylesheet"/>
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-98ac2d5361ef6f18cc0525d38bedc462.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet"/>
+<link append-hash="true" data-mode="light" href="../../site_libs/bootstrap/bootstrap-4a135b976b00f53a3a768ff94eb1df18.min.css" id="quarto-bootstrap" rel="stylesheet"/>
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -70,24 +100,14 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
-
+<script crossorigin="anonymous" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js"></script>
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&amp;family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&amp;display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../../assets/highlight/styles/github.min.css">
-<script src="../../assets/highlight/highlight.min.js"></script>
-<script src="../../assets/highlight/languages/julia.min.js"></script>
-<script src="../../assets/highlight/languages/julia-repl.min.js"></script>
-<script src="../../assets/highlight/languages/python.min.js"></script>
-<script src="../../assets/highlight/languages/r.min.js"></script>
-<script>hljs.highlightAll();</script>
-<script data-goatcounter="https://juliaactuary.goatcounter.com/count" async="" src="//gc.zgo.at/count.js"></script>
-
-  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
-
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" rel="stylesheet"/>
+<script async="" data-goatcounter="https://juliaactuary.goatcounter.com/count" src="//gc.zgo.at/count.js"></script>
+<script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 <script type="text/javascript">
 const typesetMath = (el) => {
   if (window.MathJax) {
@@ -114,183 +134,173 @@ window.Quarto = {
   typesetMath
 };
 </script>
-
-<link rel="stylesheet" href="../../styles.css">
+<link href="../../styles-c416c153cdf24884.css" rel="stylesheet"/>
 </head>
-
 <body class="nav-fixed fullcontent quarto-light">
-
 <div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top quarto-banner">
-    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
-      <div class="navbar-container container-fluid">
-      <div class="navbar-brand-container mx-auto">
-    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
-    <img src="../../assets/logos/android-chrome-512x512.png" alt="JuliaActuary Logo" class="navbar-logo light-content">
-    <img src="../../assets/logos/android-chrome-512x512.png" alt="JuliaActuary Logo" class="navbar-logo dark-content">
-    </a>
-    <a class="navbar-brand" href="../../index.html">
-    <span class="navbar-title">JuliaActuary</span>
-    </a>
-  </div>
-            <div id="quarto-search" class="" title="Search"></div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-  <span class="navbar-toggler-icon"></span>
-</button>
-          <div class="collapse navbar-collapse" id="navbarCollapse">
-            <ul class="navbar-nav navbar-nav-scroll ms-auto">
-  <li class="nav-item">
-    <a class="nav-link" href="../../packages.html"> 
-<span class="menu-text">Packages</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="https://docs.juliaactuary.org"> 
-<span class="menu-text">Docs</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="https://modernfinancialmodeling.com"> 
-<span class="menu-text">Book</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../learn.html"> 
-<span class="menu-text">Learn</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../examples.html"> 
-<span class="menu-text">Examples</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../benchmarks.html"> 
-<span class="menu-text">Benchmarks</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../community.html"> 
-<span class="menu-text">Community</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../blog.html"> 
-<span class="menu-text">Blog</span></a>
-  </li>  
-  <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/JuliaActuary"> <i class="bi bi-github" role="img">
-</i> 
-<span class="menu-text"></span></a>
-  </li>  
-  <li class="nav-item compact">
-    <a class="nav-link" href="../../all-posts.xml"> <i class="bi bi-rss" role="img">
-</i> 
-<span class="menu-text"></span></a>
-  </li>  
-</ul>
-          </div> <!-- /navcollapse -->
-            <div class="quarto-navbar-tools">
+<header class="headroom fixed-top quarto-banner" id="quarto-header">
+<nav class="navbar navbar-expand-lg" data-bs-theme="dark">
+<div class="navbar-container container-fluid">
+<div class="navbar-brand-container mx-auto">
+<a class="navbar-brand navbar-brand-logo" href="../../index.html">
+<img alt="JuliaActuary Logo" class="navbar-logo light-content" src="../../assets/logos/android-chrome-512x512.png"/>
+<img alt="JuliaActuary Logo" class="navbar-logo dark-content" src="../../assets/logos/android-chrome-512x512.png"/>
+</a>
+<a class="navbar-brand" href="../../index.html">
+<span class="navbar-title">JuliaActuary</span>
+</a>
 </div>
-      </div> <!-- /container-fluid -->
-    </nav>
+<div class="" id="quarto-search" title="Search"></div>
+<button aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-bs-target="#navbarCollapse" data-bs-toggle="collapse" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }" role="menu" type="button">
+<span class="navbar-toggler-icon"></span>
+</button>
+<div class="collapse navbar-collapse" id="navbarCollapse">
+<ul class="navbar-nav navbar-nav-scroll ms-auto">
+<li class="nav-item">
+<a class="nav-link" href="../../packages.html">
+<span class="menu-text">Packages</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="https://docs.juliaactuary.org">
+<span class="menu-text">Docs</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="../../learn.html">
+<span class="menu-text">Learn</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="../../examples.html">
+<span class="menu-text">Examples</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="../../community.html">
+<span class="menu-text">Community</span></a>
+</li>
+<li class="nav-item dropdown">
+<a aria-expanded="false" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" id="nav-menu-more" role="link">
+<span class="menu-text">More</span>
+</a>
+<ul aria-labelledby="nav-menu-more" class="dropdown-menu dropdown-menu-end">
+<li>
+<a class="dropdown-item" href="../../benchmarks.html">
+<span class="dropdown-text">Benchmarks</span></a>
+</li>
+<li>
+<a class="dropdown-item" href="../../blog.html">
+<span class="dropdown-text">Blog</span></a>
+</li>
+<li>
+<a class="dropdown-item" href="https://modernfinancialmodeling.com">
+<span class="dropdown-text">Book</span></a>
+</li>
+</ul>
+</li>
+<li class="nav-item compact">
+<a class="nav-link" href="https://github.com/JuliaActuary"> <i aria-label="JuliaActuary on GitHub" class="bi bi-github" role="img">
+</i>
+<span class="menu-text"></span></a>
+</li>
+<li class="nav-item compact">
+<a class="nav-link" href="../../all-posts.xml"> <i aria-label="RSS feed" class="bi bi-rss" role="img">
+</i>
+<span class="menu-text"></span></a>
+</li>
+</ul>
+</div> <!-- /navcollapse -->
+<div class="quarto-navbar-tools">
+</div>
+</div> <!-- /container-fluid -->
+</nav>
 </header>
 <!-- content -->
-<header id="title-block-header" class="quarto-title-block default page-columns page-full">
-  <div class="quarto-title-banner page-columns page-full">
-    <div class="quarto-title column-body">
-      <h1 class="title">How Much Capital Does Model Error Cost?</h1>
-            <p class="subtitle lead">Optimal transport for actuaries, continued: put a dollar budget on how wrong the loss model could be, and price the exact worst case that budget allows</p>
-                  <div>
-        <div class="description">
+<header class="quarto-title-block default page-columns page-full" id="title-block-header">
+<div class="quarto-title-banner page-columns page-full">
+<div class="quarto-title column-body">
+<h1 class="title">How Much Capital Does Model Error Cost?</h1>
+<p class="subtitle lead">Optimal transport for actuaries, continued: put a dollar budget on how wrong the loss model could be, and price the exact worst case that budget allows</p>
+<div>
+<div class="description">
           JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.
         </div>
-      </div>
-                          <div class="quarto-categories">
-                <div class="quarto-category">actuaryutilities</div>
-                <div class="quarto-category">statistics</div>
-                <div class="quarto-category">modeling</div>
-                <div class="quarto-category">tutorial</div>
-              </div>
-                  </div>
-  </div>
-    
-  
-  <div class="quarto-title-meta">
-
-      
-    
-      
-    </div>
-    
-  
-  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+</div>
+<div class="quarto-categories">
+<div class="quarto-category">actuaryutilities</div>
+<div class="quarto-category">statistics</div>
+<div class="quarto-category">modeling</div>
+<div class="quarto-category">tutorial</div>
+</div>
+</div>
+</div>
+<div class="quarto-title-meta">
+</div>
+</header><div class="quarto-container page-columns page-rows-contents page-layout-article page-navbar" id="quarto-content">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    
 <!-- main -->
 <main class="content quarto-banner-title-block" id="quarto-document-content">
-
-
-
-
-
 <p>Every capital number comes out of a model. Not out of the book of business — out of a model of the book. Everyone in the room knows the model is wrong; the argument is only ever about how wrong, and whether it matters. Usually that argument ends with a margin: some percentage, set years ago, defended in a memo nobody can find.</p>
 <p>This post runs the argument with arithmetic instead. The plan has three steps. First, say in dollars how far from the truth our loss model could plausibly be. Second, consider every distribution that close to our model — not a handful of hand-built stress scenarios, <em>all</em> of them. Third, report the worst capital requirement any of them produces. Step two sounds impossible. It turns out to be a one-line formula.</p>
 <p>The tool is <code>robustvalue</code>, from the optimal-transport toolkit in <a href="https://github.com/JuliaActuary/ActuaryUtilities.jl">ActuaryUtilities.jl</a>. The previous post, <a href="../../posts/optimal-transport/index.html"><em>How Far Did the Book Move?</em></a>, used the toolkit’s other three functions to measure a stop-loss book’s severity drift. You do not need to have read it — everything here is explained from scratch — but the book is the same one, and the numbers carry over.</p>
-<section id="the-book-briefly" class="level2">
+<section class="level2" id="the-book-briefly">
 <h2 class="anchored" data-anchor-id="the-book-briefly">The book, briefly</h2>
 <p>Two simulated policy years of a stop-loss claimant file. Each row is one claimant’s ground-up claims for the year, and the carrier reimburses whatever part of each total exceeds a $250,000 deductible. Because the data are simulated, we know the truth exactly: claims come from the mixture laws written out in the code below, and the current year really is worse than the prior one — more cost, thicker tail. To each year we fit the model a busy pricing actuary might actually use, a single lognormal. The fit is deliberately imperfect. That is the point. We are about to charge for the imperfection.</p>
-<div id="4" class="cell" data-execution_count="1">
+<div class="cell" data-execution_count="1" id="4">
 <details class="code-fold">
 <summary>setup and the book from part one (same code, same seeds)</summary>
-<pre class="julia cell-code"><code>using ActuaryUtilities, Distributions, DataFrames, Statistics, Random, Printf
-using CairoMakie
-
-# site plot theme (cassette futurism)
-include(joinpath(@__DIR__, "..", "..", "assets", "themes", "cassette_futurism.jl"))
-set_theme!(cassette_futurism_theme())
-
-# formatting helpers for prose and tables
-comma(x) = replace(@sprintf("%.0f", x), r"(?&lt;=[0-9])(?=(?:[0-9]{3})+$)" =&gt; ",")
-usd(x) = "\$" * comma(x)
-musd(x) = @sprintf("\$%.1fM", x / 1e6)
-pct1(x) = @sprintf("%+.1f%%", 100x)
-
-prior_law = MixtureModel(
-    [LogNormal(log(62_000), 0.95), LogNormal(log(650_000), 0.55)],
-    [0.960, 0.040])
-current_law = MixtureModel(
-    [LogNormal(log(62_000) + log(1.085), 0.97), LogNormal(log(650_000) + log(1.085), 0.55)],
-    [0.945, 0.055])
-claims_prior = rand(Xoshiro(1001), prior_law, 1620)     # prior policy year
-claims_current = rand(Xoshiro(2001), current_law, 1775) # current policy year
-ded = 250_000
-
-fit_prior = fit_mle(LogNormal, claims_prior)
-fit_current = fit_mle(LogNormal, claims_current)
-
-w1 = wasserstein(claims_prior, claims_current)          # a year of drift, per claimant
-misfit = wasserstein(fit_current, claims_current)       # model error, per claimant
-basis_move = wasserstein(fit_prior, fit_current)        # a year of drift, basis to basis
-
-DataFrame([
-    (year = "prior", n = length(claims_prior), mean = usd(mean(claims_prior)),
-        fitted_basis = @sprintf("LogNormal(%.3f, %.3f)", fit_prior.μ, fit_prior.σ)),
-    (year = "current", n = length(claims_current), mean = usd(mean(claims_current)),
-        fitted_basis = @sprintf("LogNormal(%.3f, %.3f)", fit_current.μ, fit_current.σ)),
-])</code></pre>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a aria-hidden="true" href="#cb1-1" tabindex="-1"></a><span class="im">using</span> <span class="bu">ActuaryUtilities</span>, <span class="bu">Distributions</span>, <span class="bu">DataFrames</span>, <span class="bu">Statistics</span>, <span class="bu">Random</span>, <span class="bu">Printf</span></span>
+<span id="cb1-2"><a aria-hidden="true" href="#cb1-2" tabindex="-1"></a><span class="im">using</span> <span class="bu">CairoMakie</span></span>
+<span id="cb1-3"><a aria-hidden="true" href="#cb1-3" tabindex="-1"></a></span>
+<span id="cb1-4"><a aria-hidden="true" href="#cb1-4" tabindex="-1"></a><span class="co"># site plot theme (cassette futurism)</span></span>
+<span id="cb1-5"><a aria-hidden="true" href="#cb1-5" tabindex="-1"></a><span class="fu">include</span>(<span class="fu">joinpath</span>(<span class="pp">@__DIR__</span>, <span class="st">".."</span>, <span class="st">".."</span>, <span class="st">"assets"</span>, <span class="st">"themes"</span>, <span class="st">"cassette_futurism.jl"</span>))</span>
+<span id="cb1-6"><a aria-hidden="true" href="#cb1-6" tabindex="-1"></a><span class="fu">set_theme!</span>(<span class="fu">cassette_futurism_theme</span>())</span>
+<span id="cb1-7"><a aria-hidden="true" href="#cb1-7" tabindex="-1"></a></span>
+<span id="cb1-8"><a aria-hidden="true" href="#cb1-8" tabindex="-1"></a><span class="co"># formatting helpers for prose and tables</span></span>
+<span id="cb1-9"><a aria-hidden="true" href="#cb1-9" tabindex="-1"></a><span class="fu">comma</span>(x) <span class="op">=</span> <span class="fu">replace</span>(<span class="pp">@sprintf</span>(<span class="st">"%.0f"</span>, x), <span class="st">r"</span><span class="ch">(?</span><span class="st">&lt;=</span><span class="ch">[</span><span class="st">0-9</span><span class="ch">])(?</span><span class="st">=</span><span class="ch">(?</span><span class="st">:</span><span class="ch">[</span><span class="st">0-9</span><span class="ch">]</span><span class="st">{3}</span><span class="ch">)</span><span class="sc">+$</span><span class="st">)" =&gt; ",")</span></span>
+<span id="cb1-10"><a aria-hidden="true" href="#cb1-10" tabindex="-1"></a>usd<span class="ch">(</span><span class="st">x</span><span class="ch">)</span><span class="st"> = "</span><span class="op">\$</span><span class="st">" * comma(x)</span></span>
+<span id="cb1-11"><a aria-hidden="true" href="#cb1-11" tabindex="-1"></a><span class="fu">musd</span>(x) <span class="op">=</span> <span class="pp">@sprintf</span>(<span class="st">"\$%.1fM"</span>, x <span class="op">/</span> <span class="fl">1e6</span>)</span>
+<span id="cb1-12"><a aria-hidden="true" href="#cb1-12" tabindex="-1"></a><span class="fu">pct1</span>(x) <span class="op">=</span> <span class="pp">@sprintf</span>(<span class="st">"%+.1f%%"</span>, <span class="fl">100</span>x)</span>
+<span id="cb1-13"><a aria-hidden="true" href="#cb1-13" tabindex="-1"></a></span>
+<span id="cb1-14"><a aria-hidden="true" href="#cb1-14" tabindex="-1"></a>prior_law <span class="op">=</span> <span class="fu">MixtureModel</span>(</span>
+<span id="cb1-15"><a aria-hidden="true" href="#cb1-15" tabindex="-1"></a>    [<span class="fu">LogNormal</span>(<span class="fu">log</span>(<span class="fl">62_000</span>), <span class="fl">0.95</span>), <span class="fu">LogNormal</span>(<span class="fu">log</span>(<span class="fl">650_000</span>), <span class="fl">0.55</span>)],</span>
+<span id="cb1-16"><a aria-hidden="true" href="#cb1-16" tabindex="-1"></a>    [<span class="fl">0.960</span>, <span class="fl">0.040</span>])</span>
+<span id="cb1-17"><a aria-hidden="true" href="#cb1-17" tabindex="-1"></a>current_law <span class="op">=</span> <span class="fu">MixtureModel</span>(</span>
+<span id="cb1-18"><a aria-hidden="true" href="#cb1-18" tabindex="-1"></a>    [<span class="fu">LogNormal</span>(<span class="fu">log</span>(<span class="fl">62_000</span>) <span class="op">+</span> <span class="fu">log</span>(<span class="fl">1.085</span>), <span class="fl">0.97</span>), <span class="fu">LogNormal</span>(<span class="fu">log</span>(<span class="fl">650_000</span>) <span class="op">+</span> <span class="fu">log</span>(<span class="fl">1.085</span>), <span class="fl">0.55</span>)],</span>
+<span id="cb1-19"><a aria-hidden="true" href="#cb1-19" tabindex="-1"></a>    [<span class="fl">0.945</span>, <span class="fl">0.055</span>])</span>
+<span id="cb1-20"><a aria-hidden="true" href="#cb1-20" tabindex="-1"></a>claims_prior <span class="op">=</span> <span class="fu">rand</span>(<span class="fu">Xoshiro</span>(<span class="fl">1001</span>), prior_law, <span class="fl">1620</span>)     <span class="co"># prior policy year</span></span>
+<span id="cb1-21"><a aria-hidden="true" href="#cb1-21" tabindex="-1"></a>claims_current <span class="op">=</span> <span class="fu">rand</span>(<span class="fu">Xoshiro</span>(<span class="fl">2001</span>), current_law, <span class="fl">1775</span>) <span class="co"># current policy year</span></span>
+<span id="cb1-22"><a aria-hidden="true" href="#cb1-22" tabindex="-1"></a>ded <span class="op">=</span> <span class="fl">250_000</span></span>
+<span id="cb1-23"><a aria-hidden="true" href="#cb1-23" tabindex="-1"></a></span>
+<span id="cb1-24"><a aria-hidden="true" href="#cb1-24" tabindex="-1"></a>fit_prior <span class="op">=</span> <span class="fu">fit_mle</span>(LogNormal, claims_prior)</span>
+<span id="cb1-25"><a aria-hidden="true" href="#cb1-25" tabindex="-1"></a>fit_current <span class="op">=</span> <span class="fu">fit_mle</span>(LogNormal, claims_current)</span>
+<span id="cb1-26"><a aria-hidden="true" href="#cb1-26" tabindex="-1"></a></span>
+<span id="cb1-27"><a aria-hidden="true" href="#cb1-27" tabindex="-1"></a>w1 <span class="op">=</span> <span class="fu">wasserstein</span>(claims_prior, claims_current)          <span class="co"># a year of drift, per claimant</span></span>
+<span id="cb1-28"><a aria-hidden="true" href="#cb1-28" tabindex="-1"></a>misfit <span class="op">=</span> <span class="fu">wasserstein</span>(fit_current, claims_current)       <span class="co"># model error, per claimant</span></span>
+<span id="cb1-29"><a aria-hidden="true" href="#cb1-29" tabindex="-1"></a>basis_move <span class="op">=</span> <span class="fu">wasserstein</span>(fit_prior, fit_current)        <span class="co"># a year of drift, basis to basis</span></span>
+<span id="cb1-30"><a aria-hidden="true" href="#cb1-30" tabindex="-1"></a></span>
+<span id="cb1-31"><a aria-hidden="true" href="#cb1-31" tabindex="-1"></a><span class="fu">DataFrame</span>([</span>
+<span id="cb1-32"><a aria-hidden="true" href="#cb1-32" tabindex="-1"></a>    (year <span class="op">=</span> <span class="st">"prior"</span>, n <span class="op">=</span> <span class="fu">length</span>(claims_prior), mean <span class="op">=</span> <span class="fu">usd</span>(<span class="fu">mean</span>(claims_prior)),</span>
+<span id="cb1-33"><a aria-hidden="true" href="#cb1-33" tabindex="-1"></a>        fitted_basis <span class="op">=</span> <span class="pp">@sprintf</span>(<span class="st">"LogNormal(%.3f, %.3f)"</span>, fit_prior.μ, fit_prior.σ)),</span>
+<span id="cb1-34"><a aria-hidden="true" href="#cb1-34" tabindex="-1"></a>    (year <span class="op">=</span> <span class="st">"current"</span>, n <span class="op">=</span> <span class="fu">length</span>(claims_current), mean <span class="op">=</span> <span class="fu">usd</span>(<span class="fu">mean</span>(claims_current)),</span>
+<span id="cb1-35"><a aria-hidden="true" href="#cb1-35" tabindex="-1"></a>        fitted_basis <span class="op">=</span> <span class="pp">@sprintf</span>(<span class="st">"LogNormal(%.3f, %.3f)"</span>, fit_current.μ, fit_current.σ)),</span>
+<span id="cb1-36"><a aria-hidden="true" href="#cb1-36" tabindex="-1"></a>])</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div><div style="float: left;"><span>2×4 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
-<table class="data-frame caption-top table table-sm table-striped small">
+<div aria-label="Scrollable data table" class="table-scroll" role="region" tabindex="0"><table class="data-frame caption-top table table-sm table-striped small">
 <thead>
 <tr class="columnLabelRow header">
 <th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">year</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">n</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">mean</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">fitted_basis</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;">year</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;">n</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;">mean</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;">fitted_basis</th>
 </tr>
 <tr class="columnLabelRow even">
 <th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="String">String</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="String">String</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="String">String</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;" title="String">String</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;" title="Int64">Int64</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;" title="String">String</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;" title="String">String</th>
 </tr>
 </thead>
 <tbody>
@@ -309,76 +319,76 @@ DataFrame([
 <td style="text-align: left;">LogNormal(11.262, 1.094)</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 </div>
 </div>
 </div>
 <p>Two measurements from part one set the scale of the problem, and both come from the same simple idea, so here it is in one breath. To measure how far apart two loss distributions are: line both up smallest to largest, match them rank for rank — smallest with smallest, median with median, worst with worst — and average the dollar gaps between partners. That average is the <strong>Wasserstein distance</strong>. It is the cost, in dollars per claimant, of rearranging one distribution into the other. Not a test statistic, not a p-value. A moving bill.</p>
 <p>By that ruler, the fitted lognormal misses the very claims it was fitted to by $20,039 per claimant. And the fitted model moved $21,776 per claimant between last year’s fit and this year’s. Read those together: on this dollar ruler, model misfit is about as large as one year of basis movement. Whether the two matter <em>equally</em> is a separate question — a distance says how much probability moved, not where, and tails and layers care where — but the order of magnitude is the point. The error we ignore by trusting the model is the size of an error nobody would knowingly ignore: pricing on a year-old book. This post is about pricing it instead.</p>
 </section>
-<section id="capital-lives-in-the-aggregate" class="level2">
+<section class="level2" id="capital-lives-in-the-aggregate">
 <h2 class="anchored" data-anchor-id="capital-lives-in-the-aggregate">Capital lives in the aggregate</h2>
 <p>Part one worked claimant by claimant. Capital does not. A capital requirement attaches to the whole year at once: how many claimants show up, times what each one costs, keeping only the part above the deductible. So we need an annual aggregate loss model, and ours is the ordinary textbook one. Claim counts are Poisson, centered on the current year’s volume. Each claim is a draw from the fitted lognormal. The carrier pays each claimant’s excess over $250,000, and the year’s total ceded loss is the number we track.</p>
 <p>Count the assumptions in that paragraph: Poisson counts, independent claims, frequency frozen at this year’s level, and severities from a lognormal we just measured missing by $20,039 a head. None of this is embarrassing — it is how capital models are actually built. But every item is a choice, and for the last one we hold the error in dollars. Keep that number in view. The rest of the post is about what it costs.</p>
 <p>One definitional note before any formulas. The standard we will price is <span class="math inline">\(\text{CTE}_\alpha\)</span> of the annual ceded loss — the average of the worst <span class="math inline">\(1-\alpha\)</span> share of years. Strictly, that is a required-asset level: a provision against the year’s loss. It is not quite economic capital, which in most frameworks is this provision <em>minus</em> whatever expected loss, premium, or reserve is already funded against it. We stay with the provision throughout, because it is the quantity the robust theorem prices exactly. Netting a funded amount off afterward is simple subtraction — but the worst case of a <em>difference</em> over a ball of models is a different optimization, and this post does not solve that one.</p>
-<div id="6" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>function aggregate_ceded(rng, sev_law, λ, d, nsims)
-    map(1:nsims) do _
-        sum(max(rand(rng, sev_law) - d, 0.0) for _ in 1:rand(rng, Poisson(λ)); init = 0.0)
-    end
-end
-
-λ = length(claims_current)   # claimants per policy year, held fixed across bases
-agg_prior_basis = aggregate_ceded(Xoshiro(11), fit_prior, λ, ded, 40_000)
-agg_current_basis = aggregate_ceded(Xoshiro(12), fit_current, λ, ded, 40_000)
-
-println("aggregate ceded mean: prior basis ", musd(mean(agg_prior_basis)),
-    " → current basis ", musd(mean(agg_current_basis)))</code></pre>
+<div class="cell" data-execution_count="1" id="6">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a aria-hidden="true" href="#cb2-1" tabindex="-1"></a><span class="kw">function</span> <span class="fu">aggregate_ceded</span>(rng, sev_law, λ, d, nsims)</span>
+<span id="cb2-2"><a aria-hidden="true" href="#cb2-2" tabindex="-1"></a>    <span class="fu">map</span>(<span class="fl">1</span><span class="op">:</span>nsims) <span class="cf">do</span> _</span>
+<span id="cb2-3"><a aria-hidden="true" href="#cb2-3" tabindex="-1"></a>        <span class="fu">sum</span>(<span class="fu">max</span>(<span class="fu">rand</span>(rng, sev_law) <span class="op">-</span> d, <span class="fl">0.0</span>) <span class="cf">for</span> _ <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu">rand</span>(rng, <span class="fu">Poisson</span>(λ)); init <span class="op">=</span> <span class="fl">0.0</span>)</span>
+<span id="cb2-4"><a aria-hidden="true" href="#cb2-4" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb2-5"><a aria-hidden="true" href="#cb2-5" tabindex="-1"></a><span class="cf">end</span></span>
+<span id="cb2-6"><a aria-hidden="true" href="#cb2-6" tabindex="-1"></a></span>
+<span id="cb2-7"><a aria-hidden="true" href="#cb2-7" tabindex="-1"></a>λ <span class="op">=</span> <span class="fu">length</span>(claims_current)   <span class="co"># claimants per policy year, held fixed across bases</span></span>
+<span id="cb2-8"><a aria-hidden="true" href="#cb2-8" tabindex="-1"></a>agg_prior_basis <span class="op">=</span> <span class="fu">aggregate_ceded</span>(<span class="fu">Xoshiro</span>(<span class="fl">11</span>), fit_prior, λ, ded, <span class="fl">40_000</span>)</span>
+<span id="cb2-9"><a aria-hidden="true" href="#cb2-9" tabindex="-1"></a>agg_current_basis <span class="op">=</span> <span class="fu">aggregate_ceded</span>(<span class="fu">Xoshiro</span>(<span class="fl">12</span>), fit_current, λ, ded, <span class="fl">40_000</span>)</span>
+<span id="cb2-10"><a aria-hidden="true" href="#cb2-10" tabindex="-1"></a></span>
+<span id="cb2-11"><a aria-hidden="true" href="#cb2-11" tabindex="-1"></a><span class="fu">println</span>(<span class="st">"aggregate ceded mean: prior basis "</span>, <span class="fu">musd</span>(<span class="fu">mean</span>(agg_prior_basis)),</span>
+<span id="cb2-12"><a aria-hidden="true" href="#cb2-12" tabindex="-1"></a>    <span class="st">" → current basis "</span>, <span class="fu">musd</span>(<span class="fu">mean</span>(agg_current_basis)))</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>aggregate ceded mean: prior basis $41.4M → current basis $64.7M</code></pre>
 </div>
 </div>
 </section>
-<section id="how-wrong-could-we-be-let-last-year-answer" class="level2">
+<section class="level2" id="how-wrong-could-we-be-let-last-year-answer">
 <h2 class="anchored" data-anchor-id="how-wrong-could-we-be-let-last-year-answer">How wrong could we be? Let last year answer</h2>
 <p>To charge for model error we need one number first: a dollar budget for how far from the truth the model might sit. The code calls this number the <code>radius</code> — the picture behind the name arrives in the next section — and nothing in mathematics will choose it for us. Once it is chosen, the worst-case arithmetic downstream is exact, conditional on the distribution we apply it to. So we want an anchor everyone can see, and history offers one.</p>
 <p>Here is the logic behind that anchor, spelled out, because it is easy to miss. A capital model is never estimated on the year it is used for: you fit on data through the last cycle and apply the result to the next one. And part one established that this book genuinely moves between cycles. Put those two facts together. At the moment the model is used, it is already wrong by <em>at least</em> however far the book has moved since the data it was fitted on — even if the fitting were flawless. Staleness is not an exotic failure mode; it is the default one. So “how wrong could our model be?” contains a measurable special case: “how wrong does one cycle of staleness make it?” That one, our own filing cabinet can answer.</p>
 <p>We hold two fitted models: last year’s and this year’s. Run the identical aggregate machine under each — same counts, same deductible, only the severity model swapped — and we get two versions of the annual loss distribution: what the model said a year looked like <em>then</em>, and what it says <em>now</em>. Then measure the distance between those two annual distributions, with the same sorting idea as before and one small change: square the gaps before averaging, then un-square at the end. Squaring makes the distance pay extra attention to large rearrangements. That version is called <span class="math inline">\(W_2\)</span>; the plain average is <span class="math inline">\(W_1\)</span>. The formula coming in the next section is built for <span class="math inline">\(W_2\)</span>, so that is what we compute:</p>
-<div id="8" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>radius = wasserstein(agg_prior_basis, agg_current_basis; p = 2)
-println("W₂ between the two aggregate laws (one repricing cycle of drift): ", musd(radius))</code></pre>
+<div class="cell" data-execution_count="1" id="8">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a aria-hidden="true" href="#cb4-1" tabindex="-1"></a>radius <span class="op">=</span> <span class="fu">wasserstein</span>(agg_prior_basis, agg_current_basis; p <span class="op">=</span> <span class="fl">2</span>)</span>
+<span id="cb4-2"><a aria-hidden="true" href="#cb4-2" tabindex="-1"></a><span class="fu">println</span>(<span class="st">"W₂ between the two aggregate laws (one repricing cycle of drift): "</span>, <span class="fu">musd</span>(radius))</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>W₂ between the two aggregate laws (one repricing cycle of drift): $23.4M</code></pre>
 </div>
 </div>
 <p>(For these two distributions the squaring hardly matters — <span class="math inline">\(W_2\)</span> comes to $23.4M against a <span class="math inline">\(W_1\)</span> of $23.3M — because they differ mostly by a plain shift, and every version of the distance scores a plain shift the same. Still, say which one you used; the formula depends on it.) FIG. 01 shows the two annual distributions and the gap between them.</p>
-<div id="10" class="cell" data-execution_count="1">
+<div class="cell" data-execution_count="1" id="10">
 <details class="code-fold">
 <summary>FIG. 01 plotting code</summary>
-<pre class="julia cell-code"><code>let
-    f = Figure(size = (860, 400))
-    ax = Axis(f[1, 1], title = "FIG. 01 — ONE CYCLE OF DRIFT, IN AGGREGATE DOLLARS",
-        xlabel = "annual ceded loss, \$ millions", ylabel = "density")
-    density!(ax, agg_prior_basis ./ 1e6; color = (CF_BLUE, 0.40), label = "prior-year basis")
-    density!(ax, agg_current_basis ./ 1e6; color = (CF_RED, 0.40), label = "current-year basis")
-    text!(ax, (mean(agg_prior_basis) + mean(agg_current_basis)) / 2e6, 0.012;
-        text = "basis moved\nW₂ ≈ " * musd(radius), align = (:center, :bottom),
-        fontsize = 12, color = CF_INK)
-    axislegend(ax; position = :rt)
-    f
-end</code></pre>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a aria-hidden="true" href="#cb6-1" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb6-2"><a aria-hidden="true" href="#cb6-2" tabindex="-1"></a>    f <span class="op">=</span> <span class="fu">Figure</span>(size <span class="op">=</span> (<span class="fl">860</span>, <span class="fl">400</span>))</span>
+<span id="cb6-3"><a aria-hidden="true" href="#cb6-3" tabindex="-1"></a>    ax <span class="op">=</span> <span class="fu">Axis</span>(f[<span class="fl">1</span>, <span class="fl">1</span>], title <span class="op">=</span> <span class="st">"FIG. 01 — ONE CYCLE OF DRIFT, IN AGGREGATE DOLLARS"</span>,</span>
+<span id="cb6-4"><a aria-hidden="true" href="#cb6-4" tabindex="-1"></a>        xlabel <span class="op">=</span> <span class="st">"annual ceded loss, \$ millions"</span>, ylabel <span class="op">=</span> <span class="st">"density"</span>)</span>
+<span id="cb6-5"><a aria-hidden="true" href="#cb6-5" tabindex="-1"></a>    <span class="fu">density!</span>(ax, agg_prior_basis <span class="op">./</span> <span class="fl">1e6</span>; color <span class="op">=</span> (CF_BLUE, <span class="fl">0.40</span>), label <span class="op">=</span> <span class="st">"prior-year basis"</span>)</span>
+<span id="cb6-6"><a aria-hidden="true" href="#cb6-6" tabindex="-1"></a>    <span class="fu">density!</span>(ax, agg_current_basis <span class="op">./</span> <span class="fl">1e6</span>; color <span class="op">=</span> (CF_RED, <span class="fl">0.40</span>), label <span class="op">=</span> <span class="st">"current-year basis"</span>)</span>
+<span id="cb6-7"><a aria-hidden="true" href="#cb6-7" tabindex="-1"></a>    <span class="fu">text!</span>(ax, (<span class="fu">mean</span>(agg_prior_basis) <span class="op">+</span> <span class="fu">mean</span>(agg_current_basis)) <span class="op">/</span> <span class="fl">2e6</span>, <span class="fl">0.012</span>;</span>
+<span id="cb6-8"><a aria-hidden="true" href="#cb6-8" tabindex="-1"></a>        text <span class="op">=</span> <span class="st">"basis moved</span><span class="sc">\n</span><span class="st">W₂ ≈ "</span> <span class="op">*</span> <span class="fu">musd</span>(radius), align <span class="op">=</span> (<span class="op">:</span>center, <span class="op">:</span>bottom),</span>
+<span id="cb6-9"><a aria-hidden="true" href="#cb6-9" tabindex="-1"></a>        fontsize <span class="op">=</span> <span class="fl">12</span>, color <span class="op">=</span> CF_INK)</span>
+<span id="cb6-10"><a aria-hidden="true" href="#cb6-10" tabindex="-1"></a>    <span class="fu">axislegend</span>(ax; position <span class="op">=</span> <span class="op">:</span>rt)</span>
+<span id="cb6-11"><a aria-hidden="true" href="#cb6-11" tabindex="-1"></a>    f</span>
+<span id="cb6-12"><a aria-hidden="true" href="#cb6-12" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-6-output-1.svg" class="img-fluid figure-img"></p>
+<p><img alt="Annual aggregate ceded-loss densities using prior-year and current-year severity assumptions." class="img-fluid figure-img" decoding="async" height="400" loading="eager" src="index_files/figure-html/cell-6-output-1.svg" width="860"/></p>
 </figure>
 </div>
 </div>
 </div>
 <p>So one year of model movement rearranged the annual loss distribution by $23.4M. That is our candidate radius, and it is worth being precise about what kind of number it is. It is <em>anchored</em>: a measured dollar figure, from our own book, that anyone can recompute. It is not <em>proven</em>: we watched the model move exactly once, and one observation is a hint, not a distribution of model error. And it is <em>partial</em>: the movement is a difference of two fitted models, so any error the two fits share cancels out of it entirely. Both of our lognormals understate the mixture’s tail in the same direction — that is the $20,039-per-claimant misfit from part one — and none of that shared wrongness appears in the $23.4M. This radius prices the world moving while the model lags; it is blind to the model having been wrong all along. What the anchor really buys is a better argument. “Why is the margin 10%?” has no answer. “Do we believe next year’s model error is bigger or smaller than the move we just measured?” — that, an appointed actuary can argue about with a straight face.</p>
 </section>
-<section id="the-worst-case-in-the-ball" class="level2">
+<section class="level2" id="the-worst-case-in-the-ball">
 <h2 class="anchored" data-anchor-id="the-worst-case-in-the-ball">The worst case in the ball</h2>
 <p>We now have both ingredients: a fitted model of the annual loss, and a radius of $23.4M. The last idea to build is the set of every distribution the radius allows. Take our fitted model as a center point. Collect every probability distribution whose <span class="math inline">\(W_2\)</span> distance from it is at most <span class="math inline">\(r\)</span> — every candidate for what the truth could be, if the model is wrong by no more than <span class="math inline">\(r\)</span> of rearrangement. That set is called a <em>ball</em>, for the usual geometric reason: a center, a radius, and everything inside.</p>
 <p>It helps to test a few candidate members. A distribution identical to ours but shifted $10M higher is inside the ball, because shifting every outcome by $10M costs exactly $10M of rearrangement — less than <span class="math inline">\(r\)</span>. The same distribution shifted $40M is outside. A version with our middle but a heavier tail is inside or outside depending on how many rearrangement dollars that heavier tail requires. And many members are shapes no actuary would ever propose, because the ball contains <em>everything</em> within <span class="math inline">\(r\)</span>, plausible or not. That is deliberate. The next step defends against all of it at once.</p>
@@ -389,37 +399,37 @@ end</code></pre>
 <p>Read it term by term. The left side is the largest <span class="math inline">\(\text{CTE}_\alpha\)</span> that any member <span class="math inline">\(\nu\)</span> of the ball can produce — a supremum over every distribution within distance <span class="math inline">\(r\)</span> of our fitted <span class="math inline">\(\hat{P}\)</span>. The right side is our own model’s CTE, plus a charge: the radius, times a multiplier <span class="math inline">\((1-\alpha)^{-1/2}\)</span> that depends on the tail level and nothing else. The shape of our distribution does not appear in the charge. Neither does the deductible, the claim count, or anything else about the book.</p>
 <p>Before trusting a formula that compact, compute one case by hand. Take <span class="math inline">\(\alpha = 0.95\)</span>. Then <span class="math inline">\(1-\alpha\)</span> is <span class="math inline">\(0.05\)</span>, its square root is about <span class="math inline">\(0.224\)</span>, and the multiplier is one over that: about 4.47. The charge is the multiplier times the radius — 4.47 × $23.4M ≈ $104.7M. Added to the base CTE(0.95) of $81.1M, the worst case comes to $185.8M. Every entry in the table below is this same arithmetic at a different tail level or a different radius, nothing more. One precision note for the audit file: <em>exact</em> means exact for the distribution supplied. What we supply is a 40,000-year simulation, so the base CTE and the radius are Monte Carlo estimates of the underlying compound-Poisson laws — seeded and repeatable, but still estimates.</p>
 <p>It is also worth knowing <em>which</em> member of the ball produces that worst case, because the answer is simple. Start from our own distribution. Leave the bottom 95% of outcomes exactly where they are. Take the worst 5% and slide all of them further out by one common amount, spending rearrangement budget as they go. Only a twentieth of the probability is moving, so each dollar of budget produces several dollars of slide — about 4.47 of them, which is where the multiplier comes from. When the budget is gone, the average of the worst 5% has risen by exactly the charge. That distribution — ours, with the tail slid out — is the worst member of the ball; nothing stranger does better. (The aside at the end of the next section walks through why sliding the tail is the cheapest attack.)</p>
-<p>One more reading of the equals sign, because it matters for how much to trust the number. Equality means no slack: there is no distribution inside the ball, however oddly shaped, whose CTE exceeds the right-hand side.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> If the theorem gave only an upper bound, we would have to wonder how much of the charge was real exposure and how much was looseness in the mathematics. It gives an equality, so the charge is the exposure — conditional, as always, on the ball.</p>
+<p>One more reading of the equals sign, because it matters for how much to trust the number. Equality means no slack: there is no distribution inside the ball, however oddly shaped, whose CTE exceeds the right-hand side.<a class="footnote-ref" href="#fn1" id="fnref1" role="doc-noteref"><sup>1</sup></a> If the theorem gave only an upper bound, we would have to wonder how much of the charge was real exposure and how much was looseness in the mathematics. It gives an equality, so the charge is the exposure — conditional, as always, on the ball.</p>
 <p>Here it is on our book. The radius is a choice, so the table prices more than one choice: the full measured $23.4M, half of it, and a quarter of it. The fractions are not scenarios with stories attached — they are the same formula at smaller radii, which is exactly the sensitivity a decision-maker should ask to see.</p>
-<div id="12" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>αs = [0.90, 0.95, 0.99]
-worst(α, r) = musd(robustvalue(CTE(α), agg_current_basis; radius = r))
-DataFrame(
-    "CTE level" =&gt; αs,
-    "base CTE" =&gt; [musd(CTE(α)(agg_current_basis)) for α in αs],
-    "worst case at ¼ radius" =&gt; [worst(α, radius / 4) for α in αs],
-    "at ½ radius" =&gt; [worst(α, radius / 2) for α in αs],
-    "at full radius" =&gt; [worst(α, radius) for α in αs],
-)</code></pre>
+<div class="cell" data-execution_count="1" id="12">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a aria-hidden="true" href="#cb7-1" tabindex="-1"></a>αs <span class="op">=</span> [<span class="fl">0.90</span>, <span class="fl">0.95</span>, <span class="fl">0.99</span>]</span>
+<span id="cb7-2"><a aria-hidden="true" href="#cb7-2" tabindex="-1"></a><span class="fu">worst</span>(α, r) <span class="op">=</span> <span class="fu">musd</span>(<span class="fu">robustvalue</span>(<span class="fu">CTE</span>(α), agg_current_basis; radius <span class="op">=</span> r))</span>
+<span id="cb7-3"><a aria-hidden="true" href="#cb7-3" tabindex="-1"></a><span class="fu">DataFrame</span>(</span>
+<span id="cb7-4"><a aria-hidden="true" href="#cb7-4" tabindex="-1"></a>    <span class="st">"CTE level"</span> <span class="op">=&gt;</span> αs,</span>
+<span id="cb7-5"><a aria-hidden="true" href="#cb7-5" tabindex="-1"></a>    <span class="st">"base CTE"</span> <span class="op">=&gt;</span> [<span class="fu">musd</span>(<span class="fu">CTE</span>(α)(agg_current_basis)) for α <span class="kw">in</span> αs],</span>
+<span id="cb7-6"><a aria-hidden="true" href="#cb7-6" tabindex="-1"></a>    <span class="st">"worst case at ¼ radius"</span> <span class="op">=&gt;</span> [<span class="fu">worst</span>(α, radius <span class="op">/</span> <span class="fl">4</span>) for α <span class="kw">in</span> αs],</span>
+<span id="cb7-7"><a aria-hidden="true" href="#cb7-7" tabindex="-1"></a>    <span class="st">"at ½ radius"</span> <span class="op">=&gt;</span> [<span class="fu">worst</span>(α, radius <span class="op">/</span> <span class="fl">2</span>) for α <span class="kw">in</span> αs],</span>
+<span id="cb7-8"><a aria-hidden="true" href="#cb7-8" tabindex="-1"></a>    <span class="st">"at full radius"</span> <span class="op">=&gt;</span> [<span class="fu">worst</span>(α, radius) for α <span class="kw">in</span> αs],</span>
+<span id="cb7-9"><a aria-hidden="true" href="#cb7-9" tabindex="-1"></a>)</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div><div style="float: left;"><span>3×5 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
-<table class="data-frame caption-top table table-sm table-striped small">
+<div aria-label="Scrollable data table" class="table-scroll" role="region" tabindex="0"><table class="data-frame caption-top table table-sm table-striped small">
 <thead>
 <tr class="columnLabelRow header">
 <th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">CTE level</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">base CTE</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">worst case at ¼ radius</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">at ½ radius</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">at full radius</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;">CTE level</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;">base CTE</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;">worst case at ¼ radius</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;">at ½ radius</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;">at full radius</th>
 </tr>
 <tr class="columnLabelRow even">
 <th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="String">String</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="String">String</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="String">String</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="String">String</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;" title="Float64">Float64</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;" title="String">String</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;" title="String">String</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;" title="String">String</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;" title="String">String</th>
 </tr>
 </thead>
 <tbody>
@@ -448,15 +458,15 @@ DataFrame(
 <td style="text-align: left;">$321.3M</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 </div>
 </div>
 </div>
 <p>The same function call works for other risk measures, but the guarantee weakens in the way the footnote describes: for anything other than CTE, <code>robustvalue</code> reports what one specific bad distribution inside the ball produces — a floor under the worst case, not the worst case itself:</p>
-<div id="14" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>println("VaR(0.95): base ", musd(VaR(0.95)(agg_current_basis)),
-    "  → at least ", musd(robustvalue(VaR(0.95), agg_current_basis; radius)),
-    " somewhere in the full-radius ball")</code></pre>
+<div class="cell" data-execution_count="1" id="14">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a aria-hidden="true" href="#cb8-1" tabindex="-1"></a><span class="fu">println</span>(<span class="st">"VaR(0.95): base "</span>, <span class="fu">musd</span>(<span class="fu">VaR</span>(<span class="fl">0.95</span>)(agg_current_basis)),</span>
+<span id="cb8-2"><a aria-hidden="true" href="#cb8-2" tabindex="-1"></a>    <span class="st">"  → at least "</span>, <span class="fu">musd</span>(<span class="fu">robustvalue</span>(<span class="fu">VaR</span>(<span class="fl">0.95</span>), agg_current_basis; radius)),</span>
+<span id="cb8-3"><a aria-hidden="true" href="#cb8-3" tabindex="-1"></a>    <span class="st">" somewhere in the full-radius ball"</span>)</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>VaR(0.95): base $77.2M  → at least $181.9M somewhere in the full-radius ball</code></pre>
 </div>
@@ -466,33 +476,33 @@ DataFrame(
 <p><em>Aside: robustness is not insurance.</em> It is tempting to hear “worst case over every distribution in the ball” as “we are now safe.” Notice what actually happened: we swapped one assumption for another. “The model is right” became “the model is wrong by at most <span class="math inline">\(r\)</span>.” The second assumption is weaker, which is why it is more often true — but it is still an assumption, and nothing inside the model can verify it. What the robust value buys is honesty about which assumption you are leaning on, plus exact arithmetic once you commit to it. The trust has not been eliminated. It has been moved into the radius, where it is one dollar figure a committee can look at.</p>
 </blockquote>
 </section>
-<section id="the-fragile-tail" class="level2">
+<section class="level2" id="the-fragile-tail">
 <h2 class="anchored" data-anchor-id="the-fragile-tail">The fragile tail</h2>
 <p>The multiplier <span class="math inline">\((1-\alpha)^{-1/2}\)</span> deserves a slower look, because it is where tail levels get expensive. Compute it at the three standard levels. At <span class="math inline">\(\alpha = 0.90\)</span>, <span class="math inline">\(1-\alpha\)</span> is <span class="math inline">\(0.10\)</span>, its square root is about <span class="math inline">\(0.316\)</span>, and the multiplier is about 3.2. At <span class="math inline">\(\alpha = 0.95\)</span> the same steps give 4.5. At <span class="math inline">\(\alpha = 0.99\)</span> they give 10.</p>
 <p>Now put those in dollars. The same $23.4M radius adds $74.1M of model-error charge at CTE(0.90), $104.7M at CTE(0.95), and $234.2M at CTE(0.99). Moving a capital standard from the 90th percentile to the 99th changes neither the model nor the radius, yet it roughly triples the price of every dollar of model error. And because the multiplier contains only <span class="math inline">\(\alpha\)</span>, none of this is a fact about our book. It is the same arithmetic for anyone whose capital metric lives deep in the tail of a model they know is imperfect.</p>
-<div id="16" class="cell" data-execution_count="1">
+<div class="cell" data-execution_count="1" id="16">
 <details class="code-fold">
 <summary>FIG. 02 plotting code</summary>
-<pre class="julia cell-code"><code>let
-    f = Figure(size = (860, 430))
-    ax = Axis(f[1, 1], title = "FIG. 02 — CAPITAL UNDER MODEL ERROR: RADIUS × TAIL LEVEL",
-        xlabel = "CTE level α", ylabel = "required assets, \$ millions")
-    αs = range(0.85, 0.99; length = 57)
-    base_curve = [CTE(α)(agg_current_basis) for α in αs]
-    lines!(ax, αs, base_curve ./ 1e6; color = CF_INK, linewidth = 2.0, label = "base CTE")
-    for (r, clr, lbl) in [(radius / 4, CF_AMBER, "robust CTE, ¼ radius"),
-        (radius / 2, CF_ORANGE, "robust CTE, ½ radius"), (radius, CF_RED, "robust CTE, full radius")]
-        lines!(ax, αs, [robustvalue(CTE(α), agg_current_basis; radius = r) for α in αs] ./ 1e6;
-            color = clr, linewidth = 2.0, label = lbl)
-    end
-    axislegend(ax; position = :lt)
-    f
-end</code></pre>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb10-1"><a aria-hidden="true" href="#cb10-1" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb10-2"><a aria-hidden="true" href="#cb10-2" tabindex="-1"></a>    f <span class="op">=</span> <span class="fu">Figure</span>(size <span class="op">=</span> (<span class="fl">860</span>, <span class="fl">430</span>))</span>
+<span id="cb10-3"><a aria-hidden="true" href="#cb10-3" tabindex="-1"></a>    ax <span class="op">=</span> <span class="fu">Axis</span>(f[<span class="fl">1</span>, <span class="fl">1</span>], title <span class="op">=</span> <span class="st">"FIG. 02 — CAPITAL UNDER MODEL ERROR: RADIUS × TAIL LEVEL"</span>,</span>
+<span id="cb10-4"><a aria-hidden="true" href="#cb10-4" tabindex="-1"></a>        xlabel <span class="op">=</span> <span class="st">"CTE level α"</span>, ylabel <span class="op">=</span> <span class="st">"required assets, \$ millions"</span>)</span>
+<span id="cb10-5"><a aria-hidden="true" href="#cb10-5" tabindex="-1"></a>    αs <span class="op">=</span> <span class="fu">range</span>(<span class="fl">0.85</span>, <span class="fl">0.99</span>; length <span class="op">=</span> <span class="fl">57</span>)</span>
+<span id="cb10-6"><a aria-hidden="true" href="#cb10-6" tabindex="-1"></a>    base_curve <span class="op">=</span> [<span class="fu">CTE</span>(α)(agg_current_basis) for α <span class="kw">in</span> αs]</span>
+<span id="cb10-7"><a aria-hidden="true" href="#cb10-7" tabindex="-1"></a>    <span class="fu">lines!</span>(ax, αs, base_curve <span class="op">./</span> <span class="fl">1e6</span>; color <span class="op">=</span> CF_INK, linewidth <span class="op">=</span> <span class="fl">2.0</span>, label <span class="op">=</span> <span class="st">"base CTE"</span>)</span>
+<span id="cb10-8"><a aria-hidden="true" href="#cb10-8" tabindex="-1"></a>    <span class="cf">for</span> (r, clr, lbl) <span class="kw">in</span> [(radius <span class="op">/</span> <span class="fl">4</span>, CF_AMBER, <span class="st">"robust CTE, ¼ radius"</span>),</span>
+<span id="cb10-9"><a aria-hidden="true" href="#cb10-9" tabindex="-1"></a>        (radius <span class="op">/</span> <span class="fl">2</span>, CF_ORANGE, <span class="st">"robust CTE, ½ radius"</span>), (radius, CF_RED, <span class="st">"robust CTE, full radius"</span>)]</span>
+<span id="cb10-10"><a aria-hidden="true" href="#cb10-10" tabindex="-1"></a>        <span class="fu">lines!</span>(ax, αs, [<span class="fu">robustvalue</span>(<span class="fu">CTE</span>(α), agg_current_basis; radius <span class="op">=</span> r) for α <span class="kw">in</span> αs] <span class="op">./</span> <span class="fl">1e6</span>;</span>
+<span id="cb10-11"><a aria-hidden="true" href="#cb10-11" tabindex="-1"></a>            color <span class="op">=</span> clr, linewidth <span class="op">=</span> <span class="fl">2.0</span>, label <span class="op">=</span> lbl)</span>
+<span id="cb10-12"><a aria-hidden="true" href="#cb10-12" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb10-13"><a aria-hidden="true" href="#cb10-13" tabindex="-1"></a>    <span class="fu">axislegend</span>(ax; position <span class="op">=</span> <span class="op">:</span>lt)</span>
+<span id="cb10-14"><a aria-hidden="true" href="#cb10-14" tabindex="-1"></a>    f</span>
+<span id="cb10-15"><a aria-hidden="true" href="#cb10-15" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-9-output-1.svg" class="img-fluid figure-img"></p>
+<p><img alt="Required assets by conditional-tail-expectation level under the base model and different model-error radii." class="img-fluid figure-img" decoding="async" height="430" loading="lazy" src="index_files/figure-html/cell-9-output-1.svg" width="860"/></p>
 </figure>
 </div>
 </div>
@@ -502,11 +512,11 @@ end</code></pre>
 <p><em>Under the hood: where <span class="math inline">\((1-\alpha)^{-1/2}\)</span> comes from.</em> Sliding the worst <span class="math inline">\(1-\alpha\)</span> slice of outcomes further out by the same amount <span class="math inline">\(\delta\)</span> moves only a sliver of the distribution, so it is cheap: the <span class="math inline">\(W_2\)</span> cost works out to <span class="math inline">\(\delta\sqrt{1-\alpha}\)</span>, because the rest of the distribution never moves. Spend the whole radius <span class="math inline">\(r\)</span> and the slice slides out by <span class="math inline">\(\delta = r/\sqrt{1-\alpha}\)</span> — which is exactly how much the tail average rises. The thinner the slice, the cheaper the attack and the longer the slide. A 99th-percentile promise concentrates everything in the thinnest slice, which is why it carries the largest multiplier.</p>
 </blockquote>
 </section>
-<section id="who-sets-the-radius" class="level2">
+<section class="level2" id="who-sets-the-radius">
 <h2 class="anchored" data-anchor-id="who-sets-the-radius">Who sets the radius?</h2>
 <p>No theorem sets <span class="math inline">\(r\)</span>. What the formula gives back in exchange is linearity: half the radius, half the loading, so the ¼-, ½-, and full-radius columns of the table are the entire sensitivity analysis. Reasonable anchors, from harder to easier to argue with: the measured cost of one year of model movement, which is what we used — it prices staleness. The model-to-data misfit from part one, pushed through the same aggregate machine — the natural companion, because it prices exactly the shared structural error that a difference of two fits cancels; the two anchors answer complementary halves of “how wrong?”, the model lagging the world and the model missing the world. Or the rearrangement cost of a named scenario somebody in the room actually fears. Each produces a dollar figure a committee can dispute. The disputing is the point. The radius is where the judgment lives, and the table is what owning that judgment looks like.</p>
 </section>
-<section id="what-this-doesnt-establish" class="level2">
+<section class="level2" id="what-this-doesnt-establish">
 <h2 class="anchored" data-anchor-id="what-this-doesnt-establish">What this doesn’t establish</h2>
 <p>In descending order of importance.</p>
 <p>The worst case is conditional. Every robust number above is the worst among distributions within <span class="math inline">\(r\)</span> of the fitted model. The truth has signed no agreement to stay in the ball.</p>
@@ -514,12 +524,12 @@ end</code></pre>
 <p>The anchor is one observation, and a one-sided one. We watched the model move once and called that size a radius — an argument-starter, not a distribution of model error — and because the movement is a difference of two fits, error the fits share is invisible to it. A longer history, several scenarios priced the same way, or a misfit-based companion radius would anchor it better.</p>
 <p>And everything is one-dimensional. The ball lives on the scalar annual total; the tail-slide inside <code>robustvalue</code> is one-dimensional to its bones. Joint moves — frequency with severity, several treaties at once — need multivariate transport, and the closed forms stop there.</p>
 </section>
-<section id="the-meeting-one-floor-up" class="level2">
+<section class="level2" id="the-meeting-one-floor-up">
 <h2 class="anchored" data-anchor-id="the-meeting-one-floor-up">The meeting, one floor up</h2>
 <p>The CFO’s question was: how wrong can the model be before the capital number is wrong too? Here is the answer with no theater in it. Base CTE(0.95), straight from the model: $81.1M. Measured movement of the model over one year: $23.4M. If next year’s model error is no bigger than that, the worst the true CTE(0.95) can be is $185.8M — base plus 4.47 for every dollar of radius, because that is what a 95th-percentile promise pays for model error. And one sentence rides along with the number: if the model is wrong by more than the radius, this figure promises nothing.</p>
 <p>That sentence is the improvement. The old margin promised nothing either. It just never said so.</p>
 </section>
-<section id="further-reading" class="level2">
+<section class="level2" id="further-reading">
 <h2 class="anchored" data-anchor-id="further-reading">Further reading</h2>
 <ul>
 <li>Daniel Kuhn, Peyman Mohajerin Esfahani, Viet Anh Nguyen &amp; Soroosh Shafieezadeh-Abadeh (2019), <a href="https://arxiv.org/abs/1908.08729"><em>Wasserstein Distributionally Robust Optimization</em></a> — the theory behind the exact worst case, including the CTE stability bound used here.</li>
@@ -528,19 +538,14 @@ end</code></pre>
 <li><a href="../../posts/optimal-transport/index.html"><em>How Far Did the Book Move?</em></a> — part one: the drift measurement, its checks (a permutation screen and a generative Turing model), and the stress this post’s radius is anchored to.</li>
 </ul>
 </section>
-<section id="footnotes-and-colophon" class="level2">
+<section class="level2" id="footnotes-and-colophon">
 <h2 class="anchored" data-anchor-id="footnotes-and-colophon">Footnotes and colophon</h2>
 <p>Everything here — the regenerated book, both aggregate simulations, the robust values, the figures — comes from the code shown, run at render time in Julia with <a href="https://github.com/JuliaActuary/ActuaryUtilities.jl">ActuaryUtilities.jl</a>, <a href="https://github.com/JuliaStats/Distributions.jl">Distributions.jl</a>, and <a href="https://makie.org">Makie.jl</a>. The 80,000 simulated policy years take about a second; the transport calls are sorting. Every random draw is seeded, so the numbers reproduce to the digit.</p>
 <p><em>Disclosure: this post was written by AI (Anthropic’s Claude) under the direction of and with review by Alec Loudenback.</em></p>
-
-
 </section>
-
-
-<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
-
+<div class="default" id="quarto-appendix"><section class="footnotes footnotes-end-of-document" id="footnotes" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
 <ol>
-<li id="fn1"><p>This closed form is special to CTE. For other measures — <code>VaR</code>, <code>WangTransform</code>, custom measures — <code>robustvalue</code> instead builds one concrete bad distribution inside the ball and evaluates the measure on it. That answers “at least this bad”: a floor under the worst case, not the worst case itself. If the number feeds capital, keep those two phrases straight.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn1"><p>This closed form is special to CTE. For other measures — <code>VaR</code>, <code>WangTransform</code>, custom measures — <code>robustvalue</code> instead builds one concrete bad distribution inside the ball and evaluates the measure on it. That answers “at least this bad”: a floor under the worst case, not the worst case itself. If the number feeds capital, keep those two phrases straight.<a class="footnote-back" href="#fnref1" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -944,8 +949,4 @@ end</code></pre>
   });
   </script>
 </div> <!-- /content -->
-
-
-
-
 </body></html>

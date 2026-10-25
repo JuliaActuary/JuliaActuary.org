@@ -1,13 +1,10 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
-<meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.16">
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-
-<meta name="description" content="JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.">
-
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml"><head>
+<meta charset="utf-8"/>
+<meta content="quarto-1.9.16" name="generator"/>
+<meta content="width=device-width, initial-scale=1.0, user-scalable=yes" name="viewport"/>
+<meta content="JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows." name="description"/>
 <title>Using MortaltiyTables.jl with DataFrames – JuliaActuary</title>
 <style>
 code{white-space: pre-wrap;}
@@ -21,28 +18,61 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
-
-
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script crossorigin="anonymous" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script><script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="../../site_libs/quarto-nav/headroom.min.js"></script>
 <script src="../../site_libs/clipboard/clipboard.min.js"></script>
 <script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="../../">
-<link href="../..//assets/logos/favicon.ico" rel="icon">
+<meta content="../../" name="quarto:offset"/>
+<link href="../..//assets/logos/favicon.ico" rel="icon"/>
 <script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
-<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-a0731b9a3a5d496010872d775e5d9bc3.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet"/>
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-be14ce6d32a635bebd8f9e4e558f9eeb.css" id="quarto-text-highlighting-styles" rel="stylesheet"/>
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-98ac2d5361ef6f18cc0525d38bedc462.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet"/>
+<link append-hash="true" data-mode="light" href="../../site_libs/bootstrap/bootstrap-4a135b976b00f53a3a768ff94eb1df18.min.css" id="quarto-bootstrap" rel="stylesheet"/>
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -70,148 +100,129 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
-
+<script crossorigin="anonymous" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js"></script>
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&amp;family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&amp;display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../../assets/highlight/styles/github.min.css">
-<script src="../../assets/highlight/highlight.min.js"></script>
-<script src="../../assets/highlight/languages/julia.min.js"></script>
-<script src="../../assets/highlight/languages/julia-repl.min.js"></script>
-<script src="../../assets/highlight/languages/python.min.js"></script>
-<script src="../../assets/highlight/languages/r.min.js"></script>
-<script>hljs.highlightAll();</script>
-<script data-goatcounter="https://juliaactuary.goatcounter.com/count" async="" src="//gc.zgo.at/count.js"></script>
-
-
-<link rel="stylesheet" href="../../styles.css">
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" rel="stylesheet"/>
+<script async="" data-goatcounter="https://juliaactuary.goatcounter.com/count" src="//gc.zgo.at/count.js"></script>
+<link href="../../styles-c416c153cdf24884.css" rel="stylesheet"/>
 </head>
-
 <body class="nav-fixed fullcontent quarto-light">
-
 <div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top quarto-banner">
-    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
-      <div class="navbar-container container-fluid">
-      <div class="navbar-brand-container mx-auto">
-    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
-    <img src="../../assets/logos/android-chrome-512x512.png" alt="JuliaActuary Logo" class="navbar-logo light-content">
-    <img src="../../assets/logos/android-chrome-512x512.png" alt="JuliaActuary Logo" class="navbar-logo dark-content">
-    </a>
-    <a class="navbar-brand" href="../../index.html">
-    <span class="navbar-title">JuliaActuary</span>
-    </a>
-  </div>
-            <div id="quarto-search" class="" title="Search"></div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-  <span class="navbar-toggler-icon"></span>
-</button>
-          <div class="collapse navbar-collapse" id="navbarCollapse">
-            <ul class="navbar-nav navbar-nav-scroll ms-auto">
-  <li class="nav-item">
-    <a class="nav-link" href="../../packages.html"> 
-<span class="menu-text">Packages</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="https://docs.juliaactuary.org"> 
-<span class="menu-text">Docs</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="https://modernfinancialmodeling.com"> 
-<span class="menu-text">Book</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../learn.html"> 
-<span class="menu-text">Learn</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../examples.html"> 
-<span class="menu-text">Examples</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../benchmarks.html"> 
-<span class="menu-text">Benchmarks</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../community.html"> 
-<span class="menu-text">Community</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../blog.html"> 
-<span class="menu-text">Blog</span></a>
-  </li>  
-  <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/JuliaActuary"> <i class="bi bi-github" role="img">
-</i> 
-<span class="menu-text"></span></a>
-  </li>  
-  <li class="nav-item compact">
-    <a class="nav-link" href="../../all-posts.xml"> <i class="bi bi-rss" role="img">
-</i> 
-<span class="menu-text"></span></a>
-  </li>  
-</ul>
-          </div> <!-- /navcollapse -->
-            <div class="quarto-navbar-tools">
+<header class="headroom fixed-top quarto-banner" id="quarto-header">
+<nav class="navbar navbar-expand-lg" data-bs-theme="dark">
+<div class="navbar-container container-fluid">
+<div class="navbar-brand-container mx-auto">
+<a class="navbar-brand navbar-brand-logo" href="../../index.html">
+<img alt="JuliaActuary Logo" class="navbar-logo light-content" src="../../assets/logos/android-chrome-512x512.png"/>
+<img alt="JuliaActuary Logo" class="navbar-logo dark-content" src="../../assets/logos/android-chrome-512x512.png"/>
+</a>
+<a class="navbar-brand" href="../../index.html">
+<span class="navbar-title">JuliaActuary</span>
+</a>
 </div>
-      </div> <!-- /container-fluid -->
-    </nav>
+<div class="" id="quarto-search" title="Search"></div>
+<button aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-bs-target="#navbarCollapse" data-bs-toggle="collapse" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }" role="menu" type="button">
+<span class="navbar-toggler-icon"></span>
+</button>
+<div class="collapse navbar-collapse" id="navbarCollapse">
+<ul class="navbar-nav navbar-nav-scroll ms-auto">
+<li class="nav-item">
+<a class="nav-link" href="../../packages.html">
+<span class="menu-text">Packages</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="https://docs.juliaactuary.org">
+<span class="menu-text">Docs</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="../../learn.html">
+<span class="menu-text">Learn</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="../../examples.html">
+<span class="menu-text">Examples</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="../../community.html">
+<span class="menu-text">Community</span></a>
+</li>
+<li class="nav-item dropdown">
+<a aria-expanded="false" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" id="nav-menu-more" role="link">
+<span class="menu-text">More</span>
+</a>
+<ul aria-labelledby="nav-menu-more" class="dropdown-menu dropdown-menu-end">
+<li>
+<a class="dropdown-item" href="../../benchmarks.html">
+<span class="dropdown-text">Benchmarks</span></a>
+</li>
+<li>
+<a class="dropdown-item" href="../../blog.html">
+<span class="dropdown-text">Blog</span></a>
+</li>
+<li>
+<a class="dropdown-item" href="https://modernfinancialmodeling.com">
+<span class="dropdown-text">Book</span></a>
+</li>
+</ul>
+</li>
+<li class="nav-item compact">
+<a class="nav-link" href="https://github.com/JuliaActuary"> <i aria-label="JuliaActuary on GitHub" class="bi bi-github" role="img">
+</i>
+<span class="menu-text"></span></a>
+</li>
+<li class="nav-item compact">
+<a class="nav-link" href="../../all-posts.xml"> <i aria-label="RSS feed" class="bi bi-rss" role="img">
+</i>
+<span class="menu-text"></span></a>
+</li>
+</ul>
+</div> <!-- /navcollapse -->
+<div class="quarto-navbar-tools">
+</div>
+</div> <!-- /container-fluid -->
+</nav>
 </header>
 <!-- content -->
-<header id="title-block-header" class="quarto-title-block default page-columns page-full">
-  <div class="quarto-title-banner page-columns page-full">
-    <div class="quarto-title column-body">
-      <h1 class="title">Using MortaltiyTables.jl with DataFrames</h1>
-                  <div>
-        <div class="description">
+<header class="quarto-title-block default page-columns page-full" id="title-block-header">
+<div class="quarto-title-banner page-columns page-full">
+<div class="quarto-title column-body">
+<h1 class="title">Using MortaltiyTables.jl with DataFrames</h1>
+<div>
+<div class="description">
           JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.
         </div>
-      </div>
-                          <div class="quarto-categories">
-                <div class="quarto-category">mortalitytables</div>
-                <div class="quarto-category">dataframes</div>
-                <div class="quarto-category">tutorial</div>
-              </div>
-                  </div>
-  </div>
-    
-  
-  <div class="quarto-title-meta">
-
-      
-    
-      
-    </div>
-    
-  
-  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+</div>
+<div class="quarto-categories">
+<div class="quarto-category">mortalitytables</div>
+<div class="quarto-category">dataframes</div>
+<div class="quarto-category">tutorial</div>
+</div>
+</div>
+</div>
+<div class="quarto-title-meta">
+</div>
+</header><div class="quarto-container page-columns page-rows-contents page-layout-article page-navbar" id="quarto-content">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    
 <!-- main -->
 <main class="content quarto-banner-title-block" id="quarto-document-content">
-
-
-
-
-
-<section id="using-mortaltiytables.jl-with-dataframes" class="level1">
+<section class="level1" id="using-mortaltiytables.jl-with-dataframes">
 <h1>Using MortaltiyTables.jl with DataFrames</h1>
-<section id="mortalitytables.jl-standard-representation" class="level2">
+<section class="level2" id="mortalitytables.jl-standard-representation">
 <h2 class="anchored" data-anchor-id="mortalitytables.jl-standard-representation">MortalityTables.jl standard representation</h2>
 <p>MortalityTables.jl stores the rates in a very efficient manner as a collection of vectors indexed by attained age.</p>
-<div id="4" class="cell" data-execution_count="1">
-<pre id="annotated-cell-1" class="julia cell-code code-annotation-code"><code>using MortalityTables
-
-name = "2001 VBT Residual Standard Select and Ultimate - Male Nonsmoker, ANB"
-vbt = MortalityTables.table(name)</code></pre>
+<div class="cell" data-execution_count="1" id="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="annotated-cell-1"><pre class="sourceCode julia code-annotation-code code-with-copy code-annotated"><code class="sourceCode julia"><span id="annotated-cell-1-1"><a aria-hidden="true" href="#annotated-cell-1-1" tabindex="-1"></a><span class="im">using</span> <span class="bu">MortalityTables</span></span>
+<span id="annotated-cell-1-2"><a aria-hidden="true" href="#annotated-cell-1-2" tabindex="-1"></a></span>
+<a class="code-annotation-anchor" data-target-annotation="1" data-target-cell="annotated-cell-1" onclick="event.preventDefault();">1</a><span class="code-annotation-target" id="annotated-cell-1-3"><a aria-hidden="true" href="#annotated-cell-1-3" tabindex="-1"></a>name <span class="op">=</span> <span class="st">"2001 VBT Residual Standard Select and Ultimate - Male Nonsmoker, ANB"</span></span>
+<span id="annotated-cell-1-4"><a aria-hidden="true" href="#annotated-cell-1-4" tabindex="-1"></a>vbt <span class="op">=</span> MortalityTables.<span class="fu">table</span>(name)</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-annotation">
-<dl>
-<dt data-target-cell="annotated-cell-1" data-target-annotation="1">1</dt>
+<dl class="code-annotation-container-grid">
+<dt data-target-annotation="1" data-target-cell="annotated-cell-1">1</dt>
 <dd>
-<span data-code-cell="annotated-cell-1" data-code-lines="3" data-code-annotation="1">Or any other mort.soa.org table</span>
+<span data-code-annotation="1" data-code-cell="annotated-cell-1" data-code-lines="3">Or any other mort.soa.org table</span>
 </dd>
 </dl>
 </div>
@@ -233,8 +244,8 @@ vbt = MortalityTables.table(name)</code></pre>
 </div>
 <p>First, we include the package, and then we’ll pick a table, where all of the <code>mort.soa.org</code> tables are mirrored into your MortalityTables.jl installation.</p>
 <p>To see how the data is represented, we can look at the the select data for a 55 year old and see the attained age and mortality rates:</p>
-<div id="6" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>vbt.select[55]</code></pre>
+<div class="cell" data-execution_count="1" id="6">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a aria-hidden="true" href="#cb2-1" tabindex="-1"></a>vbt.select[<span class="fl">55</span>]</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>66-element OffsetArray(::Vector{Float64}, 55:120) with eltype Float64 with indices 55:120:
  0.00139
@@ -261,44 +272,44 @@ vbt = MortalityTables.table(name)</code></pre>
 </div>
 <p>This is very efficient and convenient for modeling, but a lot of times you want the data matched up with policy data in a DataFrame.</p>
 </section>
-<section id="getting-data-into-a-dataframe" class="level2">
+<section class="level2" id="getting-data-into-a-dataframe">
 <h2 class="anchored" data-anchor-id="getting-data-into-a-dataframe">Getting data into a dataframe</h2>
-<section id="generate-sample-data" class="level3">
+<section class="level3" id="generate-sample-data">
 <h3 class="anchored" data-anchor-id="generate-sample-data">Generate sample data</h3>
-<div id="8" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>using DataFrames
-
-sample_size = 10_000
-
-sample_data = let
-    # generate fake data
-    df = DataFrame(
-        "sex" =&gt; rand(["Male","Female"],sample_size),
-        "smoke" =&gt; rand(["Smoker","Nonsmoker"],sample_size),
-        "issue_age" =&gt; rand(25:65,sample_size),
-        )
-    
-    # a random offset of issue age is the current attained age
-    df.attained_age = df.issue_age .+ rand(1:10,sample_size)
-    df
-end</code></pre>
+<div class="cell" data-execution_count="1" id="8">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a aria-hidden="true" href="#cb4-1" tabindex="-1"></a><span class="im">using</span> <span class="bu">DataFrames</span></span>
+<span id="cb4-2"><a aria-hidden="true" href="#cb4-2" tabindex="-1"></a></span>
+<span id="cb4-3"><a aria-hidden="true" href="#cb4-3" tabindex="-1"></a>sample_size <span class="op">=</span> <span class="fl">10_000</span></span>
+<span id="cb4-4"><a aria-hidden="true" href="#cb4-4" tabindex="-1"></a></span>
+<span id="cb4-5"><a aria-hidden="true" href="#cb4-5" tabindex="-1"></a>sample_data <span class="op">=</span> <span class="kw">let</span></span>
+<span id="cb4-6"><a aria-hidden="true" href="#cb4-6" tabindex="-1"></a>    <span class="co"># generate fake data</span></span>
+<span id="cb4-7"><a aria-hidden="true" href="#cb4-7" tabindex="-1"></a>    df <span class="op">=</span> <span class="fu">DataFrame</span>(</span>
+<span id="cb4-8"><a aria-hidden="true" href="#cb4-8" tabindex="-1"></a>        <span class="st">"sex"</span> <span class="op">=&gt;</span> <span class="fu">rand</span>([<span class="st">"Male"</span>,<span class="st">"Female"</span>],sample_size),</span>
+<span id="cb4-9"><a aria-hidden="true" href="#cb4-9" tabindex="-1"></a>        <span class="st">"smoke"</span> <span class="op">=&gt;</span> <span class="fu">rand</span>([<span class="st">"Smoker"</span>,<span class="st">"Nonsmoker"</span>],sample_size),</span>
+<span id="cb4-10"><a aria-hidden="true" href="#cb4-10" tabindex="-1"></a>        <span class="st">"issue_age"</span> <span class="op">=&gt;</span> <span class="fu">rand</span>(<span class="fl">25</span><span class="op">:</span><span class="fl">65</span>,sample_size),</span>
+<span id="cb4-11"><a aria-hidden="true" href="#cb4-11" tabindex="-1"></a>        )</span>
+<span id="cb4-12"><a aria-hidden="true" href="#cb4-12" tabindex="-1"></a>    </span>
+<span id="cb4-13"><a aria-hidden="true" href="#cb4-13" tabindex="-1"></a>    <span class="co"># a random offset of issue age is the current attained age</span></span>
+<span id="cb4-14"><a aria-hidden="true" href="#cb4-14" tabindex="-1"></a>    df.attained_age <span class="op">=</span> df.issue_age <span class="op">.+</span> <span class="fu">rand</span>(<span class="fl">1</span><span class="op">:</span><span class="fl">10</span>,sample_size)</span>
+<span id="cb4-15"><a aria-hidden="true" href="#cb4-15" tabindex="-1"></a>    df</span>
+<span id="cb4-16"><a aria-hidden="true" href="#cb4-16" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div><div style="float: left;"><span>10000×4 DataFrame</span></div><div style="float: right; font-style: italic;"><span>9975 rows omitted</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
-<table class="data-frame caption-top table table-sm table-striped small">
+<div aria-label="Scrollable data table" class="table-scroll" role="region" tabindex="0"><table class="data-frame caption-top table table-sm table-striped small">
 <thead>
 <tr class="columnLabelRow header">
 <th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">sex</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">smoke</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">issue_age</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">attained_age</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;">sex</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;">smoke</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;">issue_age</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;">attained_age</th>
 </tr>
 <tr class="columnLabelRow even">
 <th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="String">String</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="String">String</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;" title="String">String</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;" title="String">String</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;" title="Int64">Int64</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;" title="Int64">Int64</th>
 </tr>
 </thead>
 <tbody>
@@ -485,53 +496,53 @@ end</code></pre>
 <td style="text-align: right;">36</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 </div>
 </div>
 </div>
 </section>
-<section id="define-the-table-set-you-want-to-use" class="level3">
+<section class="level3" id="define-the-table-set-you-want-to-use">
 <h3 class="anchored" data-anchor-id="define-the-table-set-you-want-to-use">Define the table set you want to use</h3>
 <p>There are a lot of different possible combinations of parameters that you might want to use, such as rates that vary by sex, risk class, table set (VBT/CSO/etc), smoking status, relative risk, ALB/ANB, etc.</p>
 <p>It’s easy to define the parameters applicable to your assumption set. Here, we’ll use a dictionary to define the relationship:</p>
-<div id="10" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>rate_map = Dict(
-    "Male" =&gt; Dict(
-        "Smoker" =&gt; MortalityTables.table("2001 VBT Residual Standard Select and Ultimate - Male Smoker, ANB"),
-        "Nonsmoker" =&gt; MortalityTables.table("2001 VBT Residual Standard Select and Ultimate - Male Nonsmoker, ANB"),
-        ),
-    
-    "Female" =&gt; Dict(
-        "Smoker" =&gt; MortalityTables.table("2001 VBT Residual Standard Select and Ultimate - Female Smoker, ANB"),
-        "Nonsmoker" =&gt; MortalityTables.table("2001 VBT Residual Standard Select and Ultimate - Female Nonsmoker, ANB"),
-        )
-    );</code></pre>
+<div class="cell" data-execution_count="1" id="10">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a aria-hidden="true" href="#cb5-1" tabindex="-1"></a>rate_map <span class="op">=</span> <span class="fu">Dict</span>(</span>
+<span id="cb5-2"><a aria-hidden="true" href="#cb5-2" tabindex="-1"></a>    <span class="st">"Male"</span> <span class="op">=&gt;</span> <span class="fu">Dict</span>(</span>
+<span id="cb5-3"><a aria-hidden="true" href="#cb5-3" tabindex="-1"></a>        <span class="st">"Smoker"</span> <span class="op">=&gt;</span> MortalityTables.<span class="fu">table</span>(<span class="st">"2001 VBT Residual Standard Select and Ultimate - Male Smoker, ANB"</span>),</span>
+<span id="cb5-4"><a aria-hidden="true" href="#cb5-4" tabindex="-1"></a>        <span class="st">"Nonsmoker"</span> <span class="op">=&gt;</span> MortalityTables.<span class="fu">table</span>(<span class="st">"2001 VBT Residual Standard Select and Ultimate - Male Nonsmoker, ANB"</span>),</span>
+<span id="cb5-5"><a aria-hidden="true" href="#cb5-5" tabindex="-1"></a>        ),</span>
+<span id="cb5-6"><a aria-hidden="true" href="#cb5-6" tabindex="-1"></a>    </span>
+<span id="cb5-7"><a aria-hidden="true" href="#cb5-7" tabindex="-1"></a>    <span class="st">"Female"</span> <span class="op">=&gt;</span> <span class="fu">Dict</span>(</span>
+<span id="cb5-8"><a aria-hidden="true" href="#cb5-8" tabindex="-1"></a>        <span class="st">"Smoker"</span> <span class="op">=&gt;</span> MortalityTables.<span class="fu">table</span>(<span class="st">"2001 VBT Residual Standard Select and Ultimate - Female Smoker, ANB"</span>),</span>
+<span id="cb5-9"><a aria-hidden="true" href="#cb5-9" tabindex="-1"></a>        <span class="st">"Nonsmoker"</span> <span class="op">=&gt;</span> MortalityTables.<span class="fu">table</span>(<span class="st">"2001 VBT Residual Standard Select and Ultimate - Female Nonsmoker, ANB"</span>),</span>
+<span id="cb5-10"><a aria-hidden="true" href="#cb5-10" tabindex="-1"></a>        )</span>
+<span id="cb5-11"><a aria-hidden="true" href="#cb5-11" tabindex="-1"></a>    );</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 </div>
 <p>And then we’ll define a function to look up the relevant rate. Note how the function matches the levels we defined for the assumption set dictionary above.</p>
-<div id="12" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>function rate_lookup(assumption_map,sex,smoke,issue_age,attained_age)
-    # pick the relevant table
-    table = assumption_map[sex][smoke]
-    
-    # check if the select rate exists, otherwise look to the ultimate table
-    if issue_age in eachindex(table.select)
-        table.select[issue_age][attained_age]
-    else
-        table.ultimate[attained_age]
-    end
-end</code></pre>
+<div class="cell" data-execution_count="1" id="12">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a aria-hidden="true" href="#cb6-1" tabindex="-1"></a><span class="kw">function</span> <span class="fu">rate_lookup</span>(assumption_map,sex,smoke,issue_age,attained_age)</span>
+<span id="cb6-2"><a aria-hidden="true" href="#cb6-2" tabindex="-1"></a>    <span class="co"># pick the relevant table</span></span>
+<span id="cb6-3"><a aria-hidden="true" href="#cb6-3" tabindex="-1"></a>    table <span class="op">=</span> assumption_map[sex][smoke]</span>
+<span id="cb6-4"><a aria-hidden="true" href="#cb6-4" tabindex="-1"></a>    </span>
+<span id="cb6-5"><a aria-hidden="true" href="#cb6-5" tabindex="-1"></a>    <span class="co"># check if the select rate exists, otherwise look to the ultimate table</span></span>
+<span id="cb6-6"><a aria-hidden="true" href="#cb6-6" tabindex="-1"></a>    <span class="cf">if</span> issue_age <span class="kw">in</span> <span class="fu">eachindex</span>(table.select)</span>
+<span id="cb6-7"><a aria-hidden="true" href="#cb6-7" tabindex="-1"></a>        table.select[issue_age][attained_age]</span>
+<span id="cb6-8"><a aria-hidden="true" href="#cb6-8" tabindex="-1"></a>    <span class="cf">else</span></span>
+<span id="cb6-9"><a aria-hidden="true" href="#cb6-9" tabindex="-1"></a>        table.ultimate[attained_age]</span>
+<span id="cb6-10"><a aria-hidden="true" href="#cb6-10" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb6-11"><a aria-hidden="true" href="#cb6-11" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>rate_lookup (generic function with 1 method)</code></pre>
 </div>
 </div>
 </section>
-<section id="lining-up-with-dataframe" class="level3">
+<section class="level3" id="lining-up-with-dataframe">
 <h3 class="anchored" data-anchor-id="lining-up-with-dataframe">Lining up with dataframe</h3>
 <p>By mapping each row’s data to the lookup function, we get a vector of rates for our data:</p>
-<div id="14" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>rates = map(eachrow(sample_data)) do row
-    rate_lookup(rate_map, row.sex, row.smoke, row.issue_age, row.attained_age)
-end</code></pre>
+<div class="cell" data-execution_count="1" id="14">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a aria-hidden="true" href="#cb8-1" tabindex="-1"></a>rates <span class="op">=</span> <span class="fu">map</span>(<span class="fu">eachrow</span>(sample_data)) <span class="cf">do</span> row</span>
+<span id="cb8-2"><a aria-hidden="true" href="#cb8-2" tabindex="-1"></a>    <span class="fu">rate_lookup</span>(rate_map, row.sex, row.smoke, row.issue_age, row.attained_age)</span>
+<span id="cb8-3"><a aria-hidden="true" href="#cb8-3" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>10000-element Vector{Float64}:
  0.00595
@@ -557,29 +568,29 @@ end</code></pre>
 </div>
 </div>
 <p>And finally, we can just add this to the dataframe:</p>
-<div id="16" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>sample_data.expectation = rates
-
-sample_data</code></pre>
+<div class="cell" data-execution_count="1" id="16">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb10-1"><a aria-hidden="true" href="#cb10-1" tabindex="-1"></a>sample_data.expectation <span class="op">=</span> rates</span>
+<span id="cb10-2"><a aria-hidden="true" href="#cb10-2" tabindex="-1"></a></span>
+<span id="cb10-3"><a aria-hidden="true" href="#cb10-3" tabindex="-1"></a>sample_data</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div><div style="float: left;"><span>10000×5 DataFrame</span></div><div style="float: right; font-style: italic;"><span>9975 rows omitted</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
-<table class="data-frame caption-top table table-sm table-striped small">
+<div aria-label="Scrollable data table" class="table-scroll" role="region" tabindex="0"><table class="data-frame caption-top table table-sm table-striped small">
 <thead>
 <tr class="columnLabelRow header">
 <th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">sex</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">smoke</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">issue_age</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">attained_age</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">expectation</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;">sex</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;">smoke</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;">issue_age</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;">attained_age</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;">expectation</th>
 </tr>
 <tr class="columnLabelRow even">
 <th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="String">String</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="String">String</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;" title="String">String</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;" title="String">String</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;" title="Int64">Int64</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;" title="Int64">Int64</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;" title="Float64">Float64</th>
 </tr>
 </thead>
 <tbody>
@@ -792,16 +803,13 @@ sample_data</code></pre>
 <td style="text-align: right;">0.00166</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 </div>
 </div>
 </div>
-
-
 </section>
 </section>
 </section>
-
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
@@ -1204,8 +1212,4 @@ sample_data</code></pre>
   });
   </script>
 </div> <!-- /content -->
-
-
-
-
 </body></html>

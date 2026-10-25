@@ -1,15 +1,12 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
-<meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.16">
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-
-<meta name="author" content="Alec Loudenback and Dimitar Vanguelov">
-<meta name="dcterms.date" content="2021-10-24">
-<meta name="description" content="JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.">
-
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml"><head>
+<meta charset="utf-8"/>
+<meta content="quarto-1.9.16" name="generator"/>
+<meta content="width=device-width, initial-scale=1.0, user-scalable=yes" name="viewport"/>
+<meta content="Alec Loudenback and Dimitar Vanguelov" name="author"/>
+<meta content="2021-10-24" name="dcterms.date"/>
+<meta content="JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows." name="description"/>
 <title>Getting Started with Julia for Actuaries – JuliaActuary</title>
 <style>
 code{white-space: pre-wrap;}
@@ -23,28 +20,61 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
-
-
 <script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="../../site_libs/quarto-nav/headroom.min.js"></script>
 <script src="../../site_libs/clipboard/clipboard.min.js"></script>
 <script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="../../">
-<link href="../..//assets/logos/favicon.ico" rel="icon">
+<meta content="../../" name="quarto:offset"/>
+<link href="../..//assets/logos/favicon.ico" rel="icon"/>
 <script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
-<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-a0731b9a3a5d496010872d775e5d9bc3.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet"/>
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-be14ce6d32a635bebd8f9e4e558f9eeb.css" id="quarto-text-highlighting-styles" rel="stylesheet"/>
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-98ac2d5361ef6f18cc0525d38bedc462.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet"/>
+<link append-hash="true" data-mode="light" href="../../site_libs/bootstrap/bootstrap-4a135b976b00f53a3a768ff94eb1df18.min.css" id="quarto-bootstrap" rel="stylesheet"/>
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -72,143 +102,125 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&amp;family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&amp;display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../../assets/highlight/styles/github.min.css">
-<script src="../../assets/highlight/highlight.min.js"></script>
-<script src="../../assets/highlight/languages/julia.min.js"></script>
-<script src="../../assets/highlight/languages/julia-repl.min.js"></script>
-<script src="../../assets/highlight/languages/python.min.js"></script>
-<script src="../../assets/highlight/languages/r.min.js"></script>
-<script>hljs.highlightAll();</script>
-<script data-goatcounter="https://juliaactuary.goatcounter.com/count" async="" src="//gc.zgo.at/count.js"></script>
-
-
-<link rel="stylesheet" href="../../styles.css">
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" rel="stylesheet"/>
+<script async="" data-goatcounter="https://juliaactuary.goatcounter.com/count" src="//gc.zgo.at/count.js"></script>
+<link href="../../styles-c416c153cdf24884.css" rel="stylesheet"/>
 </head>
-
 <body class="nav-fixed fullcontent quarto-light">
-
 <div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top quarto-banner">
-    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
-      <div class="navbar-container container-fluid">
-      <div class="navbar-brand-container mx-auto">
-    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
-    <img src="../../assets/logos/android-chrome-512x512.png" alt="JuliaActuary Logo" class="navbar-logo light-content">
-    <img src="../../assets/logos/android-chrome-512x512.png" alt="JuliaActuary Logo" class="navbar-logo dark-content">
-    </a>
-    <a class="navbar-brand" href="../../index.html">
-    <span class="navbar-title">JuliaActuary</span>
-    </a>
-  </div>
-            <div id="quarto-search" class="" title="Search"></div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-  <span class="navbar-toggler-icon"></span>
-</button>
-          <div class="collapse navbar-collapse" id="navbarCollapse">
-            <ul class="navbar-nav navbar-nav-scroll ms-auto">
-  <li class="nav-item">
-    <a class="nav-link" href="../../packages.html"> 
-<span class="menu-text">Packages</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="https://docs.juliaactuary.org"> 
-<span class="menu-text">Docs</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="https://modernfinancialmodeling.com"> 
-<span class="menu-text">Book</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../learn.html"> 
-<span class="menu-text">Learn</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../examples.html"> 
-<span class="menu-text">Examples</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../benchmarks.html"> 
-<span class="menu-text">Benchmarks</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../community.html"> 
-<span class="menu-text">Community</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../blog.html"> 
-<span class="menu-text">Blog</span></a>
-  </li>  
-  <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/JuliaActuary"> <i class="bi bi-github" role="img">
-</i> 
-<span class="menu-text"></span></a>
-  </li>  
-  <li class="nav-item compact">
-    <a class="nav-link" href="../../all-posts.xml"> <i class="bi bi-rss" role="img">
-</i> 
-<span class="menu-text"></span></a>
-  </li>  
-</ul>
-          </div> <!-- /navcollapse -->
-            <div class="quarto-navbar-tools">
+<header class="headroom fixed-top quarto-banner" id="quarto-header">
+<nav class="navbar navbar-expand-lg" data-bs-theme="dark">
+<div class="navbar-container container-fluid">
+<div class="navbar-brand-container mx-auto">
+<a class="navbar-brand navbar-brand-logo" href="../../index.html">
+<img alt="JuliaActuary Logo" class="navbar-logo light-content" src="../../assets/logos/android-chrome-512x512.png"/>
+<img alt="JuliaActuary Logo" class="navbar-logo dark-content" src="../../assets/logos/android-chrome-512x512.png"/>
+</a>
+<a class="navbar-brand" href="../../index.html">
+<span class="navbar-title">JuliaActuary</span>
+</a>
 </div>
-      </div> <!-- /container-fluid -->
-    </nav>
+<div class="" id="quarto-search" title="Search"></div>
+<button aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-bs-target="#navbarCollapse" data-bs-toggle="collapse" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }" role="menu" type="button">
+<span class="navbar-toggler-icon"></span>
+</button>
+<div class="collapse navbar-collapse" id="navbarCollapse">
+<ul class="navbar-nav navbar-nav-scroll ms-auto">
+<li class="nav-item">
+<a class="nav-link" href="../../packages.html">
+<span class="menu-text">Packages</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="https://docs.juliaactuary.org">
+<span class="menu-text">Docs</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="../../learn.html">
+<span class="menu-text">Learn</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="../../examples.html">
+<span class="menu-text">Examples</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="../../community.html">
+<span class="menu-text">Community</span></a>
+</li>
+<li class="nav-item dropdown">
+<a aria-expanded="false" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" id="nav-menu-more" role="link">
+<span class="menu-text">More</span>
+</a>
+<ul aria-labelledby="nav-menu-more" class="dropdown-menu dropdown-menu-end">
+<li>
+<a class="dropdown-item" href="../../benchmarks.html">
+<span class="dropdown-text">Benchmarks</span></a>
+</li>
+<li>
+<a class="dropdown-item" href="../../blog.html">
+<span class="dropdown-text">Blog</span></a>
+</li>
+<li>
+<a class="dropdown-item" href="https://modernfinancialmodeling.com">
+<span class="dropdown-text">Book</span></a>
+</li>
+</ul>
+</li>
+<li class="nav-item compact">
+<a class="nav-link" href="https://github.com/JuliaActuary"> <i aria-label="JuliaActuary on GitHub" class="bi bi-github" role="img">
+</i>
+<span class="menu-text"></span></a>
+</li>
+<li class="nav-item compact">
+<a class="nav-link" href="../../all-posts.xml"> <i aria-label="RSS feed" class="bi bi-rss" role="img">
+</i>
+<span class="menu-text"></span></a>
+</li>
+</ul>
+</div> <!-- /navcollapse -->
+<div class="quarto-navbar-tools">
+</div>
+</div> <!-- /container-fluid -->
+</nav>
 </header>
 <!-- content -->
-<header id="title-block-header" class="quarto-title-block default page-columns page-full">
-  <div class="quarto-title-banner page-columns page-full">
-    <div class="quarto-title column-body">
-      <h1 class="title">Getting Started with Julia for Actuaries</h1>
-                  <div>
-        <div class="description">
+<header class="quarto-title-block default page-columns page-full" id="title-block-header">
+<div class="quarto-title-banner page-columns page-full">
+<div class="quarto-title column-body">
+<h1 class="title">Getting Started with Julia for Actuaries</h1>
+<div>
+<div class="description">
           JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.
         </div>
-      </div>
-                          <div class="quarto-categories">
-                <div class="quarto-category">industry</div>
-                <div class="quarto-category">blog</div>
-                <div class="quarto-category">statistics</div>
-                <div class="quarto-category">bayesian</div>
-              </div>
-                  </div>
-  </div>
-    
-  
-  <div class="quarto-title-meta">
-
-      <div>
-      <div class="quarto-title-meta-heading">Author</div>
-      <div class="quarto-title-meta-contents">
-               <p>Alec Loudenback and Dimitar Vanguelov </p>
-            </div>
-    </div>
-      
-      <div>
-      <div class="quarto-title-meta-heading">Published</div>
-      <div class="quarto-title-meta-contents">
-        <p class="date">October 24, 2021</p>
-      </div>
-    </div>
-    
-      
-    </div>
-    
-  
-  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+</div>
+<div class="quarto-categories">
+<div class="quarto-category">industry</div>
+<div class="quarto-category">blog</div>
+<div class="quarto-category">statistics</div>
+<div class="quarto-category">bayesian</div>
+</div>
+</div>
+</div>
+<div class="quarto-title-meta">
+<div>
+<div class="quarto-title-meta-heading">Author</div>
+<div class="quarto-title-meta-contents">
+<p>Alec Loudenback and Dimitar Vanguelov </p>
+</div>
+</div>
+<div>
+<div class="quarto-title-meta-heading">Published</div>
+<div class="quarto-title-meta-contents">
+<p class="date">October 24, 2021</p>
+</div>
+</div>
+</div>
+</header><div class="quarto-container page-columns page-rows-contents page-layout-article page-navbar" id="quarto-content">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    
 <!-- main -->
 <main class="content quarto-banner-title-block" id="quarto-document-content">
-
-
-
-
-
 <p>The previously published article titled <a href="../../posts/julia-for-actuaries/index.html">Julia for Actuaries</a> gave a longer introduction to why Julia works so well in actuarial workflows. In summary: Julia’s attributes are “evident in its pragmatic, productivity-focused design choices, pleasant syntax, rich ecosystem, thriving communities, and its ability to be both very general purpose and power cutting edge computing”.</p>
 <p>This is the second in the following trilogy of articles:</p>
 <ol type="1">
@@ -216,18 +228,18 @@ ul.task-list li input[type="checkbox"] {
 <li>Basic tooling and general packages of interest</li>
 <li>Actuarial-specific packages</li>
 </ol>
-<section id="reminder-of-why-julia" class="level2">
+<section class="level2" id="reminder-of-why-julia">
 <h2 class="anchored" data-anchor-id="reminder-of-why-julia">Reminder of “Why Julia?”</h2>
 <p>In the <a href="https://insights.stackoverflow.com/survey/2021?_ga=2.236209345.190202062.1628102352-126161871.1625855113#technology-most-loved-dreaded-and-wanted">2021 Stack Overflow Survey</a>, Julia was the 5th most loved language. This was ahead of other languages commonly used in actuarial contexts, such as Python (6th), R (28th), C++ (25th), Matlab (36th), or VBA (37th).</p>
 <p>There are three main reasons to consider using Julia:</p>
 <ol type="1">
 <li><p><strong>The language itself offers expressiveness, pleasant syntax, and less boilerplate than many alternatives.</strong> Multiple dispatch is a programming paradigm that is an evolution of object-oriented approaches that’s more amenable to a wide range of programming styles, including functional and vectorized approaches. It affords Julia code a high level of composability and is what makes the Julia ecosystem so powerful.</p></li>
-<li><p><strong>High performant Julia code, instead of needing libraries written in C/Cython/etc.</strong> For lots of problems, especially “toy” problems as you learn a language, the speed of Matlab/Python/R is fast enough. However, in real usage, particularly actuarial problems, you might find that when you need the performance, it’s too late<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p></li>
+<li><p><strong>High performant Julia code, instead of needing libraries written in C/Cython/etc.</strong> For lots of problems, especially “toy” problems as you learn a language, the speed of Matlab/Python/R is fast enough. However, in real usage, particularly actuarial problems, you might find that when you need the performance, it’s too late<a class="footnote-ref" href="#fn1" id="fnref1" role="doc-noteref"><sup>1</sup></a></p></li>
 <li><p><strong>The language, tooling, and ecosystem is very modern, mature, and powerful.</strong> A built-in package manager, packages that work together without needing to know about each other, differentiable programming, meta-programming (macros), first-class GPU/parallel support, and wide range of packages relevant to actuarial workloads.</p></li>
 </ol>
 <p>More detail of why Julia works so well in actuarial contexts was discussed in the prior article, <a href="../../posts/julia-for-actuaries/index.html">Julia for Actuaries</a>. The rest of this article is going to focus on getting oriented to using Julia, and the next article in the series will introduce actuarial packages available.</p>
 </section>
-<section id="the-language-itself" class="level2">
+<section class="level2" id="the-language-itself">
 <h2 class="anchored" data-anchor-id="the-language-itself">The language itself</h2>
 <p>Julia is a high level language, with syntax that should feel familiar to someone coming from R, Python, or Matlab. This article is too short for a true introduction to the language. Fortunately, there’s a ton of great references online, such as:</p>
 <ul>
@@ -239,16 +251,16 @@ ul.task-list li input[type="checkbox"] {
 <p>Born of a desire to have the niceties of high level languages with the performance of low level compiled code, there are many built-in data structures and functions related to numerical computing like that used in finance, insurance, and statistics.</p>
 <p>If you just want a quick introduction for beginners, <a href="https://www.juliafordatascience.com/">Julia For Data Science</a> is a great resource with easy, digestible tutorials. If you want a ground-up introduction, the e-book <a href="https://benlauwens.github.io/ThinkJulia.jl/latest/book.html">Think Julia</a> starts simple and builds up. If you prefer to learn-by-example: the interactive, free, online course <a href="https://computationalthinking.mit.edu/Spring21/">Introduction to Computational Thinking</a> by MIT will have you working on everything from data science to climate modeling.</p>
 <p>Lastly, <a href="https://juliaacademy.com/">JuliaAcademy.com</a> has a number of free courses that introduce the language via data science, machine learning, or “for nervous beginners.”</p>
-<section id="spotlight-on-features" class="level3">
+<section class="level3" id="spotlight-on-features">
 <h3 class="anchored" data-anchor-id="spotlight-on-features">Spotlight on Features</h3>
 <p>A full introduction to the language is beyond the scope of this article. There are two features we’d like to highlight here, which exemplify powerful features not available in other languages. These might sound a little technical at first, but as Paul Graham describes in his essay, <a href="http://www.paulgraham.com/avg.html">Beating the Average</a>, it is hard to see what you might be missing until you get experience with it.</p>
-<section id="multiple-dispatch" class="level4">
+<section class="level4" id="multiple-dispatch">
 <h4 class="anchored" data-anchor-id="multiple-dispatch">Multiple Dispatch</h4>
-<p>Multiple dispatch is the term for deciding which function to call based on the combination of arguments. Taking an example pointed out by data scientist Brian Groenke<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> of a simple ordinary least squares implementation:</p>
-<pre class="julia"><code>ols(x,y) = inv(x'x)x'y
-
-# alternatively, one can write this using matrix division:
-ols(x,y) = x \ y</code></pre>
+<p>Multiple dispatch is the term for deciding which function to call based on the combination of arguments. Taking an example pointed out by data scientist Brian Groenke<a class="footnote-ref" href="#fn2" id="fnref2" role="doc-noteref"><sup>2</sup></a> of a simple ordinary least squares implementation:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a aria-hidden="true" href="#cb1-1" tabindex="-1"></a><span class="fu">ols</span>(x,y) <span class="op">=</span> <span class="fu">inv</span>(x<span class="op">'</span>x)x<span class="op">'</span>y</span>
+<span id="cb1-2"><a aria-hidden="true" href="#cb1-2" tabindex="-1"></a></span>
+<span id="cb1-3"><a aria-hidden="true" href="#cb1-3" tabindex="-1"></a><span class="co"># alternatively, one can write this using matrix division:</span></span>
+<span id="cb1-4"><a aria-hidden="true" href="#cb1-4" tabindex="-1"></a><span class="fu">ols</span>(x,y) <span class="op">=</span> x <span class="op">\</span> y</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <p>“This very naive implementation already works for any appropriately sized <code>x</code> and <code>y</code>, including the multivariate case where <code>x</code> is a matrix or multiple-target case where <code>y</code> is a matrix. Furthermore, if <code>x</code> and <code>y</code> have special types [e.g diagonal or sparse matrices], we get the potentially optimized implementations [of the different combinations] for free.”</p>
 <p>In a language without multiple dispatch, the alternative would be to:</p>
 <ul>
@@ -257,23 +269,23 @@ ols(x,y) = x \ y</code></pre>
 </ul>
 <p>The statistician Josh Day wrote <a href="https://medium.com/@josh_40272/why-i-use-julia-8eb47216880e">an entire blog post</a> about how multiple dispatch boosts one’s productivity, allows for less code, and more time spent on solving the actual problem at hand.</p>
 </section>
-<section id="meta-programming-and-macros" class="level4">
+<section class="level4" id="meta-programming-and-macros">
 <h4 class="anchored" data-anchor-id="meta-programming-and-macros">Meta-programming and Macros</h4>
 <p>Meta-programming is the essentially the ability to program the language itself, and macros are one of the tools that provide this ability. In the Paul Graham essay mentioned above, macros are an example of the competitive advantage conferred by a more powerful language.</p>
 <p>For example, when you see <code>@benchmark present_value(0.05, [10, 10, 10])</code> in Julia, the <code>@benchmark</code> is a macro (starts with <code>@</code>). It modifies the written code to wrap <code>present_value</code> in setup, timing, and summary code, returning detailed timing statistics for the call. There is an example of this later in the article.</p>
-<p>Most other languages don’t have macros, and it means that it’s hard to ‘hook into’ code in a safe way. For example, benchmarking can involve a lot of boilerplate code just to setup, time, and summarize the results (such as the <code>timeit</code> library in Python)<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a>.</p>
+<p>Most other languages don’t have macros, and it means that it’s hard to ‘hook into’ code in a safe way. For example, benchmarking can involve a lot of boilerplate code just to setup, time, and summarize the results (such as the <code>timeit</code> library in Python)<a class="footnote-ref" href="#fn3" id="fnref3" role="doc-noteref"><sup>3</sup></a>.</p>
 <p>Note that <em>using</em> macros is quite prevalent when coding in Julia, however <em>writing</em> macros is <a href="https://www.youtube.com/watch?v=mSgXWpvQEHE">more advanced usage</a> and beyond the scope of a “getting-started” guide.</p>
 </section>
 </section>
 </section>
-<section id="installation-and-tooling" class="level2">
+<section class="level2" id="installation-and-tooling">
 <h2 class="anchored" data-anchor-id="installation-and-tooling">Installation and Tooling</h2>
-<section id="installation" class="level3">
+<section class="level3" id="installation">
 <h3 class="anchored" data-anchor-id="installation">Installation</h3>
 <p>Julia is open source and can be downloaded from <a href="https://JuliaLang.org">JuliaLang.org</a> and is available for all major operating systems. After you download and install, then you have Julia installed and can access the <strong>REPL</strong>, or Read-Eval-Print-Loop, which can run complete programs or <a href="https://krasjet.com/rnd.wlk/julia/">function as powerful day-to-day calculator</a>. However, many people find it more comfortable to work in a text editor or <strong>IDE</strong> (Integrated Development Environment).</p>
 <p>If you are looking for managed installations with a curated set of packages for use within an organization, there are ways to self-host package repositories and otherwise administratively manage packages. <a href="https://juliacomputing.com/">Julia Computing</a> offers managed support with enterprise solutions, including push-button cloud compute capabilities.</p>
 </section>
-<section id="package-management" class="level3">
+<section class="level3" id="package-management">
 <h3 class="anchored" data-anchor-id="package-management">Package Management</h3>
 <p>Julia comes with <code>Pkg</code>, a built-in package manger. With it, you can install packages, pin certain versions, recreate environments with the same set of dependencies, and upgrade/remove/develop packages easily. It’s one of the things that <em>just works</em> and makes Julia stand out versus alternative languages that don’t have a de-facto way of managing or installing packages.</p>
 <p>Package installation is accomplished interactively in the REPL or executing commands.</p>
@@ -284,14 +296,14 @@ ols(x,y) = x \ y</code></pre>
 <p>Related to packages, are <strong>environments</strong> which are a self-contained workspaces for your code. This lets you install only packages that are relevant to the current work. It also lets you ‘remember’ the exact set of packages and versions that you used. In fact, you can share the environment with others, and it will be able to recreate the same environment as when you ran the code. This is accomplished via a <code>Project.toml</code> file, which tracks the direct dependencies you’ve added, along with details about your project like its version number. The <code>Manifest.toml</code> tracks the entire dependency tree.</p>
 <p>Reproducibility via the environment tools above is a really key aspect that will ensure Julia code is consistent across time and users, which is important for financial controls.</p>
 </section>
-<section id="editors" class="level3">
+<section class="level3" id="editors">
 <h3 class="anchored" data-anchor-id="editors">Editors</h3>
 <p>Because Julia is very extensible and amenable to analysis of its own code, you can typically find plugins for whatever tool you prefer to write code in. A few examples:</p>
-<section id="visual-studio-code" class="level4">
+<section class="level4" id="visual-studio-code">
 <h4 class="anchored" data-anchor-id="visual-studio-code">Visual Studio Code</h4>
-<p>Visual Studio Code is a free editor from Microsoft. There’s a full-featured <a href="https://www.julia-vscode.org/">Julia plugin</a> available, which will help with auto-completion, warnings, and other code hints that you might find in a dedicated editor (e.g.&nbsp;PyCharm or RStudio). Like those tools, you can view plots, search documentation, show datasets, debug, and manage version control.</p>
+<p>Visual Studio Code is a free editor from Microsoft. There’s a full-featured <a href="https://www.julia-vscode.org/">Julia plugin</a> available, which will help with auto-completion, warnings, and other code hints that you might find in a dedicated editor (e.g. PyCharm or RStudio). Like those tools, you can view plots, search documentation, show datasets, debug, and manage version control.</p>
 </section>
-<section id="notebooks" class="level4">
+<section class="level4" id="notebooks">
 <h4 class="anchored" data-anchor-id="notebooks">Notebooks</h4>
 <p>Notebooks are typically more interactive environments than text editors - you can write code in cells and see the results side-by-side.</p>
 <p>The most popular notebook tool is Jupyter (“Julia, Python, R”). It is widely used and fits in well with exploratory data analysis or other interactive workflows. It can be installed by adding the <a href="https://github.com/JuliaLang/IJulia.jl"><code>IJulia.jl</code></a> package.</p>
@@ -299,7 +311,7 @@ ols(x,y) = x \ y</code></pre>
 </section>
 </section>
 </section>
-<section id="a-whirlwind-tour-of-general-purpose-packages" class="level2">
+<section class="level2" id="a-whirlwind-tour-of-general-purpose-packages">
 <h2 class="anchored" data-anchor-id="a-whirlwind-tour-of-general-purpose-packages">A Whirlwind Tour of General-Purpose Packages</h2>
 <p>The Julia ecosystem favors composability and interoperability, enabled by multiple dispatch. In other words, because it’s easy to automatically specialize functionality based on the type of data being used, there’s much less need to bundle a lot of features within a single package.</p>
 <p>As you’ll see, Julia packages tend to be less vertically integrated because it’s easier to pass data around. Counterexamples of this in Python and R:</p>
@@ -310,21 +322,21 @@ ols(x,y) = x \ y</code></pre>
 </ul>
 <p>Julia is not perfect in this regard, but it’s neat to see how frequently things <em>just work</em>. It’s not magic, but because of Julia features outside the scope of this article it’s easy for package developers (and you!) to do this.</p>
 <p>Julia also has language-level support for documentation, so packages can follow a consistent style of help-text and have the docs be auto-generated into web pages available locally or online.</p>
-<p>The following highlighted packages were chosen for their relevance to typical actuarial work, with a bias towards those used regularly by the authors. This is a small sampling of the over 6000 registered Julia Packages<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a></p>
-<section id="data" class="level3">
+<p>The following highlighted packages were chosen for their relevance to typical actuarial work, with a bias towards those used regularly by the authors. This is a small sampling of the over 6000 registered Julia Packages<a class="footnote-ref" href="#fn4" id="fnref4" role="doc-noteref"><sup>4</sup></a></p>
+<section class="level3" id="data">
 <h3 class="anchored" data-anchor-id="data">Data</h3>
 <p>Julia offers a rich data ecosystem with a multitude of available packages. Perhaps at the center of the data ecosystem are <a href="https://github.com/JuliaData/CSV.jl"><code>CSV.jl</code></a> and <a href="https://dataframes.juliadata.org/stable/"><code>DataFrames.jl</code></a>. <code>CSV.jl</code> is for reading and writing files text files (namely CSVs) and offers top-class read and write performance. <code>DataFrames.jl</code> is a mature package for working with dataframes, comparable to Pandas or dplyr.</p>
 <p>Other notable packages include <a href="https://github.com/JuliaDatabases/ODBC.jl"><code>ODBC.jl</code></a>, which lets you connect to any database (given you have the right drivers installed), and <a href="https://github.com/JuliaData/Arrow.jl"><code>Arrow.jl</code></a> which implements the <a href="https://arrow.apache.org/">Apache Arrow</a> standard in Julia.</p>
 <p>Worth mentioning also is <code>Dates</code>, a built-in package making date manipulation straightforward and robust.</p>
 <p>Check out <a href="https://github.com/JuliaData">JuliaData</a> org for more packages and information.</p>
 </section>
-<section id="plotting" class="level3">
+<section class="level3" id="plotting">
 <h3 class="anchored" data-anchor-id="plotting">Plotting</h3>
 <p><a href="http://docs.juliaplots.org/latest/"><code>Plots.jl</code></a> is a meta-package providing an interface to consistently work with several plotting <a href="https://docs.juliaplots.org/latest/backends/">backends</a>, depending if you are trying to emphasize interactivity on the web or print-quality output. You can very easily add animations or change almost any feature of a plot.</p>
 <p><a href="https://github.com/JuliaPlots/StatsPlots.jl"><code>StatsPlots.jl</code></a> extends <code>Plots.jl</code> with a focus on data visualization and compatibility with dataframes.</p>
 <p><a href="http://makie.juliaplots.org/dev/"><code>Makie.jl</code></a> supports GPU-accelerated plotting and can create very rich, <a href="https://lazarusa.github.io/BeautifulMakie/">beautiful visualizations</a>, but it’s main downside is that it has not yet been optimized to minimize the time-to-first-plot.</p>
 </section>
-<section id="statistics" class="level3">
+<section class="level3" id="statistics">
 <h3 class="anchored" data-anchor-id="statistics">Statistics</h3>
 <p>Julia has first-class support for <code>missing</code> values, which follows the rules of <a href="https://en.wikipedia.org/wiki/Three-valued_logic">three-valued logic</a> so other packages don’t need to do anything special to incorporate missing values.</p>
 <p><a href="https://github.com/JuliaStats/StatsBase.jl"><code>StatsBase.jl</code></a> and <a href="https://github.com/JuliaStats/Distributions.jl"><code>Distributions.jl</code></a> are essentials for a range of statistics functions and probability distributions respectively.</p>
@@ -337,87 +349,81 @@ ols(x,y) = x \ y</code></pre>
 </ul>
 <p>You can find more packages and learn about them <a href="https://juliastats.org/">here</a>.</p>
 </section>
-<section id="machine-learning" class="level3">
+<section class="level3" id="machine-learning">
 <h3 class="anchored" data-anchor-id="machine-learning">Machine Learning</h3>
 <p><a href="https://fluxml.ai/"><code>Flux</code></a>, <a href="https://www.gen.dev/"><code>Gen</code></a>, <a href="https://github.com/denizyuret/Knet.jl"><code>Knet</code></a>, and <a href="https://alan-turing-institute.github.io/MLJ.jl/v0.12/"><code>MLJ</code></a> are all very popular machine learning libraries. There are also packages for PyTorch, Tensorflow, and SciKitML available. One advantage for users is that the Julia packages are written in Julia, so it can be easier to adapt or see what’s going on in the entire stack. In contrast to this design, PyTorch and Tensorflow are built primarily with C++.</p>
 <p>Another advantage is that the Julia libraries can use automatic differentiation to optimize on a wider range of data and functions than those built into libraries in other languages.</p>
 </section>
-<section id="differentiable-programming" class="level3">
+<section class="level3" id="differentiable-programming">
 <h3 class="anchored" data-anchor-id="differentiable-programming">Differentiable Programming</h3>
 <p>Sensitivity testing is very common in actuarial workflows: essentially, it’s understanding the change in one variable in relation to another. In other words, the derivative!</p>
 <p>Julia has unique capabilities where almost across the entire language and ecosystem, you can take the derivative of entire functions or scripts. For example, the following is real Julia code to automatically calculate the sensitivity of the ending account value with respect to the inputs:</p>
-<pre class="julia-repl"><code>julia&gt; using Zygote
-
-julia&gt; function policy_av(pol)
-    COIs = [0.00319, 0.00345, 0.0038, 0.00419, 0.0047, 0.00532]
-    av = 0.0
-    for (i,coi) in enumerate(COIs)
-        av += av * pol.credit_rate
-        av += pol.annual_premium
-        av -= pol.face * coi
-    end
-    return av                # return the final account value
-end
-
-julia&gt; pol = (annual_premium = 1000, face = 100_000, credit_rate = 0.05);
-
-julia&gt; policy_av(pol)        # the ending account value
-4048.08
-
-julia&gt; policy_av'(pol)       # the derivative of the account value with respect to the inputs
-(annual_premium = 6.802, face = -0.0275, credit_rate = 10972.52)</code></pre>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a aria-hidden="true" href="#cb2-1" tabindex="-1"></a>julia<span class="op">&gt;</span> <span class="im">using</span> <span class="bu">Zygote</span></span>
+<span id="cb2-2"><a aria-hidden="true" href="#cb2-2" tabindex="-1"></a></span>
+<span id="cb2-3"><a aria-hidden="true" href="#cb2-3" tabindex="-1"></a>julia<span class="op">&gt;</span> <span class="kw">function</span> <span class="fu">policy_av</span>(pol)</span>
+<span id="cb2-4"><a aria-hidden="true" href="#cb2-4" tabindex="-1"></a>    COIs <span class="op">=</span> [<span class="fl">0.00319</span>, <span class="fl">0.00345</span>, <span class="fl">0.0038</span>, <span class="fl">0.00419</span>, <span class="fl">0.0047</span>, <span class="fl">0.00532</span>]</span>
+<span id="cb2-5"><a aria-hidden="true" href="#cb2-5" tabindex="-1"></a>    av <span class="op">=</span> <span class="fl">0.0</span></span>
+<span id="cb2-6"><a aria-hidden="true" href="#cb2-6" tabindex="-1"></a>    <span class="cf">for</span> (i,coi) <span class="kw">in</span> <span class="fu">enumerate</span>(COIs)</span>
+<span id="cb2-7"><a aria-hidden="true" href="#cb2-7" tabindex="-1"></a>        av <span class="op">+=</span> av <span class="op">*</span> pol.credit_rate</span>
+<span id="cb2-8"><a aria-hidden="true" href="#cb2-8" tabindex="-1"></a>        av <span class="op">+=</span> pol.annual_premium</span>
+<span id="cb2-9"><a aria-hidden="true" href="#cb2-9" tabindex="-1"></a>        av <span class="op">-=</span> pol.face <span class="op">*</span> coi</span>
+<span id="cb2-10"><a aria-hidden="true" href="#cb2-10" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb2-11"><a aria-hidden="true" href="#cb2-11" tabindex="-1"></a>    <span class="cf">return</span> av                <span class="co"># return the final account value</span></span>
+<span id="cb2-12"><a aria-hidden="true" href="#cb2-12" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb2-13"><a aria-hidden="true" href="#cb2-13" tabindex="-1"></a></span>
+<span id="cb2-14"><a aria-hidden="true" href="#cb2-14" tabindex="-1"></a>julia<span class="op">&gt;</span> pol <span class="op">=</span> (annual_premium <span class="op">=</span> <span class="fl">1000</span>, face <span class="op">=</span> <span class="fl">100_000</span>, credit_rate <span class="op">=</span> <span class="fl">0.05</span>);</span>
+<span id="cb2-15"><a aria-hidden="true" href="#cb2-15" tabindex="-1"></a></span>
+<span id="cb2-16"><a aria-hidden="true" href="#cb2-16" tabindex="-1"></a>julia<span class="op">&gt;</span> <span class="fu">policy_av</span>(pol)        <span class="co"># the ending account value</span></span>
+<span id="cb2-17"><a aria-hidden="true" href="#cb2-17" tabindex="-1"></a><span class="fl">4048.08</span></span>
+<span id="cb2-18"><a aria-hidden="true" href="#cb2-18" tabindex="-1"></a></span>
+<span id="cb2-19"><a aria-hidden="true" href="#cb2-19" tabindex="-1"></a>julia<span class="op">&gt;</span> policy_av<span class="op">'</span>(pol)       <span class="co"># the derivative of the account value with respect to the inputs</span></span>
+<span id="cb2-20"><a aria-hidden="true" href="#cb2-20" tabindex="-1"></a>(annual_premium <span class="op">=</span> <span class="fl">6.802</span>, face <span class="op">=</span> <span class="op">-</span><span class="fl">0.0275</span>, credit_rate <span class="op">=</span> <span class="fl">10972.52</span>)</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <p>When executing the code above, Julia isn’t just adding a small amount and calculating the finite difference. Differentiation is applied to entire programs through extensive use of basic derivatives and the chain rule. <strong>Automatic differentiation</strong>, has uses in optimization, machine learning, sensitivity testing, and risk analysis. You can read more about Julia’s autodiff ecosystem <a href="https://juliadiff.org/">here</a>.</p>
 </section>
-<section id="utilities" class="level3">
+<section class="level3" id="utilities">
 <h3 class="anchored" data-anchor-id="utilities">Utilities</h3>
 <p>There are also a lot of quality-of-life packages, like <a href="https://timholy.github.io/Revise.jl/stable/"><code>Revise.jl</code></a> which lets you edit code on the fly without needing to re-run entire scripts.</p>
 <p><a href="https://github.com/JuliaCI/BenchmarkTools.jl"><code>BenchmarkTools.jl</code></a> makes it incredibly easy to benchmark your code - simply add <code>@benchmark</code> in front of what you want to test, and you will be presented with detailed statistics. For example:</p>
-<pre class="julia"><code>julia&gt; using ActuaryUtilities, BenchmarkTools
-
-julia&gt; @benchmark present_value(0.05,[10,10,10])
-
-BenchmarkTools.Trial: 10000 samples with 994 evaluations.
- Range (min … max):  33.492 ns … 829.015 ns  ┊ GC (min … max): 0.00% … 95.40%
- Time  (median):     34.708 ns               ┊ GC (median):    0.00%
- Time  (mean ± σ):   36.599 ns ±  33.686 ns  ┊ GC (mean ± σ):  4.40% ±  4.55%
-
-  ▁▃▆▆▆██▇▄▃▂         ▁                                        ▂
-  █████████████▆▆▇█▇████▇██▇█▇█▇▇▆▆▅▅▅▅▅▄▅▄▄▅▅▅▅▄▄▁▅▄▄▅▄▄▅▅▆▅▆ █
-  33.5 ns       Histogram: log(frequency) by time      45.6 ns &lt;
-
- Memory estimate: 112 bytes, allocs estimate: 1.
-</code></pre>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a aria-hidden="true" href="#cb3-1" tabindex="-1"></a>julia<span class="op">&gt;</span> <span class="im">using</span> <span class="bu">ActuaryUtilities</span>, <span class="bu">BenchmarkTools</span></span>
+<span id="cb3-2"><a aria-hidden="true" href="#cb3-2" tabindex="-1"></a></span>
+<span id="cb3-3"><a aria-hidden="true" href="#cb3-3" tabindex="-1"></a>julia<span class="op">&gt;</span> <span class="pp">@benchmark</span> <span class="fu">present_value</span>(<span class="fl">0.05</span>,[<span class="fl">10</span>,<span class="fl">10</span>,<span class="fl">10</span>])</span>
+<span id="cb3-4"><a aria-hidden="true" href="#cb3-4" tabindex="-1"></a></span>
+<span id="cb3-5"><a aria-hidden="true" href="#cb3-5" tabindex="-1"></a>BenchmarkTools.Trial<span class="op">:</span> <span class="fl">10000</span> samples with <span class="fl">994</span> evaluations.</span>
+<span id="cb3-6"><a aria-hidden="true" href="#cb3-6" tabindex="-1"></a> <span class="dt">Range</span> (min <span class="op">…</span> max)<span class="op">:</span>  <span class="fl">33.492</span> ns <span class="op">…</span> <span class="fl">829.015</span> ns  ┊ GC (min <span class="op">…</span> max)<span class="op">:</span> <span class="fl">0.00</span><span class="op">%</span> <span class="op">…</span> <span class="fl">95.40</span><span class="op">%</span></span>
+<span id="cb3-7"><a aria-hidden="true" href="#cb3-7" tabindex="-1"></a> <span class="dt">Time</span>  (median)<span class="op">:</span>     <span class="fl">34.708</span> ns               ┊ GC (median)<span class="op">:</span>    <span class="fl">0.00</span><span class="op">%</span></span>
+<span id="cb3-8"><a aria-hidden="true" href="#cb3-8" tabindex="-1"></a> <span class="dt">Time</span>  (mean <span class="op">±</span> σ)<span class="op">:</span>   <span class="fl">36.599</span> ns <span class="op">±</span>  <span class="fl">33.686</span> ns  ┊ GC (mean <span class="op">±</span> σ)<span class="op">:</span>  <span class="fl">4.40</span><span class="op">%</span> <span class="op">±</span>  <span class="fl">4.55</span><span class="op">%</span></span>
+<span id="cb3-9"><a aria-hidden="true" href="#cb3-9" tabindex="-1"></a></span>
+<span id="cb3-10"><a aria-hidden="true" href="#cb3-10" tabindex="-1"></a>  ▁▃▆▆▆██▇▄▃▂         ▁                                        ▂</span>
+<span id="cb3-11"><a aria-hidden="true" href="#cb3-11" tabindex="-1"></a>  █████████████▆▆▇█▇████▇██▇█▇█▇▇▆▆▅▅▅▅▅▄▅▄▄▅▅▅▅▄▄▁▅▄▄▅▄▄▅▅▆▅▆ █</span>
+<span id="cb3-12"><a aria-hidden="true" href="#cb3-12" tabindex="-1"></a>  <span class="fl">33.5</span> ns       Histogram<span class="op">:</span> <span class="fu">log</span>(frequency) by time      <span class="fl">45.6</span> ns <span class="op">&lt;</span></span>
+<span id="cb3-13"><a aria-hidden="true" href="#cb3-13" tabindex="-1"></a></span>
+<span id="cb3-14"><a aria-hidden="true" href="#cb3-14" tabindex="-1"></a> Memory estimate<span class="op">:</span> <span class="fl">112</span> bytes, allocs estimate<span class="op">:</span> <span class="fl">1</span>.</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <p><code>Test</code> is a built-in package for performing testsets, while <a href="https://github.com/JuliaDocs/Documenter.jl"><code>Documenter.jl</code></a> will build high-quality documentation based on your inline documentation.</p>
 <p><a href="https://github.com/pdeffebach/ClipData.jl"><code>ClipData.jl</code></a> lets you copy and paste from spreadsheets to Julia sessions.</p>
 </section>
-<section id="other-packages" class="level3">
+<section class="level3" id="other-packages">
 <h3 class="anchored" data-anchor-id="other-packages">Other packages</h3>
 <p>Julia is a general-purpose language, so you will find packages for web development, graphics, game development, audio production, and much more. You can explore packages (and their dependencies) at https://juliahub.com/.</p>
 </section>
-<section id="actuarial-packages" class="level3">
+<section class="level3" id="actuarial-packages">
 <h3 class="anchored" data-anchor-id="actuarial-packages">Actuarial packages</h3>
 <p>Saving the best for last, the next article in the series will dive deeper into actuarial packages, such as those published by <a href="https://JuliaActuary.org">JuliaActuary</a> for easy mortality table manipulation, common actuarial functions, financial math, and experience analysis.</p>
 </section>
 </section>
-<section id="getting-help" class="level2">
+<section class="level2" id="getting-help">
 <h2 class="anchored" data-anchor-id="getting-help">Getting Help</h2>
 <p>Aside from the usual StackOverflow, there is a <a href="https://julialang.org/community/">community page</a> with links to the Discourse forum, Slack, and Zulip. The latter two have a dedicated <code>#actuary</code> channel.</p>
 </section>
-<section id="summary" class="level2">
+<section class="level2" id="summary">
 <h2 class="anchored" data-anchor-id="summary">Summary</h2>
 <p>This article introduced Julia, getting setup with running and editing, and pointed toward a number of general-purpose features and packages useful to actuaries. The next article in the series will focus on the range of actuarial-specific packages available.</p>
-
-
 </section>
-
-
-<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
-
+<div class="default" id="quarto-appendix"><section class="footnotes footnotes-end-of-document" id="footnotes" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
 <ol>
-<li id="fn1"><p>https://ocw.mit.edu/courses/mathematics/18-335j-introduction-to-numerical-methods-spring-2019/week-1/Julia-intro.pdf<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn2"><p>https://discourse.julialang.org/t/claim-false-julia-isnt-multiple-dispatch-but-overloading/42370/114<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn3"><p>Perhaps benchmarking isn’t the best example because of the ‘magic’ <code>%timeit</code> keyword in Jupyter. However, the <a href="https://ipython.readthedocs.io/en/stable/interactive/magics.html">documentation</a> for IPython itself reveals the limitations: “To Jupyter users: Magics are specific to and provided by the IPython kernel. Whether Magics are available on a kernel is a decision that is made by the kernel developer on a per-kernel basis. To work properly, Magics must use a syntax element which is not valid in the underlying language.”<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn4"><p>As of July 2021.<a href="#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn1"><p>https://ocw.mit.edu/courses/mathematics/18-335j-introduction-to-numerical-methods-spring-2019/week-1/Julia-intro.pdf<a class="footnote-back" href="#fnref1" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>https://discourse.julialang.org/t/claim-false-julia-isnt-multiple-dispatch-but-overloading/42370/114<a class="footnote-back" href="#fnref2" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3"><p>Perhaps benchmarking isn’t the best example because of the ‘magic’ <code>%timeit</code> keyword in Jupyter. However, the <a href="https://ipython.readthedocs.io/en/stable/interactive/magics.html">documentation</a> for IPython itself reveals the limitations: “To Jupyter users: Magics are specific to and provided by the IPython kernel. Whether Magics are available on a kernel is a decision that is made by the kernel developer on a per-kernel basis. To work properly, Magics must use a syntax element which is not valid in the underlying language.”<a class="footnote-back" href="#fnref3" role="doc-backlink">↩︎</a></p></li>
+<li id="fn4"><p>As of July 2021.<a class="footnote-back" href="#fnref4" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -821,8 +827,4 @@ BenchmarkTools.Trial: 10000 samples with 994 evaluations.
   });
   </script>
 </div> <!-- /content -->
-
-
-
-
 </body></html>

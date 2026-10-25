@@ -1,13 +1,10 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
-<meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.16">
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-
-<meta name="description" content="JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.">
-
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml"><head>
+<meta charset="utf-8"/>
+<meta content="quarto-1.9.16" name="generator"/>
+<meta content="width=device-width, initial-scale=1.0, user-scalable=yes" name="viewport"/>
+<meta content="JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows." name="description"/>
 <title>Bayesian vs Limited Fluctuation Experience Analysis – JuliaActuary</title>
 <style>
 code{white-space: pre-wrap;}
@@ -21,28 +18,61 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
-
-
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script crossorigin="anonymous" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script><script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="../../site_libs/quarto-nav/headroom.min.js"></script>
 <script src="../../site_libs/clipboard/clipboard.min.js"></script>
 <script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="../../">
-<link href="../..//assets/logos/favicon.ico" rel="icon">
+<meta content="../../" name="quarto:offset"/>
+<link href="../..//assets/logos/favicon.ico" rel="icon"/>
 <script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
-<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-a0731b9a3a5d496010872d775e5d9bc3.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet"/>
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-be14ce6d32a635bebd8f9e4e558f9eeb.css" id="quarto-text-highlighting-styles" rel="stylesheet"/>
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-98ac2d5361ef6f18cc0525d38bedc462.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet"/>
+<link append-hash="true" data-mode="light" href="../../site_libs/bootstrap/bootstrap-4a135b976b00f53a3a768ff94eb1df18.min.css" id="quarto-bootstrap" rel="stylesheet"/>
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -70,24 +100,14 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
-
+<script crossorigin="anonymous" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js"></script>
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&amp;family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&amp;display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../../assets/highlight/styles/github.min.css">
-<script src="../../assets/highlight/highlight.min.js"></script>
-<script src="../../assets/highlight/languages/julia.min.js"></script>
-<script src="../../assets/highlight/languages/julia-repl.min.js"></script>
-<script src="../../assets/highlight/languages/python.min.js"></script>
-<script src="../../assets/highlight/languages/r.min.js"></script>
-<script>hljs.highlightAll();</script>
-<script data-goatcounter="https://juliaactuary.goatcounter.com/count" async="" src="//gc.zgo.at/count.js"></script>
-
-  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
-
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" rel="stylesheet"/>
+<script async="" data-goatcounter="https://juliaactuary.goatcounter.com/count" src="//gc.zgo.at/count.js"></script>
+<script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 <script type="text/javascript">
 const typesetMath = (el) => {
   if (window.MathJax) {
@@ -114,141 +134,131 @@ window.Quarto = {
   typesetMath
 };
 </script>
-
-<link rel="stylesheet" href="../../styles.css">
+<link href="../../styles-c416c153cdf24884.css" rel="stylesheet"/>
 </head>
-
 <body class="nav-fixed fullcontent quarto-light">
-
 <div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top quarto-banner">
-    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
-      <div class="navbar-container container-fluid">
-      <div class="navbar-brand-container mx-auto">
-    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
-    <img src="../../assets/logos/android-chrome-512x512.png" alt="JuliaActuary Logo" class="navbar-logo light-content">
-    <img src="../../assets/logos/android-chrome-512x512.png" alt="JuliaActuary Logo" class="navbar-logo dark-content">
-    </a>
-    <a class="navbar-brand" href="../../index.html">
-    <span class="navbar-title">JuliaActuary</span>
-    </a>
-  </div>
-            <div id="quarto-search" class="" title="Search"></div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-  <span class="navbar-toggler-icon"></span>
-</button>
-          <div class="collapse navbar-collapse" id="navbarCollapse">
-            <ul class="navbar-nav navbar-nav-scroll ms-auto">
-  <li class="nav-item">
-    <a class="nav-link" href="../../packages.html"> 
-<span class="menu-text">Packages</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="https://docs.juliaactuary.org"> 
-<span class="menu-text">Docs</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="https://modernfinancialmodeling.com"> 
-<span class="menu-text">Book</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../learn.html"> 
-<span class="menu-text">Learn</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../examples.html"> 
-<span class="menu-text">Examples</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../benchmarks.html"> 
-<span class="menu-text">Benchmarks</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../community.html"> 
-<span class="menu-text">Community</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../blog.html"> 
-<span class="menu-text">Blog</span></a>
-  </li>  
-  <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/JuliaActuary"> <i class="bi bi-github" role="img">
-</i> 
-<span class="menu-text"></span></a>
-  </li>  
-  <li class="nav-item compact">
-    <a class="nav-link" href="../../all-posts.xml"> <i class="bi bi-rss" role="img">
-</i> 
-<span class="menu-text"></span></a>
-  </li>  
-</ul>
-          </div> <!-- /navcollapse -->
-            <div class="quarto-navbar-tools">
+<header class="headroom fixed-top quarto-banner" id="quarto-header">
+<nav class="navbar navbar-expand-lg" data-bs-theme="dark">
+<div class="navbar-container container-fluid">
+<div class="navbar-brand-container mx-auto">
+<a class="navbar-brand navbar-brand-logo" href="../../index.html">
+<img alt="JuliaActuary Logo" class="navbar-logo light-content" src="../../assets/logos/android-chrome-512x512.png"/>
+<img alt="JuliaActuary Logo" class="navbar-logo dark-content" src="../../assets/logos/android-chrome-512x512.png"/>
+</a>
+<a class="navbar-brand" href="../../index.html">
+<span class="navbar-title">JuliaActuary</span>
+</a>
 </div>
-      </div> <!-- /container-fluid -->
-    </nav>
+<div class="" id="quarto-search" title="Search"></div>
+<button aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-bs-target="#navbarCollapse" data-bs-toggle="collapse" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }" role="menu" type="button">
+<span class="navbar-toggler-icon"></span>
+</button>
+<div class="collapse navbar-collapse" id="navbarCollapse">
+<ul class="navbar-nav navbar-nav-scroll ms-auto">
+<li class="nav-item">
+<a class="nav-link" href="../../packages.html">
+<span class="menu-text">Packages</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="https://docs.juliaactuary.org">
+<span class="menu-text">Docs</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="../../learn.html">
+<span class="menu-text">Learn</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="../../examples.html">
+<span class="menu-text">Examples</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="../../community.html">
+<span class="menu-text">Community</span></a>
+</li>
+<li class="nav-item dropdown">
+<a aria-expanded="false" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" id="nav-menu-more" role="link">
+<span class="menu-text">More</span>
+</a>
+<ul aria-labelledby="nav-menu-more" class="dropdown-menu dropdown-menu-end">
+<li>
+<a class="dropdown-item" href="../../benchmarks.html">
+<span class="dropdown-text">Benchmarks</span></a>
+</li>
+<li>
+<a class="dropdown-item" href="../../blog.html">
+<span class="dropdown-text">Blog</span></a>
+</li>
+<li>
+<a class="dropdown-item" href="https://modernfinancialmodeling.com">
+<span class="dropdown-text">Book</span></a>
+</li>
+</ul>
+</li>
+<li class="nav-item compact">
+<a class="nav-link" href="https://github.com/JuliaActuary"> <i aria-label="JuliaActuary on GitHub" class="bi bi-github" role="img">
+</i>
+<span class="menu-text"></span></a>
+</li>
+<li class="nav-item compact">
+<a class="nav-link" href="../../all-posts.xml"> <i aria-label="RSS feed" class="bi bi-rss" role="img">
+</i>
+<span class="menu-text"></span></a>
+</li>
+</ul>
+</div> <!-- /navcollapse -->
+<div class="quarto-navbar-tools">
+</div>
+</div> <!-- /container-fluid -->
+</nav>
 </header>
 <!-- content -->
-<header id="title-block-header" class="quarto-title-block default page-columns page-full">
-  <div class="quarto-title-banner page-columns page-full">
-    <div class="quarto-title column-body">
-      <h1 class="title">Bayesian vs Limited Fluctuation Experience Analysis</h1>
-                  <div>
-        <div class="description">
+<header class="quarto-title-block default page-columns page-full" id="title-block-header">
+<div class="quarto-title-banner page-columns page-full">
+<div class="quarto-title column-body">
+<h1 class="title">Bayesian vs Limited Fluctuation Experience Analysis</h1>
+<div>
+<div class="description">
           JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.
         </div>
-      </div>
-                          <div class="quarto-categories">
-                <div class="quarto-category">modeling</div>
-                <div class="quarto-category">statistics</div>
-                <div class="quarto-category">experience-analysis</div>
-                <div class="quarto-category">bayesian</div>
-              </div>
-                  </div>
-  </div>
-    
-  
-  <div class="quarto-title-meta">
-
-      
-    
-      
-    </div>
-    
-  
-  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+</div>
+<div class="quarto-categories">
+<div class="quarto-category">modeling</div>
+<div class="quarto-category">statistics</div>
+<div class="quarto-category">experience-analysis</div>
+<div class="quarto-category">bayesian</div>
+</div>
+</div>
+</div>
+<div class="quarto-title-meta">
+</div>
+</header><div class="quarto-container page-columns page-rows-contents page-layout-article page-navbar" id="quarto-content">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    
 <!-- main -->
 <main class="content quarto-banner-title-block" id="quarto-document-content">
-
-
-
-
-
 <p>Alternate title: Why actuaries should cease to care about the number 1082.</p>
-<section id="introduction" class="level2">
+<section class="level2" id="introduction">
 <h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
 <p>This notebook briefly discusses two approaches to experience analysis (rate setting). One traditional method, Limited Fluctuation Credibility (LFC), has been around for a very long time although was never intended to be the most accurate predictive method. However, many actuaries still discuss the notion of “full” or “partially” credible indicating a reliance on the LFC concepts.</p>
 <p>The Bayesian approach uses explicit assumptions about the statistical relationships and all data given to the model to make inferences. Small datasets lead to greater uncertainty, while larger datasets never reach a point that could be considered “fully credible”, although the posterior density may narrow considerably.</p>
 <p>This notebook argues that the Bayesian approach is superior to the LFC heuristics and should be adopted more widely in actuarial practice.</p>
 <p>The example will use an auto-claims dataset and will use the first two years of experience to predict the third.</p>
-<div id="4" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>using CSV
-using DataFramesMeta
-using Distributions
-using Turing
-using MCMCChains
-using DataFrames
-using Logging;
-Logging.disable_logging(Logging.Warn);
-using StatsFuns
-using StatisticalRethinking
-using CairoMakie
-
-include(joinpath(@__DIR__, "..", "..", "assets", "themes", "cassette_futurism.jl"))
-set_theme!(cassette_futurism_theme())</code></pre>
+<div class="cell" data-execution_count="1" id="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a aria-hidden="true" href="#cb1-1" tabindex="-1"></a><span class="im">using</span> <span class="bu">CSV</span></span>
+<span id="cb1-2"><a aria-hidden="true" href="#cb1-2" tabindex="-1"></a><span class="im">using</span> <span class="bu">DataFramesMeta</span></span>
+<span id="cb1-3"><a aria-hidden="true" href="#cb1-3" tabindex="-1"></a><span class="im">using</span> <span class="bu">Distributions</span></span>
+<span id="cb1-4"><a aria-hidden="true" href="#cb1-4" tabindex="-1"></a><span class="im">using</span> <span class="bu">Turing</span></span>
+<span id="cb1-5"><a aria-hidden="true" href="#cb1-5" tabindex="-1"></a><span class="im">using</span> <span class="bu">MCMCChains</span></span>
+<span id="cb1-6"><a aria-hidden="true" href="#cb1-6" tabindex="-1"></a><span class="im">using</span> <span class="bu">DataFrames</span></span>
+<span id="cb1-7"><a aria-hidden="true" href="#cb1-7" tabindex="-1"></a><span class="im">using</span> <span class="bu">Logging;</span></span>
+<span id="cb1-8"><a aria-hidden="true" href="#cb1-8" tabindex="-1"></a><span class="bu">Logging</span>.<span class="fu">disable_logging</span>(<span class="bu">Logging</span>.Warn);</span>
+<span id="cb1-9"><a aria-hidden="true" href="#cb1-9" tabindex="-1"></a><span class="im">using</span> <span class="bu">StatsFuns</span></span>
+<span id="cb1-10"><a aria-hidden="true" href="#cb1-10" tabindex="-1"></a><span class="im">using</span> <span class="bu">StatisticalRethinking</span></span>
+<span id="cb1-11"><a aria-hidden="true" href="#cb1-11" tabindex="-1"></a><span class="im">using</span> <span class="bu">CairoMakie</span></span>
+<span id="cb1-12"><a aria-hidden="true" href="#cb1-12" tabindex="-1"></a></span>
+<span id="cb1-13"><a aria-hidden="true" href="#cb1-13" tabindex="-1"></a><span class="fu">include</span>(<span class="fu">joinpath</span>(<span class="pp">@__DIR__</span>, <span class="st">".."</span>, <span class="st">".."</span>, <span class="st">"assets"</span>, <span class="st">"themes"</span>, <span class="st">"cassette_futurism.jl"</span>))</span>
+<span id="cb1-14"><a aria-hidden="true" href="#cb1-14" tabindex="-1"></a><span class="fu">set_theme!</span>(<span class="fu">cassette_futurism_theme</span>())</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>WARNING: Constructor for type "HMC" was extended in `StatisticalRethinking` without explicit qualification or import.
   NOTE: Assumed "HMC" refers to `Turing.HMC`. This behavior is deprecated and may differ in future versions.`
@@ -258,22 +268,22 @@ set_theme!(cassette_futurism_theme())</code></pre>
 </div>
 </div>
 </section>
-<section id="limited-fluctuation-credibility" class="level2">
+<section class="level2" id="limited-fluctuation-credibility">
 <h2 class="anchored" data-anchor-id="limited-fluctuation-credibility">Limited Fluctuation Credibility</h2>
 <blockquote class="blockquote">
 <p>The Limited Fluctuation Method was so named because it allowed premiums to fluctuate from year to year based on experience, while limiting those fluctuations by giving less than full credibility to premiums based on limited data. In contrast, setting premium rates by giving full credibility to recent experience could be called the Full Fluctuation Method. While every credibility method serves to limit fluctuations, this method acquired its name because it was the first. The Limited Fluctuation Method, also known as Classical Credibility, is the most widely-used credibility method because it can be relatively simple to apply. Outside North America, this method is sometimes referred to as American Credibility.</p>
 </blockquote>
 <p>Quoted from <a href="https://www.soa.org/globalassets/assets/files/resources/tables-calcs-tools/credibility-methods-life-health-pensions.pdf">Atkinson, 2019</a>.</p>
-<section id="formulas" class="level3">
+<section class="level3" id="formulas">
 <h3 class="anchored" data-anchor-id="formulas">Formulas</h3>
 <p>The Limited Fluctuation Method components: a credibility weight, <span class="math display">\[Z\]</span>, an Observed Rate, and a Prior Rate.</p>
 <p><span class="math display">\[
 \text{Credibility-Weighted Rate} = Z × \text{Observed Rate} + (1 – Z) × \text{Prior Rate}
 \]</span></p>
 <p>With probability equal to <span class="math inline">\(LC_p\)</span> that the Observed Rate does not differ from the true rate by more than <span class="math inline">\(LC_r\)</span>.</p>
-<div id="6" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>LC_p = 0.9
-LC_r = 0.05</code></pre>
+<div class="cell" data-execution_count="1" id="6">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a aria-hidden="true" href="#cb3-1" tabindex="-1"></a>LC_p <span class="op">=</span> <span class="fl">0.9</span></span>
+<span id="cb3-2"><a aria-hidden="true" href="#cb3-2" tabindex="-1"></a>LC_r <span class="op">=</span> <span class="fl">0.05</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>0.05</code></pre>
 </div>
@@ -281,8 +291,8 @@ LC_r = 0.05</code></pre>
 <p><span class="math display">\[
 \text{Claims for full credibility} = \left(\frac{\text{Z-Score}}{\text{ratio}}\right)^{2}
 \]</span></p>
-<div id="8" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>LC_full_credibility = round(Int, (quantile(Normal(), 1 - (1 - LC_p) / 2) / LC_r)^2)</code></pre>
+<div class="cell" data-execution_count="1" id="8">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a aria-hidden="true" href="#cb5-1" tabindex="-1"></a>LC_full_credibility <span class="op">=</span> <span class="fu">round</span>(<span class="dt">Int</span>, (<span class="fu">quantile</span>(<span class="fu">Normal</span>(), <span class="fl">1</span> <span class="op">-</span> (<span class="fl">1</span> <span class="op">-</span> LC_p) <span class="op">/</span> <span class="fl">2</span>) <span class="op">/</span> LC_r)<span class="op">^</span><span class="fl">2</span>)</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>1082</code></pre>
 </div>
@@ -294,7 +304,7 @@ LC_r = 0.05</code></pre>
 Z = \sqrt{\frac{\text{no. claims in group}}{\text{no. claims full credibility}}}
 \]</span></p>
 </section>
-<section id="issues-with-limited-fluctuation" class="level3">
+<section class="level3" id="issues-with-limited-fluctuation">
 <h3 class="anchored" data-anchor-id="issues-with-limited-fluctuation">Issues with Limited Fluctuation</h3>
 <ul>
 <li>Ignores available information:
@@ -306,12 +316,12 @@ Z = \sqrt{\frac{\text{no. claims in group}}{\text{no. claims full credibility}}}
 <li>Relies on a number of assumptions/constraints:
 <ul>
 <li>That aggregated claims can be approximated by a normal distribution</li>
-<li>The thresholds of $LC_p and $LC_r are arbitrary (e.g.&nbsp;all of the same arguments against p-value thresholds can apply to this approach) ““”</li>
+<li>The thresholds of $LC_p and $LC_r are arbitrary (e.g. all of the same arguments against p-value thresholds can apply to this approach) ““”</li>
 </ul></li>
 </ul>
 </section>
 </section>
-<section id="bayesian-approach" class="level2">
+<section class="level2" id="bayesian-approach">
 <h2 class="anchored" data-anchor-id="bayesian-approach">Bayesian Approach</h2>
 <p>Bayes’ formula of updating the posterior probability conditioned on the observed data:</p>
 <p><span class="math display">\[
@@ -321,29 +331,29 @@ P(A\mid B) = \frac{P(B \mid A) P(A)}{P(B)}
 <p>The issue is that once the probability distributions and data become non-trivial, the formula becomes analytically intractable. Work over the last several decades has set the stage for addressing these situations by developing algorithms that let you sample the Bayesian posterior, even if you can’t analytically say what that is.</p>
 <p>A full overview is beyond the scope of this notebook, which is simply to demonstrate that Limited Fluctuation Credibility is of questionable use in practice and that superior tools exist. For references on modern Bayesian statistics, see the end notes.</p>
 <p>Note that this is describing a <em>different</em>, more first-principles approach than the the Buhlman Bayesian approach, which attempts to simply relate group experience to population experience. The Bayesian approach described here is much more general and extensible.</p>
-<section id="the-formulation" class="level3">
+<section class="level3" id="the-formulation">
 <h3 class="anchored" data-anchor-id="the-formulation">The formulation</h3>
 <p>Contrary to Limited Fluctuation, the Bayesian approach forces one to be explicit about the presumed structure of the probability model. The flexibility of the statistical model allows one to incorporate actuarial judgement in a quantitative way. For example, in this example we assume that the claims experience of each group informs a global (hyperparameter) prior distribution which we could use as a starting point for a new type of observation. More on this once the data is introduced.</p>
 </section>
 </section>
-<section id="sample-claims-prediction" class="level2">
+<section class="level2" id="sample-claims-prediction">
 <h2 class="anchored" data-anchor-id="sample-claims-prediction">Sample Claims Prediction</h2>
 <p>The data comes from an <a href="https://www.kaggle.com/competitions/ClaimPredictionChallenge/data?select=dictionary.html">Allstate auto-claims data via Kaggle</a>. It contains exposure level information about predictor variable and claim amounts for calendar years 2005-2007.</p>
 <p>For simplicity, we will focus on the narrow objective of estimating the claims rate at the level of automobile make and model. We will use the years 2005 and 2006 as the training data set and then 2007 to evaluate the predictive model.</p>
 <p>The original data is over 13 million rows, we will load an already summarized CSV and split it into <code>train</code> and <code>test</code> sets based on the <code>Calendar_Year</code>.</p>
-<div id="10" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>train, test = let
-    pth = download("https://raw.githubusercontent.com/JuliaActuary/Learn/master/data/condensed_auto_claims.csv")
-    df = CSV.read(pth, DataFrame, normalizenames=true)
-    df.p_observed = df.claims ./ df.n
-
-
-    train = df[df.Calendar_Year.&lt;2007, :]
-    test = df[df.Calendar_Year.==2007, :]
-
-    train, test
-
-end</code></pre>
+<div class="cell" data-execution_count="1" id="10">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a aria-hidden="true" href="#cb7-1" tabindex="-1"></a>train, test <span class="op">=</span> <span class="kw">let</span></span>
+<span id="cb7-2"><a aria-hidden="true" href="#cb7-2" tabindex="-1"></a>    pth <span class="op">=</span> <span class="fu">download</span>(<span class="st">"https://raw.githubusercontent.com/JuliaActuary/Learn/master/data/condensed_auto_claims.csv"</span>)</span>
+<span id="cb7-3"><a aria-hidden="true" href="#cb7-3" tabindex="-1"></a>    df <span class="op">=</span> CSV.<span class="fu">read</span>(pth, DataFrame, normalizenames<span class="op">=</span><span class="cn">true</span>)</span>
+<span id="cb7-4"><a aria-hidden="true" href="#cb7-4" tabindex="-1"></a>    df.p_observed <span class="op">=</span> df.claims <span class="op">./</span> df.n</span>
+<span id="cb7-5"><a aria-hidden="true" href="#cb7-5" tabindex="-1"></a></span>
+<span id="cb7-6"><a aria-hidden="true" href="#cb7-6" tabindex="-1"></a></span>
+<span id="cb7-7"><a aria-hidden="true" href="#cb7-7" tabindex="-1"></a>    train <span class="op">=</span> df[df.Calendar_Year<span class="op">.&lt;</span><span class="fl">2007</span>, <span class="op">:</span>]</span>
+<span id="cb7-8"><a aria-hidden="true" href="#cb7-8" tabindex="-1"></a>    test <span class="op">=</span> df[df.Calendar_Year<span class="op">.==</span><span class="fl">2007</span>, <span class="op">:</span>]</span>
+<span id="cb7-9"><a aria-hidden="true" href="#cb7-9" tabindex="-1"></a></span>
+<span id="cb7-10"><a aria-hidden="true" href="#cb7-10" tabindex="-1"></a>    train, test</span>
+<span id="cb7-11"><a aria-hidden="true" href="#cb7-11" tabindex="-1"></a></span>
+<span id="cb7-12"><a aria-hidden="true" href="#cb7-12" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div class="ansi-escaped-output">
 <pre>(<span class="ansi-bold">2413×5 DataFrame</span>
@@ -390,7 +400,7 @@ end</code></pre>
 </div>
 </div>
 </div>
-<section id="discussion-of-bayesian-model" class="level3">
+<section class="level3" id="discussion-of-bayesian-model">
 <h3 class="anchored" data-anchor-id="discussion-of-bayesian-model">Discussion of Bayesian model</h3>
 <p>Each group (make and model combination) has an expected claim rate <span class="math inline">\(μ_i\)</span>, which is informed by the global hyperparameter <span class="math inline">\(μ\)</span> and variance <span class="math inline">\(\sigma^2\)</span>. Then, the observed claims by group are assumed to be distributed according to a <a href="https://juliaactuary.org/tutorials/poissonbinomial/">Poisson distribution</a>.</p>
 <p>A complete overview of modern Bayesian models is beyond the scope of this notebook, but a few key points:</p>
@@ -405,43 +415,43 @@ end</code></pre>
 <li><code>μ_i \sim Normal(μ,σ)</code> is the actual prior for each group’s rate of claim and is informed by the above hyperparameters.</li>
 </ul></li>
 <li><code>@model</code> is a Turing.jl macro which enables interpreting the nice <code>~</code> syntax, which makes the Julia code look very similar to the traditional mathematical notation.</li>
-<li>Note the use of broadcasting with the dot syntax (e.g.&nbsp;the <code>.</code> in <code>.~</code>). This tells Julia to vectorize and fuse the computation.
+<li>Note the use of broadcasting with the dot syntax (e.g. the <code>.</code> in <code>.~</code>). This tells Julia to vectorize and fuse the computation.
 <ul>
 <li><code>data.claims ~ product_distribution(Poisson.(data.n .* logistic.(μ_i)))</code> means “each value in <code>data.claims</code> is a random outcome (<code>~</code>) distributed accroding to a corresponding Poisson distribution with <code>\lambda =n \times \text{logistic}(\mu_i)</code> where <code>text{logistic}(\mu_i)</code> is the average claims rate for each group.</li>
 </ul></li>
 </ul>
-<div id="12" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>@model function model_poisson(data, claims)
-    # hyperparameter that informs the prior for each group
-    μ ~ Normal(-2, 4)
-    σ ~ Exponential(0.25)
-
-    # the random variable representing the average claim rate for each group
-    # filldist creates a set of random variable without needing to list out each one
-    μ_i ~ filldist(Normal(μ, σ), length(unique(data.Blind_Model)))
-
-    # use the poisson appproximation to the binomial claim outcome with a
-    # logisitc link function to keep the probability between 0 and 1
-    claims ~ product_distribution(Poisson.(data.n .* logistic.(μ_i)))
-end</code></pre>
+<div class="cell" data-execution_count="1" id="12">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a aria-hidden="true" href="#cb8-1" tabindex="-1"></a><span class="pp">@model</span> <span class="kw">function</span> <span class="fu">model_poisson</span>(data, claims)</span>
+<span id="cb8-2"><a aria-hidden="true" href="#cb8-2" tabindex="-1"></a>    <span class="co"># hyperparameter that informs the prior for each group</span></span>
+<span id="cb8-3"><a aria-hidden="true" href="#cb8-3" tabindex="-1"></a>    μ <span class="op">~</span> <span class="fu">Normal</span>(<span class="op">-</span><span class="fl">2</span>, <span class="fl">4</span>)</span>
+<span id="cb8-4"><a aria-hidden="true" href="#cb8-4" tabindex="-1"></a>    σ <span class="op">~</span> <span class="fu">Exponential</span>(<span class="fl">0.25</span>)</span>
+<span id="cb8-5"><a aria-hidden="true" href="#cb8-5" tabindex="-1"></a></span>
+<span id="cb8-6"><a aria-hidden="true" href="#cb8-6" tabindex="-1"></a>    <span class="co"># the random variable representing the average claim rate for each group</span></span>
+<span id="cb8-7"><a aria-hidden="true" href="#cb8-7" tabindex="-1"></a>    <span class="co"># filldist creates a set of random variable without needing to list out each one</span></span>
+<span id="cb8-8"><a aria-hidden="true" href="#cb8-8" tabindex="-1"></a>    μ_i <span class="op">~</span> <span class="fu">filldist</span>(<span class="fu">Normal</span>(μ, σ), <span class="fu">length</span>(<span class="fu">unique</span>(data.Blind_Model)))</span>
+<span id="cb8-9"><a aria-hidden="true" href="#cb8-9" tabindex="-1"></a></span>
+<span id="cb8-10"><a aria-hidden="true" href="#cb8-10" tabindex="-1"></a>    <span class="co"># use the poisson appproximation to the binomial claim outcome with a</span></span>
+<span id="cb8-11"><a aria-hidden="true" href="#cb8-11" tabindex="-1"></a>    <span class="co"># logisitc link function to keep the probability between 0 and 1</span></span>
+<span id="cb8-12"><a aria-hidden="true" href="#cb8-12" tabindex="-1"></a>    claims <span class="op">~</span> <span class="fu">product_distribution</span>(<span class="fu">Poisson</span>.(data.n <span class="op">.*</span> <span class="fu">logistic</span>.(μ_i)))</span>
+<span id="cb8-13"><a aria-hidden="true" href="#cb8-13" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>model_poisson (generic function with 2 methods)</code></pre>
 </div>
 </div>
 <p>Here’s what the prior distribution of claims looks like… and peeking ahead to what the posterior for a single group of claims looks like. See how even though our posterior was very wide (favoring small claims rates), it was dominated by the data to create a very narrow posterior average claims rate.</p>
 <p>The model is combined with the data and <a href="https://turing.ml/stable/">Turing.jl</a> is used to computationally arrive at the posterior distribution for the parameters in the statistical model, <span class="math inline">\(\mu\)</span>, <span class="math inline">\(\mu_i\)</span>, and <span class="math inline">\(\sigma\)</span>.</p>
-<div id="14" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>mp = let
-    # combine the different years in the training set
-    condensed = @chain train begin
-        groupby(:Blind_Model)
-        @combine begin
-            :n = sum(:n)
-            :claims = sum(:claims)
-        end
-    end
-    model_poisson(condensed, condensed.claims)
-end</code></pre>
+<div class="cell" data-execution_count="1" id="14">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb10-1"><a aria-hidden="true" href="#cb10-1" tabindex="-1"></a>mp <span class="op">=</span> <span class="kw">let</span></span>
+<span id="cb10-2"><a aria-hidden="true" href="#cb10-2" tabindex="-1"></a>    <span class="co"># combine the different years in the training set</span></span>
+<span id="cb10-3"><a aria-hidden="true" href="#cb10-3" tabindex="-1"></a>    condensed <span class="op">=</span> <span class="pp">@chain</span> train <span class="cf">begin</span></span>
+<span id="cb10-4"><a aria-hidden="true" href="#cb10-4" tabindex="-1"></a>        <span class="fu">groupby</span>(<span class="op">:</span>Blind_Model)</span>
+<span id="cb10-5"><a aria-hidden="true" href="#cb10-5" tabindex="-1"></a>        <span class="pp">@combine</span> <span class="cf">begin</span></span>
+<span id="cb10-6"><a aria-hidden="true" href="#cb10-6" tabindex="-1"></a>            <span class="op">:</span>n <span class="op">=</span> <span class="fu">sum</span>(<span class="op">:</span>n)</span>
+<span id="cb10-7"><a aria-hidden="true" href="#cb10-7" tabindex="-1"></a>            <span class="op">:</span>claims <span class="op">=</span> <span class="fu">sum</span>(<span class="op">:</span>claims)</span>
+<span id="cb10-8"><a aria-hidden="true" href="#cb10-8" tabindex="-1"></a>        <span class="cf">end</span></span>
+<span id="cb10-9"><a aria-hidden="true" href="#cb10-9" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb10-10"><a aria-hidden="true" href="#cb10-10" tabindex="-1"></a>    <span class="fu">model_poisson</span>(condensed, condensed.claims)</span>
+<span id="cb10-11"><a aria-hidden="true" href="#cb10-11" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div class="ansi-escaped-output">
 <pre>DynamicPPL.Model{typeof(model_poisson), (:data, :claims), (), (), Tuple{DataFrame, Vector{Int64}}, Tuple{}, DynamicPPL.DefaultContext, false}(model_poisson, (data = <span class="ansi-bold">1238×3 DataFrame</span>
@@ -469,93 +479,93 @@ end</code></pre>
 </div>
 </div>
 </section>
-<section id="bayesian-posterior-sampling" class="level3">
+<section class="level3" id="bayesian-posterior-sampling">
 <h3 class="anchored" data-anchor-id="bayesian-posterior-sampling">Bayesian Posterior Sampling</h3>
 <p>Here’s where recent advances in algorithms and computing power make Bayesian analyis possible. We can’t analytically compute the posterior distribution, but we can genererate <em>samples</em> from the posterior such that the frequency of the sampled result appears in proportion to the true posterior density. This uses a technique called <a href="https://en.wikipedia.org/wiki/Markov_chain_Monte_Carlo">Markov Chain Monte Carlo</a>, abbreviated MCMC. There are different algorithms in this family, and we will use one called the No-U-Turn Sampler (NUTS for short).</p>
 <p>The result of the <code>sample</code> function is a set of data containing data that is generated in proportion to the posterior distributions and we will use this data to make predictions and understand the distribution of our parameters.</p>
 <p>Run the chain:</p>
-<div id="16" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>
-cp = MCMCChains.Chains(sample(mp, NUTS(), 500; check_model=false)) # this is the line that runs the MCMC sampler
-
-# ╔═╡ 6b5d2186-78ac-48ae-8529-e0dcd51d0b00
-let
-    # sample from the priors before learning from any data
-    ch_prior = MCMCChains.Chains(sample(mp, Prior(), 1500; check_model=false))
-
-    f = Figure()
-    ax = Axis(f[1, 1], title="Prior distribution of expected claims rate for a group")
-    μ = vec(ch_prior["μ_i[1]"].data)
-    hist!(ax, logistic.(μ); bins=50)
-    ax2 = Axis(f[2, 1], title="Posterior distribution of expected claims rate for a group")
-    μ = vec(cp["μ_i[1]"].data)
-    hist!(ax2, logistic.(μ); bins=50)
-    linkxaxes!(ax, ax2)
-    f
-end</code></pre>
+<div class="cell" data-execution_count="1" id="16">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb11-1"><a aria-hidden="true" href="#cb11-1" tabindex="-1"></a></span>
+<span id="cb11-2"><a aria-hidden="true" href="#cb11-2" tabindex="-1"></a>cp <span class="op">=</span> MCMCChains.<span class="fu">Chains</span>(<span class="fu">sample</span>(mp, <span class="fu">NUTS</span>(), <span class="fl">500</span>; check_model<span class="op">=</span><span class="cn">false</span>)) <span class="co"># this is the line that runs the MCMC sampler</span></span>
+<span id="cb11-3"><a aria-hidden="true" href="#cb11-3" tabindex="-1"></a></span>
+<span id="cb11-4"><a aria-hidden="true" href="#cb11-4" tabindex="-1"></a><span class="co"># ╔═╡ 6b5d2186-78ac-48ae-8529-e0dcd51d0b00</span></span>
+<span id="cb11-5"><a aria-hidden="true" href="#cb11-5" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb11-6"><a aria-hidden="true" href="#cb11-6" tabindex="-1"></a>    <span class="co"># sample from the priors before learning from any data</span></span>
+<span id="cb11-7"><a aria-hidden="true" href="#cb11-7" tabindex="-1"></a>    ch_prior <span class="op">=</span> MCMCChains.<span class="fu">Chains</span>(<span class="fu">sample</span>(mp, <span class="fu">Prior</span>(), <span class="fl">1500</span>; check_model<span class="op">=</span><span class="cn">false</span>))</span>
+<span id="cb11-8"><a aria-hidden="true" href="#cb11-8" tabindex="-1"></a></span>
+<span id="cb11-9"><a aria-hidden="true" href="#cb11-9" tabindex="-1"></a>    f <span class="op">=</span> <span class="fu">Figure</span>()</span>
+<span id="cb11-10"><a aria-hidden="true" href="#cb11-10" tabindex="-1"></a>    ax <span class="op">=</span> <span class="fu">Axis</span>(f[<span class="fl">1</span>, <span class="fl">1</span>], title<span class="op">=</span><span class="st">"Prior distribution of expected claims rate for a group"</span>)</span>
+<span id="cb11-11"><a aria-hidden="true" href="#cb11-11" tabindex="-1"></a>    μ <span class="op">=</span> <span class="fu">vec</span>(ch_prior[<span class="st">"μ_i[1]"</span>].data)</span>
+<span id="cb11-12"><a aria-hidden="true" href="#cb11-12" tabindex="-1"></a>    <span class="fu">hist!</span>(ax, <span class="fu">logistic</span>.(μ); bins<span class="op">=</span><span class="fl">50</span>)</span>
+<span id="cb11-13"><a aria-hidden="true" href="#cb11-13" tabindex="-1"></a>    ax2 <span class="op">=</span> <span class="fu">Axis</span>(f[<span class="fl">2</span>, <span class="fl">1</span>], title<span class="op">=</span><span class="st">"Posterior distribution of expected claims rate for a group"</span>)</span>
+<span id="cb11-14"><a aria-hidden="true" href="#cb11-14" tabindex="-1"></a>    μ <span class="op">=</span> <span class="fu">vec</span>(cp[<span class="st">"μ_i[1]"</span>].data)</span>
+<span id="cb11-15"><a aria-hidden="true" href="#cb11-15" tabindex="-1"></a>    <span class="fu">hist!</span>(ax2, <span class="fu">logistic</span>.(μ); bins<span class="op">=</span><span class="fl">50</span>)</span>
+<span id="cb11-16"><a aria-hidden="true" href="#cb11-16" tabindex="-1"></a>    <span class="fu">linkxaxes!</span>(ax, ax2)</span>
+<span id="cb11-17"><a aria-hidden="true" href="#cb11-17" tabindex="-1"></a>    f</span>
+<span id="cb11-18"><a aria-hidden="true" href="#cb11-18" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-9-output-1.svg" class="img-fluid figure-img"></p>
+<p><img alt="Prior and posterior distributions of the expected claims rate for a vehicle group." class="img-fluid figure-img" decoding="async" height="450" loading="eager" src="index_files/figure-html/cell-9-output-1.svg" width="600"/></p>
 </figure>
 </div>
 </div>
 </div>
 </section>
-<section id="visualizing-the-posterior-density" class="level3">
+<section class="level3" id="visualizing-the-posterior-density">
 <h3 class="anchored" data-anchor-id="visualizing-the-posterior-density">Visualizing the Posterior Density</h3>
 <p>This is a plot of the posterior density for all of the many, many <span class="math inline">\(\mu\)</span> parameters in our model. The black line shows the distribution which comes from our hyperparameters μ and σ. In the event of coming across a new group of interest (in our case, a new make of car), this is the prior distribution for the expected claims rate. The model has learned this from the data itself, and serves to regularize predictions.</p>
-<div id="18" class="cell" data-execution_count="1">
+<div class="cell" data-execution_count="1" id="18">
 <details class="code-fold">
 <summary>Utilitiy Function to Plot the Posterior</summary>
-<pre class="julia cell-code"><code>"""
-    dplot(chain,parameter_string)
-
-plot the posterior density for model parameters matching the given string.
-"""
-function dplot(ch, param_string)
-    f = Figure()
-    ax = Axis(f[1, 1])
-
-    # plot each group posterior
-    for (ind, param) in enumerate(ch.name_map.parameters)
-        if contains(string(param), param_string)
-            v = vec(getindex(ch, param).data)
-            density!(
-                ax, logistic.(v), color=(:red, 0.0),
-                strokecolor=(:red, 0.3), strokewidth=1, strokearound=false, label="Individual group posterior"
-            )
-        end
-    end
-
-    # Plot hyperparameters
-    hyper_mean = mean(getindex(ch, :μ).data)
-    hyper_sigma = mean(getindex(ch, :σ).data)
-    d = density!(
-        ax, logistic.(rand(Normal(hyper_mean, hyper_sigma), 1000)), color=(:black, 0.0),
-        strokecolor=(:black, 0.3), strokewidth=3, strokearound=false, label="Hyper-parameter distribution"
-    )
-
-
-    xlims!(0.0, 0.03)
-    hideydecorations!(ax)
-    axislegend(ax, unique=true)
-    return f
-end
-
-dplot(cp, "μ")</code></pre>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb12-1"><a aria-hidden="true" href="#cb12-1" tabindex="-1"></a><span class="st">"""</span></span>
+<span id="cb12-2"><a aria-hidden="true" href="#cb12-2" tabindex="-1"></a><span class="st">    dplot(chain,parameter_string)</span></span>
+<span id="cb12-3"><a aria-hidden="true" href="#cb12-3" tabindex="-1"></a></span>
+<span id="cb12-4"><a aria-hidden="true" href="#cb12-4" tabindex="-1"></a><span class="st">plot the posterior density for model parameters matching the given string.</span></span>
+<span id="cb12-5"><a aria-hidden="true" href="#cb12-5" tabindex="-1"></a><span class="st">"""</span></span>
+<span id="cb12-6"><a aria-hidden="true" href="#cb12-6" tabindex="-1"></a><span class="kw">function</span> <span class="fu">dplot</span>(ch, param_string)</span>
+<span id="cb12-7"><a aria-hidden="true" href="#cb12-7" tabindex="-1"></a>    f <span class="op">=</span> <span class="fu">Figure</span>()</span>
+<span id="cb12-8"><a aria-hidden="true" href="#cb12-8" tabindex="-1"></a>    ax <span class="op">=</span> <span class="fu">Axis</span>(f[<span class="fl">1</span>, <span class="fl">1</span>])</span>
+<span id="cb12-9"><a aria-hidden="true" href="#cb12-9" tabindex="-1"></a></span>
+<span id="cb12-10"><a aria-hidden="true" href="#cb12-10" tabindex="-1"></a>    <span class="co"># plot each group posterior</span></span>
+<span id="cb12-11"><a aria-hidden="true" href="#cb12-11" tabindex="-1"></a>    <span class="cf">for</span> (ind, param) <span class="kw">in</span> <span class="fu">enumerate</span>(ch.name_map.parameters)</span>
+<span id="cb12-12"><a aria-hidden="true" href="#cb12-12" tabindex="-1"></a>        <span class="cf">if</span> <span class="fu">contains</span>(<span class="fu">string</span>(param), param_string)</span>
+<span id="cb12-13"><a aria-hidden="true" href="#cb12-13" tabindex="-1"></a>            v <span class="op">=</span> <span class="fu">vec</span>(<span class="fu">getindex</span>(ch, param).data)</span>
+<span id="cb12-14"><a aria-hidden="true" href="#cb12-14" tabindex="-1"></a>            <span class="fu">density!</span>(</span>
+<span id="cb12-15"><a aria-hidden="true" href="#cb12-15" tabindex="-1"></a>                ax, <span class="fu">logistic</span>.(v), color<span class="op">=</span>(<span class="op">:</span>red, <span class="fl">0.0</span>),</span>
+<span id="cb12-16"><a aria-hidden="true" href="#cb12-16" tabindex="-1"></a>                strokecolor<span class="op">=</span>(<span class="op">:</span>red, <span class="fl">0.3</span>), strokewidth<span class="op">=</span><span class="fl">1</span>, strokearound<span class="op">=</span><span class="cn">false</span>, label<span class="op">=</span><span class="st">"Individual group posterior"</span></span>
+<span id="cb12-17"><a aria-hidden="true" href="#cb12-17" tabindex="-1"></a>            )</span>
+<span id="cb12-18"><a aria-hidden="true" href="#cb12-18" tabindex="-1"></a>        <span class="cf">end</span></span>
+<span id="cb12-19"><a aria-hidden="true" href="#cb12-19" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb12-20"><a aria-hidden="true" href="#cb12-20" tabindex="-1"></a></span>
+<span id="cb12-21"><a aria-hidden="true" href="#cb12-21" tabindex="-1"></a>    <span class="co"># Plot hyperparameters</span></span>
+<span id="cb12-22"><a aria-hidden="true" href="#cb12-22" tabindex="-1"></a>    hyper_mean <span class="op">=</span> <span class="fu">mean</span>(<span class="fu">getindex</span>(ch, <span class="op">:</span>μ).data)</span>
+<span id="cb12-23"><a aria-hidden="true" href="#cb12-23" tabindex="-1"></a>    hyper_sigma <span class="op">=</span> <span class="fu">mean</span>(<span class="fu">getindex</span>(ch, <span class="op">:</span>σ).data)</span>
+<span id="cb12-24"><a aria-hidden="true" href="#cb12-24" tabindex="-1"></a>    d <span class="op">=</span> <span class="fu">density!</span>(</span>
+<span id="cb12-25"><a aria-hidden="true" href="#cb12-25" tabindex="-1"></a>        ax, <span class="fu">logistic</span>.(<span class="fu">rand</span>(<span class="fu">Normal</span>(hyper_mean, hyper_sigma), <span class="fl">1000</span>)), color<span class="op">=</span>(<span class="op">:</span>black, <span class="fl">0.0</span>),</span>
+<span id="cb12-26"><a aria-hidden="true" href="#cb12-26" tabindex="-1"></a>        strokecolor<span class="op">=</span>(<span class="op">:</span>black, <span class="fl">0.3</span>), strokewidth<span class="op">=</span><span class="fl">3</span>, strokearound<span class="op">=</span><span class="cn">false</span>, label<span class="op">=</span><span class="st">"Hyper-parameter distribution"</span></span>
+<span id="cb12-27"><a aria-hidden="true" href="#cb12-27" tabindex="-1"></a>    )</span>
+<span id="cb12-28"><a aria-hidden="true" href="#cb12-28" tabindex="-1"></a></span>
+<span id="cb12-29"><a aria-hidden="true" href="#cb12-29" tabindex="-1"></a></span>
+<span id="cb12-30"><a aria-hidden="true" href="#cb12-30" tabindex="-1"></a>    <span class="fu">xlims!</span>(<span class="fl">0.0</span>, <span class="fl">0.03</span>)</span>
+<span id="cb12-31"><a aria-hidden="true" href="#cb12-31" tabindex="-1"></a>    <span class="fu">hideydecorations!</span>(ax)</span>
+<span id="cb12-32"><a aria-hidden="true" href="#cb12-32" tabindex="-1"></a>    <span class="fu">axislegend</span>(ax, unique<span class="op">=</span><span class="cn">true</span>)</span>
+<span id="cb12-33"><a aria-hidden="true" href="#cb12-33" tabindex="-1"></a>    <span class="cf">return</span> f</span>
+<span id="cb12-34"><a aria-hidden="true" href="#cb12-34" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb12-35"><a aria-hidden="true" href="#cb12-35" tabindex="-1"></a></span>
+<span id="cb12-36"><a aria-hidden="true" href="#cb12-36" tabindex="-1"></a><span class="fu">dplot</span>(cp, <span class="st">"μ"</span>)</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-10-output-1.svg" class="img-fluid figure-img"></p>
+<p><img alt="Posterior claims-rate densities for individual groups alongside the population hyperparameter distribution." class="img-fluid figure-img" decoding="async" height="450" loading="lazy" src="index_files/figure-html/cell-10-output-1.svg" width="600"/></p>
 </figure>
 </div>
 </div>
 </div>
 </section>
 </section>
-<section id="predictions-and-results" class="level2">
+<section class="level2" id="predictions-and-results">
 <h2 class="anchored" data-anchor-id="predictions-and-results">Predictions and Results</h2>
 <p>Here we compare four predictive models:</p>
 <ol type="1">
@@ -564,23 +574,23 @@ dplot(cp, "μ")</code></pre>
 <li>Limited Fluctuation Year-by-Year where the “prior” in the LFC formula is the claim rate for the ith group in 2005 and updated using 2006 claim rates.</li>
 <li>Bayesian approach where the predicted claim rate is based on the bayesian model discussed above.</li>
 </ol>
-<section id="predictions" class="level3">
+<section class="level3" id="predictions">
 <h3 class="anchored" data-anchor-id="predictions">Predictions</h3>
 </section>
-<section id="bayesian-approach-has-lower-error" class="level3">
+<section class="level3" id="bayesian-approach-has-lower-error">
 <h3 class="anchored" data-anchor-id="bayesian-approach-has-lower-error">Bayesian approach has lower error</h3>
 <p>Looking at the accumulated absolute error, the bayesian approach has about 16% lower error than the Limited Fluctuation approaches.</p>
 </section>
-<section id="total-actual-to-expected" class="level3">
+<section class="level3" id="total-actual-to-expected">
 <h3 class="anchored" data-anchor-id="total-actual-to-expected">Total Actual to Expected</h3>
 <p>Here, offsetting errors happen to make the naive and LF year-by-year (the latter is a good proxy for the former) such that their total A/E is better than the Bayesian approach.</p>
 <p>Given the lower error of the Bayesian approach, one would expect that over multiple years that it would produce more accurate predictions than the alternative methods.</p>
 </section>
 </section>
-<section id="conclusion" class="level2">
+<section class="level2" id="conclusion">
 <h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
 <p>This notebook shows that the Bayesian approach results in claims predictions with less total predictive error than the limited fluctuation method.</p>
-<section id="further-thoughts" class="level3">
+<section class="level3" id="further-thoughts">
 <h3 class="anchored" data-anchor-id="further-thoughts">Further thoughts</h3>
 <p>The Bayesian approach could be extended to improve its accuracy even further:</p>
 <ul>
@@ -588,13 +598,13 @@ dplot(cp, "μ")</code></pre>
 <li>The Bayesian hyperparameter provides a framework to think about “unseen” make-model combinations</li>
 </ul>
 </section>
-<section id="downsides-to-the-bayesian-approach" class="level3">
+<section class="level3" id="downsides-to-the-bayesian-approach">
 <h3 class="anchored" data-anchor-id="downsides-to-the-bayesian-approach">Downsides to the Bayesian approach</h3>
 <ul>
 <li>Computationally intensive. Complex <code>@models</code> can take very long time to run (many hours), compared to relatively quick frequentest methods like maximum likelihood estimation.</li>
 </ul>
 </section>
-<section id="further-reading" class="level3">
+<section class="level3" id="further-reading">
 <h3 class="anchored" data-anchor-id="further-reading">Further Reading</h3>
 <p>If this notebook has piqued your interest in Bayesian techniques, the following books are recommended learning resources (from easiest to most difficult):</p>
 <ul>
@@ -607,126 +617,126 @@ dplot(cp, "μ")</code></pre>
 </ul>
 </section>
 </section>
-<section id="appendices" class="level2">
+<section class="level2" id="appendices">
 <h2 class="anchored" data-anchor-id="appendices">Appendices</h2>
 <p>Additional legwork to get the alternate limited fluctuation approach data:</p>
-<div id="20" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code># An alternate approach to LFC where the first year becomes the prior, adjusted by data from the seonc year.
-LF2 = let
-    # split dataset by year and recombine
-    df2005 = @subset(train, :Calendar_Year .== 2005)
-    df2006 = @subset(train, :Calendar_Year .== 2006)
-    df = outerjoin(df2005, df2006, on=:Blind_Model, renamecols="_2005" =&gt; "_2006")
-
-    # use 2005 actuals as LFC prior, and the overall mean if model is missing
-    μ_2005 = sum(skipmissing(df.claims_2005)) / sum(skipmissing(df.n_2005))
-    df.assumed = coalesce.(df.p_observed_2005, μ_2005)
-
-    df.LF2_Z = min.(1, .√(coalesce.(df.claims_2006, 0.0) ./ LC_full_credibility))
-    df.LF2_μ = let Z = df.LF2_Z
-        # use the 2005 mean if the model not observed in 2006
-        Z .* coalesce.(df.p_observed_2006, μ_2005) .+ (1 .- Z) .* df.assumed
-    end
-    df
-end
-
-claims_summary_posterior = let
-    # combine the dataset by model
-    df = @chain train begin
-        groupby(:Blind_Model)
-        @combine begin
-            :n = sum(:n)
-            :claims = sum(:claims)
-        end
-    end
-    pop_μ = sum(df.claims) / sum(df.n)
-    df[!, :pop_μ] .= pop_μ
-
-    ## Bayesian prediction
-    # get the mean of the posterior estimate for the ith model group
-    means = map(1:length(unique(df.Blind_Model))) do i
-        d = logistic.(getindex(cp, Symbol("μ_i[$i]")).data)
-        (est=mean(d), se=std(d))
-    end
-
-    df.p_observed = df.claims ./ df.n
-    df.bayes_μ = [x.est for x in means]
-    df.bayes_se = [x.se for x in means]
-
-    ## Limited Fluctuation (square root rule)
-    # using overall population mean
-    # using the square-root rule
-    df.LF_Z = min.(1, .√(df.claims ./ LC_full_credibility))
-    df.LF_μ = let Z = df.LF_Z
-        Z .* (df.p_observed) .+ (1 .- Z) .* pop_μ
-    end
-
-    ## Limited Fluctuation
-    # using the first year as the prior, 2nd year as new data
-    # using some additional procesing to get the LF2 dataframe, see appendix
-    df2005 = @subset(train, :Calendar_Year .== 2005)
-    dict2005 = Dict(
-        model =&gt; rate
-        for (model, rate) in zip(df2005.Blind_Model, df2005.p_observed)
-    )
-
-    df = leftjoin(df, LF2[:, [:Blind_Model, :LF2_μ]], on=:Blind_Model)
-
-    df = innerjoin(df, test; on=:Blind_Model, renamecols="_train" =&gt; "_test")
-
-    # predictions on the test set using the predictive rates time exposures
-    df.pred_bayes = df.n_test .* df.bayes_μ_train
-    df.pred_LF = df.n_test .* df.LF_μ_train
-    df.pred_LF2 = df.n_test .* df.LF2_μ_train
-    df.pred_naive = df.n_test .* df.p_observed_train
-
-    sort!(df, :n_train, rev=true)
-end</code></pre>
+<div class="cell" data-execution_count="1" id="20">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb13-1"><a aria-hidden="true" href="#cb13-1" tabindex="-1"></a><span class="co"># An alternate approach to LFC where the first year becomes the prior, adjusted by data from the seonc year.</span></span>
+<span id="cb13-2"><a aria-hidden="true" href="#cb13-2" tabindex="-1"></a>LF2 <span class="op">=</span> <span class="kw">let</span></span>
+<span id="cb13-3"><a aria-hidden="true" href="#cb13-3" tabindex="-1"></a>    <span class="co"># split dataset by year and recombine</span></span>
+<span id="cb13-4"><a aria-hidden="true" href="#cb13-4" tabindex="-1"></a>    df2005 <span class="op">=</span> <span class="pp">@subset</span>(train, <span class="op">:</span>Calendar_Year <span class="op">.==</span> <span class="fl">2005</span>)</span>
+<span id="cb13-5"><a aria-hidden="true" href="#cb13-5" tabindex="-1"></a>    df2006 <span class="op">=</span> <span class="pp">@subset</span>(train, <span class="op">:</span>Calendar_Year <span class="op">.==</span> <span class="fl">2006</span>)</span>
+<span id="cb13-6"><a aria-hidden="true" href="#cb13-6" tabindex="-1"></a>    df <span class="op">=</span> <span class="fu">outerjoin</span>(df2005, df2006, on<span class="op">=:</span>Blind_Model, renamecols<span class="op">=</span><span class="st">"_2005"</span> <span class="op">=&gt;</span> <span class="st">"_2006"</span>)</span>
+<span id="cb13-7"><a aria-hidden="true" href="#cb13-7" tabindex="-1"></a></span>
+<span id="cb13-8"><a aria-hidden="true" href="#cb13-8" tabindex="-1"></a>    <span class="co"># use 2005 actuals as LFC prior, and the overall mean if model is missing</span></span>
+<span id="cb13-9"><a aria-hidden="true" href="#cb13-9" tabindex="-1"></a>    μ_2005 <span class="op">=</span> <span class="fu">sum</span>(<span class="fu">skipmissing</span>(df.claims_2005)) <span class="op">/</span> <span class="fu">sum</span>(<span class="fu">skipmissing</span>(df.n_2005))</span>
+<span id="cb13-10"><a aria-hidden="true" href="#cb13-10" tabindex="-1"></a>    df.assumed <span class="op">=</span> <span class="fu">coalesce</span>.(df.p_observed_2005, μ_2005)</span>
+<span id="cb13-11"><a aria-hidden="true" href="#cb13-11" tabindex="-1"></a></span>
+<span id="cb13-12"><a aria-hidden="true" href="#cb13-12" tabindex="-1"></a>    df.LF2_Z <span class="op">=</span> <span class="fu">min</span>.(<span class="fl">1</span>, .<span class="fu">√</span>(<span class="fu">coalesce</span>.(df.claims_2006, <span class="fl">0.0</span>) <span class="op">./</span> LC_full_credibility))</span>
+<span id="cb13-13"><a aria-hidden="true" href="#cb13-13" tabindex="-1"></a>    df.LF2_μ <span class="op">=</span> <span class="kw">let</span> Z <span class="op">=</span> df.LF2_Z</span>
+<span id="cb13-14"><a aria-hidden="true" href="#cb13-14" tabindex="-1"></a>        <span class="co"># use the 2005 mean if the model not observed in 2006</span></span>
+<span id="cb13-15"><a aria-hidden="true" href="#cb13-15" tabindex="-1"></a>        Z <span class="op">.*</span> <span class="fu">coalesce</span>.(df.p_observed_2006, μ_2005) <span class="op">.+</span> (<span class="fl">1</span> <span class="op">.-</span> Z) <span class="op">.*</span> df.assumed</span>
+<span id="cb13-16"><a aria-hidden="true" href="#cb13-16" tabindex="-1"></a>    <span class="kw">end</span></span>
+<span id="cb13-17"><a aria-hidden="true" href="#cb13-17" tabindex="-1"></a>    df</span>
+<span id="cb13-18"><a aria-hidden="true" href="#cb13-18" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb13-19"><a aria-hidden="true" href="#cb13-19" tabindex="-1"></a></span>
+<span id="cb13-20"><a aria-hidden="true" href="#cb13-20" tabindex="-1"></a>claims_summary_posterior <span class="op">=</span> <span class="kw">let</span></span>
+<span id="cb13-21"><a aria-hidden="true" href="#cb13-21" tabindex="-1"></a>    <span class="co"># combine the dataset by model</span></span>
+<span id="cb13-22"><a aria-hidden="true" href="#cb13-22" tabindex="-1"></a>    df <span class="op">=</span> <span class="pp">@chain</span> train <span class="cf">begin</span></span>
+<span id="cb13-23"><a aria-hidden="true" href="#cb13-23" tabindex="-1"></a>        <span class="fu">groupby</span>(<span class="op">:</span>Blind_Model)</span>
+<span id="cb13-24"><a aria-hidden="true" href="#cb13-24" tabindex="-1"></a>        <span class="pp">@combine</span> <span class="cf">begin</span></span>
+<span id="cb13-25"><a aria-hidden="true" href="#cb13-25" tabindex="-1"></a>            <span class="op">:</span>n <span class="op">=</span> <span class="fu">sum</span>(<span class="op">:</span>n)</span>
+<span id="cb13-26"><a aria-hidden="true" href="#cb13-26" tabindex="-1"></a>            <span class="op">:</span>claims <span class="op">=</span> <span class="fu">sum</span>(<span class="op">:</span>claims)</span>
+<span id="cb13-27"><a aria-hidden="true" href="#cb13-27" tabindex="-1"></a>        <span class="cf">end</span></span>
+<span id="cb13-28"><a aria-hidden="true" href="#cb13-28" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb13-29"><a aria-hidden="true" href="#cb13-29" tabindex="-1"></a>    pop_μ <span class="op">=</span> <span class="fu">sum</span>(df.claims) <span class="op">/</span> <span class="fu">sum</span>(df.n)</span>
+<span id="cb13-30"><a aria-hidden="true" href="#cb13-30" tabindex="-1"></a>    df[!, <span class="op">:</span>pop_μ] <span class="op">.=</span> pop_μ</span>
+<span id="cb13-31"><a aria-hidden="true" href="#cb13-31" tabindex="-1"></a></span>
+<span id="cb13-32"><a aria-hidden="true" href="#cb13-32" tabindex="-1"></a>    <span class="co">## Bayesian prediction</span></span>
+<span id="cb13-33"><a aria-hidden="true" href="#cb13-33" tabindex="-1"></a>    <span class="co"># get the mean of the posterior estimate for the ith model group</span></span>
+<span id="cb13-34"><a aria-hidden="true" href="#cb13-34" tabindex="-1"></a>    means <span class="op">=</span> <span class="fu">map</span>(<span class="fl">1</span><span class="op">:</span><span class="fu">length</span>(<span class="fu">unique</span>(df.Blind_Model))) <span class="cf">do</span> i</span>
+<span id="cb13-35"><a aria-hidden="true" href="#cb13-35" tabindex="-1"></a>        d <span class="op">=</span> <span class="fu">logistic</span>.(<span class="fu">getindex</span>(cp, <span class="fu">Symbol</span>(<span class="st">"μ_i[</span><span class="sc">$</span>i<span class="st">]"</span>)).data)</span>
+<span id="cb13-36"><a aria-hidden="true" href="#cb13-36" tabindex="-1"></a>        (est<span class="op">=</span><span class="fu">mean</span>(d), se<span class="op">=</span><span class="fu">std</span>(d))</span>
+<span id="cb13-37"><a aria-hidden="true" href="#cb13-37" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb13-38"><a aria-hidden="true" href="#cb13-38" tabindex="-1"></a></span>
+<span id="cb13-39"><a aria-hidden="true" href="#cb13-39" tabindex="-1"></a>    df.p_observed <span class="op">=</span> df.claims <span class="op">./</span> df.n</span>
+<span id="cb13-40"><a aria-hidden="true" href="#cb13-40" tabindex="-1"></a>    df.bayes_μ <span class="op">=</span> [x.est for x <span class="kw">in</span> means]</span>
+<span id="cb13-41"><a aria-hidden="true" href="#cb13-41" tabindex="-1"></a>    df.bayes_se <span class="op">=</span> [x.se for x <span class="kw">in</span> means]</span>
+<span id="cb13-42"><a aria-hidden="true" href="#cb13-42" tabindex="-1"></a></span>
+<span id="cb13-43"><a aria-hidden="true" href="#cb13-43" tabindex="-1"></a>    <span class="co">## Limited Fluctuation (square root rule)</span></span>
+<span id="cb13-44"><a aria-hidden="true" href="#cb13-44" tabindex="-1"></a>    <span class="co"># using overall population mean</span></span>
+<span id="cb13-45"><a aria-hidden="true" href="#cb13-45" tabindex="-1"></a>    <span class="co"># using the square-root rule</span></span>
+<span id="cb13-46"><a aria-hidden="true" href="#cb13-46" tabindex="-1"></a>    df.LF_Z <span class="op">=</span> <span class="fu">min</span>.(<span class="fl">1</span>, .<span class="fu">√</span>(df.claims <span class="op">./</span> LC_full_credibility))</span>
+<span id="cb13-47"><a aria-hidden="true" href="#cb13-47" tabindex="-1"></a>    df.LF_μ <span class="op">=</span> <span class="kw">let</span> Z <span class="op">=</span> df.LF_Z</span>
+<span id="cb13-48"><a aria-hidden="true" href="#cb13-48" tabindex="-1"></a>        Z <span class="op">.*</span> (df.p_observed) <span class="op">.+</span> (<span class="fl">1</span> <span class="op">.-</span> Z) <span class="op">.*</span> pop_μ</span>
+<span id="cb13-49"><a aria-hidden="true" href="#cb13-49" tabindex="-1"></a>    <span class="kw">end</span></span>
+<span id="cb13-50"><a aria-hidden="true" href="#cb13-50" tabindex="-1"></a></span>
+<span id="cb13-51"><a aria-hidden="true" href="#cb13-51" tabindex="-1"></a>    <span class="co">## Limited Fluctuation</span></span>
+<span id="cb13-52"><a aria-hidden="true" href="#cb13-52" tabindex="-1"></a>    <span class="co"># using the first year as the prior, 2nd year as new data</span></span>
+<span id="cb13-53"><a aria-hidden="true" href="#cb13-53" tabindex="-1"></a>    <span class="co"># using some additional procesing to get the LF2 dataframe, see appendix</span></span>
+<span id="cb13-54"><a aria-hidden="true" href="#cb13-54" tabindex="-1"></a>    df2005 <span class="op">=</span> <span class="pp">@subset</span>(train, <span class="op">:</span>Calendar_Year <span class="op">.==</span> <span class="fl">2005</span>)</span>
+<span id="cb13-55"><a aria-hidden="true" href="#cb13-55" tabindex="-1"></a>    dict2005 <span class="op">=</span> <span class="fu">Dict</span>(</span>
+<span id="cb13-56"><a aria-hidden="true" href="#cb13-56" tabindex="-1"></a>        model <span class="op">=&gt;</span> rate</span>
+<span id="cb13-57"><a aria-hidden="true" href="#cb13-57" tabindex="-1"></a>        <span class="cf">for</span> (model, rate) <span class="kw">in</span> <span class="fu">zip</span>(df2005.Blind_Model, df2005.p_observed)</span>
+<span id="cb13-58"><a aria-hidden="true" href="#cb13-58" tabindex="-1"></a>    )</span>
+<span id="cb13-59"><a aria-hidden="true" href="#cb13-59" tabindex="-1"></a></span>
+<span id="cb13-60"><a aria-hidden="true" href="#cb13-60" tabindex="-1"></a>    df <span class="op">=</span> <span class="fu">leftjoin</span>(df, LF2[<span class="op">:</span>, [<span class="op">:</span>Blind_Model, <span class="op">:</span>LF2_μ]], on<span class="op">=:</span>Blind_Model)</span>
+<span id="cb13-61"><a aria-hidden="true" href="#cb13-61" tabindex="-1"></a></span>
+<span id="cb13-62"><a aria-hidden="true" href="#cb13-62" tabindex="-1"></a>    df <span class="op">=</span> <span class="fu">innerjoin</span>(df, test; on<span class="op">=:</span>Blind_Model, renamecols<span class="op">=</span><span class="st">"_train"</span> <span class="op">=&gt;</span> <span class="st">"_test"</span>)</span>
+<span id="cb13-63"><a aria-hidden="true" href="#cb13-63" tabindex="-1"></a></span>
+<span id="cb13-64"><a aria-hidden="true" href="#cb13-64" tabindex="-1"></a>    <span class="co"># predictions on the test set using the predictive rates time exposures</span></span>
+<span id="cb13-65"><a aria-hidden="true" href="#cb13-65" tabindex="-1"></a>    df.pred_bayes <span class="op">=</span> df.n_test <span class="op">.*</span> df.bayes_μ_train</span>
+<span id="cb13-66"><a aria-hidden="true" href="#cb13-66" tabindex="-1"></a>    df.pred_LF <span class="op">=</span> df.n_test <span class="op">.*</span> df.LF_μ_train</span>
+<span id="cb13-67"><a aria-hidden="true" href="#cb13-67" tabindex="-1"></a>    df.pred_LF2 <span class="op">=</span> df.n_test <span class="op">.*</span> df.LF2_μ_train</span>
+<span id="cb13-68"><a aria-hidden="true" href="#cb13-68" tabindex="-1"></a>    df.pred_naive <span class="op">=</span> df.n_test <span class="op">.*</span> df.p_observed_train</span>
+<span id="cb13-69"><a aria-hidden="true" href="#cb13-69" tabindex="-1"></a></span>
+<span id="cb13-70"><a aria-hidden="true" href="#cb13-70" tabindex="-1"></a>    <span class="fu">sort!</span>(df, <span class="op">:</span>n_train, rev<span class="op">=</span><span class="cn">true</span>)</span>
+<span id="cb13-71"><a aria-hidden="true" href="#cb13-71" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div><div style="float: left;"><span>1224×18 DataFrame</span></div><div style="float: right;"><span style="font-style: italic;">1199 rows omitted</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
-<table class="data-frame caption-top table table-sm table-striped small">
+<div aria-label="Scrollable data table" class="table-scroll" role="region" tabindex="0"><table class="data-frame caption-top table table-sm table-striped small">
 <thead>
 <tr class="header">
 <th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">Blind_Model</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">n_train</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">claims_train</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">pop_μ_train</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">p_observed_train</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">bayes_μ_train</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">bayes_se_train</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">LF_Z_train</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">LF_μ_train</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">LF2_μ_train</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">Calendar_Year_test</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">n_test</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">claims_test</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">p_observed_test</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">pred_bayes</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">pred_LF</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">pred_LF2</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">pred_naive</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;">Blind_Model</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;">n_train</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;">claims_train</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;">pop_μ_train</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;">p_observed_train</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;">bayes_μ_train</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;">bayes_se_train</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;">LF_Z_train</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;">LF_μ_train</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;">LF2_μ_train</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;">Calendar_Year_test</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;">n_test</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;">claims_test</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;">p_observed_test</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;">pred_bayes</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;">pred_LF</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;">pred_LF2</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;">pred_naive</th>
 </tr>
 <tr class="subheader headerLastRow even">
 <th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="InlineStrings.String7">String7</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="Union{Missing, Float64}">Float64?</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;" title="InlineStrings.String7">String7</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;" title="Int64">Int64</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;" title="Int64">Int64</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;" title="Float64">Float64</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;" title="Float64">Float64</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;" title="Float64">Float64</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;" title="Float64">Float64</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;" title="Float64">Float64</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;" title="Float64">Float64</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;" title="Union{Missing, Float64}">Float64?</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;" title="Int64">Int64</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;" title="Int64">Int64</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;" title="Int64">Int64</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;" title="Float64">Float64</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;" title="Float64">Float64</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;" title="Float64">Float64</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;" title="Float64">Float64</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;" title="Float64">Float64</th>
 </tr>
 </thead>
 <tbody>
@@ -1277,59 +1287,59 @@ end</code></pre>
 <td style="text-align: right;">0.0</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 </div>
 </div>
 </div>
-<div id="22" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>let df = claims_summary_posterior
-    f = Figure()
-    ax = Axis(f[1, 1], title="Cumulative Predictive Residual Error", subtitle="(Lower is better predictive accuracy)", xlabel=L"$i^{th}$ vehicle group", ylabel=L"absolute error")
-    lines!(ax, cumsum(abs.(df.pred_LF .- df.claims_test)), label="Limited Fluctuation Overall", color=(:purple, 0.5))
-    lines!(ax, cumsum(abs.(df.pred_LF2 .- df.claims_test)), label="Limited Fluctuation Year-by-Year", color=(:blue, 0.5))
-    lines!(ax, cumsum(abs.(df.pred_bayes .- df.claims_test)), label="Bayesian", color=(:red, 0.5))
-    lines!(ax, cumsum(abs.(df.pred_naive .- df.claims_test)), label="Naive", color=(:grey10, 0.5))
-    # xlims!(0,40)
-    # Legend(f[1,1],[s1,s2],["LFC"halign=:right,valign=:top)
-    axislegend(ax, position=:rb)
-    f
-end</code></pre>
+<div class="cell" data-execution_count="1" id="22">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb14-1"><a aria-hidden="true" href="#cb14-1" tabindex="-1"></a><span class="kw">let</span> df <span class="op">=</span> claims_summary_posterior</span>
+<span id="cb14-2"><a aria-hidden="true" href="#cb14-2" tabindex="-1"></a>    f <span class="op">=</span> <span class="fu">Figure</span>()</span>
+<span id="cb14-3"><a aria-hidden="true" href="#cb14-3" tabindex="-1"></a>    ax <span class="op">=</span> <span class="fu">Axis</span>(f[<span class="fl">1</span>, <span class="fl">1</span>], title<span class="op">=</span><span class="st">"Cumulative Predictive Residual Error"</span>, subtitle<span class="op">=</span><span class="st">"(Lower is better predictive accuracy)"</span>, xlabel<span class="op">=</span>L<span class="st">"</span><span class="sc">$</span>i<span class="st">^{th}$ vehicle group"</span>, ylabel<span class="op">=</span>L<span class="st">"absolute error"</span>)</span>
+<span id="cb14-4"><a aria-hidden="true" href="#cb14-4" tabindex="-1"></a>    <span class="fu">lines!</span>(ax, <span class="fu">cumsum</span>(<span class="fu">abs</span>.(df.pred_LF <span class="op">.-</span> df.claims_test)), label<span class="op">=</span><span class="st">"Limited Fluctuation Overall"</span>, color<span class="op">=</span>(<span class="op">:</span>purple, <span class="fl">0.5</span>))</span>
+<span id="cb14-5"><a aria-hidden="true" href="#cb14-5" tabindex="-1"></a>    <span class="fu">lines!</span>(ax, <span class="fu">cumsum</span>(<span class="fu">abs</span>.(df.pred_LF2 <span class="op">.-</span> df.claims_test)), label<span class="op">=</span><span class="st">"Limited Fluctuation Year-by-Year"</span>, color<span class="op">=</span>(<span class="op">:</span>blue, <span class="fl">0.5</span>))</span>
+<span id="cb14-6"><a aria-hidden="true" href="#cb14-6" tabindex="-1"></a>    <span class="fu">lines!</span>(ax, <span class="fu">cumsum</span>(<span class="fu">abs</span>.(df.pred_bayes <span class="op">.-</span> df.claims_test)), label<span class="op">=</span><span class="st">"Bayesian"</span>, color<span class="op">=</span>(<span class="op">:</span>red, <span class="fl">0.5</span>))</span>
+<span id="cb14-7"><a aria-hidden="true" href="#cb14-7" tabindex="-1"></a>    <span class="fu">lines!</span>(ax, <span class="fu">cumsum</span>(<span class="fu">abs</span>.(df.pred_naive <span class="op">.-</span> df.claims_test)), label<span class="op">=</span><span class="st">"Naive"</span>, color<span class="op">=</span>(<span class="op">:</span>grey10, <span class="fl">0.5</span>))</span>
+<span id="cb14-8"><a aria-hidden="true" href="#cb14-8" tabindex="-1"></a>    <span class="co"># xlims!(0,40)</span></span>
+<span id="cb14-9"><a aria-hidden="true" href="#cb14-9" tabindex="-1"></a>    <span class="co"># Legend(f[1,1],[s1,s2],["LFC"halign=:right,valign=:top)</span></span>
+<span id="cb14-10"><a aria-hidden="true" href="#cb14-10" tabindex="-1"></a>    <span class="fu">axislegend</span>(ax, position<span class="op">=:</span>rb)</span>
+<span id="cb14-11"><a aria-hidden="true" href="#cb14-11" tabindex="-1"></a>    f</span>
+<span id="cb14-12"><a aria-hidden="true" href="#cb14-12" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-12-output-1.svg" class="img-fluid figure-img"></p>
+<p><img alt="Cumulative absolute prediction errors for Bayesian, limited-fluctuation, year-by-year, and naive estimates." class="img-fluid figure-img" decoding="async" height="450" loading="lazy" src="index_files/figure-html/cell-12-output-1.svg" width="600"/></p>
 </figure>
 </div>
 </div>
 </div>
-<div id="24" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>let
-    post = claims_summary_posterior
-    X = @chain vcat(train, test) begin
-        groupby(:Calendar_Year)
-        @combine :claim_rate = sum(:claims) / sum(:n)
-    end
-    f = Figure()
-    ax = Axis(f[1, 1], xlabel="year", ylabel="claims rate")
-    scatter!(ax, X.Calendar_Year, X.claim_rate, label="data")
-    scatter!(ax, [2007], [sum(post.pred_bayes) / sum(post.n_test)], label="Bayes", marker=:hline, markersize=30)
-    scatter!(ax, [2007], [sum(post.pred_LF) / sum(post.n_test)], label="LF Overall", marker=:hline, markersize=30)
-    scatter!(ax, [2007], [sum(post.pred_LF2) / sum(post.n_test)], label="LF Year-by-Year", marker=:hline, markersize=30)
-    scatter!(ax, [2007], [sum(post.pred_naive) / sum(post.n_test)], label="naive", marker=:hline, markersize=30)
-    axislegend(ax, position=:rb)
-    ylims!(0.005, 0.008)
-    f
-end</code></pre>
+<div class="cell" data-execution_count="1" id="24">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb15-1"><a aria-hidden="true" href="#cb15-1" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb15-2"><a aria-hidden="true" href="#cb15-2" tabindex="-1"></a>    post <span class="op">=</span> claims_summary_posterior</span>
+<span id="cb15-3"><a aria-hidden="true" href="#cb15-3" tabindex="-1"></a>    X <span class="op">=</span> <span class="pp">@chain</span> <span class="fu">vcat</span>(train, test) <span class="cf">begin</span></span>
+<span id="cb15-4"><a aria-hidden="true" href="#cb15-4" tabindex="-1"></a>        <span class="fu">groupby</span>(<span class="op">:</span>Calendar_Year)</span>
+<span id="cb15-5"><a aria-hidden="true" href="#cb15-5" tabindex="-1"></a>        <span class="pp">@combine</span> <span class="op">:</span>claim_rate <span class="op">=</span> <span class="fu">sum</span>(<span class="op">:</span>claims) <span class="op">/</span> <span class="fu">sum</span>(<span class="op">:</span>n)</span>
+<span id="cb15-6"><a aria-hidden="true" href="#cb15-6" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb15-7"><a aria-hidden="true" href="#cb15-7" tabindex="-1"></a>    f <span class="op">=</span> <span class="fu">Figure</span>()</span>
+<span id="cb15-8"><a aria-hidden="true" href="#cb15-8" tabindex="-1"></a>    ax <span class="op">=</span> <span class="fu">Axis</span>(f[<span class="fl">1</span>, <span class="fl">1</span>], xlabel<span class="op">=</span><span class="st">"year"</span>, ylabel<span class="op">=</span><span class="st">"claims rate"</span>)</span>
+<span id="cb15-9"><a aria-hidden="true" href="#cb15-9" tabindex="-1"></a>    <span class="fu">scatter!</span>(ax, X.Calendar_Year, X.claim_rate, label<span class="op">=</span><span class="st">"data"</span>)</span>
+<span id="cb15-10"><a aria-hidden="true" href="#cb15-10" tabindex="-1"></a>    <span class="fu">scatter!</span>(ax, [<span class="fl">2007</span>], [<span class="fu">sum</span>(post.pred_bayes) <span class="op">/</span> <span class="fu">sum</span>(post.n_test)], label<span class="op">=</span><span class="st">"Bayes"</span>, marker<span class="op">=:</span>hline, markersize<span class="op">=</span><span class="fl">30</span>)</span>
+<span id="cb15-11"><a aria-hidden="true" href="#cb15-11" tabindex="-1"></a>    <span class="fu">scatter!</span>(ax, [<span class="fl">2007</span>], [<span class="fu">sum</span>(post.pred_LF) <span class="op">/</span> <span class="fu">sum</span>(post.n_test)], label<span class="op">=</span><span class="st">"LF Overall"</span>, marker<span class="op">=:</span>hline, markersize<span class="op">=</span><span class="fl">30</span>)</span>
+<span id="cb15-12"><a aria-hidden="true" href="#cb15-12" tabindex="-1"></a>    <span class="fu">scatter!</span>(ax, [<span class="fl">2007</span>], [<span class="fu">sum</span>(post.pred_LF2) <span class="op">/</span> <span class="fu">sum</span>(post.n_test)], label<span class="op">=</span><span class="st">"LF Year-by-Year"</span>, marker<span class="op">=:</span>hline, markersize<span class="op">=</span><span class="fl">30</span>)</span>
+<span id="cb15-13"><a aria-hidden="true" href="#cb15-13" tabindex="-1"></a>    <span class="fu">scatter!</span>(ax, [<span class="fl">2007</span>], [<span class="fu">sum</span>(post.pred_naive) <span class="op">/</span> <span class="fu">sum</span>(post.n_test)], label<span class="op">=</span><span class="st">"naive"</span>, marker<span class="op">=:</span>hline, markersize<span class="op">=</span><span class="fl">30</span>)</span>
+<span id="cb15-14"><a aria-hidden="true" href="#cb15-14" tabindex="-1"></a>    <span class="fu">axislegend</span>(ax, position<span class="op">=:</span>rb)</span>
+<span id="cb15-15"><a aria-hidden="true" href="#cb15-15" tabindex="-1"></a>    <span class="fu">ylims!</span>(<span class="fl">0.005</span>, <span class="fl">0.008</span>)</span>
+<span id="cb15-16"><a aria-hidden="true" href="#cb15-16" tabindex="-1"></a>    f</span>
+<span id="cb15-17"><a aria-hidden="true" href="#cb15-17" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-13-output-1.svg" class="img-fluid figure-img"></p>
+<p><img alt="Historical aggregate claims rates and the competing predictions for the following year." class="img-fluid figure-img" decoding="async" height="450" loading="lazy" src="index_files/figure-html/cell-13-output-1.svg" width="600"/></p>
 </figure>
 </div>
 </div>
 </div>
 </section>
-<section id="some-remarks-about-the-results" class="level2">
+<section class="level2" id="some-remarks-about-the-results">
 <h2 class="anchored" data-anchor-id="some-remarks-about-the-results">Some Remarks about the Results</h2>
 <p>With limited, real-world data drawing conclusions is a little bit messy because we don’t know what the ground-truth should be, but here are some thoughts that seem to be consistent with what the data and results suggest:</p>
 <ul>
@@ -1337,10 +1347,7 @@ end</code></pre>
 <li>The partial pooling limits over-fitting, which happens with the naive approach. Our Bayesian approach is somewhat skeptical of groups with low observation counts that stand out from the rest. But it also doesn’t forgoe useful data, as it learns from even low exposures according to what’s consistent with probability theory (Baye’s rule).</li>
 <li>The naive approach is pretty close to the textbook definition of over-fitting. The LF approaches appear to be under-fitting group-level as there are only $(sum(claims_summary_posterior.LF_Z_train .&gt;= .9999)) groups with “full credibility” (<code>Z=1</code>), even though there are groups with less than “full credibility” with over 100,000 observations in the training set.</li>
 </ul>
-
-
 </section>
-
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
@@ -1743,8 +1750,4 @@ end</code></pre>
   });
   </script>
 </div> <!-- /content -->
-
-
-
-
 </body></html>

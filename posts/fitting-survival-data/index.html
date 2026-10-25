@@ -1,13 +1,10 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
-<meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.16">
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-
-<meta name="description" content="JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.">
-
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml"><head>
+<meta charset="utf-8"/>
+<meta content="quarto-1.9.16" name="generator"/>
+<meta content="width=device-width, initial-scale=1.0, user-scalable=yes" name="viewport"/>
+<meta content="JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows." name="description"/>
 <title>Fitting survival data with MortalityTables.jl – JuliaActuary</title>
 <style>
 code{white-space: pre-wrap;}
@@ -21,28 +18,61 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
-
-
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script crossorigin="anonymous" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script><script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="../../site_libs/quarto-nav/headroom.min.js"></script>
 <script src="../../site_libs/clipboard/clipboard.min.js"></script>
 <script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="../../">
-<link href="../..//assets/logos/favicon.ico" rel="icon">
+<meta content="../../" name="quarto:offset"/>
+<link href="../..//assets/logos/favicon.ico" rel="icon"/>
 <script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
-<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-a0731b9a3a5d496010872d775e5d9bc3.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet"/>
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-be14ce6d32a635bebd8f9e4e558f9eeb.css" id="quarto-text-highlighting-styles" rel="stylesheet"/>
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-98ac2d5361ef6f18cc0525d38bedc462.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet"/>
+<link append-hash="true" data-mode="light" href="../../site_libs/bootstrap/bootstrap-4a135b976b00f53a3a768ff94eb1df18.min.css" id="quarto-bootstrap" rel="stylesheet"/>
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -70,170 +100,151 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
-
+<script crossorigin="anonymous" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js"></script>
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&amp;family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&amp;display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../../assets/highlight/styles/github.min.css">
-<script src="../../assets/highlight/highlight.min.js"></script>
-<script src="../../assets/highlight/languages/julia.min.js"></script>
-<script src="../../assets/highlight/languages/julia-repl.min.js"></script>
-<script src="../../assets/highlight/languages/python.min.js"></script>
-<script src="../../assets/highlight/languages/r.min.js"></script>
-<script>hljs.highlightAll();</script>
-<script data-goatcounter="https://juliaactuary.goatcounter.com/count" async="" src="//gc.zgo.at/count.js"></script>
-
-
-<link rel="stylesheet" href="../../styles.css">
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" rel="stylesheet"/>
+<script async="" data-goatcounter="https://juliaactuary.goatcounter.com/count" src="//gc.zgo.at/count.js"></script>
+<link href="../../styles-c416c153cdf24884.css" rel="stylesheet"/>
 </head>
-
 <body class="nav-fixed fullcontent quarto-light">
-
 <div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top quarto-banner">
-    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
-      <div class="navbar-container container-fluid">
-      <div class="navbar-brand-container mx-auto">
-    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
-    <img src="../../assets/logos/android-chrome-512x512.png" alt="JuliaActuary Logo" class="navbar-logo light-content">
-    <img src="../../assets/logos/android-chrome-512x512.png" alt="JuliaActuary Logo" class="navbar-logo dark-content">
-    </a>
-    <a class="navbar-brand" href="../../index.html">
-    <span class="navbar-title">JuliaActuary</span>
-    </a>
-  </div>
-            <div id="quarto-search" class="" title="Search"></div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-  <span class="navbar-toggler-icon"></span>
-</button>
-          <div class="collapse navbar-collapse" id="navbarCollapse">
-            <ul class="navbar-nav navbar-nav-scroll ms-auto">
-  <li class="nav-item">
-    <a class="nav-link" href="../../packages.html"> 
-<span class="menu-text">Packages</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="https://docs.juliaactuary.org"> 
-<span class="menu-text">Docs</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="https://modernfinancialmodeling.com"> 
-<span class="menu-text">Book</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../learn.html"> 
-<span class="menu-text">Learn</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../examples.html"> 
-<span class="menu-text">Examples</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../benchmarks.html"> 
-<span class="menu-text">Benchmarks</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../community.html"> 
-<span class="menu-text">Community</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../blog.html"> 
-<span class="menu-text">Blog</span></a>
-  </li>  
-  <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/JuliaActuary"> <i class="bi bi-github" role="img">
-</i> 
-<span class="menu-text"></span></a>
-  </li>  
-  <li class="nav-item compact">
-    <a class="nav-link" href="../../all-posts.xml"> <i class="bi bi-rss" role="img">
-</i> 
-<span class="menu-text"></span></a>
-  </li>  
-</ul>
-          </div> <!-- /navcollapse -->
-            <div class="quarto-navbar-tools">
+<header class="headroom fixed-top quarto-banner" id="quarto-header">
+<nav class="navbar navbar-expand-lg" data-bs-theme="dark">
+<div class="navbar-container container-fluid">
+<div class="navbar-brand-container mx-auto">
+<a class="navbar-brand navbar-brand-logo" href="../../index.html">
+<img alt="JuliaActuary Logo" class="navbar-logo light-content" src="../../assets/logos/android-chrome-512x512.png"/>
+<img alt="JuliaActuary Logo" class="navbar-logo dark-content" src="../../assets/logos/android-chrome-512x512.png"/>
+</a>
+<a class="navbar-brand" href="../../index.html">
+<span class="navbar-title">JuliaActuary</span>
+</a>
 </div>
-      </div> <!-- /container-fluid -->
-    </nav>
+<div class="" id="quarto-search" title="Search"></div>
+<button aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-bs-target="#navbarCollapse" data-bs-toggle="collapse" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }" role="menu" type="button">
+<span class="navbar-toggler-icon"></span>
+</button>
+<div class="collapse navbar-collapse" id="navbarCollapse">
+<ul class="navbar-nav navbar-nav-scroll ms-auto">
+<li class="nav-item">
+<a class="nav-link" href="../../packages.html">
+<span class="menu-text">Packages</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="https://docs.juliaactuary.org">
+<span class="menu-text">Docs</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="../../learn.html">
+<span class="menu-text">Learn</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="../../examples.html">
+<span class="menu-text">Examples</span></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="../../community.html">
+<span class="menu-text">Community</span></a>
+</li>
+<li class="nav-item dropdown">
+<a aria-expanded="false" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" id="nav-menu-more" role="link">
+<span class="menu-text">More</span>
+</a>
+<ul aria-labelledby="nav-menu-more" class="dropdown-menu dropdown-menu-end">
+<li>
+<a class="dropdown-item" href="../../benchmarks.html">
+<span class="dropdown-text">Benchmarks</span></a>
+</li>
+<li>
+<a class="dropdown-item" href="../../blog.html">
+<span class="dropdown-text">Blog</span></a>
+</li>
+<li>
+<a class="dropdown-item" href="https://modernfinancialmodeling.com">
+<span class="dropdown-text">Book</span></a>
+</li>
+</ul>
+</li>
+<li class="nav-item compact">
+<a class="nav-link" href="https://github.com/JuliaActuary"> <i aria-label="JuliaActuary on GitHub" class="bi bi-github" role="img">
+</i>
+<span class="menu-text"></span></a>
+</li>
+<li class="nav-item compact">
+<a class="nav-link" href="../../all-posts.xml"> <i aria-label="RSS feed" class="bi bi-rss" role="img">
+</i>
+<span class="menu-text"></span></a>
+</li>
+</ul>
+</div> <!-- /navcollapse -->
+<div class="quarto-navbar-tools">
+</div>
+</div> <!-- /container-fluid -->
+</nav>
 </header>
 <!-- content -->
-<header id="title-block-header" class="quarto-title-block default page-columns page-full">
-  <div class="quarto-title-banner page-columns page-full">
-    <div class="quarto-title column-body">
-      <h1 class="title">Fitting survival data with MortalityTables.jl</h1>
-                  <div>
-        <div class="description">
+<header class="quarto-title-block default page-columns page-full" id="title-block-header">
+<div class="quarto-title-banner page-columns page-full">
+<div class="quarto-title column-body">
+<h1 class="title">Fitting survival data with MortalityTables.jl</h1>
+<div>
+<div class="description">
           JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.
         </div>
-      </div>
-                          <div class="quarto-categories">
-                <div class="quarto-category">survival</div>
-                <div class="quarto-category">tutorial</div>
-              </div>
-                  </div>
-  </div>
-    
-  
-  <div class="quarto-title-meta">
-
-      
-    
-      
-    </div>
-    
-  
-  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+</div>
+<div class="quarto-categories">
+<div class="quarto-category">survival</div>
+<div class="quarto-category">tutorial</div>
+</div>
+</div>
+</div>
+<div class="quarto-title-meta">
+</div>
+</header><div class="quarto-container page-columns page-rows-contents page-layout-article page-navbar" id="quarto-content">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    
 <!-- main -->
 <main class="content quarto-banner-title-block" id="quarto-document-content">
-
-
-
-
-
-<div id="4" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>begin
-    using LsqFit
-    using MortalityTables
-    using CairoMakie
-    using Distributions
-    using Optim
-    using DataFrames
-    using Survival
-end
-
-# Apply the site's custom Makie plot theme (cassette futurism).
-include(joinpath(@__DIR__, "..", "..", "assets", "themes", "cassette_futurism.jl"))
-set_theme!(cassette_futurism_theme())</code></pre>
+<div class="cell" data-execution_count="1" id="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a aria-hidden="true" href="#cb1-1" tabindex="-1"></a><span class="cf">begin</span></span>
+<span id="cb1-2"><a aria-hidden="true" href="#cb1-2" tabindex="-1"></a>    <span class="im">using</span> <span class="bu">LsqFit</span></span>
+<span id="cb1-3"><a aria-hidden="true" href="#cb1-3" tabindex="-1"></a>    <span class="im">using</span> <span class="bu">MortalityTables</span></span>
+<span id="cb1-4"><a aria-hidden="true" href="#cb1-4" tabindex="-1"></a>    <span class="im">using</span> <span class="bu">CairoMakie</span></span>
+<span id="cb1-5"><a aria-hidden="true" href="#cb1-5" tabindex="-1"></a>    <span class="im">using</span> <span class="bu">Distributions</span></span>
+<span id="cb1-6"><a aria-hidden="true" href="#cb1-6" tabindex="-1"></a>    <span class="im">using</span> <span class="bu">Optim</span></span>
+<span id="cb1-7"><a aria-hidden="true" href="#cb1-7" tabindex="-1"></a>    <span class="im">using</span> <span class="bu">DataFrames</span></span>
+<span id="cb1-8"><a aria-hidden="true" href="#cb1-8" tabindex="-1"></a>    <span class="im">using</span> <span class="bu">Survival</span></span>
+<span id="cb1-9"><a aria-hidden="true" href="#cb1-9" tabindex="-1"></a><span class="cf">end</span></span>
+<span id="cb1-10"><a aria-hidden="true" href="#cb1-10" tabindex="-1"></a></span>
+<span id="cb1-11"><a aria-hidden="true" href="#cb1-11" tabindex="-1"></a><span class="co"># Apply the site's custom Makie plot theme (cassette futurism).</span></span>
+<span id="cb1-12"><a aria-hidden="true" href="#cb1-12" tabindex="-1"></a><span class="fu">include</span>(<span class="fu">joinpath</span>(<span class="pp">@__DIR__</span>, <span class="st">".."</span>, <span class="st">".."</span>, <span class="st">"assets"</span>, <span class="st">"themes"</span>, <span class="st">"cassette_futurism.jl"</span>))</span>
+<span id="cb1-13"><a aria-hidden="true" href="#cb1-13" tabindex="-1"></a><span class="fu">set_theme!</span>(<span class="fu">cassette_futurism_theme</span>())</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 </div>
 <p><em>This tutorial is via <a href="https://gist.github.com/PharmCat/fe1e64a2241aa35d3a3fa925989c3784">PharmCat on Github</a> (this link has similar code with comments in Russian and English).</em></p>
-<section id="fitting-a-weibull-survival-curve" class="level2">
+<section class="level2" id="fitting-a-weibull-survival-curve">
 <h2 class="anchored" data-anchor-id="fitting-a-weibull-survival-curve">Fitting a Weibull survival curve</h2>
 <p>Sample data:</p>
-<div id="6" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>data = let
-    survival = [0.99, 0.98, 0.95, 0.9, 0.8, 0.65, 0.5, 0.38, 0.25, 0.2, 0.1, 0.05, 0.02, 0.01]
-    times = 1:length(survival)
-    DataFrame(; times, survival)
-end</code></pre>
+<div class="cell" data-execution_count="1" id="6">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a aria-hidden="true" href="#cb2-1" tabindex="-1"></a>data <span class="op">=</span> <span class="kw">let</span></span>
+<span id="cb2-2"><a aria-hidden="true" href="#cb2-2" tabindex="-1"></a>    survival <span class="op">=</span> [<span class="fl">0.99</span>, <span class="fl">0.98</span>, <span class="fl">0.95</span>, <span class="fl">0.9</span>, <span class="fl">0.8</span>, <span class="fl">0.65</span>, <span class="fl">0.5</span>, <span class="fl">0.38</span>, <span class="fl">0.25</span>, <span class="fl">0.2</span>, <span class="fl">0.1</span>, <span class="fl">0.05</span>, <span class="fl">0.02</span>, <span class="fl">0.01</span>]</span>
+<span id="cb2-3"><a aria-hidden="true" href="#cb2-3" tabindex="-1"></a>    times <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fu">length</span>(survival)</span>
+<span id="cb2-4"><a aria-hidden="true" href="#cb2-4" tabindex="-1"></a>    <span class="fu">DataFrame</span>(; times, survival)</span>
+<span id="cb2-5"><a aria-hidden="true" href="#cb2-5" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div><div style="float: left;"><span>14×2 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
-<table class="data-frame caption-top table table-sm table-striped small">
+<div aria-label="Scrollable data table" class="table-scroll" role="region" tabindex="0"><table class="data-frame caption-top table table-sm table-striped small">
 <thead>
 <tr class="columnLabelRow header">
 <th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">times</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">survival</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;">times</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;">survival</th>
 </tr>
 <tr class="columnLabelRow even">
 <th class="stubheadLabel" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;" title="Int64">Int64</th>
+<th data-quarto-table-cell-role="th" style="text-align: left;" title="Float64">Float64</th>
 </tr>
 </thead>
 <tbody>
@@ -308,21 +319,21 @@ end</code></pre>
 <td style="text-align: right;">0.01</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 </div>
 </div>
 </div>
 <p>Visualizing the data:</p>
-<div id="8" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>plt = Figure(); ax = Axis(plt[1,1]; xlabel="time", ylabel="survival",
-    title="Observed survival proportion")
-lines!(ax, data.times, data.survival;
-    label="observed", color=CASSETTE_PALETTE[1], linewidth=2)
-plt</code></pre>
+<div class="cell" data-execution_count="1" id="8">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a aria-hidden="true" href="#cb3-1" tabindex="-1"></a>plt <span class="op">=</span> <span class="fu">Figure</span>(); ax <span class="op">=</span> <span class="fu">Axis</span>(plt[<span class="fl">1</span>,<span class="fl">1</span>]; xlabel<span class="op">=</span><span class="st">"time"</span>, ylabel<span class="op">=</span><span class="st">"survival"</span>,</span>
+<span id="cb3-2"><a aria-hidden="true" href="#cb3-2" tabindex="-1"></a>    title<span class="op">=</span><span class="st">"Observed survival proportion"</span>)</span>
+<span id="cb3-3"><a aria-hidden="true" href="#cb3-3" tabindex="-1"></a><span class="fu">lines!</span>(ax, data.times, data.survival;</span>
+<span id="cb3-4"><a aria-hidden="true" href="#cb3-4" tabindex="-1"></a>    label<span class="op">=</span><span class="st">"observed"</span>, color<span class="op">=</span>CASSETTE_PALETTE[<span class="fl">1</span>], linewidth<span class="op">=</span><span class="fl">2</span>)</span>
+<span id="cb3-5"><a aria-hidden="true" href="#cb3-5" tabindex="-1"></a>plt</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-5-output-1.svg" class="img-fluid figure-img"></p>
+<p><img alt="Observed survival proportions decreasing over time." class="img-fluid figure-img" decoding="async" height="450" loading="eager" src="index_files/figure-html/cell-5-output-1.svg" width="600"/></p>
 </figure>
 </div>
 </div>
@@ -333,38 +344,38 @@ plt</code></pre>
 <li><code>p</code>: array of model parameters</li>
 </ul>
 <p><code>model(x, p)</code> will accept the full data set as the first argument <code>x</code>. This means that we need to write our model function so it applies the model to the full dataset. We use <code>@.</code> to apply (“broadcast”) the calculations across all rows.</p>
-<div id="10" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>@. model1(x, p) = survival(MortalityTables.Weibull(; m=p[1], σ=p[2]), x)</code></pre>
+<div class="cell" data-execution_count="1" id="10">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a aria-hidden="true" href="#cb4-1" tabindex="-1"></a>@. <span class="fu">model1</span>(x, p) <span class="op">=</span> <span class="fu">survival</span>(MortalityTables.<span class="fu">Weibull</span>(; m<span class="op">=</span>p[<span class="fl">1</span>], σ<span class="op">=</span>p[<span class="fl">2</span>]), x)</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>model1 (generic function with 1 method)</code></pre>
 </div>
 </div>
-<section id="fitting-the-model" class="level4">
+<section class="level4" id="fitting-the-model">
 <h4 class="anchored" data-anchor-id="fitting-the-model">Fitting the Model</h4>
 <p>And fit the model with <a href="https://github.com/JuliaNLSolvers/LsqFit.jl">LsqFit.jl</a>:</p>
-<div id="12" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>fit1 = curve_fit(model1, data.times, data.survival, [1.0, 1.0])
-
-lines!(ax, data.times, model1(data.times, fit1.param);
-    label="fitted Weibull", color=CASSETTE_PALETTE[2], linewidth=2, linestyle=:dash)
-axislegend(ax, position=:rt)
-plt</code></pre>
+<div class="cell" data-execution_count="1" id="12">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a aria-hidden="true" href="#cb6-1" tabindex="-1"></a>fit1 <span class="op">=</span> <span class="fu">curve_fit</span>(model1, data.times, data.survival, [<span class="fl">1.0</span>, <span class="fl">1.0</span>])</span>
+<span id="cb6-2"><a aria-hidden="true" href="#cb6-2" tabindex="-1"></a></span>
+<span id="cb6-3"><a aria-hidden="true" href="#cb6-3" tabindex="-1"></a><span class="fu">lines!</span>(ax, data.times, <span class="fu">model1</span>(data.times, fit1.param);</span>
+<span id="cb6-4"><a aria-hidden="true" href="#cb6-4" tabindex="-1"></a>    label<span class="op">=</span><span class="st">"fitted Weibull"</span>, color<span class="op">=</span>CASSETTE_PALETTE[<span class="fl">2</span>], linewidth<span class="op">=</span><span class="fl">2</span>, linestyle<span class="op">=:</span>dash)</span>
+<span id="cb6-5"><a aria-hidden="true" href="#cb6-5" tabindex="-1"></a><span class="fu">axislegend</span>(ax, position<span class="op">=:</span>rt)</span>
+<span id="cb6-6"><a aria-hidden="true" href="#cb6-6" tabindex="-1"></a>plt</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-7-output-1.svg" class="img-fluid figure-img"></p>
+<p><img alt="Observed survival proportions and the fitted Weibull survival curve." class="img-fluid figure-img" decoding="async" height="450" loading="lazy" src="index_files/figure-html/cell-7-output-1.svg" width="600"/></p>
 </figure>
 </div>
 </div>
 </div>
 </section>
-<section id="maximum-likelihood-estimation" class="level3">
+<section class="level3" id="maximum-likelihood-estimation">
 <h3 class="anchored" data-anchor-id="maximum-likelihood-estimation">Maximum Likelihood estimation</h3>
 <p>Generate 100 sample datapoints:</p>
-<div id="14" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code># MortalityTables.Weibull(m, σ) has S(x) = exp(-(x/m)^(m/σ)), which in
-# Distributions.jl parameterization is Weibull(shape = m/σ, scale = m)
-t = rand(Weibull(fit1.param[1] / fit1.param[2], fit1.param[1]), 100)</code></pre>
+<div class="cell" data-execution_count="1" id="14">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a aria-hidden="true" href="#cb7-1" tabindex="-1"></a><span class="co"># MortalityTables.Weibull(m, σ) has S(x) = exp(-(x/m)^(m/σ)), which in</span></span>
+<span id="cb7-2"><a aria-hidden="true" href="#cb7-2" tabindex="-1"></a><span class="co"># Distributions.jl parameterization is Weibull(shape = m/σ, scale = m)</span></span>
+<span id="cb7-3"><a aria-hidden="true" href="#cb7-3" tabindex="-1"></a>t <span class="op">=</span> <span class="fu">rand</span>(<span class="fu">Weibull</span>(fit1.param[<span class="fl">1</span>] <span class="op">/</span> fit1.param[<span class="fl">2</span>], fit1.param[<span class="fl">1</span>]), <span class="fl">100</span>)</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>100-element Vector{Float64}:
   4.399979544008741
@@ -390,22 +401,22 @@ t = rand(Weibull(fit1.param[1] / fit1.param[2], fit1.param[1]), 100)</code></pre
 </div>
 </div>
 </section>
-<section id="without-censored-data" class="level3">
+<section class="level3" id="without-censored-data">
 <h3 class="anchored" data-anchor-id="without-censored-data">Without Censored Data”</h3>
-<div id="16" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>#No censored data
-fit_mle(Weibull, t)</code></pre>
+<div class="cell" data-execution_count="1" id="16">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb9-1"><a aria-hidden="true" href="#cb9-1" tabindex="-1"></a><span class="co">#No censored data</span></span>
+<span id="cb9-2"><a aria-hidden="true" href="#cb9-2" tabindex="-1"></a><span class="fu">fit_mle</span>(Weibull, t)</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>Distributions.Weibull{Float64}(α=2.9146414287544875, θ=7.4731035169321975)</code></pre>
 </div>
 </div>
 </section>
-<section id="with-censored-data" class="level3">
+<section class="level3" id="with-censored-data">
 <h3 class="anchored" data-anchor-id="with-censored-data">With Censored Data</h3>
 <p>Pick some arbitrary observations to censor:</p>
-<div id="18" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>c = collect(trues(100))
-c[[1, 3, 7, 9]] .= false</code></pre>
+<div class="cell" data-execution_count="1" id="18">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb11-1"><a aria-hidden="true" href="#cb11-1" tabindex="-1"></a>c <span class="op">=</span> <span class="fu">collect</span>(<span class="fu">trues</span>(<span class="fl">100</span>))</span>
+<span id="cb11-2"><a aria-hidden="true" href="#cb11-2" tabindex="-1"></a>c[[<span class="fl">1</span>, <span class="fl">3</span>, <span class="fl">7</span>, <span class="fl">9</span>]] <span class="op">.=</span> <span class="cn">false</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>4-element view(::Vector{Bool}, [1, 3, 7, 9]) with eltype Bool:
  0
@@ -414,26 +425,26 @@ c[[1, 3, 7, 9]] .= false</code></pre>
  0</code></pre>
 </div>
 </div>
-<div id="20" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>#ML function
-survmle(x) = begin
-    ml = 0.0
-    for i = 1:length(t)
-        if c[i]
-            ml += logpdf(Weibull(x[2], x[1]), t[i]) #if not censored log(f(x))
-        else
-            ml += logccdf(Weibull(x[2], x[1]), t[i]) #if censored log(1-F)
-        end
-    end
-    -ml
-end
-
-opt = Optim.optimize(
-    survmle,          # function to optimize
-    [1.0, 1.0], # lower bound
-    [15.0, 15.0],            # upper bound
-    [3.0, 3.0]          # initial guess
-)</code></pre>
+<div class="cell" data-execution_count="1" id="20">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb13-1"><a aria-hidden="true" href="#cb13-1" tabindex="-1"></a><span class="co">#ML function</span></span>
+<span id="cb13-2"><a aria-hidden="true" href="#cb13-2" tabindex="-1"></a><span class="fu">survmle</span>(x) <span class="op">=</span> <span class="cf">begin</span></span>
+<span id="cb13-3"><a aria-hidden="true" href="#cb13-3" tabindex="-1"></a>    ml <span class="op">=</span> <span class="fl">0.0</span></span>
+<span id="cb13-4"><a aria-hidden="true" href="#cb13-4" tabindex="-1"></a>    <span class="cf">for</span> i <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fu">length</span>(t)</span>
+<span id="cb13-5"><a aria-hidden="true" href="#cb13-5" tabindex="-1"></a>        <span class="cf">if</span> c[i]</span>
+<span id="cb13-6"><a aria-hidden="true" href="#cb13-6" tabindex="-1"></a>            ml <span class="op">+=</span> <span class="fu">logpdf</span>(<span class="fu">Weibull</span>(x[<span class="fl">2</span>], x[<span class="fl">1</span>]), t[i]) <span class="co">#if not censored log(f(x))</span></span>
+<span id="cb13-7"><a aria-hidden="true" href="#cb13-7" tabindex="-1"></a>        <span class="cf">else</span></span>
+<span id="cb13-8"><a aria-hidden="true" href="#cb13-8" tabindex="-1"></a>            ml <span class="op">+=</span> <span class="fu">logccdf</span>(<span class="fu">Weibull</span>(x[<span class="fl">2</span>], x[<span class="fl">1</span>]), t[i]) <span class="co">#if censored log(1-F)</span></span>
+<span id="cb13-9"><a aria-hidden="true" href="#cb13-9" tabindex="-1"></a>        <span class="cf">end</span></span>
+<span id="cb13-10"><a aria-hidden="true" href="#cb13-10" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb13-11"><a aria-hidden="true" href="#cb13-11" tabindex="-1"></a>    <span class="op">-</span>ml</span>
+<span id="cb13-12"><a aria-hidden="true" href="#cb13-12" tabindex="-1"></a><span class="cf">end</span></span>
+<span id="cb13-13"><a aria-hidden="true" href="#cb13-13" tabindex="-1"></a></span>
+<span id="cb13-14"><a aria-hidden="true" href="#cb13-14" tabindex="-1"></a>opt <span class="op">=</span> Optim.<span class="fu">optimize</span>(</span>
+<span id="cb13-15"><a aria-hidden="true" href="#cb13-15" tabindex="-1"></a>    survmle,          <span class="co"># function to optimize</span></span>
+<span id="cb13-16"><a aria-hidden="true" href="#cb13-16" tabindex="-1"></a>    [<span class="fl">1.0</span>, <span class="fl">1.0</span>], <span class="co"># lower bound</span></span>
+<span id="cb13-17"><a aria-hidden="true" href="#cb13-17" tabindex="-1"></a>    [<span class="fl">15.0</span>, <span class="fl">15.0</span>],            <span class="co"># upper bound</span></span>
+<span id="cb13-18"><a aria-hidden="true" href="#cb13-18" tabindex="-1"></a>    [<span class="fl">3.0</span>, <span class="fl">3.0</span>]          <span class="co"># initial guess</span></span>
+<span id="cb13-19"><a aria-hidden="true" href="#cb13-19" tabindex="-1"></a>)</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code> * Status: success
 
@@ -459,8 +470,8 @@ opt = Optim.optimize(
 </div>
 </div>
 <p>The solution converges to similar values as the function generating the synthetic data:</p>
-<div id="22" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>Optim.minimizer(opt)</code></pre>
+<div class="cell" data-execution_count="1" id="22">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb15-1"><a aria-hidden="true" href="#cb15-1" tabindex="-1"></a>Optim.<span class="fu">minimizer</span>(opt)</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>2-element Vector{Float64}:
  7.5744579570073265
@@ -469,46 +480,43 @@ opt = Optim.optimize(
 </div>
 </section>
 </section>
-<section id="fitting-kaplan-meier" class="level2">
+<section class="level2" id="fitting-kaplan-meier">
 <h2 class="anchored" data-anchor-id="fitting-kaplan-meier">Fitting Kaplan Meier</h2>
 <p>KaplanMeier comes from <a href="https://github.com/JuliaStats/Survival.jl">Survival.jl</a>.</p>
-<div id="24" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>#t- time vector;c - censored events vector
-km = fit(Survival.KaplanMeier, t, c)
-
-plt2 = Figure(); ax2 = Axis(plt2[1,1]; xlabel="time", ylabel="survival")
-stairs!(ax2, km.events.time, km.survival;
-    label="Empirical (Kaplan–Meier)", color=CASSETTE_PALETTE[1], step=:post, linewidth=2)
-plt2</code></pre>
+<div class="cell" data-execution_count="1" id="24">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb17-1"><a aria-hidden="true" href="#cb17-1" tabindex="-1"></a><span class="co">#t- time vector;c - censored events vector</span></span>
+<span id="cb17-2"><a aria-hidden="true" href="#cb17-2" tabindex="-1"></a>km <span class="op">=</span> <span class="fu">fit</span>(Survival.KaplanMeier, t, c)</span>
+<span id="cb17-3"><a aria-hidden="true" href="#cb17-3" tabindex="-1"></a></span>
+<span id="cb17-4"><a aria-hidden="true" href="#cb17-4" tabindex="-1"></a>plt2 <span class="op">=</span> <span class="fu">Figure</span>(); ax2 <span class="op">=</span> <span class="fu">Axis</span>(plt2[<span class="fl">1</span>,<span class="fl">1</span>]; xlabel<span class="op">=</span><span class="st">"time"</span>, ylabel<span class="op">=</span><span class="st">"survival"</span>)</span>
+<span id="cb17-5"><a aria-hidden="true" href="#cb17-5" tabindex="-1"></a><span class="fu">stairs!</span>(ax2, km.events.time, km.survival;</span>
+<span id="cb17-6"><a aria-hidden="true" href="#cb17-6" tabindex="-1"></a>    label<span class="op">=</span><span class="st">"Empirical (Kaplan–Meier)"</span>, color<span class="op">=</span>CASSETTE_PALETTE[<span class="fl">1</span>], step<span class="op">=:</span>post, linewidth<span class="op">=</span><span class="fl">2</span>)</span>
+<span id="cb17-7"><a aria-hidden="true" href="#cb17-7" tabindex="-1"></a>plt2</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-13-output-1.svg" class="img-fluid figure-img"></p>
+<p><img alt="Empirical Kaplan-Meier survival estimates over time." class="img-fluid figure-img" decoding="async" height="450" loading="lazy" src="index_files/figure-html/cell-13-output-1.svg" width="600"/></p>
 </figure>
 </div>
 </div>
 </div>
-<div id="26" class="cell" data-execution_count="1">
-<pre class="julia cell-code"><code>@. model(x, p) = survival(MortalityTables.Weibull(; m=p[1], σ=p[2]), x)
-
-mfit = LsqFit.curve_fit(model, km.events.time, km.survival, [2.0, 2.0])
-
-lines!(ax2, km.events.time, model(km.events.time, mfit.param);
-    label="Theoretical Weibull", color=CASSETTE_PALETTE[2], linewidth=2, linestyle=:dash)
-axislegend(ax2, position=:rt)
-plt2</code></pre>
+<div class="cell" data-execution_count="1" id="26">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb18-1"><a aria-hidden="true" href="#cb18-1" tabindex="-1"></a>@. <span class="fu">model</span>(x, p) <span class="op">=</span> <span class="fu">survival</span>(MortalityTables.<span class="fu">Weibull</span>(; m<span class="op">=</span>p[<span class="fl">1</span>], σ<span class="op">=</span>p[<span class="fl">2</span>]), x)</span>
+<span id="cb18-2"><a aria-hidden="true" href="#cb18-2" tabindex="-1"></a></span>
+<span id="cb18-3"><a aria-hidden="true" href="#cb18-3" tabindex="-1"></a>mfit <span class="op">=</span> LsqFit.<span class="fu">curve_fit</span>(model, km.events.time, km.survival, [<span class="fl">2.0</span>, <span class="fl">2.0</span>])</span>
+<span id="cb18-4"><a aria-hidden="true" href="#cb18-4" tabindex="-1"></a></span>
+<span id="cb18-5"><a aria-hidden="true" href="#cb18-5" tabindex="-1"></a><span class="fu">lines!</span>(ax2, km.events.time, <span class="fu">model</span>(km.events.time, mfit.param);</span>
+<span id="cb18-6"><a aria-hidden="true" href="#cb18-6" tabindex="-1"></a>    label<span class="op">=</span><span class="st">"Theoretical Weibull"</span>, color<span class="op">=</span>CASSETTE_PALETTE[<span class="fl">2</span>], linewidth<span class="op">=</span><span class="fl">2</span>, linestyle<span class="op">=:</span>dash)</span>
+<span id="cb18-7"><a aria-hidden="true" href="#cb18-7" tabindex="-1"></a><span class="fu">axislegend</span>(ax2, position<span class="op">=:</span>rt)</span>
+<span id="cb18-8"><a aria-hidden="true" href="#cb18-8" tabindex="-1"></a>plt2</span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-14-output-1.svg" class="img-fluid figure-img"></p>
+<p><img alt="Kaplan-Meier survival estimates compared with the fitted Weibull curve." class="img-fluid figure-img" decoding="async" height="450" loading="lazy" src="index_files/figure-html/cell-14-output-1.svg" width="600"/></p>
 </figure>
 </div>
 </div>
 </div>
-
-
 </section>
-
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
@@ -911,8 +919,4 @@ plt2</code></pre>
   });
   </script>
 </div> <!-- /content -->
-
-
-
-
 </body></html>
