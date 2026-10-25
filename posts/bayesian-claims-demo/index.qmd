@@ -190,7 +190,7 @@ end
 
 ## 2. Parametric model
 
-We use the [Makeham–Beard mortality law](https://docs.juliaactuary.org/MortalityTables/stable/ParametricMortalityModels/#MortalityTables.MakehamBeard) to describe how the force of mortality varies with age. `hazard(model, age)` is an instantaneous rate, not a death probability. The binomial likelihood needs the annual probability `decrement(model, age, age + 1)`, obtained by integrating the hazard over that year. This probability is between zero and one for a valid mortality law.
+We use the [Makeham–Beard mortality law](https://docs.juliaactuary.org/MortalityTables/stable/ParametricMortalityModels/#MortalityTables.MakehamBeard-ParametricMortalityModels) to describe how the force of mortality varies with age. `hazard(model, age)` is an instantaneous rate, not a death probability. The binomial likelihood needs the annual probability `decrement(model, age, age + 1)`, obtained by integrating the hazard over that year. This probability is between zero and one for a valid mortality law.
 
 The priors keep `a`, `b` and `k` positive, with `c = 0`. The binomial probability comes from `decrement`; the instantaneous hazard itself need not be bounded by one.
 
