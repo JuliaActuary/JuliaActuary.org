@@ -21,12 +21,10 @@ website:
       - learn.qmd
       - examples.qmd
       - community.qmd
-      - text: More
-        menu:
-          - benchmarks.qmd
-          - blog.qmd
-          - text: Book
-            href: https://modernfinancialmodeling.com
+      - benchmarks.qmd
+      - blog.qmd
+      - text: Book
+        href: https://modernfinancialmodeling.com
       - icon: github
         aria-label: JuliaActuary on GitHub
         href: https://github.com/JuliaActuary
