@@ -17996,7 +17996,7 @@ font-style: inherit;">Pluto;</span> Pluto.run()                        </span></
   <category>modeling</category>
   <category>scenario-generator</category>
   <guid>https://JuliaActuary.org/posts/academy-generator-rates/</guid>
-  <pubDate>Sun, 25 Oct 2026 01:37:54 GMT</pubDate>
+  <pubDate>Sun, 25 Oct 2026 04:29:57 GMT</pubDate>
 </item>
 <item>
   <title>Replicating the AAA equtity generator</title>
@@ -19147,7 +19147,7 @@ font-style: inherit;">end</span></span></code></pre></div></div>
   <category>modeling</category>
   <category>scenario-generator</category>
   <guid>https://JuliaActuary.org/posts/academy-generator/</guid>
-  <pubDate>Sun, 25 Oct 2026 01:37:54 GMT</pubDate>
+  <pubDate>Sun, 25 Oct 2026 04:29:57 GMT</pubDate>
 </item>
 <item>
   <title>Autodifferentiation and Asset Liability Management (AAD &amp; ALM)</title>
@@ -21912,7 +21912,7 @@ font-style: inherit;">AutoForwardDiff</span>(), zeros)</span></code></pre></div>
   <category>autodiff</category>
   <category>alm</category>
   <guid>https://JuliaActuary.org/posts/autodiff_ALM/</guid>
-  <pubDate>Sun, 25 Oct 2026 01:37:54 GMT</pubDate>
+  <pubDate>Sun, 25 Oct 2026 04:29:57 GMT</pubDate>
 </item>
 <item>
   <title>Bayesian vs Limited Fluctuation Experience Analysis</title>
@@ -24157,7 +24157,7 @@ font-style: inherit;">end</span></span></code></pre></div></div>
   <category>experience-analysis</category>
   <category>bayesian</category>
   <guid>https://JuliaActuary.org/posts/bayes-vs-limited-fluctuation/</guid>
-  <pubDate>Sun, 25 Oct 2026 01:37:54 GMT</pubDate>
+  <pubDate>Sun, 25 Oct 2026 04:29:57 GMT</pubDate>
 </item>
 <item>
   <title>Bayesian Markov-Chain-Monte-Carlo and Claims Data</title>
@@ -27787,7 +27787,7 @@ Use `describe(chains)` for summary statistics and quantiles.</code></pre>
   <category>statistics</category>
   <category>bayesian</category>
   <guid>https://JuliaActuary.org/posts/bayesian-claims-demo/</guid>
-  <pubDate>Sun, 25 Oct 2026 01:37:54 GMT</pubDate>
+  <pubDate>Sun, 25 Oct 2026 04:29:57 GMT</pubDate>
 </item>
 <item>
   <title>Interactive Cashflow Analysis with ActuaryUtilities.jl</title>
@@ -27838,7 +27838,7 @@ font-style: inherit;">Pluto;</span> Pluto.run()</span></code></pre></div></div>
   <category>financemodels</category>
   <category>assets</category>
   <guid>https://JuliaActuary.org/posts/cashflow-interactive/</guid>
-  <pubDate>Sun, 25 Oct 2026 01:37:54 GMT</pubDate>
+  <pubDate>Sun, 25 Oct 2026 04:29:57 GMT</pubDate>
 </item>
 <item>
   <title>Credibility When Claims Are Scarce</title>
@@ -33634,7 +33634,7 @@ font-style: inherit;">length</span>(horizon)</span></code></pre></div></div>
   <category>credibility</category>
   <category>modeling</category>
   <guid>https://JuliaActuary.org/posts/credibility-sparse-data/</guid>
-  <pubDate>Sun, 25 Oct 2026 01:37:54 GMT</pubDate>
+  <pubDate>Sun, 25 Oct 2026 04:29:57 GMT</pubDate>
 </item>
 <item>
   <title>Exposure Calculation with ExperienceAnalysis.jl</title>
@@ -34119,7 +34119,7 @@ font-style: inherit;">:</span>exposure_fraction]]</span></code></pre></div></div
   <category>dataframes</category>
   <category>tutorial</category>
   <guid>https://JuliaActuary.org/posts/exposures-example/</guid>
-  <pubDate>Sun, 25 Oct 2026 01:37:54 GMT</pubDate>
+  <pubDate>Sun, 25 Oct 2026 04:29:57 GMT</pubDate>
 </item>
 <item>
   <title>Fitting survival data with MortalityTables.jl</title>
@@ -34858,7 +34858,7 @@ font-style: inherit;">=:</span>rt)</span>
   <category>survival</category>
   <category>tutorial</category>
   <guid>https://JuliaActuary.org/posts/fitting-survival-data/</guid>
-  <pubDate>Sun, 25 Oct 2026 01:37:54 GMT</pubDate>
+  <pubDate>Sun, 25 Oct 2026 04:29:57 GMT</pubDate>
 </item>
 </channel>
 </rss>
