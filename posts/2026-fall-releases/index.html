@@ -7,7 +7,7 @@
 <meta content="Alec Loudenback" name="author"/>
 <meta content="2026-10-11" name="dcterms.date"/>
 <meta content="JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows." name="description"/>
-<title>FinanceModels 7, ActuaryUtilities 6, MortalityTables 3 and FinanceCore 3 – JuliaActuary</title>
+<title>FinanceModels 7, ActuaryUtilities 6, MortalityTables 3, FinanceCore 3 and LifeContingencies 3 – JuliaActuary</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -181,7 +181,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <header class="quarto-title-block default page-columns page-full" id="title-block-header">
 <div class="quarto-title-banner page-columns page-full">
 <div class="quarto-title column-body">
-<h1 class="title">FinanceModels 7, ActuaryUtilities 6, MortalityTables 3 and FinanceCore 3</h1>
+<h1 class="title">FinanceModels 7, ActuaryUtilities 6, MortalityTables 3, FinanceCore 3 and LifeContingencies 3</h1>
 <div>
 <div class="description">
           JuliaActuary is an ecosystem of packages that makes Julia the easiest language to get started for actuarial workflows.
@@ -212,9 +212,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <!-- margin-sidebar -->
 <!-- main -->
 <main class="content quarto-banner-title-block" id="quarto-document-content">
-<p>Four major JuliaActuary releases improve curve calibration, interest-rate risk, valuation and mortality calculations. They add sensitivities through calibration and curve blending, simplify common calls, and fix errors that could produce plausible but incorrect results.</p>
-<p>Some fixes change the numbers in existing models: portfolio values, the sign of DV01, zero rates beyond a curve’s last knot, and the age assignments of rates in eight SOA tables. The examples below explain those changes and show how to migrate.</p>
-<p><strong>FinanceModels 7.0</strong>, <strong>ActuaryUtilities 6.0</strong>, <strong>MortalityTables 3.0</strong> and <strong>FinanceCore 3.0</strong> are major releases with breaking changes; FinanceCore 3.0 includes the fixes of FinanceCore 2.8. Migration guides and release notes are linked under <a href="#upgrading">Upgrading</a>.</p>
+<p>Five major JuliaActuary releases improve curve calibration, interest-rate risk, life-contingent valuation and mortality calculations. They add sensitivities through calibration, curve blending and policy-value columns, simplify common calls, and fix errors that could produce plausible but incorrect results.</p>
+<p>Some fixes change the numbers in existing models: portfolio values, the sign of DV01, zero rates beyond a curve’s last knot, the age assignments of rates in eight SOA tables, and life-contingent guarantees and reserves. The sections below explain those changes and how to migrate.</p>
+<p><strong>FinanceModels 7.0</strong>, <strong>ActuaryUtilities 6.0</strong>, <strong>MortalityTables 3.0</strong>, <strong>FinanceCore 3.0</strong> and <strong>LifeContingencies 3.0</strong> are major releases with breaking changes; FinanceCore 3.0 includes the fixes of FinanceCore 2.8. Migration guides and release notes are linked under <a href="#upgrading">Upgrading</a>.</p>
 <ol type="1">
 <li><a href="#new-capabilities">New capabilities</a></li>
 <li><a href="#changes-affecting-existing-models">Changes affecting existing models</a></li>
@@ -222,7 +222,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><a href="#upgrading">Upgrading</a></li>
 <li><a href="#ai-assistance-disclosure">AI assistance disclosure</a></li>
 </ol>
-<p>The code blocks execute when the post is rendered. The <a href="Project.toml">Project.toml</a> and <a href="Manifest.toml">Manifest.toml</a> record the complete environment: FinanceCore 3.0.0, FinanceModels 7.0.0, ActuaryUtilities 6.0.0 and the MortalityTables 3.0.0 release commit. <a href="reproducibility.txt">Reproduction instructions</a> explain how to rebuild the examples and figures; <a href="#upgrading">Upgrading</a> links the migration guides.</p>
+<p>The code blocks execute when the post is rendered. The <a href="Project.toml">Project.toml</a> and <a href="Manifest.toml">Manifest.toml</a> record the environment for the executable examples: FinanceCore 3.0.0, FinanceModels 7.0.0, ActuaryUtilities 6.0.0 and the MortalityTables 3.0.0 release commit. <a href="reproducibility.txt">Reproduction instructions</a> explain how to rebuild the examples and figures; <a href="#upgrading">Upgrading</a> links the migration guides.</p>
 <div class="cell" data-execution_count="1" id="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a aria-hidden="true" href="#cb1-1" tabindex="-1"></a><span class="im">using</span> <span class="bu">FinanceModels</span>, <span class="bu">FinanceCore</span>, <span class="bu">ActuaryUtilities</span>, <span class="bu">MortalityTables</span>, <span class="bu">ForwardDiff</span></span></code></pre></div><button class="code-copy-button" title="Copy to Clipboard"><i class="bi"></i></button></div>
 </div>
@@ -785,6 +785,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </section>
+<section class="level3" id="products-and-policy-value-columns-lifecontingencies">
+<h3 class="anchored" data-anchor-id="products-and-policy-value-columns-lifecontingencies">Products and policy-value columns (LifeContingencies)</h3>
+<p>LifeContingencies 3 rebuilds life-contingent valuation around shared finite-state transition and payment interfaces. <code>Endowment(lc, n)</code> combines death benefits during the term with a survival benefit at an explicit maturity. Products also support MortalityTables’ parametric mortality laws.</p>
+<p><code>PricedPolicy(benefit, premiums)</code> establishes an equivalence premium once, or stores a supplied premium. <code>policy_value(policy, times)</code> returns a numeric vector for integer policy anniversaries, covering term, limited-pay, whole-life, endowment and annuity contracts. With <code>basis=...</code>, you can change valuation assumptions while retaining that premium; construct a new policy to recompute the equivalence premium. <code>premium_net(benefit, premiums)</code> also prices against an explicit premium schedule.</p>
+<p>Known-status valuation through <code>state=...</code> handles joint-life statuses and guaranteed annuity payments after death. An experimental finite-state engine extends projection and valuation to other models, with a worked long-term care example; its interfaces may change in minor releases.</p>
+<p>Net premiums and reserves remain textbook calculations. Statutory and GAAP reserve methods are outside this release’s scope.</p>
+</section>
 </section>
 <section class="level2" id="changes-affecting-existing-models">
 <h2 class="anchored" data-anchor-id="changes-affecting-existing-models">Changes affecting existing models</h2>
@@ -919,7 +926,7 @@ Stacktrace:
  [2] <span class="ansi-bold">fit</span><span class="ansi-bold">(</span><span class="ansi-bright-black-fg">mod0</span>::FinanceModels.Spline.PolynomialSpline, <span class="ansi-bright-black-fg">quotes</span>::Vector<span class="ansi-bright-black-fg">{Quote{Float64, FinanceModels.Bond.Fixed{Periodic, Float64, Float64}}}</span>, <span class="ansi-bright-black-fg">method</span>::FinanceModels.Fit.Bootstrap<span class="ansi-bold">)</span>
  <span class="ansi-bright-black-fg">  @</span> <span class="ansi-magenta-fg">FinanceModels</span> <span class="ansi-bright-black-fg">~/.julia/packages/FinanceModels/quEQy/src/</span><span class="ansi-bright-black-fg" style="text-decoration:underline">fit.jl:515</span>
  [3] top-level scope
- <span class="ansi-bright-black-fg">  @</span> <span class="ansi-bright-black-fg">/private/tmp/juliaactuary-fall-finalization/posts/2026-fall-releases/</span><span class="ansi-bright-black-fg" style="text-decoration:underline">index.qmd:528</span></pre>
+ <span class="ansi-bright-black-fg">  @</span> <span class="ansi-bright-black-fg">~/prog/JuliaActuary.org/posts/2026-fall-releases/</span><span class="ansi-bright-black-fg" style="text-decoration:underline">index.qmd:543</span></pre>
 </div>
 </div>
 </div>
@@ -965,7 +972,7 @@ Stacktrace:
  [4] <span class="ansi-bold">fit</span>
  <span class="ansi-bright-black-fg">  @</span> <span class="ansi-bright-black-fg">~/.julia/packages/FinanceModels/quEQy/src/</span><span class="ansi-bright-black-fg" style="text-decoration:underline">fit.jl:394</span><span class="ansi-bright-black-fg"> [inlined]</span>
  [5] top-level scope
- <span class="ansi-bright-black-fg">  @</span> <span class="ansi-bright-black-fg">/private/tmp/juliaactuary-fall-finalization/posts/2026-fall-releases/</span><span class="ansi-bright-black-fg" style="text-decoration:underline">index.qmd:553</span></pre>
+ <span class="ansi-bright-black-fg">  @</span> <span class="ansi-bright-black-fg">~/prog/JuliaActuary.org/posts/2026-fall-releases/</span><span class="ansi-bright-black-fg" style="text-decoration:underline">index.qmd:568</span></pre>
 </div>
 </div>
 </div>
@@ -1172,7 +1179,7 @@ Stacktrace:
  [3] <span class="ansi-bold">present_value</span><span class="ansi-bold">(</span><span class="ansi-bright-black-fg">r</span>::Float64, <span class="ansi-bright-black-fg">x</span>::Tuple<span class="ansi-bright-black-fg">{Float64, Float64, Float64}</span>, <span class="ansi-bright-black-fg">times</span>::Tuple<span class="ansi-bright-black-fg">{Float64, Float64}</span><span class="ansi-bold">)</span>
  <span class="ansi-bright-black-fg">  @</span> <span class="ansi-cyan-fg">FinanceCore</span> <span class="ansi-bright-black-fg">~/.julia/packages/FinanceCore/poZGd/src/</span><span class="ansi-bright-black-fg" style="text-decoration:underline">pv.jl:57</span>
  [4] top-level scope
- <span class="ansi-bright-black-fg">  @</span> <span class="ansi-bright-black-fg">/private/tmp/juliaactuary-fall-finalization/posts/2026-fall-releases/</span><span class="ansi-bright-black-fg" style="text-decoration:underline">index.qmd:697</span></pre>
+ <span class="ansi-bright-black-fg">  @</span> <span class="ansi-bright-black-fg">~/prog/JuliaActuary.org/posts/2026-fall-releases/</span><span class="ansi-bright-black-fg" style="text-decoration:underline">index.qmd:713</span></pre>
 </div>
 </div>
 </div>
@@ -1207,6 +1214,16 @@ Stacktrace:
 <pre><code>(0.0, nothing)</code></pre>
 </div>
 </div>
+</section>
+<section class="level3" id="lifecontingencies">
+<h3 class="anchored" data-anchor-id="lifecontingencies">LifeContingencies</h3>
+<ul>
+<li><strong>Guarantees count installments exactly.</strong> An annuity guarantees <code>certain * frequency</code> payments. Use <code>certain=0</code> for no guarantee; it replaces <code>certain=nothing</code>.</li>
+<li><strong>Payment phases are explicit.</strong> Future product PVs include annuity-due installments at the valuation date by default, while end-period payments have settled. Use <code>phase=:after</code> for a strict-future cutoff. Consistent payment-date snapping prevents floating-point drift from dropping installments or retaining settled claims.</li>
+<li><strong>Mortality tails must support the contract.</strong> Unsupported tails now raise errors instead of silently truncating products or commutation sums. Specify the actual contract term or an explicit endowment maturity when appropriate.</li>
+<li><strong>Joint-life contingencies are explicit.</strong> <code>JointLife</code> requires <code>contingency=FirstToDie()</code> or <code>contingency=LastSurvivor()</code>. <code>Independent()</code> names the independence assumption; <code>Frasier</code> remains an alias.</li>
+<li><strong>Known-status values and reserves are corrected.</strong> Fixes cover <code>alive=false</code>, last-survivor horizons, joint cashflows after death and late-duration reserve precision.</li>
+</ul>
 <div class="callout callout-style-default callout-note callout-titled">
 <div aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout" class="callout-header d-flex align-content-center collapsed" data-bs-target=".callout-5-contents" data-bs-toggle="collapse">
 <div class="callout-icon-container">
@@ -1261,6 +1278,13 @@ Stacktrace:
 <li><code>convert(to, rate)</code> replaces the three-argument <code>convert(to, rate, from)</code>, which ignored <code>from</code>. Converted rates are unchanged.</li>
 <li><code>Rate(r, f)</code> converts a rate to the convention <code>f</code>, as <code>convert(f, r)</code> does: <code>Rate(Continuous(0.05), Periodic(2))</code> is <code>Periodic(0.0506302…, 2)</code>. <code>Rate(r)</code> returns <code>r</code>.</li>
 <li><code>discount(rate, t)</code> and <code>accumulation(rate, t)</code> take a <code>Rate</code> or a number; a model without its own method gets a <code>MethodError</code> from them.</li>
+</ul>
+<p><strong>LifeContingencies</strong></p>
+<ul>
+<li>Fractional assumptions use <code>UniformDeaths()</code>, <code>ConstantForce()</code> and <code>Balducci()</code>.</li>
+<li>Custom curves must implement <code>discount(curve, from, to)</code> using the original curve origin.</li>
+<li>Product <code>survival</code>, <code>probability</code>, <code>cashflows</code> and <code>discount</code> views return vectors. Zero-duration products retain their assumptions and return empty payment streams.</li>
+<li>Obsolete internal product types and undefined lowercase exports are removed.</li>
 </ul>
 </div>
 </div>
@@ -1532,15 +1556,20 @@ Stacktrace:
 <td><a href="https://github.com/JuliaActuary/FinanceCore.jl/blob/v3.0.0/NEWS.md">Release notes</a>, including a migration table</td>
 </tr>
 <tr class="odd">
+<td>LifeContingencies</td>
+<td>3.0</td>
+<td><a href="https://github.com/JuliaActuary/LifeContingencies.jl/blob/master/docs/src/migration.md">Migration guide</a> and <a href="https://github.com/JuliaActuary/LifeContingencies.jl/blob/master/NEWS.md">NEWS</a></td>
+</tr>
+<tr class="even">
 <td>EconomicScenarioGenerators</td>
 <td>0.7.1 (final planned release)</td>
 <td><a href="https://github.com/JuliaActuary/EconomicScenarioGenerators.jl/blob/2adedcf6030cc3210af7a2c2e59c7adc85702d61/NEWS.md">Proposed release notes</a></td>
 </tr>
 </tbody>
 </table></div>
-<p>FinanceModels 7 and ActuaryUtilities 6 require FinanceCore 3, which includes the 2.8 fixes described here. FinanceModels 7 also requires Optimization 5.</p>
+<p>FinanceModels 7 and ActuaryUtilities 6 require FinanceCore 3, which includes the 2.8 fixes described here. FinanceModels 7 also requires Optimization 5. LifeContingencies 3 requires MortalityTables 3 and FinanceCore 3.</p>
 <p>EconomicScenarioGenerators 0.7.1 is planned as its final release, adding compatibility with FinanceModels 7. FinanceModels’ short-rate models, <code>simulate</code> and <code>pv_mc</code> cover its interest-rate workflows; correlated and equity scenarios are planned for FinanceModels 7.1, after which ESG is planned to be archived. Under FinanceModels 7, an ESG <code>YieldCurve</code> holds the zero rate flat before its first grid point and the forward flat after its last. Values at the grid points stay the same.</p>
-<p>If something you rely on behaves differently and isn’t covered, open an issue in <a href="https://github.com/JuliaActuary/FinanceModels.jl/issues">FinanceModels</a>, <a href="https://github.com/JuliaActuary/ActuaryUtilities.jl/issues">ActuaryUtilities</a>, <a href="https://github.com/JuliaActuary/MortalityTables.jl/issues">MortalityTables</a> or <a href="https://github.com/JuliaActuary/FinanceCore.jl/issues">FinanceCore</a>, or ask on the <a href="https://github.com/orgs/JuliaActuary/discussions">JuliaActuary discussions</a>.</p>
+<p>If something you rely on behaves differently and isn’t covered, open an issue in <a href="https://github.com/JuliaActuary/FinanceModels.jl/issues">FinanceModels</a>, <a href="https://github.com/JuliaActuary/ActuaryUtilities.jl/issues">ActuaryUtilities</a>, <a href="https://github.com/JuliaActuary/MortalityTables.jl/issues">MortalityTables</a>, <a href="https://github.com/JuliaActuary/FinanceCore.jl/issues">FinanceCore</a> or <a href="https://github.com/JuliaActuary/LifeContingencies.jl/issues">LifeContingencies</a>, or ask on the <a href="https://github.com/orgs/JuliaActuary/discussions">JuliaActuary discussions</a>.</p>
 </section>
 <section class="level2" id="ai-assistance-disclosure">
 <h2 class="anchored" data-anchor-id="ai-assistance-disclosure">AI assistance disclosure</h2>
