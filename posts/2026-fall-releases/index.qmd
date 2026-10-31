@@ -1,5 +1,5 @@
 ---
-title: "FinanceModels 7, ActuaryUtilities 6, MortalityTables 3 and FinanceCore 3"
+title: "FinanceModels 7, ActuaryUtilities 6, MortalityTables 3, FinanceCore 3 and LifeContingencies 3"
 author: "Alec Loudenback"
 date: "2026-10-11"
 categories: [code, blog]
@@ -18,11 +18,11 @@ Pkg.activate(".")
 Pkg.instantiate()
 ```
 
-Four major JuliaActuary releases improve curve calibration, interest-rate risk, valuation and mortality calculations. They add sensitivities through calibration and curve blending, simplify common calls, and fix errors that could produce plausible but incorrect results.
+Five major JuliaActuary releases improve curve calibration, interest-rate risk, life-contingent valuation and mortality calculations. They add sensitivities through calibration, curve blending and policy-value columns, simplify common calls, and fix errors that could produce plausible but incorrect results.
 
-Some fixes change the numbers in existing models: portfolio values, the sign of DV01, zero rates beyond a curve's last knot, and the age assignments of rates in eight SOA tables. The examples below explain those changes and show how to migrate.
+Some fixes change the numbers in existing models: portfolio values, the sign of DV01, zero rates beyond a curve's last knot, the age assignments of rates in eight SOA tables, and life-contingent guarantees and reserves. The sections below explain those changes and how to migrate.
 
-**FinanceModels 7.0**, **ActuaryUtilities 6.0**, **MortalityTables 3.0** and **FinanceCore 3.0** are major releases with breaking changes; FinanceCore 3.0 includes the fixes of FinanceCore 2.8. Migration guides and release notes are linked under [Upgrading](#upgrading).
+**FinanceModels 7.0**, **ActuaryUtilities 6.0**, **MortalityTables 3.0**, **FinanceCore 3.0** and **LifeContingencies 3.0** are major releases with breaking changes; FinanceCore 3.0 includes the fixes of FinanceCore 2.8. Migration guides and release notes are linked under [Upgrading](#upgrading).
 
 1. [New capabilities](#new-capabilities)
 2. [Changes affecting existing models](#changes-affecting-existing-models)
@@ -30,7 +30,7 @@ Some fixes change the numbers in existing models: portfolio values, the sign of 
 4. [Upgrading](#upgrading)
 5. [AI assistance disclosure](#ai-assistance-disclosure)
 
-The code blocks execute when the post is rendered. The [Project.toml](Project.toml) and [Manifest.toml](Manifest.toml) record the complete environment: FinanceCore 3.0.0, FinanceModels 7.0.0, ActuaryUtilities 6.0.0 and the MortalityTables 3.0.0 release commit. [Reproduction instructions](reproducibility.txt) explain how to rebuild the examples and figures; [Upgrading](#upgrading) links the migration guides.
+The code blocks execute when the post is rendered. The [Project.toml](Project.toml) and [Manifest.toml](Manifest.toml) record the environment for the executable examples: FinanceCore 3.0.0, FinanceModels 7.0.0, ActuaryUtilities 6.0.0 and the MortalityTables 3.0.0 release commit. [Reproduction instructions](reproducibility.txt) explain how to rebuild the examples and figures; [Upgrading](#upgrading) links the migration guides.
 
 ```{julia}
 using FinanceModels, FinanceCore, ActuaryUtilities, MortalityTables, ForwardDiff
@@ -439,6 +439,16 @@ The Hessian shows how those sensitivities change; the IRR is linear in the repay
  delay = ForwardDiff.derivative(t -> rate(irr([-100.0, 110.0], [0.0, t])), 1.0))
 ```
 
+### Products and policy-value columns (LifeContingencies)
+
+LifeContingencies 3 rebuilds life-contingent valuation around shared finite-state transition and payment interfaces. `Endowment(lc, n)` combines death benefits during the term with a survival benefit at an explicit maturity. Products also support MortalityTables' parametric mortality laws.
+
+`PricedPolicy(benefit, premiums)` establishes an equivalence premium once, or stores a supplied premium. `policy_value(policy, times)` returns a numeric vector for integer policy anniversaries, covering term, limited-pay, whole-life, endowment and annuity contracts. With `basis=...`, you can change valuation assumptions while retaining that premium; construct a new policy to recompute the equivalence premium. `premium_net(benefit, premiums)` also prices against an explicit premium schedule.
+
+Known-status valuation through `state=...` handles joint-life statuses and guaranteed annuity payments after death. An experimental finite-state engine extends projection and valuation to other models, with a worked long-term care example; its interfaces may change in minor releases.
+
+Net premiums and reserves remain textbook calculations. Statutory and GAAP reserve methods are outside this release's scope.
+
 ## Changes affecting existing models
 
 These changes can alter valuations, risk measures or accepted inputs. Check the assumptions and conventions your existing models use when upgrading.
@@ -725,6 +735,14 @@ Periodic(0.04, 1) + Continuous(0.01), Continuous(0.01) + Periodic(0.04, 1)
 pv(0.05, Any[]), irr(Float64[])
 ```
 
+### LifeContingencies
+
+- **Guarantees count installments exactly.** An annuity guarantees `certain * frequency` payments. Use `certain=0` for no guarantee; it replaces `certain=nothing`.
+- **Payment phases are explicit.** Future product PVs include annuity-due installments at the valuation date by default, while end-period payments have settled. Use `phase=:after` for a strict-future cutoff. Consistent payment-date snapping prevents floating-point drift from dropping installments or retaining settled claims.
+- **Mortality tails must support the contract.** Unsupported tails now raise errors instead of silently truncating products or commutation sums. Specify the actual contract term or an explicit endowment maturity when appropriate.
+- **Joint-life contingencies are explicit.** `JointLife` requires `contingency=FirstToDie()` or `contingency=LastSurvivor()`. `Independent()` names the independence assumption; `Frasier` remains an alias.
+- **Known-status values and reserves are corrected.** Fixes cover `alive=false`, last-survivor horizons, joint cashflows after death and late-duration reserve precision.
+
 ::: {.callout-note collapse="true"}
 ## Additional API changes
 
@@ -770,6 +788,13 @@ pv(0.05, Any[]), irr(Float64[])
 - `convert(to, rate)` replaces the three-argument `convert(to, rate, from)`, which ignored `from`. Converted rates are unchanged.
 - `Rate(r, f)` converts a rate to the convention `f`, as `convert(f, r)` does: `Rate(Continuous(0.05), Periodic(2))` is `Periodic(0.0506302…, 2)`. `Rate(r)` returns `r`.
 - `discount(rate, t)` and `accumulation(rate, t)` take a `Rate` or a number; a model without its own method gets a `MethodError` from them.
+
+**LifeContingencies**
+
+- Fractional assumptions use `UniformDeaths()`, `ConstantForce()` and `Balducci()`.
+- Custom curves must implement `discount(curve, from, to)` using the original curve origin.
+- Product `survival`, `probability`, `cashflows` and `discount` views return vectors. Zero-duration products retain their assumptions and return empty payment streams.
+- Obsolete internal product types and undefined lowercase exports are removed.
 
 :::
 
@@ -886,13 +911,14 @@ Use FinanceModels 7 and ActuaryUtilities 6 together for the APIs shown here. The
 | ActuaryUtilities | 6.0 | [Version upgrade guide](https://docs.juliaactuary.org/ActuaryUtilities/stable/upgrade/), including replacements for removed calls |
 | MortalityTables | 3.0 | [Release notes](https://github.com/JuliaActuary/MortalityTables.jl/blob/cae71f5750374cb234826080a7487520d87828e5/NEWS.md) |
 | FinanceCore | 3.0 | [Release notes](https://github.com/JuliaActuary/FinanceCore.jl/blob/v3.0.0/NEWS.md), including a migration table |
+| LifeContingencies | 3.0 | [Migration guide](https://github.com/JuliaActuary/LifeContingencies.jl/blob/master/docs/src/migration.md) and [NEWS](https://github.com/JuliaActuary/LifeContingencies.jl/blob/master/NEWS.md) |
 | EconomicScenarioGenerators | 0.7.1 (final planned release) | [Proposed release notes](https://github.com/JuliaActuary/EconomicScenarioGenerators.jl/blob/2adedcf6030cc3210af7a2c2e59c7adc85702d61/NEWS.md) |
 
-FinanceModels 7 and ActuaryUtilities 6 require FinanceCore 3, which includes the 2.8 fixes described here. FinanceModels 7 also requires Optimization 5.
+FinanceModels 7 and ActuaryUtilities 6 require FinanceCore 3, which includes the 2.8 fixes described here. FinanceModels 7 also requires Optimization 5. LifeContingencies 3 requires MortalityTables 3 and FinanceCore 3.
 
 EconomicScenarioGenerators 0.7.1 is planned as its final release, adding compatibility with FinanceModels 7. FinanceModels' short-rate models, `simulate` and `pv_mc` cover its interest-rate workflows; correlated and equity scenarios are planned for FinanceModels 7.1, after which ESG is planned to be archived. Under FinanceModels 7, an ESG `YieldCurve` holds the zero rate flat before its first grid point and the forward flat after its last. Values at the grid points stay the same.
 
-If something you rely on behaves differently and isn't covered, open an issue in [FinanceModels](https://github.com/JuliaActuary/FinanceModels.jl/issues), [ActuaryUtilities](https://github.com/JuliaActuary/ActuaryUtilities.jl/issues), [MortalityTables](https://github.com/JuliaActuary/MortalityTables.jl/issues) or [FinanceCore](https://github.com/JuliaActuary/FinanceCore.jl/issues), or ask on the [JuliaActuary discussions](https://github.com/orgs/JuliaActuary/discussions).
+If something you rely on behaves differently and isn't covered, open an issue in [FinanceModels](https://github.com/JuliaActuary/FinanceModels.jl/issues), [ActuaryUtilities](https://github.com/JuliaActuary/ActuaryUtilities.jl/issues), [MortalityTables](https://github.com/JuliaActuary/MortalityTables.jl/issues), [FinanceCore](https://github.com/JuliaActuary/FinanceCore.jl/issues) or [LifeContingencies](https://github.com/JuliaActuary/LifeContingencies.jl/issues), or ask on the [JuliaActuary discussions](https://github.com/orgs/JuliaActuary/discussions).
 
 ## AI assistance disclosure
 
